@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!-- 正式的要强制加https域名 | 测试的要注释这段 -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>操作指南</title>
+    <script>
+        (function(doc, win) {
+        var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            // 750 为设计稿宽度  适配rem
+            recalc = function() {
+            var clientWidth = docEl.clientWidth;
+            if (!clientWidth) return;
+            clientWidth = clientWidth <= 1080 ? clientWidth : 1080;
+            docEl.style.fontSize = (clientWidth / 750) * 100 + 'px';
+            };
+        if (!doc.addEventListener) return;
+        win.addEventListener(resizeEvt, recalc, false);
+        doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);
+    </script>
+    <script src="./static/js/jquery.min.js"></script>
+    <script src="./static/js/template-web.js"></script>
+    <style>
+        html, body, div, p, a, img{
+            padding: 0;
+            margin: 0;
+        }
+        a{
+            text-decoration: none;
+        }
+        ul, ol, li {
+            list-style: none;
+        }
+        html, body, .warp{
+            width: 100%;
+            height: 100%;
+        }
+        .warp{
+            font-size: 16px;
+        }
+        .content{
+            padding: 0 .266667rem;
+            box-sizing: border-box;
+        }
+        .title{
+            padding: .266667rem 0;
+        }
+        .myVideo{
+            width: 100%;
+            height: 3.466667rem;
+        }
+        h1{
+            padding-top: .266667rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        h1>.titleImg{
+            width: 40px;
+            height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="warp">
+        <h1><img class="titleImg" src="./static/img/logo.png" alt=""> 小竹熊操作指南</h1>
+        <div class="content">
+        </div>
+    </div>
+</body>
+<script id="temp" type="text/html">
+    {{each items}}
+    <li>
+        <p class="title"><span>{{ $value.adTitle }}</span></p>
+        <video class="myVideo" controlsList="nodownload" webkit-playsinline="true" poster="./static/img/ggGb.e44226ec.png" x5-video-orientation="portraint" preload="auto" x-webkit-airplay="true" x5-video-player-fullscreen="true" x5-video-player-type="h5-page" object-fit:fill controls="controls">
+            <source src="{{ $value.img }}" type="video/mp4" />
+            你的浏览器不支持H5播放器
+        </video>
+    </li>
+    {{/each}}
+</script>
+<script>
+    $(function(){
+        // var baseUrl = document.location.origin
+      function getQueryVariable(variable){
+       var vars = window.location.href.split("?");
+       var str = vars[vars.length - 1].split('&')[0]
+       if(str.includes(variable)) {
+           var list = str.split('=')
+        return list[list.length - 1]
+       } else {
+        return false
+       }
+    }
+        // 发送请求
+        $.ajax({
+            type: "post",
+            url: "https://www.toysbear.com/api/GetToken",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                companyNum: 'LittleBearWeb',
+                platForm: 'PC'
+            })
+        }).then(res=>{
+            if (res.result.code === 200) {
+                var Utoken = res.result.item
+                var fd = {
+                        adPosition:2,
+                        maxResultCount: 99,
+                        platform: "all",
+                        skipCount :1,
+                    }
+                if(getQueryVariable('companyType')) {fd.roleName = getQueryVariable('companyType')}
+                $.ajax({
+                    type: "post",
+                    url: "https://www.toysbear.com/api/GetAdvertisementPage",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(fd),
+                    headers: {
+                        Utoken: Utoken
+                    }
+                }).then(res=>{
+                    if (res.result.code === 200) {
+                        var data = res.result.item
+                        var html = template('temp', data)
+                        $('.content').html(html)
+                    }
+                })
+            }
+        })
+    })
+</script>
+</html>

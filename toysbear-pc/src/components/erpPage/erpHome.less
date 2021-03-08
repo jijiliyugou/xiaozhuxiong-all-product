@@ -1,0 +1,312 @@
+@deep: ~">>>";
+[v-cloak] {
+  display: none;
+}
+@my-padding:20px;
+.erpHomeWrap{
+  background-color: #F5F5F5;
+  min-height: 100vh;
+  box-sizing: border-box;
+  // 广告层
+  .advertisingLayer{
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    left: -10px;
+    top: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    .editionCenter{
+      width: 1200px;
+      margin: 0 auto;
+      height: 100%;
+      position: relative;
+      .erweimaBox{
+        position: absolute;
+        right: -130px;
+        bottom: 30px;
+        pointer-events: auto; // 关键
+        cursor: pointer;
+      }
+    }
+  }
+  // 内容层
+  .toplauotBox{
+    height: 90px;
+    width: 100%;
+    background-color: #fff;
+    box-sizing: border-box;
+    .toplauot{
+      height: 100%;
+      width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .left, .right{
+        flex: 1;
+      }
+      .left{
+        display: flex;
+        align-items: center;
+        color: #2B6AA8;
+        .titleBox{
+          margin-left: 20px;
+          .chTitle{
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 37px;
+          }
+          .enTitle{
+            font-size: 12px;
+            -webkit-transform: translateX(-10px) scale(0.9);
+            -moz-transform: translateX(-10px) scale(0.9);
+            -ms-transform: translateX(-10px) scale(0.9);
+            transform: translateX(-10px) scale(0.9);
+          }
+        }
+      }
+      .right{
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        .shouyeBox{
+          display: flex;
+          align-items: center;
+          margin-right: 60px;
+          font-weight: bold;
+          cursor: pointer;
+          .homeText{
+            color: #2D60B3;
+          }
+          .sampleText{
+            color: #999999;
+          }
+          .homeIcon{
+            width: 21px;
+            height: 21px;
+            margin-right: 10px;
+            background: url('~@/assets/images/activeHomeIcon.png') no-repeat center;
+          }
+          .mySampleIcon{
+            width: 21px;
+            height: 21px;
+            margin-right: 10px;
+            background: url('~@/assets/images/mySampleIcon.png') no-repeat center;
+          }
+        }
+        .signOutBox{
+          display: flex;
+          align-items: center;
+          .userImg{
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+          }
+          .signOut{
+            color: #666666;
+            margin-left: 17px;
+            cursor: pointer;
+          }
+        }
+        .loginBtn{
+          cursor: pointer;
+          width: 120px;
+          height: 36px;
+          background: #2D60B3;
+          opacity: 1;
+          border-radius: 100px;
+          font-weight: 400;
+          color: #FFFFFF;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
+  .bannerTong{
+    width: 100%;
+    height: 230px;
+    background-color: #2260a9;
+    background: url('~@/assets/images/erpHomeBanner.png') no-repeat center;
+    background-size: 100% 100%;
+    .bannerContext{
+      color: #FFFFFF;
+      font-family: PingFang SC;
+      width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      .contentBox{
+        position: absolute;
+        left: 47px;
+        top: 64px;
+        .title{
+          font-size: 36px;
+          font-weight: bold;
+          line-height: 50px;
+        }
+        .explain{
+          margin-top: 17px;
+          font-size: 24px;
+          font-weight: 300;
+          line-height: 33px;
+        }
+      }
+    }
+  }
+  .floorBox{
+    width: 1200px;
+    margin: 0 auto;
+    .flootTitle{
+      width: 100%;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 20px;
+      font-family: PingFang SC;
+      font-weight: bold;
+      color: #333333;
+      text-indent: 19px;
+      .more{
+        text-indent: 0;
+        color: #999999;
+        font-size: 14px;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        .moreIcon{
+          padding-top: 2px;
+          margin-left: 5px;
+        }
+      }
+    }
+    // 展厅列表样式
+    .exhibitionList{
+      background-color: #fff;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 20px;
+      .bigExhibitions{
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        overflow: hidden;
+        // overflow-y: hidden;
+        // overflow-x: auto;
+        // &::-webkit-scrollbar {
+        //   display: none;
+        // }
+        .bigExhibitionItem{
+          width: 273px;
+          height: 155px;
+          display: inline-block;
+          margin-right: 20px;
+          cursor: pointer;
+          &:last-of-type{
+            margin-right: 0;
+          }
+          .imgBox{
+            width: 273px;
+            height: 121px;
+            .hallLogo{
+              width: 273px;
+              height: 121px;
+            }
+          }
+          .hallName{
+            height: 50px;
+            width: 273px;
+            line-height: 50px;
+            text-align: center;
+            overflow: hidden;/*超出部分隐藏*/
+            white-space: nowrap;/*不换行*/
+            text-overflow:ellipsis;/*超出部分文字以...显示*/
+          }
+        }
+      }
+      .minExhibitions{
+        margin-top: 20px;
+        .minExhibitionItem{
+          width: 127px;
+          display: inline-block;
+          margin-right: 20px;
+          cursor: pointer;
+          &:last-of-type{
+            margin-right: 0;
+          }
+          .imgBox{
+            width: 127px;
+            height: 70px;
+            .hallLogo{
+              width: 127px;
+              height: 70px;
+            }
+          }
+          .hallName{
+            width: 127px;
+            margin-top: 10px;
+            text-align: center;
+            overflow: hidden;/*超出部分隐藏*/
+            white-space: nowrap;/*不换行*/
+            text-overflow:ellipsis;/*超出部分文字以...显示*/
+          }
+        }
+      }
+    }
+    // 新品样式
+    .newArrivals{
+      width: 100%;
+      height: 278px;
+      background-color: #fff;
+      box-sizing: border-box;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      .itemBox{
+        // height: 238px;
+        width: 180px;
+        box-sizing: border-box;
+        &:last-of-type{
+          margin: 0;
+        }
+        .imgBox{
+          width: 180px;
+          height: 136px;
+          .hallLogo{
+            width: 180px;
+            height: 136px;
+          }
+        }
+        .contentText{
+          width: 180px;
+          height: 102px;
+          display: flex;
+          .hallName{
+            width: 180px;
+            margin-top: 10px;
+            overflow: hidden;/*超出部分隐藏*/
+            white-space: nowrap;/*不换行*/
+            text-overflow:ellipsis;/*超出部分文字以...显示*/
+            .name{
+              font-size: 16px;
+              font-weight: 400;
+              line-height: 44px;
+            }
+            .textItem{
+              font-size: 14px;
+              line-height: 22px;
+              color: #999;
+              .price{
+                color: #FF0032;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

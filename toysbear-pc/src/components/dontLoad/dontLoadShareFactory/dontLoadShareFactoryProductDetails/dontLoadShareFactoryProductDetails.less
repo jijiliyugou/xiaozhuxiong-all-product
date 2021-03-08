@@ -1,0 +1,144 @@
+@deep: ~">>>";
+.baojia {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  box-sizing: border-box;
+  font-size: 0.32rem;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  .productBox {
+    width: 100%;
+    padding: .266667rem;
+    box-sizing: border-box;
+    @{deep} .el-carousel__button {
+      width: .133333rem;
+      height: .133333rem;
+      border-radius: .066667rem;
+    }
+    @{deep} .myImgBox {
+      width: 100%;
+      height: 300px;
+      box-sizing: border-box;
+      position: relative;
+      .newIcon {
+        width: .933333rem;
+        height: .933333rem;
+        background: url('~@/assets/images/new.png') no-repeat center;
+        background-size: 100% 100%;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+      }
+      .videoIcon {
+        width: 1.333333rem;
+        height: 1.333333rem;
+        border-radius: .666667rem;
+        background: url('~@/assets/images/videoIcon.png') no-repeat center;
+        background-size: 100% 100%;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .myImg {
+        width: 100%;
+        height: 300px;
+        position: static;
+        img {
+          position: static;
+        }
+      }
+      .el-carousel__button {
+        width: 10px;
+        height: 10px;
+        border-radius: 5px;
+      }
+    }
+  }
+  .priceBox {
+    padding: .266667rem;
+    padding-top: 0;
+    box-sizing: border-box;
+    .price {
+      color: #FF0032;
+    }
+    .productName {
+      font-weight: 500;
+      margin: .133333rem 0;
+    }
+    .iconListBox {
+      display: flex;
+      .right,.middle {
+        flex: 1;
+        .vipIcon {
+          margin-left: .133333rem;
+          width: .8rem;
+          height: .4rem;
+          background: url('~@/assets/images/vip.png') no-repeat center;
+          background-size: 100% 100%;
+        }
+        .presentIcon {
+          margin-left: .133333rem;
+          width: .666667rem;
+          height: .4rem;
+          background: url('~@/assets/images/present.png') no-repeat center;
+          background-size: 100% 100%;
+        }
+        .cardIcon {
+          margin-left: .133333rem;
+          width: .466667rem;
+          height: .4rem;
+          background: url('~@/assets/images/card.png') no-repeat center;
+          background-size: 100% 100%;
+        }
+        .dateIcon {
+          margin-right: .133333rem;
+          width: .346667rem;
+          height: .346667rem;
+          background: url('~@/assets/images/报价分享时间.png') no-repeat center;
+          background-size: 100% 100%;
+        }
+      }
+      .right,.middle,.right {
+        display: flex;
+        align-items: center;
+      }
+      .right {
+        justify-content: flex-end;
+        font-size: .266667rem;
+      }
+    }
+  }
+  .line {
+    width: 100%;
+    height: .266667rem;
+    background-color: #f5f5f5;
+  }
+  .contentText {
+    padding: .266667rem;
+    box-sizing: border-box;
+    color: #333;
+    font-size: .28rem;
+    .sourceBox {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .conText {
+      .conTextTitle {
+        color: #239BF7;
+        margin-top: .266667rem;
+      }
+      .item {
+        display: flex;
+        align-items: center;
+        margin-top: .066667rem;
+        .title {
+          color: #999999;
+        }
+      }
+    }
+  }
+}

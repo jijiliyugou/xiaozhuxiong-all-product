@@ -1,0 +1,413 @@
+@deep: ~">>>";
+.baojia {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  box-sizing: border-box;
+  font-size: 0.32rem;
+  padding-top: 2.133334rem;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  .searchBox {
+    width: 100%;
+    padding: .266667rem;
+    box-sizing: border-box;
+    background-color: #fff;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    .keyWordSearch {
+      height: 0.7rem;
+      background: #eceeef;
+      border-radius: 0.453333rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
+      .el-input{
+        height: 100%;
+        background-color: transparent;
+        flex: 1;
+        @{deep} input{
+          height: 100%;
+          background-color: transparent;
+          width: 100%;
+          border: none;
+          font-size: 0.3rem;
+        }
+      }
+      .el-button{
+        width: 1.866667rem;
+        height: 100%;
+        border-radius: 0.5rem;
+        // font-size: 0.346667rem;
+        font-size: 0.32rem;
+        background-color: #165AF7;
+      }
+    }
+    .filterProduct{
+      width: 100%;
+      height: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.293333rem;
+      color: #707070;
+      border-bottom: 1px solid #ebeef5;
+      .filterItem{
+        flex: 1;
+      }
+      .more{
+        display: flex;
+        justify-content: flex-end;
+        i.list{
+          display: block;
+          width: 0.4rem;
+          height: 0.4rem;
+          background: url('~@/assets/images/格式化列表.png') no-repeat center;
+          background-size: contain;
+        }
+        i.square{
+          display: block;
+          width: 0.4rem;
+          height: 0.4rem;
+          background: url('~@/assets/images/liebiao2.png') no-repeat center;
+          background-size: contain;
+        }
+      }
+      .active {
+        color: #165AF7;
+      }
+    }
+    .screens,.category{
+      position: absolute;
+      width: 100%;
+      font-size: 0.25rem;
+      box-sizing: border-box;
+      left: 0;
+      background-color: #fff;
+      box-shadow: 1px 3px 10px 1px rgba(0, 60, 200, 0.1);
+    }
+    .screens{
+      .contentWrap{
+        padding: 0.366667rem 0.2rem;
+        padding-bottom: 0;
+        .item{
+        display: flex;
+        justify-content: space-between;
+        .left,.right{
+          flex: 1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          box-sizing: border-box;
+          .title{
+            flex: 1;
+            white-space:nowrap;
+          }
+        }
+        .left{
+          padding-right: 0.133333rem;
+        }
+      }
+    }
+      
+      .selectImg, .packing {
+        display: flex;
+        align-items: center;
+        margin-top: 0.266667rem;
+      }
+      .selectImg {
+        .title{
+          margin-right:0.266667rem;
+        }
+      }
+      .submitBtnList {
+        margin-top: 0.5rem;
+        display: flex;
+        .reset,.submit{
+          flex: 1;
+          text-align: center;
+          padding: 0.2rem;
+          margin: 0;
+          border: none;
+          border-radius: 0;
+          font-size: 0.25rem;
+        }
+        .reset{
+          background-color: #ccc;
+          color: #000;
+        }
+        .submit{
+          background-color: #165af7;
+        }
+      }
+    }
+    .category{
+      .contentWrap{
+        height: 5.333333rem;
+        bottom: -5.333333rem;
+        display: flex;
+        justify-content: space-between;
+      .leftCate{
+        width: 2rem;
+        height: 100%;
+        padding: 0.2rem 0;
+        box-sizing: border-box;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .cateItens{
+          flex: 1;
+          display: flex;
+          flex-wrap: wrap;
+          align-content: flex-start;
+          overflow-x: hidden;
+          overflow-y: scroll;
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE 10+ */
+          &::-webkit-scrollbar {
+            display: none; /* Chrome Safari */
+          }
+          .item{
+            width: 100%;
+            padding-bottom: 0.2rem;
+            margin: 0;
+            box-sizing: border-box;
+            background-color: #fff;
+            &:last-of-type{
+              padding: 0;
+            }
+            &.active{
+              color: #165af7;
+            }
+          }
+        }
+      }
+      .rightCate{
+        flex: 1;
+        height: 100%;
+        background-color: #e4f3ff;
+        padding: 0.2rem 0.2rem;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .allCateCount{
+          padding-bottom: 0.2rem;
+          &.active {
+            color: #165af7;
+          }
+        }
+        .cateItens{
+          width: 100%;
+          display: flex;
+          flex: 1;
+          flex-wrap: wrap;
+          align-content: flex-start;
+          overflow-x: hidden;
+          overflow-y: scroll;
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE 10+ */
+          &::-webkit-scrollbar {
+            display: none; /* Chrome Safari */
+          }
+          .item{
+            margin-right: 0.3rem;
+            &.active{
+              color: #165af7;
+            }
+          }
+        }
+      }
+      }
+      .submitBtnList {
+        display: flex;
+        .reset,.submit{
+          flex: 1;
+          text-align: center;
+          padding: 0.2rem;
+          margin: 0;
+          border: none;
+          border-radius: 0;
+          font-size: 0.25rem;
+        }
+        .reset{
+          background-color: #ccc;
+          color: #000;
+        }
+        .submit{
+          background-color: #165af7;
+        }
+      }
+    }
+  }
+  .productBox {
+    width: 100%;
+    padding: 0 .266667rem;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    .item {
+      margin-bottom: .266667rem;
+      width: 3.35rem;
+      height: 6rem;
+      border-radius: 5px;
+      box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.14);
+      .myImgBox {
+        position: relative;
+        width: 3.35rem;
+        height: 3.35rem;
+        .myImg {
+          width: 3.35rem;
+          height: 3.35rem;
+        }
+        .newIcon {
+          width: .933333rem;
+          height: .933333rem;
+          background: url('~@/assets/images/new.png') no-repeat center;
+          background-size: 100% 100%;
+          position: absolute;
+          left: -1px;
+          top: -1px;
+        }
+      }
+      .context {
+        width: 100%;
+        height: 1.866667rem;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        .itemText {
+          color: #000;
+          font-weight: 400;
+          padding: 10px;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          &.name {
+            font-size: 20px;
+            font-weight: 500;
+          }
+          .price { 
+            color: #FF0032;
+          }
+        }
+      }
+      .iconBox {
+        width: 100%;
+        height: .7rem;
+        display: flex;
+        align-items: center;
+        .vipIcon {
+          width: .8rem;
+          height: .4rem;
+          margin-left: .2rem;
+          background: url('~@/assets/images/vip.png') no-repeat center;
+          background-size: contain;
+        }
+        .presentIcon {
+          width: .666667rem;
+          height: .4rem;
+          margin-left: .2rem;
+          background: url('~@/assets/images/present.png') no-repeat center;
+          background-size: contain;
+        }
+        .cardIcon {
+          width: .4rem;
+          height: .4rem;
+          margin-left: .2rem;
+          background: url('~@/assets/images/card.png') no-repeat center;
+          background-size: 100% 100%;
+        }
+      }
+    }
+  }
+  .productListBox {
+    width: 100%;
+    padding: 0 .266667rem;
+    box-sizing: border-box;
+    .itemBox {
+      width: 100%;
+      background: #FFFFFF;
+      box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.14);
+      margin: .266667rem 0;
+      .top {
+        display: flex;
+        align-items: center;
+        padding: .266667rem 0;
+        .left {
+          width: 2.666667rem;
+          position: relative;
+          .myImg {
+            width: 2.666667rem;
+            height: 2.666667rem;
+            img {
+              width: 2.666667rem;
+              height: 2.666667rem;
+            }
+          }
+          .newIcon {
+            width: .933333rem;
+            height: .933333rem;
+            background: url('~@/assets/images/new.png') no-repeat center;
+            background-size: 100% 100%;
+            position: absolute;
+            left: -1px;
+            top: -1px;
+          }
+        }
+        .right {
+          width: 4.2rem;
+          margin-left: .066667rem;
+          font-size: .266667rem;
+          color: #333333;
+          .productName {
+            color: #000;
+            font-size: .32rem;
+          }
+          .item {
+            margin-top: .066667rem;
+            overflow: hidden;/*超出部分隐藏*/
+            white-space: nowrap;/*不换行*/
+            text-overflow:ellipsis;/*超出部分文字以...显示*/
+            .value {
+              color: #666666;
+            }
+            .price {
+              color: #F51E12;
+              font-weight: bold;
+              font-size: .293333rem;
+            }
+          }
+        }
+      }
+      .bottom {
+        padding: .266667rem .4rem;
+        color: #57B568;
+        font-size: .266667rem;
+        border-top: 1px solid #EEEEEE;
+      }
+    }
+  }
+}
+@{deep} .el-select-dropdown {
+  z-index: 2;
+}
+.el-select-dropdown__wrap {
+  max-height: 3.653333rem;
+    .el-select-dropdown__list {
+    padding: 0.08rem 0;
+    .el-select-dropdown__item{
+      font-size: 0.266667rem;
+      padding: 0 0.266667rem;
+      height: 0.666667rem;
+      line-height: 0.666667rem;
+    }
+  }
+}
