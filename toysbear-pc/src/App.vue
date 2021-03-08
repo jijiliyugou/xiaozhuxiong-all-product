@@ -64,7 +64,7 @@ export default {
   methods: {
     // 去购物车
     toMyShoppingCart() {
-      console.log(123);
+      console.log(1234);
     },
     // 初始化IM
     // initIM() {
