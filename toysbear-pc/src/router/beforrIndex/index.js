@@ -40,7 +40,11 @@ export default {
     {
       path: "product",
       name: "Product",
-      component: Product
+      component: Product,
+      meta: {
+        title: "产品列表",
+        keepAlive: true
+      }
     },
     {
       path: "productDetail/:id",

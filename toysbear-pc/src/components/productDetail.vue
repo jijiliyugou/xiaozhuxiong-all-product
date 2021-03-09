@@ -399,7 +399,6 @@ export default {
       this.getIntegralTotal();
   },
   mounted() {
-    // this.getUpdateIntegral()
     this.getProductByNumber();
   }
 };

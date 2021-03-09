@@ -17,17 +17,55 @@
                 style="width: 90%"
               ></el-input>
             </el-form-item>
-            <el-form-item label="时间段搜索">
-              <el-date-picker
-                v-model="searchForm.dateTile"
-                value-format="yyyy-MM-ddTHH:mm:ss"
-                type="datetimerange"
-                :picker-options="pickerOptions"
-                range-separator="—"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                align="right"
-              ></el-date-picker>
+            <el-form-item label="类型查询：">
+              <el-select
+                clearable
+                v-model="searchForm.companyType"
+                placeholder="请选择"
+                style="width: 90%"
+              >
+                <el-option
+                  v-for="item in [
+                    { itemCode: null, itemText: '全部' },
+                    ...clientTypeList
+                  ]"
+                  :key="item.itemCode"
+                  :label="item.itemText"
+                  :value="item.itemCode"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="审核状态：">
+              <el-select
+                clearable
+                v-model="searchForm.auditState"
+                placeholder="请选择"
+                style="width: 90%"
+              >
+                <el-option
+                  v-for="(item, index) in [
+                    {
+                      itemText: '全部',
+                      itemCode: null
+                    },
+                    {
+                      itemText: '未审核',
+                      itemCode: 0
+                    },
+                    {
+                      itemText: '审核通过',
+                      itemCode: 1
+                    },
+                    {
+                      itemText: '拒绝',
+                      itemCode: 2
+                    }
+                  ]"
+                  :key="index"
+                  :label="item.itemText"
+                  :value="item.itemCode"
+                ></el-option>
+              </el-select>
             </el-form-item>
             <el-form-item class="btnList">
               <el-button type="primary" @click="search">查询</el-button>
@@ -48,8 +86,9 @@
             ></el-table-column>
             <el-table-column prop="companyType" label="公司类型">
               <template slot-scope="scope">
-                <template v-for="(item, i) in companyTypeList">
+                <template v-for="(item, i) in clientTypeList">
                   <el-tag
+                    disable-transitions
                     :key="i"
                     :type="tags[i]"
                     v-if="scope.row.companyType === item.itemCode"
@@ -70,12 +109,15 @@
             <el-table-column prop="qq" label="QQ"></el-table-column>
             <el-table-column prop="auditState" label="审核状态">
               <template slot-scope="scope">
-                <template v-for="(item, i) in userAuditTypeList">
-                  <el-tag
-                    :type="tagss[item.itemCode]"
-                    :key="i"
-                    v-if="scope.row.auditState == item.itemCode"
-                    >{{ item.itemText }}</el-tag
+                <template>
+                  <el-tag type="primary" v-if="scope.row.auditState === 0"
+                    >未审核</el-tag
+                  >
+                  <el-tag type="success" v-else-if="scope.row.auditState === 1"
+                    >审核通过</el-tag
+                  >
+                  <el-tag type="danger" v-else-if="scope.row.auditState === 2"
+                    >拒绝</el-tag
                   >
                 </template>
               </template>
@@ -219,10 +261,12 @@
 <script>
 import bsTop from "@/components/BsTop";
 import bsFooter from "@/components/oldFooter";
+import { getClientTypeList } from "@/assets/js/common.js";
 export default {
   components: { bsTop, bsFooter },
   data() {
     return {
+      clientTypeList: [],
       offAuditTypeList: [],
       userAuditTypeList: [],
       companyTypeList: [],
@@ -244,53 +288,10 @@ export default {
       currentPage: 1,
       pageSize: 10,
       tableData: [],
-      // addVersionRules: {
-      //   platForm: [
-      //     { required: true, message: '请选择手机平台', trigger: 'change' }
-      //   ],
-      //   vesion: [
-      //     { required: true, message: '请输入版本号', trigger: 'blur' },
-      //     { min: 1, max: 9999, message: '请输入版本号', trigger: 'blur' }
-      //   ],
-      //   fileUrl: [
-      //     { required: true, message: '请输入链接地址', trigger: 'blur' },
-      //     { min: 1, max: 9999, message: '请输入链接地址', trigger: 'blur' }
-      //   ]
-      // },
-      pickerOptions: {
-        shortcuts: [
-          {
-            text: "最近一周",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近一个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit("pick", [start, end]);
-            }
-          },
-          {
-            text: "最近三个月",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit("pick", [start, end]);
-            }
-          }
-        ]
-      },
       searchForm: {
         keyword: null,
-        dateTile: []
+        auditState: null,
+        companyType: null
       }
     };
   },
@@ -300,14 +301,21 @@ export default {
       this.currentPage = 1;
       this.getCompanyAuditPage();
     },
+    // 获取拒绝原因
+    async getOffAuditTypeList() {
+      const res = await this.$http.post("/api/ServiceConfigurationList", {
+        basisParameters: "offAuditType"
+      });
+      if (res.data.result.code === 200) {
+        this.offAuditTypeList = res.data.result.item;
+      } else this.$message.error(res.data.result.msg);
+    },
     // 获取所有公司
     async getCompanyAuditPage() {
       const fd = {
+        ...this.searchForm,
         skipCount: this.currentPage,
-        maxResultCount: this.pageSize,
-        endTime: this.searchForm.dateTile && this.searchForm.dateTile[1],
-        startTime: this.searchForm.dateTile && this.searchForm.dateTile[0],
-        keyword: this.searchForm.keyword
+        maxResultCount: this.pageSize
       };
       for (const key in fd) {
         if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
@@ -352,24 +360,7 @@ export default {
     },
     // 获取公司类型列表
     async getCompanyTypeList(type) {
-      const res = await this.$http.post("/api/ServiceConfigurationList", {
-        basisParameters: type
-      });
-      if (res.data.result.code === 200) {
-        switch (type) {
-          case "CompanyType":
-            this.companyTypeList = res.data.result.item;
-            break;
-          case "userAuditType":
-            this.userAuditTypeList = res.data.result.item;
-            break;
-          case "offAuditType":
-            this.offAuditTypeList = res.data.result.item;
-            break;
-        }
-      } else {
-        this.$message.error(res.data.result.msg);
-      }
+      this.clientTypeList = await getClientTypeList(type, this);
     }
   },
   watch: {},
@@ -378,8 +369,7 @@ export default {
   },
   created() {
     this.getCompanyTypeList("CompanyType");
-    this.getCompanyTypeList("userAuditType");
-    this.getCompanyTypeList("offAuditType");
+    this.getOffAuditTypeList();
   }
 };
 </script>

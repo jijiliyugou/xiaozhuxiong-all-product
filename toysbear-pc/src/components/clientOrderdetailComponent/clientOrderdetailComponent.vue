@@ -19,10 +19,6 @@
               }}</span>
             </li>
           </div>
-          <!-- <li class="totlePrice">
-            <span>总款数：</span>
-            <span class="content">{{ tableData.totalKuanshu }}</span>
-          </li> -->
         </ul>
         <div class="btns">
           <el-button type="primary" @click="openSelectTemplate">
@@ -59,7 +55,6 @@
       :data="tableData.shareOrderDetails && tableData.shareOrderDetails.items"
       :header-cell-style="{ backgroundColor: '#2468a9', color: '#fff' }"
       style="width:100%"
-      ref="dataTable"
       height="600px"
     >
       <el-table-column
@@ -140,27 +135,6 @@
         </template>
       </el-table-column>
       <el-table-column label="产品规格(CM)" width="100" align="center">
-        <!-- <el-table-column
-            label="长"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.pr_le }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="宽"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.pr_wi }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="高"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.pr_hi }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>
             {{ scope.row.pr_le }} x {{ scope.row.pr_wi }} x
@@ -169,27 +143,6 @@
         </template>
       </el-table-column>
       <el-table-column label="包装规格(CM)" width="100" align="center">
-        <!-- <el-table-column
-            label="长"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.in_le }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="宽"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.in_wi }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="高"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.in_hi }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>
             {{ scope.row.in_le }} x {{ scope.row.in_wi }} x
@@ -198,27 +151,6 @@
         </template>
       </el-table-column>
       <el-table-column label="外箱规格(CM)" width="100" align="center">
-        <!-- <el-table-column
-            label="长"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.ou_le }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="宽"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.ou_wi }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="高"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.ou_hi }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>
             {{ scope.row.ou_le }} x {{ scope.row.ou_wi }} x
@@ -227,39 +159,11 @@
         </template>
       </el-table-column>
       <el-table-column label="毛重/净重(KG)" align="center">
-        <!-- <el-table-column
-            label="毛重"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.gr_we }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="净重"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.ne_we }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>{{ scope.row.gr_we }}/{{ scope.row.ne_we }}</div>
         </template>
       </el-table-column>
       <el-table-column label="体积/材积(CBM/CUFT)" width="90" align="center">
-        <!-- <el-table-column
-            label="体积"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.bulk_stere }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="材积"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.bulk_feet }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>{{ scope.row.bulk_stere }}/{{ scope.row.bulk_feet }}</div>
         </template>
@@ -278,25 +182,6 @@
       </el-table-column>
       <el-table-column label="展厅来源" align="center" prop="exhibitionName">
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center" width="200">
-          <template slot-scope="scope">
-            <el-button
-              style="margin-right:10px;"
-              size="mini"
-              type="primary"
-              @click="openOrderDetail(scope.row)"
-              >查看订单</el-button
-            >
-            <el-popconfirm
-              title="确定要删除这个版本吗？"
-              @onConfirm="handleDelete(scope.row)"
-            >
-              <el-button size="mini" slot="reference" type="danger"
-                >删除</el-button
-              >
-            </el-popconfirm>
-          </template>
-        </el-table-column> -->
     </el-table>
     <center style="margin-top:20px;">
       <el-pagination
@@ -320,7 +205,6 @@
         top="60px"
         width="80%"
       >
-        <!-- <div class="box" style="height:500px;"> -->
         <el-card class="box-card">
           <div
             slot="header"
@@ -438,7 +322,7 @@ export default {
       showViewer: false,
       exportTemplateDialog: false,
       isOrderDetailDialog: false,
-      tableData: [],
+      tableData: {},
       currentPage: 1,
       pageSize: 10,
       totalCount: 0
@@ -449,7 +333,7 @@ export default {
     exportOrder(type) {
       const fd = {
         templateType: type,
-        shareOrderNumber: this.tableData.shareOrderNumber
+        shareOrderNumber: this.shareOrderNumber
       };
       this.$http
         .post("/api/ExportCustomerOrderDetailToExcel", fd, {
@@ -491,10 +375,6 @@ export default {
     openSelectTemplate() {
       this.exportTemplateDialog = true;
     },
-    // 打开订单详情
-    openOrderDetail() {
-      this.isOrderDetailDialog = true;
-    },
     // 获取分享客户订单
     async getSearchCompanyShareOrderDetailsPage() {
       const res = await this.$http.post(
@@ -509,7 +389,6 @@ export default {
       if (res.data.result.code === 200) {
         this.tableData = res.data.result.item;
         this.totalCount = res.data.result.item.shareOrderDetails.totalCount;
-        this.$refs.dataTable.toggleAllSelection();
       } else {
         this.$message.error(res.data.result.msg);
       }

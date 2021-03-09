@@ -1,4 +1,7 @@
-// 获取年月日时分秒
+/**
+ * 获取年月日时分秒
+ * @returns YYYYmmddhhmfss
+ */
 export function getCurrentTime() {
   let yy = new Date().getFullYear();
   let mm = new Date().getMonth() + 1;
@@ -20,4 +23,24 @@ export function getCurrentTime() {
     mf.toString() +
     ss.toString()
   );
+}
+
+/**
+ * 获取公司类型列表
+ * @returns Promise<any>
+ */
+export function getClientTypeList(type, _that) {
+  return new Promise((result, reject) => {
+    _that.$http
+      .post("/api/ServiceConfigurationList", {
+        basisParameters: type
+      })
+      .then(res => {
+        if (res.data.result.code === 200) {
+          result(res.data.result.item);
+        } else {
+          reject([]);
+        }
+      });
+  });
 }

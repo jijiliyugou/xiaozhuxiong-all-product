@@ -10,7 +10,6 @@ import "element-ui/lib/theme-chalk/index.css";
 import "element-ui/lib/theme-chalk/display.css";
 import "@/assets/css/theme/index.css";
 import RTM from "@/assets/js/signalROptions";
-// import IM from "@/assets/js/im.js";
 import Video from "video.js";
 import "video.js/dist/video-js.css";
 import "@/assets/css/globalVariable.less";

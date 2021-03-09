@@ -4,6 +4,15 @@ import axios from "axios";
 import createPersistedState from "vuex-persistedstate";
 import globalJson from "./Json.js";
 Vue.use(Vuex);
+function myForEach(oList, yList) {
+  for (let i = 0; i < oList.length; i++) {
+    for (let j = 0; j < yList.length; j++) {
+      if (oList[i].productNumber === yList[j].productNumber) {
+        oList.splice(i, 1);
+      }
+    }
+  }
+}
 export default new Vuex.Store({
   state: {
     historyNames: [],
@@ -42,10 +51,25 @@ export default new Vuex.Store({
     currentComparnyId: null
   },
   mutations: {
+    initShoppingCart(state, payLoad) {
+      const key = state.userInfo.uid;
+      Vue.prototype.$set(state, key, payLoad);
+    },
+    // 修改数量方法
+    replaceShoppingCartValueCount(state, payLoad) {
+      const key = state.userInfo.uid;
+      for (let i = 0; i < state[key].length; i++) {
+        for (const keys in state[key][i]) {
+          Vue.prototype.$set(state[key][i], keys, payLoad[i][keys]);
+        }
+      }
+      localStorage.setItem(key, JSON.stringify(state[key]));
+    },
     // 更新购物车
     resetShoppingCart(state, payLoad) {
       const key = state.userInfo.uid;
-      Vue.prototype.$set(state, key, payLoad);
+      myForEach(state[key], payLoad);
+      localStorage.setItem(key, JSON.stringify(state[key]));
     },
     // 加购
     pushShopping(state, payLoad) {
@@ -57,11 +81,7 @@ export default new Vuex.Store({
         payLoad.index = 1;
         Vue.prototype.$set(state, key, [payLoad]);
       }
-      const fd = {
-        key: key,
-        value: state[key]
-      };
-      localStorage.setItem("shoppingCart", JSON.stringify(fd));
+      localStorage.setItem(key, JSON.stringify(state[key]));
     },
     // 删除购物车某指定一个商品
     popShopping(state, payLoad) {
@@ -70,11 +90,7 @@ export default new Vuex.Store({
         if (state[key][i].productNumber === payLoad.productNumber)
           state[key].splice(i, 1);
       }
-      const fd = {
-        key: key,
-        value: state[key]
-      };
-      localStorage.setItem("shoppingCart", JSON.stringify(fd));
+      localStorage.setItem(key, JSON.stringify(state[key]));
     },
     handlerBeforeSearchKeyWord(state, value) {
       state.beforeSearch.name = value;

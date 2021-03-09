@@ -752,7 +752,7 @@ export default {
 }
 @{deep} .el-container {
   height: 100%;
-  height: 100vh;
+  min-height: 100vh;
   .el-main {
     min-height: calc(100% - 222px);
   }

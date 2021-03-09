@@ -213,7 +213,7 @@
       </div>
       <!-- 产品列表 -->
       <productList
-        v-if="!isProductDetail"
+        v-show="!isProductDetail"
         ref="childrenProduct"
         @showProductDetail="showProductDetail"
         @handlerCubeImgEvent="handlerCubeImgEvent"

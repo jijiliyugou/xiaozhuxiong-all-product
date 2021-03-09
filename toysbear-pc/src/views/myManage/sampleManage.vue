@@ -98,7 +98,6 @@
           top="60px"
           width="80%"
         >
-          <!-- <div class="box" style="height:500px;"> -->
           <el-card class="box-card">
             <div
               slot="header"
@@ -232,11 +231,11 @@
 import bsTop from "@/components/BsTop";
 import bsFooter from "@/components/oldFooter";
 import { mapState } from "vuex";
-import ElImageViewer from "element-ui/packages/image/src/image-viewer";
 import { getCurrentTime } from "@/assets/js/common.js";
 import companySampleDetailComponent from "@/components/companySampleDetailComponent/companySampleDetailComponent.vue";
+import ElImageViewer from "element-ui/packages/image/src/image-viewer";
 export default {
-  components: { bsTop, bsFooter, ElImageViewer, companySampleDetailComponent },
+  components: { bsTop, bsFooter, companySampleDetailComponent, ElImageViewer },
   data() {
     return {
       isOrderDetailDialog: false,
@@ -366,11 +365,6 @@ export default {
   justify-content: space-between;
   .inputList {
     flex: 1;
-  }
-}
-@{deep} .el-image-viewer__wrapper {
-  .el-image-viewer__mask {
-    opacity: 0.1;
   }
 }
 </style>

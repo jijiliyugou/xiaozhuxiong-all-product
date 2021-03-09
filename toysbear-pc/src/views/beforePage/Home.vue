@@ -395,6 +395,10 @@ export default {
     },
     // 提交搜索
     subSearch(flag) {
+      if (!this.$store.state.isLogin) {
+        this.$message.error("请先登录后再进行搜索");
+        return false;
+      }
       if (flag !== true) this.keywordActive = null;
       this.$store.commit("handlerBeforeSearchImg", null);
       this.$store.commit("handlerBeforeSearchImgPreview", null);
@@ -497,6 +501,10 @@ export default {
     },
     // 选择图片搜索
     changeUpload(e) {
+      if (!this.$store.state.isLogin) {
+        this.$message.error("请先登录后再进行搜索");
+        return false;
+      }
       this.fileinfo = e.target.files[0];
       const isLt5M = this.fileinfo.size / 1024 / 1024 < 3;
       if (!isLt5M) {

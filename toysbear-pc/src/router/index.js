@@ -3,6 +3,10 @@ import VueRouter from "vue-router";
 import store from "@/store";
 import axios from "axios";
 import { staticRouters, setMenuTree } from "./routers";
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err);
+};
 Vue.use(VueRouter);
 function getToken() {
   return new Promise((result, reject) => {
@@ -25,7 +29,17 @@ export const router = new VueRouter({
   linkActiveClass: "router-link-active",
   mode: "hash",
   // mode: "history",
-  routes: staticRouters
+  routes: staticRouters,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return {
+        x: 0,
+        y: 0
+      };
+    }
+  }
 });
 export async function getMenuFuc() {
   const list = store.state.routers;

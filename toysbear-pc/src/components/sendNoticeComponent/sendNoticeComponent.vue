@@ -226,6 +226,7 @@
 
 <script>
 import draggable from "vuedraggable";
+import ElImageViewer from "element-ui/packages/image/src/image-viewer";
 export default {
   props: {
     options: {
@@ -233,7 +234,8 @@ export default {
     }
   },
   components: {
-    draggable
+    draggable,
+    ElImageViewer
   },
   data() {
     return {

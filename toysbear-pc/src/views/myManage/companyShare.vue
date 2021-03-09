@@ -34,15 +34,6 @@
             style="width: 100%"
             :default-sort="{ prop: 'date', order: 'descending' }"
           >
-            <!-- <el-table-column type="expand">
-           <template slot-scope="props">
-             <el-form label-position="left" inline class="demo-table-expand">
-              <el-form-item label="客户：">
-                <el-tag style="margin-left:20px;" v-for="(item, i) in props.row.customerInfos" :key="i">{{ item.name }}</el-tag>
-              </el-form-item>
-            </el-form>
-           </template>
-        </el-table-column> -->
             <el-table-column prop="shareUrl" label="网址">
               <template slot-scope="scope">
                 <div :id="scope.row.id">

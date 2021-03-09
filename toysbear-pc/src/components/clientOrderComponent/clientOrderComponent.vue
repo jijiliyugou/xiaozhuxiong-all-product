@@ -57,14 +57,6 @@
             @click="openOrderDetail(scope.row)"
             >查看订单</el-button
           >
-          <!-- <el-popconfirm
-              title="确定要删除这个版本吗？"
-              @onConfirm="handleDelete(scope.row)"
-            >
-              <el-button size="mini" slot="reference" type="danger"
-                >删除</el-button
-              >
-            </el-popconfirm> -->
         </template>
       </el-table-column>
     </el-table>

@@ -95,12 +95,13 @@ export default {
           res.data.result.commparnyList[0].commparnyId
         );
         this.$store.commit("updateAppLoading", true);
-        let localShoppingCart = localStorage.getItem("shoppingCart");
+        const localKey = res.data.result.uid;
+        let localShoppingCart = localStorage.getItem(localKey);
         if (localShoppingCart) {
           localShoppingCart = JSON.parse(localShoppingCart);
-          if (localShoppingCart.key === res.data.result.uid) {
-            this.$store.commit("resetShoppingCart", localShoppingCart.value);
-          }
+          this.$store.commit("initShoppingCart", localShoppingCart);
+        } else {
+          this.$store.commit("initShoppingCart", []);
         }
         await this.waitTime(1);
         // 登录成功获取系统参数

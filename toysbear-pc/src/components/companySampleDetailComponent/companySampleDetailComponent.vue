@@ -19,10 +19,6 @@
               }}</span>
             </li>
           </div>
-          <!-- <li class="totlePrice">
-            <span>总款数：</span>
-            <span class="content">{{ tableData.totalKuanshu }}</span>
-          </li> -->
         </ul>
         <div class="btns">
           <el-button type="primary" @click="openSelectTemplate">
@@ -31,28 +27,7 @@
           </el-button>
         </div>
       </div>
-      <!-- <div class="infoBox">
-        <ul class="totalAllBox">
-          <li class="totlePrice">
-            <span>总款数：</span>
-            <span class="content">{{ tableData.totalKuanshu }}</span>
-          </li>
-          <li class="totlePrice">
-            <span>总箱数：</span>
-            <span class="content">{{ tableData.totalCount }}</span>
-          </li>
-          <li class="totlePrice">
-            <span>总数量：</span>
-            <span class="content">{{ tableData.totalNumber }}</span>
-          </li>
-          <li class="totlePrice">
-            <span>总金额：</span>
-            <span class="content">{{ tableData.totalAmount }}</span>
-          </li>
-        </ul>
-      </div> -->
     </el-card>
-    <!-- highlight-current-row -->
     <el-table
       size="mini"
       :data="tableData"
@@ -118,27 +93,6 @@
         </template>
       </el-table-column>
       <el-table-column label="产品规格(CM)" width="100" align="center">
-        <!-- <el-table-column
-            label="长"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.pr_le }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="宽"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.pr_wi }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="高"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.pr_hi }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>
             {{ scope.row.pr_le }} x {{ scope.row.pr_wi }} x
@@ -147,27 +101,6 @@
         </template>
       </el-table-column>
       <el-table-column label="包装规格(CM)" width="130" align="center">
-        <!-- <el-table-column
-            label="长"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.in_le }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="宽"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.in_wi }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="高"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.in_hi }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>
             {{ scope.row.in_le }} x {{ scope.row.in_wi }} x
@@ -176,27 +109,6 @@
         </template>
       </el-table-column>
       <el-table-column label="外箱规格(CM)" width="100" align="center">
-        <!-- <el-table-column
-            label="长"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.ou_le }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="宽"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.ou_wi }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="高"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.ou_hi }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>
             {{ scope.row.ou_le }} x {{ scope.row.ou_wi }} x
@@ -205,39 +117,11 @@
         </template>
       </el-table-column>
       <el-table-column label="毛重/净重(KG)" align="center">
-        <!-- <el-table-column
-            label="毛重"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.gr_we }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="净重"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.ne_we }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>{{ scope.row.gr_we }}/{{ scope.row.ne_we }}</div>
         </template>
       </el-table-column>
       <el-table-column label="体积/材积(CBM/CUFT)" width="90" align="center">
-        <!-- <el-table-column
-            label="体积"
-            align="center">
-             <template slot-scope="scope">
-              <span>{{ scope.row.bulk_stere }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="材积"
-            align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.bulk_feet }}</span>
-            </template>
-          </el-table-column> -->
         <template slot-scope="scope">
           <div>{{ scope.row.bulk_stere }}/{{ scope.row.bulk_feet }}</div>
         </template>
@@ -261,25 +145,6 @@
       </el-table-column>
       <el-table-column label="展厅来源" align="center" prop="exhibitionName">
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center" width="200">
-          <template slot-scope="scope">
-            <el-button
-              style="margin-right:10px;"
-              size="mini"
-              type="primary"
-              @click="openOrderDetail(scope.row)"
-              >查看订单</el-button
-            >
-            <el-popconfirm
-              title="确定要删除这个版本吗？"
-              @onConfirm="handleDelete(scope.row)"
-            >
-              <el-button size="mini" slot="reference" type="danger"
-                >删除</el-button
-              >
-            </el-popconfirm>
-          </template>
-        </el-table-column> -->
     </el-table>
     <center style="margin-top:20px;">
       <el-pagination
@@ -303,7 +168,6 @@
         top="60px"
         width="80%"
       >
-        <!-- <div class="box" style="height:500px;"> -->
         <el-card class="box-card">
           <div
             slot="header"
@@ -447,9 +311,10 @@ export default {
           { responseType: "blob" }
         )
         .then(res => {
+          const currentTime = getCurrentTime();
           const fileName = this.item.companyName
-            ? this.item.companyName + "_" + getCurrentTime() + ".xlsx"
-            : getCurrentTime() + ".xlsx";
+            ? this.item.companyName + "_" + currentTime + ".xlsx"
+            : currentTime + ".xlsx";
           const blob = res.data;
           if (window.navigator && window.navigator.msSaveOrOpenBlob) {
             // 兼容IE
@@ -473,7 +338,6 @@ export default {
     },
     // 打开预览模板
     openViewer(url) {
-      console.log(url);
       this.viewerImgList = [url];
       this.showViewer = true;
     },
