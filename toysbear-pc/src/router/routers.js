@@ -46,10 +46,12 @@ export async function setMenuTree(menuTree) {
   const routerList = [];
   if (menuTree) {
     for (let i = 0; i < menuTree.length; i++) {
-      for (let j = 0; j < menuTree[i].children.length; j++) {
-        for (const value of dynamicRouting) {
-          if (value.path === menuTree[i].children[j].linkUrl) {
-            routerList.push(value);
+      if (menuTree[i].children) {
+        for (let j = 0; j < menuTree[i].children.length; j++) {
+          for (const value of dynamicRouting) {
+            if (value.path === menuTree[i].children[j].linkUrl) {
+              routerList.push(value);
+            }
           }
         }
       }

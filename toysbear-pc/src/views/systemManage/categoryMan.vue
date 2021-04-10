@@ -78,7 +78,7 @@
                 >
                 <el-popconfirm
                   title="确定要删除这条菜单吗？"
-                  @onConfirm="handleDelete(scope.row)"
+                  @confirm="handleDelete(scope.row)"
                 >
                   <el-button size="mini" slot="reference" type="danger"
                     >删除</el-button

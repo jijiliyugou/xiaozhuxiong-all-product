@@ -94,7 +94,7 @@
                 >
                 <el-popconfirm
                   title="确定要删除此角色吗？"
-                  @onConfirm="handleDelete(scope.$index, scope.row)"
+                  @confirm="handleDelete(scope.$index, scope.row)"
                 >
                   <el-button size="mini" slot="reference" type="danger"
                     >删除</el-button

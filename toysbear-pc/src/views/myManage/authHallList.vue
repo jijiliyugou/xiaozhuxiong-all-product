@@ -100,7 +100,7 @@
                 <el-popconfirm
                   style="margin-left:10px;"
                   title="确定要删除这条择样单吗？"
-                  @onConfirm="handleSampleDelete(scope.row)"
+                  @confirm="handleSampleDelete(scope.row)"
                 >
                   <el-button
                     size="mini"
@@ -277,7 +277,7 @@
             <el-popconfirm
               style="margin-left:10px;"
               title="确定要删除这条择样单吗？"
-              @onConfirm="handleDelete(scope.row)"
+              @confirm="handleDelete(scope.row)"
             >
               <el-button size="mini" slot="reference" type="danger"
                 >删除</el-button

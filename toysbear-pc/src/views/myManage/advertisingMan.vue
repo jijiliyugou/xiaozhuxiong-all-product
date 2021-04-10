@@ -174,7 +174,7 @@
                 <el-popconfirm
                   style="margin-left: 10px"
                   title="确定要删除这条广告吗？"
-                  @onConfirm="handleDelete(scope.row)"
+                  @confirm="handleDelete(scope.row)"
                 >
                   <el-button size="mini" type="danger" slot="reference"
                     >删除</el-button
@@ -286,8 +286,8 @@
           </el-form-item>
           <el-form-item
             label="广告内容："
-            v-if="formDatas.adType === 1"
-            :prop="formDatas.adType === 1 && 'content'"
+            v-if="formDatas.adType == 1"
+            prop="content"
             :label-width="formLabelWidth"
           >
             <quill-editor
@@ -298,9 +298,28 @@
             ></quill-editor>
           </el-form-item>
           <el-form-item
+            label="选择展厅："
+            v-else-if="formDatas.adType == 3"
+            prop="content"
+            :label-width="formLabelWidth"
+          >
+            <el-select
+              style="width:100%;"
+              v-model="formDatas.content"
+              placeholder="请选择展厅"
+            >
+              <el-option
+                v-for="(item, i) in hallList"
+                :key="i"
+                :label="item.companyName"
+                :value="item.companyNumber"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item
             label="广告图片："
             v-else
-            :prop="formDatas.adType === 0 && 'img'"
+            prop="img"
             :label-width="formLabelWidth"
           >
             <div
@@ -427,6 +446,7 @@ export default {
         { label: "iOS", value: "iOS" },
         { label: "Android", value: "Android" }
       ],
+      hallList: [],
       adPositionList: [],
       dialogImageUrl: null,
       dialogImgVisible: false,
@@ -523,6 +543,18 @@ export default {
     };
   },
   methods: {
+    // 获取展厅列表
+    async getOrgCompanyList() {
+      const res = await this.$http.post("/api/OrgCompanyList", {
+        companyType: "Exhibition"
+      });
+      if (res.data.result.code === 200) {
+        this.hallList = res.data.result.item;
+        this.getSampleTemplatePage();
+      } else {
+        this.$message.error(res.data.result.msg);
+      }
+    },
     // 选择视频
     onEditorChange() {},
     // 获取公司类型列表
@@ -817,6 +849,7 @@ export default {
     }
   },
   mounted() {
+    this.getOrgCompanyList();
     this.getAdTypeList();
     this.getAdPositionList();
     this.getAdvertisementPage();

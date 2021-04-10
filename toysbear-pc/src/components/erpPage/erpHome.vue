@@ -82,7 +82,7 @@
               </el-image>
             </div>
             <div class="hallName">
-              {{ item.companyName }}
+              {{ item.companyName || item.adTitle }}
             </div>
           </div>
         </div>

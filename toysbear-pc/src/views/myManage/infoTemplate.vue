@@ -17,7 +17,7 @@
                 style="width: 90%"
               ></el-input>
             </el-form-item>
-            <el-form-item label="展厅查询">
+            <!-- <el-form-item label="展厅查询">
               <el-select
                 clearable
                 v-model="searchForm.hallNumber"
@@ -34,7 +34,7 @@
                   :value="item.companyNumber"
                 ></el-option>
               </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item class="btnList">
               <el-button type="primary" @click="search">查询</el-button>
               <el-button type="primary" @click="openAdd">新增</el-button>
@@ -56,7 +56,7 @@
               prop="templateName"
               label="模板名称"
             ></el-table-column>
-            <el-table-column prop="hallName" label="展厅"></el-table-column>
+            <!-- <el-table-column prop="hallName" label="展厅"></el-table-column> -->
             <el-table-column prop="messageModel" label="消息类型">
               <template slot-scope="scope">
                 <el-tag effect="plain">{{ scope.row.messageModel }}</el-tag>
@@ -81,7 +81,7 @@
                 <el-popconfirm
                   style="margin-left: 10px"
                   title="确定要删除这条信息吗？"
-                  @onConfirm="handlerDelete(scope.row)"
+                  @confirm="handlerDelete(scope.row)"
                 >
                   <el-button size="mini" type="danger" slot="reference"
                     >删除</el-button
@@ -131,7 +131,7 @@
             <el-input v-model="addInfoForm.templateName"></el-input>
           </el-form-item>
           <div class="formItems">
-            <el-form-item label="展厅：" prop="hallNumber">
+            <!-- <el-form-item label="展厅：" prop="hallNumber">
               <el-select
                 v-model="addInfoForm.hallNumber"
                 @change="changeHallNumber"
@@ -145,7 +145,7 @@
                 >
                 </el-option>
               </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="消息类型：" prop="messageExt">
               <el-select
                 v-model="addInfoForm.messageExt"

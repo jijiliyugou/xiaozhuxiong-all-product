@@ -169,11 +169,9 @@ export default {
       allCount: 0,
       ws: null,
       wsBaseUrl:
-        process.env.NODE_ENV === "production"
-          ? "wss://impush.toysbear.com/ws?UserId=" +
-            this.$store.state.userInfo.userInfo.id
-          : "ws://139.9.71.135:8090/ws?UserId=" +
-            this.$store.state.userInfo.userInfo.id,
+        "wss://impush.toysbear.com/ws?UserId=" +
+        this.$store.state.userInfo.userInfo.id,
+      // wsBaseUrl: "ws://139.9.71.135:8090/ws?UserId=" + this.$store.state.userInfo.userInfo.id,
       lockReturn: false,
       timeout: 280000,
       // timeout: 1000,

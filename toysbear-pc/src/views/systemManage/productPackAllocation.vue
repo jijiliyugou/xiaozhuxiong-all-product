@@ -35,7 +35,7 @@
               >
               <el-popconfirm
                 title="确定要重置该展厅下的全部分类吗？"
-                @onConfirm="clearCateAll()"
+                @confirm="clearCateAll()"
               >
                 <el-button
                   type="danger"
@@ -115,7 +115,7 @@
                   <el-popconfirm
                     title="确定要重置已分配好的分类吗？"
                     :ref="'myPopconfirm' + data.id"
-                    @onConfirm="subEditCate(null, data)"
+                    @confirm="subEditCate(null, data)"
                   >
                     <el-button
                       @click.stop="removes('myPopconfirm' + data.id)"

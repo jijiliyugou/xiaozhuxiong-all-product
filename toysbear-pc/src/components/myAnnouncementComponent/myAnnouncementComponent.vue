@@ -74,7 +74,7 @@
               <el-popconfirm
                 class="deleteBtn"
                 title="确定要删除这条公告吗？"
-                @onConfirm="deleteCement(item, i)"
+                @confirm="deleteCement(item, i)"
               >
                 <span slot="reference">删除</span>
               </el-popconfirm>

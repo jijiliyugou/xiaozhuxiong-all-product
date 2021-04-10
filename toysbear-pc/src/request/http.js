@@ -56,6 +56,17 @@ myAxios.install = function(Vue) {
         config.url.includes("HotRecommendPage")
       )
         axios.startDate = Date.now();
+      // 屏蔽不需要验证code的请求，如下载导出等
+      console.log("config", config);
+      // if (
+      //   config.url.includes("LittleBearInstallDownload") ||
+      //   config.url.includes("LittleBearInstallRepeatDownload") ||
+      //   config.url.includes("ExportCompanySampleListToExcel") ||
+      //   config.url.includes("ExportCustomerOrderDetailToExcel")
+      // ) {
+      // console.log(config);
+      // config.timeout = 99999999;
+      // }
       // 配置不需要loading的请求
       if (
         !config.url.includes("CreateLogRecord") &&
@@ -73,8 +84,10 @@ myAxios.install = function(Vue) {
       ) {
         $Store.commit("updateAppLoading", true);
       }
-      config.headers.Utoken =
-        $Store.state.userInfo && $Store.state.userInfo.accessToken;
+      if (!config.url.includes("GetToken")) {
+        config.headers.Utoken =
+          $Store.state.userInfo && $Store.state.userInfo.accessToken;
+      }
       config.headers["content-type"] = "application/json";
       return config;
     },

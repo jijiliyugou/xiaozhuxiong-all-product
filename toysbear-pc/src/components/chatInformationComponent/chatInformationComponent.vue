@@ -75,7 +75,7 @@
     <el-popconfirm
       class="deleteBtn"
       title="是否退出群组？"
-      @onConfirm="deleteCement"
+      @confirm="deleteCement"
     >
       <div slot="reference" class="deleteOut">
         <span>删除并退出</span>

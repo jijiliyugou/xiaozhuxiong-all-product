@@ -121,8 +121,8 @@
                   >编辑</el-button
                 >
                 <el-popconfirm
-                  title="确定要删除这个版本吗？"
-                  @onConfirm="handleDelete(scope.row)"
+                  title="确定要删除这个分享吗？"
+                  @confirm="handleDelete(scope.row)"
                 >
                   <el-button
                     size="mini"
@@ -497,7 +497,7 @@ export default {
         currencyType: "¥",
         currencyTypeName: "RMB",
         totalCost: "0",
-        exchange: 0,
+        exchange: 1,
         size: "24",
         decimalPlaces: 3,
         rejectionMethod: "四舍五入"
@@ -757,6 +757,10 @@ export default {
     async subProcessingLog() {
       this.$refs.addClientFormRef.validate(async valid => {
         if (valid) {
+          if (this.clienFormData.exchange <= 0) {
+            this.$message.error("汇率不能小于0");
+            return false;
+          }
           let url = "/api/CreateWebsiteShareInfo";
           if (this.dialogTitle === "编辑分享")
             url = "/api/UpdateWebsiteShareInfo";

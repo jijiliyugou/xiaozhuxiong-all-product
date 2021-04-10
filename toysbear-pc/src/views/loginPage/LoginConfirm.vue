@@ -135,10 +135,20 @@ export default {
             this.$message.error(re.data.result.msg);
             this.$store.commit("removeLoginItems");
           }
-          this.$router.push("/me");
+          switch (item.companyType) {
+            case "Sales":
+              // this.$router.push("/bsIndex");
+              location.href = "https://www.toysbear.com/new/#/bsIndex";
+              break;
+            default:
+              this.$router.push("/me");
+              // location.href = "http://139.9.71.135:8080/#/me";
+              break;
+          }
           // let token = JSON.stringify(res.data.result);
           // location =
           //   "http://127.0.0.1:8081/#/meInfo/infoList?id=" +token
+          // this.$router.push("/me");
         } catch (error) {
           this.$store.commit("updateAppLoading", false);
           this.$message.error("获取菜单失败，请检查网络");

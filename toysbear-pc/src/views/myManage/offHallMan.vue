@@ -153,7 +153,7 @@
                 >
                 <el-popconfirm
                   title="确定要删除这条信息吗？"
-                  @onConfirm="handleDelete(scope.row)"
+                  @confirm="handleDelete(scope.row)"
                 >
                   <el-button size="mini" slot="reference" type="danger"
                     >删除</el-button
@@ -372,7 +372,7 @@
                     >
                     <el-popconfirm
                       title="确定要删除这条菜单吗？"
-                      @onConfirm="handleShelfDelete(scope.row)"
+                      @confirm="handleShelfDelete(scope.row)"
                     >
                       <el-button size="mini" slot="reference" type="danger"
                         >删除</el-button
@@ -757,7 +757,7 @@
                   >
                   <el-popconfirm
                     title="确定要删除这条菜单吗？"
-                    @onConfirm="handleShelfDelete(scope.row)"
+                    @confirm="handleShelfDelete(scope.row)"
                   >
                     <el-button size="mini" slot="reference" type="danger"
                       >删除</el-button

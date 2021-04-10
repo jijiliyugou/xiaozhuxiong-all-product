@@ -33,7 +33,21 @@
           </div>
           <div class="item">
             <div class="title">厂商数量：</div>
-            {{ tableData | filterTableData }}
+            {{ option.supplierCount }}
+          </div>
+          <div class="item">
+            <div class="title">是否导入：</div>
+            <el-checkbox style="marginLeft: 10px;" v-model="currentValue">
+              是
+            </el-checkbox>
+          </div>
+          <div
+            class="item fanhui"
+            style="cursor: pointer;"
+            @click="$emit('fanhui')"
+          >
+            <i class="iconfont icon-fanhui" style="margin-right: 5px;"></i>
+            返回
           </div>
         </div>
       </div>
@@ -41,6 +55,7 @@
     <div class="tableBox">
       <div class="tableWrap">
         <el-table
+          @sort-change="sort_change"
           :header-cell-style="{ backgroundColor: '#2D60B3', color: '#fff' }"
           size="mini"
           :data="tableData"
@@ -75,53 +90,145 @@
             align="center"
             label="产品名称"
           >
+            <template slot-scope="scope">
+              {{ scope.row.pr_na || "--" }}
+            </template>
           </el-table-column>
           <el-table-column prop="client_nu" align="center" label="公司编号">
+            <template slot-scope="scope">
+              {{ scope.row.client_nu || "--" }}
+            </template>
           </el-table-column>
           <el-table-column prop="fa_no" align="center" label="货号">
+            <template slot-scope="scope">
+              {{ scope.row.fa_no || "--" }}
+            </template>
           </el-table-column>
           <el-table-column prop="ch_pa" align="center" label="包装">
+            <template slot-scope="scope">
+              {{ scope.row.ch_pa || "--" }}
+            </template>
           </el-table-column>
-          <el-table-column prop="ou_lo" align="center" label="装箱量">
+          <el-table-column
+            prop="ou_lo"
+            align="center"
+            width="100"
+            label="内盒/装箱数"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.in_en || "--" }}</span
+              >/<span>{{ scope.row.ou_lo || "--" }}</span>
+            </template>
           </el-table-column>
           <el-table-column prop="fa_pr" align="center" label="出厂价">
           </el-table-column>
-          <el-table-column align="center" prop="ha_in_qu" label="价格">
+          <el-table-column
+            align="center"
+            sortable="custom"
+            prop="ha_in_qu"
+            label="价格"
+          >
+            <template slot-scope="scope">
+              {{ scope.row.ha_in_qu || "--" }}
+            </template>
           </el-table-column>
-          <el-table-column label="包装" align="center">
+          <el-table-column label="产品规格" align="center">
+            <el-table-column prop="pr_le" label="长" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.pr_le || "--" }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="pr_wi" label="宽" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.pr_wi || "--" }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="pr_hi" label="高" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.pr_hi || "--" }}
+              </template>
+            </el-table-column>
+          </el-table-column>
+          <el-table-column label="包装规格" align="center">
             <el-table-column prop="in_le" label="长" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.in_le || "--" }}
+              </template>
             </el-table-column>
             <el-table-column prop="in_wi" label="宽" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.in_wi || "--" }}
+              </template>
             </el-table-column>
             <el-table-column prop="in_hi" label="高" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.in_hi || "--" }}
+              </template>
             </el-table-column>
           </el-table-column>
-          <el-table-column label="外箱" align="center">
+          <el-table-column label="外箱规格" align="center">
             <el-table-column prop="ou_le" label="长" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.ou_le || "--" }}
+              </template>
             </el-table-column>
             <el-table-column prop="ou_wi" label="宽" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.ou_wi || "--" }}
+              </template>
             </el-table-column>
             <el-table-column prop="ou_hi" label="高" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.ou_hi || "--" }}
+              </template>
             </el-table-column>
           </el-table-column>
           <el-table-column prop="bulk_stere" align="center" label="体积">
+            <template slot-scope="scope">
+              {{ scope.row.bulk_stere || "--" }}
+            </template>
           </el-table-column>
           <el-table-column prop="bulk_feet" align="center" label="材积">
+            <template slot-scope="scope">
+              {{ scope.row.bulk_feet || "--" }}
+            </template>
           </el-table-column>
           <el-table-column prop="gr_we" align="center" label="毛重">
+            <template slot-scope="scope">
+              {{ scope.row.gr_we || "--" }}
+            </template>
           </el-table-column>
           <el-table-column prop="ne_we" align="center" label="净重">
+            <template slot-scope="scope">
+              {{ scope.row.ne_we || "--" }}
+            </template>
           </el-table-column>
           <el-table-column prop="remark" align="center" label="备注">
+            <template slot-scope="scope">
+              {{ scope.row.remark || "--" }}
+            </template>
           </el-table-column>
-          <!-- <el-table-column
-          prop="name"
-          align="center"
-          label="摊位号">
-        </el-table-column> -->
           <el-table-column prop="ma_na" align="center" label="厂家名称">
+            <template slot-scope="scope">
+              {{ scope.row.ma_na || "--" }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="handset"
+            align="center"
+            width="100"
+            label="厂商联系方式"
+          >
+            <template slot-scope="scope">
+              <span>
+                {{ scope.row.supplierPhone || "--" }}
+              </span>
+            </template>
           </el-table-column>
           <el-table-column prop="ma_nu" align="center" label="厂家编号">
+            <template slot-scope="scope">
+              {{ scope.row.ma_nu || "--" }}
+            </template>
           </el-table-column>
         </el-table>
         <div class="erweimaWrap">
@@ -153,6 +260,9 @@ export default {
   props: ["option"],
   data() {
     return {
+      currentValue: false,
+      sortOrder: null,
+      sortType: null,
       totalCount: 0,
       pageSize: 10,
       currentPage: 1,
@@ -176,14 +286,38 @@ export default {
     }
   },
   methods: {
+    sort_change(column) {
+      this.sortOrder = 1;
+      switch (column.order) {
+        case "descending": // 降序
+          this.sortType = 1;
+          break;
+        case "ascending": // 升序
+          this.sortType = 2;
+          break;
+        default:
+          this.sortOrder = null;
+          this.sortType = null;
+          break;
+      }
+      this.currentPage = 1;
+      this.getOrderDetail();
+    },
     // 获取详情列表
     async getOrderDetail() {
-      const res = await this.$http.post("/api/SampleOrderDetailPage", {
+      const fd = {
         maxResultCount: this.pageSize,
         skipCount: this.currentPage,
-        id: this.option.erpOrderID,
+        orderType: this.option.orderType,
+        sortOrder: this.sortOrder,
+        sortType: this.sortType,
         sampleNumber: this.option.orderNumber
-      });
+      };
+      for (const key in fd) {
+        if (fd[key] === null || fd[key] === undefined || fd[key] === "")
+          delete fd[key];
+      }
+      const res = await this.$http.post("/api/SampleOrderDetailPageThree", fd);
       if (res.data.result.code === 200) {
         this.totalCount = res.data.result.item.totalCount;
         this.tableData = res.data.result.item.items;
@@ -197,14 +331,35 @@ export default {
     },
     handleSizeChange(pages) {
       this.pageSize = pages;
-      if (this.currentPage * pages > this.totalCount) return;
+      if (this.currentPage * pages > this.totalCount && this.currentPage != 1)
+        return;
       this.getOrderDetail();
     }
   },
   created() {},
   mounted() {
-    console.log(this.option);
     this.getOrderDetail();
+  },
+  watch: {
+    currentValue(val) {
+      console.log(val);
+      if (val) {
+        const currentSelectItem = {
+          number: this.option.orderNumber,
+          orderType: this.option.orderType,
+          token:
+            this.$store.state.userInfo && this.$store.state.userInfo.accessToken
+        };
+        this.$emit("resetCurrentValue", currentSelectItem);
+      } else {
+        this.$emit("resetCurrentValue", {
+          number: null,
+          orderType: null,
+          token:
+            this.$store.state.userInfo && this.$store.state.userInfo.accessToken
+        });
+      }
+    }
   }
 };
 </script>
@@ -240,6 +395,7 @@ export default {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      position: relative;
       .addrs {
         color: #333333;
         font-size: 18px;
@@ -252,6 +408,14 @@ export default {
         .item {
           display: flex;
           margin-right: 40px;
+          &.fanhui {
+            position: absolute;
+            right: 18px;
+            top: 18px;
+            &:hover {
+              color: #2d60b3;
+            }
+          }
           &:last-of-type {
             margin: 0;
           }

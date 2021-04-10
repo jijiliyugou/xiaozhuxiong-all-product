@@ -212,6 +212,26 @@
           >
             <span class="headerTitle">报出价(带工厂信息)</span>
             <div>
+              <div class="isFac">
+                <span class="facTitle">是否按厂商导出</span>
+                <el-select
+                  v-model="imageExportWay"
+                  clearable
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="item in imageExportWayList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </div>
+              <el-radio-group class="myExportWay" v-model="exportWay">
+                <el-radio :label="1">带图片导出</el-radio>
+                <el-radio :label="2">不带图片导出</el-radio>
+              </el-radio-group>
               <el-button
                 type="primary"
                 @click="openViewer(require('@/assets/images/mode1.png'))"
@@ -235,6 +255,26 @@
           >
             <span class="headerTitle">报出价(不带工厂信息)</span>
             <div>
+              <div class="isFac">
+                <span class="facTitle">是否按厂商导出</span>
+                <el-select
+                  v-model="imageExportWay"
+                  clearable
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="item in imageExportWayList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </div>
+              <el-radio-group class="myExportWay" v-model="exportWay">
+                <el-radio :label="1">带图片导出</el-radio>
+                <el-radio :label="2">不带图片导出</el-radio>
+              </el-radio-group>
               <el-button
                 type="primary"
                 @click="openViewer(require('@/assets/images/mode2.png'))"
@@ -258,6 +298,26 @@
           >
             <span class="headerTitle">出厂价(带工厂信息)</span>
             <div>
+              <div class="isFac">
+                <span class="facTitle">是否按厂商导出</span>
+                <el-select
+                  v-model="imageExportWay"
+                  clearable
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="item in imageExportWayList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </div>
+              <el-radio-group class="myExportWay" v-model="exportWay">
+                <el-radio :label="1">带图片导出</el-radio>
+                <el-radio :label="2">不带图片导出</el-radio>
+              </el-radio-group>
               <el-button
                 type="primary"
                 @click="openViewer(require('@/assets/images/mode3.png'))"
@@ -281,6 +341,26 @@
           >
             <span class="headerTitle">出厂价+报出价+工厂信息</span>
             <div>
+              <div class="isFac">
+                <span class="facTitle">是否按厂商导出</span>
+                <el-select
+                  v-model="imageExportWay"
+                  clearable
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="item in imageExportWayList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  >
+                  </el-option>
+                </el-select>
+              </div>
+              <el-radio-group class="myExportWay" v-model="exportWay">
+                <el-radio :label="1">带图片导出</el-radio>
+                <el-radio :label="2">不带图片导出</el-radio>
+              </el-radio-group>
               <el-button
                 type="primary"
                 @click="openViewer(require('@/assets/images/mode4.png'))"
@@ -319,6 +399,13 @@ export default {
   props: ["shareOrderNumber"],
   data() {
     return {
+      imageExportWayList: [
+        { value: 0, label: "请选择" },
+        { value: 2, label: "按厂商单独导图片" },
+        { value: 1, label: "不按厂商单独导图片" }
+      ],
+      imageExportWay: 0,
+      exportWay: 1,
       showViewer: false,
       exportTemplateDialog: false,
       isOrderDetailDialog: false,
@@ -332,27 +419,34 @@ export default {
     // 导出模板
     exportOrder(type) {
       const fd = {
+        excelExportWay: this.exportWay,
+        imageExportWay: this.imageExportWay ? this.imageExportWay : 0,
         templateType: type,
         shareOrderNumber: this.shareOrderNumber
       };
       this.$http
         .post("/api/ExportCustomerOrderDetailToExcel", fd, {
-          responseType: "blob"
+          responseType: "blob",
+          timeout: 1000000000
         })
         .then(res => {
           const time = getCurrentTime();
           const fileName = this.tableData.customerName
             ? this.tableData.customerName + "_" + time + ".xlsx"
             : time + ".xlsx";
+          const zipName = this.shareOrderNumber.companyName
+            ? this.shareOrderNumber.companyName + "_" + time + ".zip"
+            : time + ".zip";
+          const myName = this.imageExportWay > 0 ? zipName : fileName;
           const blob = res.data;
           if (window.navigator && window.navigator.msSaveOrOpenBlob) {
             // 兼容IE
-            window.navigator.msSaveOrOpenBlob(blob, fileName);
+            window.navigator.msSaveOrOpenBlob(blob, myName);
           } else {
             // 兼容Google及fireFox
             const link = document.createElement("a");
             link.style.display = "none";
-            link.download = fileName;
+            link.download = myName;
             link.href = URL.createObjectURL(blob);
             document.body.appendChild(link);
             link.click();
@@ -501,6 +595,16 @@ export default {
       font-size: 16px;
       font-weight: bold;
     }
+    .isFac {
+      display: inline;
+      margin: 20px;
+      .facTitle {
+        margin-right: 10px;
+      }
+    }
   }
+}
+.myExportWay {
+  margin-right: 20px;
 }
 </style>

@@ -655,7 +655,7 @@
               <el-popconfirm
                 style="margin-left: 10px"
                 title="确定要删除该员工吗？"
-                @onConfirm="deleteEmployees(scope.row)"
+                @confirm="deleteEmployees(scope.row)"
               >
                 <el-button size="mini" type="danger" slot="reference"
                   >删除</el-button

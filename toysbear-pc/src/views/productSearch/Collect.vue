@@ -252,7 +252,7 @@ export default {
         this.getCollectList();
       }
     },
-    // 删除收藏
+    // 取消收藏
     async handleDelete(row) {
       const res = await this.$http.post("/api/CreateProductCollection", {
         productNumber: row.productNumber

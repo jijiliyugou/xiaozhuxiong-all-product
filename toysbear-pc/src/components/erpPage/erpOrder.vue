@@ -26,7 +26,7 @@
           <div class="shouyeBox" @click="resetSample">
             <i class="mySampleIcon"></i>
             <span class="sampleText">
-              {{ myOrderSample }}
+              我的订单
             </span>
           </div>
           <!-- <div class="loginBtn" @click="toLogins">登录系统</div> -->
@@ -56,6 +56,7 @@
           :inline="true"
           label-position="right"
           label-width="100px"
+          size="small"
           :model="searchFD"
           class="demo-form-inline"
         >
@@ -74,13 +75,16 @@
             <div class="itemBox">
               <el-form-item label="来源：">
                 <el-select
-                  clearable
                   v-model="searchFD.orderFrom"
                   placeholder="请选择"
                   style="width: 100%"
                 >
                   <el-option
                     v-for="(item, index) in [
+                      {
+                        label: '全部',
+                        value: '全部'
+                      },
                       {
                         label: '展厅',
                         value: 'Hall'
@@ -100,13 +104,16 @@
             <div class="itemBox">
               <el-form-item label="订单类型：">
                 <el-select
-                  clearable
                   v-model="searchFD.orderType"
                   placeholder="请选择"
                   style="width: 100%"
                 >
                   <el-option
                     v-for="(item, index) in [
+                      {
+                        label: '全部',
+                        value: '全部'
+                      },
                       {
                         label: '择样',
                         value: 'Sample'
@@ -145,7 +152,6 @@
                 <!-- type="daterange" -->
                 <el-date-picker
                   v-model="dateTile"
-                  style="max-width: 217px;"
                   value-format="yyyy-MM-ddTHH:mm:ss"
                   :picker-options="pickerOptions"
                   type="daterange"
@@ -157,7 +163,13 @@
               </el-form-item>
             </div>
             <div class="itemBox">
-              <el-button type="primary" @click="search">搜索</el-button>
+              <el-button
+                type="primary"
+                class="searchBtn"
+                size="small"
+                @click="search"
+                >搜索</el-button
+              >
             </div>
           </div>
         </el-form>
@@ -166,12 +178,13 @@
       <div class="tableBox">
         <div class="tableWrap">
           <el-table
+            :max-height="600"
+            @sort-change="sort_change"
             :header-cell-style="{ backgroundColor: '#2D60B3', color: '#fff' }"
             :data="tableList"
             id="myTable"
             ref="singleTable"
             size="medium"
-            height="600"
             tooltip-effect="dark"
             highlight-current-row
             @current-change="handleSelectionChange"
@@ -181,30 +194,67 @@
                 <el-checkbox v-model="scope.row.checked"></el-checkbox>
               </template>
             </el-table-column>
-            <el-table-column
-              prop="hall_na"
-              label="择样来源"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="the_nu"
-              label="本次代号"
-              align="center"
-            ></el-table-column>
-            <el-table-column
-              prop="number"
-              label="择样编号"
-              align="center"
-            ></el-table-column>
-            <el-table-column prop="happenDate" label="择样时间" align="center">
+            <el-table-column prop="hall_na" label="订单来源" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.hall_na || "--" }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="orderType" label="订单类型" align="center">
               <template slot-scope="scope">
                 {{
-                  scope.row.happenDate &&
-                    scope.row.happenDate.replace(/t[\s\S]+/gi, "")
+                  scope.row.orderType == "Sample"
+                    ? "择样"
+                    : scope.row.orderType == "CompanySample"
+                    ? "找样"
+                    : scope.row.orderType == "ShareOrder"
+                    ? "客户订单"
+                    : "--"
                 }}
               </template>
             </el-table-column>
-            <el-table-column label="择样明细" align="center">
+            <el-table-column prop="toCompanyName" label="客户" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.toCompanyName || "--" }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="the_nu" label="本次代号" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.the_nu || "--" }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="orderCount" label="订单数量" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.orderCount || "--" }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="number" label="订单编号" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.number || "--" }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="remark" label="订单备注" align="center">
+              <template slot-scope="scope">
+                {{
+                  scope.row.remark && scope.row.orderType != "Sample"
+                    ? scope.row.remark
+                    : "--"
+                }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="happenDate"
+              label="订单时间"
+              sortable="custom"
+              align="center"
+            >
+              <template slot-scope="scope">
+                {{
+                  scope.row.happenDate &&
+                    scope.row.happenDate.replace(/t[\s\S]+/gi, " ")
+                }}
+              </template>
+            </el-table-column>
+            <el-table-column label="订单明细" align="center">
               <template slot-scope="scope">
                 <span class="openDetail" @click.stop="openDetail(scope.row)"
                   >点击查看</span
@@ -232,7 +282,11 @@
     </template>
     <!-- 详情 -->
     <div v-else>
-      <erpSampleDetails :option="currentSample" />
+      <erpSampleDetails
+        @resetCurrentValue="resetCurrentValue"
+        @fanhui="fanhui"
+        :option="currentSample"
+      />
     </div>
     <!-- 隐藏的输入框 -->
     <el-input
@@ -348,17 +402,18 @@ export default {
   },
   data() {
     return {
+      sortOrder: null,
+      sortType: null,
       dateTile: null,
       searchFD: {
         keyword: null,
-        orderFrom: null,
-        orderType: null,
+        orderFrom: "全部",
+        orderType: "全部",
         startTime: null,
         endTime: null,
         orderNumber: null
       },
       currentSample: null,
-      myOrderSample: "我的订单",
       isOrderDetial: false,
       jiaerweima: require("@/assets/images/erweimaicon@2x.png"),
       isActive: false,
@@ -367,7 +422,8 @@ export default {
         // 选中的值
         token:
           this.$store.state.userInfo && this.$store.state.userInfo.accessToken,
-        number: null
+        number: null,
+        orderType: null
       },
       tableList: [],
       totalCount: 0,
@@ -412,9 +468,40 @@ export default {
     }
   },
   methods: {
+    // 返回事件
+    fanhui() {
+      this.isOrderDetial = false;
+      this.currentSelectItem = {
+        number: null,
+        orderType: null,
+        token:
+          this.$store.state.userInfo && this.$store.state.userInfo.accessToken
+      };
+    },
+    // 详情选择可导出
+    resetCurrentValue(val) {
+      this.currentSelectItem = val;
+    },
+    // 时间排序
+    sort_change(column) {
+      this.sortOrder = 2;
+      switch (column.order) {
+        case "descending": // 降序
+          this.sortType = 1;
+          break;
+        case "ascending": // 升序
+          this.sortType = 2;
+          break;
+        default:
+          this.sortOrder = null;
+          this.sortType = null;
+          break;
+      }
+      this.currentPage = 1;
+      this.getOrderList();
+    },
     resetSample() {
       this.isOrderDetial = false;
-      this.myOrderSample = "我的订单";
     },
     // 退出登录
     signOut() {
@@ -424,7 +511,6 @@ export default {
     openDetail(item) {
       this.currentSample = item;
       this.isOrderDetial = true;
-      this.myOrderSample = "返回订单列表";
     },
     // 去主页
     toHome() {
@@ -463,7 +549,8 @@ export default {
     },
     handleSizeChange(pages) {
       this.pageSize = pages;
-      if (this.currentPage * pages > this.totalCount) return;
+      if (this.currentPage * pages > this.totalCount && this.currentPage != 1)
+        return;
       this.getOrderList();
     },
     // 搜索
@@ -471,11 +558,13 @@ export default {
       this.currentPage = 1;
       this.getOrderList();
     },
+    // 获取列表
     async getOrderList() {
       const fd = {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
-        orderType: "Sample",
+        sortOrder: this.sortOrder,
+        sortType: this.sortType,
         ...this.searchFD
       };
       if (this.dateTile) {
@@ -508,6 +597,7 @@ export default {
           }
         });
         this.currentSelectItem.number = row.orderNumber;
+        this.currentSelectItem.orderType = row.orderType;
       }
     }
   },
@@ -733,4 +823,18 @@ export default {
 //     }
 //   }
 // }
+@{deep} .sort-caret {
+  &.descending {
+    border-top-color: #c0c4cc;
+  }
+  &.ascending {
+    border-bottom-color: #c0c4cc;
+  }
+}
+@{deep} .el-table .descending .sort-caret.descending {
+  border-top-color: #fff;
+}
+@{deep} .el-table .ascending .sort-caret.ascending {
+  border-bottom-color: #fff;
+}
 </style>

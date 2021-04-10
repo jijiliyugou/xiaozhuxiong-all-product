@@ -27,7 +27,7 @@
           <i v-show="isCTNS === 0" class="el-icon-d-caret"></i>
           <i class="el-icon-caret-bottom" v-show="isCTNS === 1"></i>
           <i v-show="isCTNS === 2" class="el-icon-caret-top"></i>
-        </p> -->
+        </p>
         <p
           :class="{ sortID: true, active: isTotalQTY !== 0 }"
           @click="sortTotalQTY"
@@ -45,7 +45,7 @@
           <i v-show="isTotalAmount === 0" class="el-icon-d-caret"></i>
           <i class="el-icon-caret-bottom" v-show="isTotalAmount === 1"></i>
           <i v-show="isTotalAmount === 2" class="el-icon-caret-top"></i>
-        </p>
+        </p> -->
       </div>
       <!-- 表格 -->
       <div class="tableBoxWrap">
@@ -167,12 +167,9 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="箱量" align="center" width="100">
+          <!-- <el-table-column label="箱量" align="center" width="100">
             <template slot="header">
               <div style="line-height: normal;">
-                <!-- <p style="padding:0;line-height: 13px;">
-                  箱数
-                </p> -->
                 <p style="padding:0;line-height: 13px;">
                   总个数
                 </p>
@@ -180,24 +177,14 @@
             </template>
             <template slot-scope="scope">
               <div>
-                <!-- <div>
-                  <input
-                    class="inputNumber"
-                    type="number"
-                    @input="changeInputNumber($event, scope.row)"
-                    @focus="selectInputValue($event)"
-                    @keydown="nextInput($event)"
-                    v-model="scope.row.shoppingCount"
-                  />
-                </div> -->
                 <div class="tableTotalNumber">
                   {{ scope.row.ou_lo * scope.row.shoppingCount }}
                   <span>PCS</span>
                 </div>
               </div>
             </template>
-          </el-table-column>
-          <el-table-column width="120" align="center">
+          </el-table-column> -->
+          <!-- <el-table-column width="120" align="center">
             <template slot="header">
               <div style="line-height: normal;">
                 <p style="padding:0;line-height: 13px;">
@@ -236,7 +223,7 @@
                 </p>
               </div>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column width="50">
             <template slot-scope="scope">
               <el-popconfirm
@@ -271,38 +258,38 @@
               ><span class="changeColor">{{ totalJingzhong() }}</span>
               <span class="changeColor">(kg)</span>
             </div>
-          </div>
-          <div class="totalBox" style="border-bottom:1px solid #e9e9e9;">
-            <!-- 总条数 -->
             <div class="totalWrap totalVolume">
               总条数：
               <span class="changeColor">
                 {{ dataList.length }}
               </span>
             </div>
-            <!-- 总箱数 -->
-            <!-- <div class="totalWrap totalVolume">
+          </div>
+          <!-- <div class="totalBox" style="border-bottom:1px solid #e9e9e9;"> -->
+          <!-- 总条数 -->
+          <!-- 总箱数 -->
+          <!-- <div class="totalWrap totalVolume">
               总箱数：
               <span class="changeColor">
                 {{ myTotalQuantity(dataList) }}
               </span>
             </div> -->
-            <!-- 总个数 -->
-            <div class="totalWrap totalVolume">
+          <!-- 总个数 -->
+          <!-- <div class="totalWrap totalVolume">
               总个数：
               <span class="changeColor">
                 {{ myTotalGe(dataList) }}
               </span>
-            </div>
-            <!-- 总价 -->
-            <div class="totalWrap totalPrice">
+            </div> -->
+          <!-- 总价 -->
+          <!-- <div class="totalWrap totalPrice">
               总价：
               <span class="price">{{ userInfo.currencyType }}</span>
               <span style="margin-left:5px;" class="price">
                 {{ myTotalPrice(dataList) }}
               </span>
-            </div>
-          </div>
+            </div> -->
+          <!-- </div> -->
         </div>
         <!-- 提交信息 -->
         <div class="contactInfoBox">

@@ -24,6 +24,7 @@
       class="cartBox"
       v-if="
         !$route.path.includes('/login') &&
+          !$route.path.includes('/erp') &&
           userInfo &&
           userInfo.commparnyList &&
           userInfo.commparnyList[0].companyType === 'Sales'
@@ -40,9 +41,6 @@
           </el-badge>
         </div>
       </div>
-      <!-- <div class="toTop" @click="toTop">
-        <i class="toTopIcon el-icon-top"></i>
-      </div> -->
     </div>
   </div>
 </template>

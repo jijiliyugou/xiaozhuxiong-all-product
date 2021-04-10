@@ -44,6 +44,7 @@ export const router = new VueRouter({
 export async function getMenuFuc() {
   const list = store.state.routers;
   const routers = await setMenuTree(list);
+  console.log(routers, 1233456);
   router.addRoutes(routers);
 }
 // 拦截

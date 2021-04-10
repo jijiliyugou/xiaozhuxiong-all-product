@@ -1,0 +1,162 @@
+@deep: ~">>>";
+[v-cloak] {
+  display: none;
+}
+.erpLoginBox{
+  background-color: #F5F5F5;
+  min-height: 100vh;
+  position: relative;
+  // 头部
+  .toplauotBox{
+    height: 90px;
+    width: 100%;
+    background-color: #fff;
+    box-sizing: border-box;
+    .toplauot{
+      height: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .left, .right{
+        flex: 1;
+      }
+      .left{
+        display: flex;
+        align-items: center;
+        color: #2B6AA8;
+        .titleBox{
+          margin-left: 20px;
+          .chTitle{
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 37px;
+          }
+          .enTitle{
+            font-size: 12px;
+            -webkit-transform: translateX(-10px) scale(0.9);
+            -moz-transform: translateX(-10px) scale(0.9);
+            -ms-transform: translateX(-10px) scale(0.9);
+            transform: translateX(-10px) scale(0.9);
+          }
+        }
+      }
+      .right{
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        .shouyeBox{
+          display: flex;
+          align-items: center;
+          margin-right: 60px;
+          font-weight: bold;
+          cursor: pointer;
+          .homeText{
+            color: #999999;
+          }
+          .sampleText{
+            color: #999999;
+          }
+          .homeIcon{
+            width: 21px;
+            height: 21px;
+            margin-right: 10px;
+            background: url('~@/assets/images/erpHomeIcon.png') no-repeat center;
+          }
+          .mySampleIcon{
+            width: 21px;
+            height: 21px;
+            margin-right: 10px;
+            background: url('~@/assets/images/mySampleIcon.png') no-repeat center;
+          }
+        }
+        .loginBtn{
+          cursor: pointer;
+          width: 120px;
+          height: 36px;
+          background: #2D60B3;
+          opacity: 1;
+          border-radius: 100px;
+          font-weight: 400;
+          color: #FFFFFF;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+  }
+  .loginWrap{
+    width: 1200px;
+    height: 532px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background-color: #fff;
+    transform: translate(-50%, -50%);
+    .loginBox{
+      width: 100%;
+      height: 100%;
+      .userBox {
+        height: 100%;
+        padding: 30px;
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        overflow: auto;
+        .userItem {
+          width: 208px;
+          height: 92px;
+          background: #ffffff;
+          border: 1px solid #e5e5e5;
+          border-radius: 9px;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          margin-bottom: 30px;
+          &:nth-last-of-type(1) {
+            margin-bottom: 0;
+          }
+          &:nth-last-of-type(2) {
+            margin-bottom: 0;
+          }
+          &:nth-last-of-type(3) {
+            margin-bottom: 0;
+          }
+          &:nth-last-of-type(4) {
+            margin-bottom: 0;
+          }
+          @{deep} .img {
+            width: 60px;
+            min-width: 60px;
+            height: 60px;
+            color: #fff;
+            transition: all 1s;
+            border-radius: 50%;
+            margin: 16px;
+            img {
+              width: 60px;
+              height: 60px;
+            }
+          }
+          p {
+            transition: all 1s;
+            text-overflow: -o-ellipsis-lastline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+        }
+        .testItem {
+          width: 208px;
+        }
+      }
+    }
+  }
+}

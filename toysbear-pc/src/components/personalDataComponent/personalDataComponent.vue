@@ -128,7 +128,7 @@
           发 消 息
         </el-button>
         <el-popconfirm
-          @onConfirm="confirmRemoveFriends"
+          @confirm="confirmRemoveFriends"
           v-if="personalDetail.isFriend"
           title="是否确定删除好友?"
         >

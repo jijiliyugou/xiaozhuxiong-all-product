@@ -265,6 +265,37 @@
               opacity: 0.5;
             }
           }
+          .myCount {
+            width: 130px;
+            min-width: 130px;
+            margin-left: 20px;
+            height: 44px;
+            line-height: 44px;
+            &:hover {
+              color: #2D60B3;
+            }
+          }
+        }
+        .myInputBox {
+          position: relative;
+          font-size: 16px;
+          .inputIcon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            z-index: 1;
+            transform: translate(0, -50%);
+            &.mobile {
+              background: url("~@/assets/images/手机 (2).png") no-repeat center;
+              background-size: contain;
+            }
+            &.idCode {
+              background: url("~@/assets/images/验证码.png") no-repeat center;
+              background-size: contain;
+            }
+          }
         }
         .loginBtn {
           width: 100%;
@@ -275,27 +306,6 @@
             opacity: 0.5;
           }
         }
-            .myInputBox {
-              position: relative;
-              font-size: 16px;
-              .inputIcon {
-                position: absolute;
-                left: 10px;
-                top: 50%;
-                width: 20px;
-                height: 20px;
-                z-index: 1;
-                transform: translate(0, -50%);
-                &.mobile {
-                  background: url("~@/assets/images/手机 (2).png") no-repeat center;
-                  background-size: contain;
-                }
-                &.idCode {
-                  background: url("~@/assets/images/验证码.png") no-repeat center;
-                  background-size: contain;
-                }
-              }
-            }
           }
         }
       }

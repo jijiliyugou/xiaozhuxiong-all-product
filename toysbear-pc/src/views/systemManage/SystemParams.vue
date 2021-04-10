@@ -69,7 +69,7 @@
                 <el-popconfirm
                   style="margin-left: 10px"
                   title="确定要删除该参数名吗？"
-                  @onConfirm="deleteA(scope.row)"
+                  @confirm="deleteA(scope.row)"
                 >
                   <el-button
                     size="mini"
@@ -172,7 +172,7 @@
                 <el-popconfirm
                   style="margin-left: 10px"
                   title="确定要删除该系统参数吗？"
-                  @onConfirm="deleteB(scope.row)"
+                  @confirm="deleteB(scope.row)"
                 >
                   <el-button
                     size="mini"

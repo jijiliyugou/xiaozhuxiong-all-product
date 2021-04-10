@@ -3,14 +3,10 @@
  */
 // 这里需要引入vuex
 import store from "@/store";
-const env = process.env.NODE_ENV;
 const wsConnection = {
   $ws: null,
-  baseUrl:
-    env === "production"
-      ? "wss://impush.toysbear.com/ws?UserId="
-      : "ws://139.9.71.135:8090/ws?UserId=",
-  // baseUrl: env === 'production' ? 'ws://139.9.71.135:8090/ws?UserId=' : 'ws://139.9.71.135:8090/ws?UserId=',
+  baseUrl: "wss://impush.toysbear.com/ws?UserId=",
+  // baseUrl: "ws://139.9.71.135:8090/ws?UserId=",
   lockReturn: false,
   timeout: 280000,
   // timeout: 2000,

@@ -58,6 +58,7 @@
             padding: '0'
           }"
           :data="dataList"
+          @selection-change="selectionChange"
           id="myTable"
           ref="multipleTable"
           size="medium"
@@ -221,16 +222,6 @@
             <template slot-scope="scope">
               <div>
                 <div>
-                  <!-- <el-input-number
-                    style="width:50px;color:#ff3e3e;"
-                    @input.native="changeInputNumber($event, scope.row)"
-                    @click.native="selectInputValue($event)"
-                    v-model="scope.row.shoppingCount"
-                    :controls="false"
-                    size="mini"
-                    :min="0"
-                    :max="99999"
-                  ></el-input-number> -->
                   <input
                     class="inputNumber"
                     type="number"
@@ -315,17 +306,17 @@
             <div class="totalWrap totalVolume">
               {{ myShoppingCartLang.totalVolume }}：
               <span class="changeColor left">
-                {{ myTotalVolume(dataList).outerBoxStere }}cbm
+                {{ myTotalOuterBoxStere }}cbm
               </span>
               <span class="changeColor right">
-                {{ myTotalVolume(dataList).outerBoxFeet }}cuft
+                {{ myTotalOuterBoxFeet }}cuft
               </span>
             </div>
             <!-- 总净重 -->
             <div class="totalWrap totalVolume">
               {{ myOrderLang.totalGrossNetWeight }}：
-              <span class="changeColor">{{ totalMaozhong() }}/</span
-              ><span class="changeColor">{{ totalJingzhong() }}</span>
+              <span class="changeColor">{{ myTotalMaozhong }}/</span
+              ><span class="changeColor">{{ myTotalJingzhong }}</span>
               <span class="changeColor">(kg)</span>
             </div>
           </div>
@@ -334,21 +325,21 @@
             <div class="totalWrap totalVolume">
               {{ myShoppingCartLang.totalRecords }} ：
               <span class="changeColor">
-                {{ dataList.length }}
+                {{ selectTableData.length }}
               </span>
             </div>
             <!-- 总箱数 -->
             <div class="totalWrap totalVolume">
               {{ myShoppingCartLang.totalQuantity }} ：
               <span class="changeColor">
-                {{ myTotalQuantity(dataList) }}
+                {{ myTotalQuantity }}
               </span>
             </div>
             <!-- 总个数 -->
             <div class="totalWrap totalVolume">
               {{ myShoppingCartLang.totalCount }}：
               <span class="changeColor">
-                {{ myTotalGe(dataList) }}
+                {{ myTotalGe }}
               </span>
             </div>
             <!-- 总价 -->
@@ -356,7 +347,7 @@
               {{ myShoppingCartLang.totalPrice }}：
               <span class="price">{{ userInfo.currencyType }}</span>
               <span style="margin-left:5px;" class="price">
-                {{ myTotalPrice(dataList) }}
+                {{ myTotalPrice }}
               </span>
             </div>
           </div>
@@ -431,6 +422,14 @@ export default {
   components: {},
   data() {
     return {
+      myTotalOuterBoxStere: 0,
+      myTotalOuterBoxFeet: 0,
+      myTotalPrice: 0,
+      myTotalQuantity: 0,
+      myTotalJingzhong: 0,
+      myTotalMaozhong: 0,
+      myTotalGe: 0,
+      selectTableData: [],
       isID: 0,
       isPrice: 0,
       isCTNS: 0,
@@ -445,16 +444,7 @@ export default {
         remark: "",
         shareOrderDetails: []
       },
-      tableList: [
-        {
-          id: 0,
-          number: 1,
-          total: 98.0,
-          img: require("@/assets/images/cheche.png")
-        },
-        { id: 1, number: 2, total: 198.0 },
-        { id: 2, number: 3, total: 78.0 }
-      ]
+      tableList: []
     };
   },
   methods: {
@@ -769,53 +759,48 @@ export default {
       });
       window.open(href, "_blank");
     },
+    // table勾选发生变化事件
+    selectionChange(selection) {
+      this.selectTableData = selection;
+    },
     // 计算总个数量
-    myTotalGe() {
+    calculationTotalGe(list) {
       let number = 0;
-      for (let i = 0; i < this.dataList.length; i++) {
+      for (let i = 0; i < list.length; i++) {
         number = this.add(
           number,
-          this.multiply(
-            this.dataList[i].shoppingCount,
-            this.dataList[i].outerBoxLo
-          )
+          this.multiply(list[i].shoppingCount, list[i].outerBoxLo)
         );
       }
       return number;
     },
     // 计算总毛重
-    totalMaozhong() {
+    calculationTotalMaozhong(list) {
       let number = 0;
-      for (let i = 0; i < this.dataList.length; i++) {
+      for (let i = 0; i < list.length; i++) {
         number = this.add(
           number,
-          this.multiply(
-            this.dataList[i].shoppingCount,
-            this.dataList[i].outerBoxWeight
-          )
+          this.multiply(list[i].shoppingCount, list[i].outerBoxWeight)
         );
       }
       return number;
     },
     // 计算总净重
-    totalJingzhong() {
+    calculationTotalJingzhong(list) {
       let number = 0;
-      for (let i = 0; i < this.dataList.length; i++) {
+      for (let i = 0; i < list.length; i++) {
         number = this.add(
           number,
-          this.multiply(
-            this.dataList[i].shoppingCount,
-            this.dataList[i].outerBoxNetWeight
-          )
+          this.multiply(list[i].shoppingCount, list[i].outerBoxNetWeight)
         );
       }
       return number;
     },
     // 计算总箱数量
-    myTotalQuantity() {
+    calculationTotalQuantity(list) {
       let number = 0;
-      for (let i = 0; i < this.dataList.length; i++) {
-        number = this.add(number, this.dataList[i].shoppingCount || 0);
+      for (let i = 0; i < list.length; i++) {
+        number = this.add(number, list[i].shoppingCount || 0);
       }
       return number;
     },
@@ -832,7 +817,7 @@ export default {
       this.$root.eventHub.$emit("resetProductsForeach", this.dataList);
     },
     // 计算总价
-    myTotalPrice(list) {
+    calculationTotalPrice(list) {
       let price = 0;
       for (let i = 0; i < list.length; i++) {
         price = this.add(
@@ -846,7 +831,7 @@ export default {
       return price;
     },
     // 计算总体积材积
-    myTotalVolume(list) {
+    calculationTotalVolume(list) {
       let outerBoxStere = 0,
         outerBoxFeet = 0;
       for (let i = 0; i < list.length; i++) {
@@ -859,10 +844,8 @@ export default {
           this.multiply(list[i].outerBoxFeet, list[i].shoppingCount)
         );
       }
-      return {
-        outerBoxStere,
-        outerBoxFeet
-      };
+      this.myTotalOuterBoxStere = outerBoxStere;
+      this.myTotalOuterBoxFeet = outerBoxFeet;
     },
     // 修改购物车数量
     changeInputNumber(e, val) {
@@ -930,6 +913,23 @@ export default {
     this.$refs.multipleTable.toggleAllSelection();
   },
   watch: {
+    selectTableData: {
+      deep: true,
+      handler(list) {
+        // 计算总个数
+        this.myTotalGe = this.calculationTotalGe(list);
+        // 计算总箱数
+        this.myTotalQuantity = this.calculationTotalQuantity(list);
+        // 计算总毛重
+        this.myTotalMaozhong = this.calculationTotalMaozhong(list);
+        // 计算总净重
+        this.myTotalJingzhong = this.calculationTotalJingzhong(list);
+        // 计算总体积材积
+        this.calculationTotalVolume(list);
+        // 计算总金额
+        this.myTotalPrice = this.calculationTotalPrice(list);
+      }
+    },
     "$store.state.globalLang"(val) {
       if (val) document.title = this.myShoppingCartLang.myShoppingCart;
     }

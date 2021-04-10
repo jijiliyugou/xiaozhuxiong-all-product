@@ -1,0 +1,197 @@
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video {
+	margin:0;
+	padding:0;
+}
+html,body,#app{
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	width: 100%;
+	color: #333333;
+	font-family: "Microsoft YaHei";
+	.el-container{
+		min-height: calc(100%);
+	}
+}
+body,#app {
+	overflow: auto;
+	font-size: 14px;
+}
+h1,h2,h3,h4,h5,h6,em,i {
+	font-weight:100;
+	font-style:normal;
+}
+ul,ol,li {
+	list-style-type:none;
+}
+a {
+	color:#666;
+	text-decoration:none;
+	outline:0;
+}
+a:hover {
+	text-decoration:none;
+}
+// 表格样式
+.el-table {
+	/*
+	 *改变浏览器默认的滚动条样式
+	 */
+	.el-table__body-wrapper::-webkit-scrollbar-track {
+		background-color: #f8f8f8;
+	}
+	.el-table__body-wrapper::-webkit-scrollbar-track-piece {
+		background-color: #f8f8f8;
+	}
+	.el-table__body-wrapper::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+	.el-table__body-wrapper::-webkit-scrollbar-thumb {
+		background-color: #dddddd;
+		border-radius: 3px;
+	}
+	.el-table__body-wrapper::-webkit-scrollbar-thumb:hover {
+		background-color: #bbb;
+	}
+	.el-table__header {
+		.cell {
+			font-weight: 400;
+			font-size: 14px;
+			color: #666;
+		}
+	}
+	.el-table__body tr:hover > td{
+			background-color:#eff6ff !important;
+	}
+	tr > td,
+	tr > th{
+		&:first-of-type {
+			padding-left:10px !important;
+		} 
+	}
+}
+// 分页样式
+.el-pagination {
+	.btn-prev,
+	.btn-next {
+		background-color: #fff !important;
+		border: 1px solid #e9e9e9 !important;
+		border-radius: 4px !important;
+	}
+	.el-pager {
+		.number {
+			background-color: #fff !important;
+			border: 1px solid #e9e9e9 !important;
+			border-radius: 4px !important;
+			&.active {
+				background-color: #3368A9 !important;
+			}
+		}
+		.more {
+			background-color: #fff !important;
+			border: 1px solid #e9e9e9 !important;
+			border-radius: 4px !important;
+		}
+	}
+}
+// 截图样式
+.cropperWrap {
+	.cropper-content {
+		.cropper {
+			width: auto;
+			height: 500px;
+		}
+	}
+	.submitBtn {
+		width: 264px;
+		margin-top: 20px;
+		height: 40px;
+		opacity: 1;
+		border-radius: 5px;
+	}
+}
+// 弹框样式
+.el-message-box {
+	padding: 0 !important;
+	.el-message-box__header {
+		height: 50px;
+		line-height: 50px;
+		padding: 0;
+		.el-message-box__title {
+			display: inline;
+			padding-left: 20px;
+		}
+	}
+	.el-message-box__content{
+		text-align: center;
+		border-top: 1px solid #EBEEF5;
+		padding-top: 10px;
+		padding-bottom: 45px;
+		.el-message-box__message p{
+			color: #333;
+			font-size: 15px;
+		}
+	}
+	.el-message-box__btns{
+		height: 36px;
+		padding: 0;
+		margin-bottom: 30px;
+		display: flex;
+		justify-content: center;
+		.el-button {
+			width: 100px;
+			height: 36px;
+			&:last-of-type {
+				margin-left: 30px;
+			}
+		}
+	}
+}
+// 模态框样式
+.el-dialog {
+	.el-dialog__header {
+		height: 50px;
+		line-height: 50px;
+		padding: 0;
+		padding-left: 20px;
+	}
+	.el-dialog__body {
+		padding: 20px;
+	}
+}
+.el-tabs--border-card{
+	border: none !important;
+	box-shadow: none !important;
+}
+// input删除图标样式
+.el-input__suffix {
+    .el-input__suffix-inner {
+      border-color: none;
+      .el-icon-circle-close:before {
+        content: "\e79d" !important;
+        font-size: 18px;
+      }
+    }
+  }
+  //视频窗口大小
+  .video-js {
+    width: 524px;
+    height: 393px;
+}
+// 时间搜索框样式
+.el-date-editor .el-range-separator{
+	width: 8%!important;
+}
+.mouse-cover-canvas {
+    position: absolute;
+    left: 810px !important;
+    top: 180px !important;
+  }
+  .magnifier-box{
+	  overflow: hidden !important;
+	img{
+		height: 100% !important;
+		width: 100% !important;
+	}
+  } 
