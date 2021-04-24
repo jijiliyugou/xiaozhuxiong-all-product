@@ -10,25 +10,35 @@
             height: 120px;
             border-radius: 50%;;"
               fit="contain"
-              :src="item.companyLogo"
+              :src="companyInfo.companyLogo"
               lazy
             >
               <div slot="placeholder" class="image-slot">
-                <img :src="require('@/assets/images/logo.png')" />
+                <img :src="require('@/assets/images/imgError.png')" />
               </div>
               <div slot="error" class="image-slot">
-                <img :src="require('@/assets/images/logo.png')" />
+                <img :src="require('@/assets/images/imgError.png')" />
               </div>
             </el-image>
           </div>
           <div class="clientsData">
-            <div class="name">{{ item.companyName }}</div>
+            <div class="name">{{ companyInfo.companyName }}</div>
             <div class="tel">
-              <p>联系人：{{ item.contactsMan }}</p>
-              <p>电话：{{ item.phoneNumber }}</p>
-              <p>手机：{{ item.phoneNumber }}</p>
-              <p>地址：{{ item.address }}</p>
-              <p><img src="~@/assets/images/consult.png" alt /> 在线咨询</p>
+              <p v-if="companyInfo.contactsMan">
+                联系人：{{ companyInfo.contactsMan }}
+              </p>
+              <p v-if="companyInfo.telePhoneNumber">
+                电话：{{ companyInfo.telePhoneNumber }}
+              </p>
+              <p v-if="companyInfo.phoneNumber">
+                手机：{{ companyInfo.phoneNumber }}
+              </p>
+              <p v-if="companyInfo.qq">QQ：{{ companyInfo.qq }}</p>
+              <p v-if="companyInfo.address">地址：{{ companyInfo.address }}</p>
+              <p class="onlineConsultation" @click="toNews">
+                <img src="~@/assets/images/consult.png" alt />
+                在线咨询
+              </p>
             </div>
           </div>
         </div>
@@ -187,6 +197,7 @@
 <script>
 import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
+import eventBus from "@/assets/js/common/eventBus.js";
 export default {
   name: "bsMyClientsDetail",
   components: {
@@ -200,6 +211,7 @@ export default {
   },
   data() {
     return {
+      companyInfo: {},
       isDiyu: 0,
       isPrice: null,
       isTime: null,
@@ -224,11 +236,42 @@ export default {
       typesList: []
     };
   },
+
   created() {},
   mounted() {
+    eventBus.$emit("showCart", true);
     this.getProductListPageAll();
+    this.getCompanyByID();
   },
   methods: {
+    // 去聊天
+    toNews() {
+      const fd = {
+        name: this.companyInfo.companyNumber + "bsNews",
+        linkUrl: "/bsIndex/bsNews",
+        component: "bsNews",
+        refresh: true,
+        label: this.companyInfo.companyName,
+        value: this.companyInfo
+      };
+      this.$router.push("/bsIndex/bsNews");
+      this.$store.commit("myAddTab", fd);
+    },
+    // 获取厂商资料
+    async getCompanyByID() {
+      const res = await this.$http.post("/api/CompanyByID", {
+        companyNumber: this.item.companyNumber
+      });
+      if (res.data.result.code === 200) {
+        this.companyInfo = res.data.result.item;
+        console.log(res.data.result.item);
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
     //所有产品接口
     async getProductListPageAll() {
       const fd = {
@@ -467,6 +510,9 @@ export default {
                 width: 28px;
                 height: 28px;
               }
+            }
+            .onlineConsultation {
+              cursor: pointer;
             }
           }
         }

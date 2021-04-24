@@ -1,103 +1,14 @@
 <template>
   <div class="bsSampleQuotationDetails">
     <div class="title">报价详情</div>
-    <div class="hander">
-      <div class="handerTop">
-        <div class="flex_t">
-          <p>
-            报价单号：<span class="pId">{{ itemList.offerNumber }} </span>
-          </p>
-          <p>
-            客户名称：<span>{{ itemList.customerName }} </span>
-          </p>
-          <p>
-            操作员：<span style="color:#2D7FE4">{{ itemList.linkman }} </span>
-          </p>
-          <p>
-            状态：<span
-              :style="{
-                color: itemList.status == 0 ? '#3368A9' : '#2D7FE4'
-              }"
-              >{{
-                itemList.status == 0
-                  ? "未审核"
-                  : itemList.status == 1
-                  ? "审核通过"
-                  : "审核不通过"
-              }}
-            </span>
-          </p>
-        </div>
-        <div class="flex_b">
-          <p>
-            报价时间：<span>{{ itemList.createdOn }} </span>
-          </p>
-          <p>
-            报价备注：<span>{{ itemList.title }} </span>
-          </p>
-        </div>
-      </div>
-      <div class="handerTab">
-        <el-table
-          :header-cell-style="{ backgroundColor: '#f9fafc' }"
-          :data="handerTabData"
-          style="width: 100%"
-          row-key="id"
-          border
-          lazy
-        >
-          <el-table-column
-            align="center"
-            prop="offerMethod"
-            label="报价方式"
-            width="180"
-          >
-          </el-table-column>
-          <el-table-column align="center" prop="profit" label="利润率">
-          </el-table-column>
-          <el-table-column
-            align="center"
-            prop="totalCost"
-            label="总费用"
-            width="180"
-          >
-          </el-table-column>
-          <el-table-column
-            align="center"
-            prop="exchange"
-            label="汇率"
-            width="180"
-          >
-          </el-table-column>
-          <el-table-column align="center" prop="decimalPlaces" label="小数位数">
-          </el-table-column>
-
-          <el-table-column align="center" prop="cu_deName" label="币种">
-          </el-table-column>
-          <el-table-column align="center" prop="size" label="每车尺寸">
-          </el-table-column>
-          <el-table-column
-            align="center"
-            prop="rejectionMethod"
-            label="取舍方式"
-          >
-          </el-table-column>
-          <el-table-column align="center" prop="miniPrice" label="价钱小于">
-          </el-table-column>
-          <el-table-column
-            align="center"
-            prop="miniPriceDecimalPlaces"
-            label="小数位数"
-          >
-          </el-table-column>
-        </el-table>
-      </div>
-    </div>
-
+    <bsSampleQuotationTopComponent
+      :itemList="itemList"
+      :handerTabData="handerTabData"
+    ></bsSampleQuotationTopComponent>
     <div class="bsSampleTable">
       <div class="top">
         <div class="left">报价商品列表({{ tableData.length }})</div>
-        <div class="right">
+        <div class="right" v-if="tableData.length > 0">
           <el-button @click="exportOrder()" type="warning"> 导出列表</el-button>
         </div>
       </div>
@@ -108,20 +19,30 @@
           ref="collecTable"
           :header-cell-style="{ background: '#f1f3f6' }"
         >
-          <el-table-column prop="img" label="产品" align="center" width="300">
+          <el-table-column label="序号" type="index" align="center" width="60">
+          </el-table-column>
+          <el-table-column prop="img" label="产品" width="280">
             <template slot-scope="scope">
               <div class="imgBox">
                 <el-image
                   @click.native="goDetails(scope.row)"
                   fit="contain"
-                  style="width:80px;height:60px;"
-                  :src="scope.row.imageUrl && scope.row.imgUrlList[0]"
+                  style="width: 80px; height: 60px"
+                  :src="scope.row.imgUrlList && scope.row.imgUrlList[0]"
                 >
                   <div slot="placeholder" class="errorImg">
-                    <img src="~@/assets/images/imgError.png" alt />
+                    <img
+                      style="width: 55px; height: 60px"
+                      src="~@/assets/images/imgError.png"
+                      alt
+                    />
                   </div>
                   <div slot="error" class="errorImg">
-                    <img src="~@/assets/images/imgError.png" alt />
+                    <img
+                      style="width: 55px; height: 60px"
+                      src="~@/assets/images/imgError.png"
+                      alt
+                    />
                   </div>
                 </el-image>
                 <div class="productName">
@@ -210,8 +131,13 @@
             prop="boxNumber"
             label="箱数"
             align="center"
-            width="100"
+            width="80"
           >
+            <template slot-scope="scope">
+              <span>
+                {{ handleOffer(scope.row.boxNumber) }}
+              </span>
+            </template>
           </el-table-column>
           <!-- <el-table-column label="箱数" align="center" width="100">
             <template slot-scope="scope">
@@ -233,36 +159,49 @@
           >
             <template slot-scope="scope">
               <span>
-                {{ sumPriceCount(scope.row.boxNumber, scope.row.ou_lo) }}
+                {{
+                  handleOffer(
+                    sumPriceCount(scope.row.boxNumber, scope.row.ou_lo)
+                  )
+                }}
               </span>
             </template>
           </el-table-column>
+          <el-table-column prop="price" label="厂价" align="center" width="100">
+            <template slot-scope="scope">
+              <span style="color: #f56c6c"> ￥{{ scope.row.price }} </span>
+            </template>
+          </el-table-column>
+
           <el-table-column
-            prop="unitPrice"
-            label="单价"
+            prop="offerAmount"
+            label="报出价"
             align="center"
             width="100"
           >
             <template slot-scope="scope">
-              <span style="color:#f56c6c">
-                {{ scope.row.cu_de + scope.row.unitPrice }}
+              <span style="color: #f56c6c">
+                {{ scope.row.cu_de + handleOffer(scope.row.offerAmount) }}
               </span>
             </template>
           </el-table-column>
+
           <el-table-column
             prop="OfferTotalAmount"
-            label="总价"
+            label="报出总价"
             align="center"
             width="100"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.cu_de }}</span>
-              <span style="color:#f56c6c">
+              <span style="color: #f56c6c">{{ scope.row.cu_de }}</span>
+              <span style="color: #f56c6c">
                 {{
-                  priceCount(
-                    scope.row.unitPrice,
-                    scope.row.ou_lo,
-                    scope.row.boxNumber
+                  handleOffer(
+                    priceCount(
+                      scope.row.offerAmount,
+                      scope.row.ou_lo,
+                      scope.row.boxNumber
+                    )
                   )
                 }}
               </span>
@@ -270,6 +209,9 @@
           </el-table-column>
         </el-table>
       </div>
+    </div>
+    <!-- 统计 -->
+    <div class="tableBtoBox">
       <div class="tableBto">
         <div class="right">
           <p class="item">
@@ -283,35 +225,41 @@
           <p class="item">
             <span class="itemTitle">总体积/总材积：</span>
             <span
-              >{{ myTotalVolume(tableData).outerBoxStere }}/{{
-                myTotalVolume(tableData).outerBoxFeet
+              >{{ handleOffer(myTotalVolume(tableData).outerBoxStere) }}/{{
+                handleOffer(myTotalVolume(tableData).outerBoxFeet)
               }}</span
             >
           </p>
           <p class="item">
             <span class="itemTitle">总毛重/总净重：</span>
-            <span>{{ totalMaozhong() }}/{{ totalJingzhong() }}(KG)</span>
+            <span
+              >{{ handleOffer(totalMaozhong()) }}/{{
+                handleOffer(totalJingzhong())
+              }}(KG)</span
+            >
           </p>
           <p class="item">
             <span class="itemTitle">总金额：</span>
-            <span class="price">￥{{ myTotalPrice(tableData) }}</span>
+            <span class="price"
+              >{{ item.cu_de + handleOffer(myTotalPrice(tableData)) }}
+            </span>
           </p>
         </div>
       </div>
-      <!-- 分页 -->
-      <!-- <center style="padding:20px 0;">
-        <el-pagination
-          layout="total, sizes, prev, pager, next, jumper"
-          :page-sizes="[12, 24, 36, 48]"
-          background
-          :total="totalCount"
-          :page-size="pageSize"
-          :current-page.sync="currentPage"
-          @current-change="handleCurrentChange"
-          @size-change="handleSizeChange"
-        ></el-pagination>
-      </center> -->
     </div>
+    <!-- 分页 -->
+    <!-- <center style="padding:20px 0;">
+          <el-pagination
+            layout="total, sizes, prev, pager, next, jumper"
+            :page-sizes="[12, 24, 36, 48]"
+            background
+            :total="totalCount"
+            :page-size="pageSize"
+            :current-page.sync="currentPage"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+          ></el-pagination>
+        </center> -->
     <!-- 导出订单模板dialog -->
     <transition name="el-zoom-in-center">
       <el-dialog
@@ -329,10 +277,12 @@
 
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent";
+import bsSampleQuotationTopComponent from "@/components/bsComponents/bsSampleComponent/bsSampleQuotationTopComponent";
 export default {
   name: "bsSampleQuotationDetails",
   components: {
-    bsExportOrder
+    bsExportOrder,
+    bsSampleQuotationTopComponent
   },
   props: {
     item: {
@@ -346,7 +296,7 @@ export default {
       handerTabData: [],
       tableData: [],
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 500,
       totalCount: 0,
       itemList: {}
     };
@@ -354,13 +304,19 @@ export default {
   created() {},
 
   mounted() {
-    this.getProductOfferDetailPage();
     this.getProductOfferNumber();
   },
   methods: {
+    // 判断编号
+    handleOffer(row) {
+      if (this.item.offerNumber.indexOf("S") < 0) {
+        return row;
+      } else {
+        return 0;
+      }
+    },
     //厂商跳转
     toFactory(item) {
-      console.log(item);
       const fd = {
         name: item.supplierNumber,
         linkUrl: this.$route.path,
@@ -380,16 +336,19 @@ export default {
     },
     // 获取该订单报价公式详情
     async getProductOfferNumber() {
-      const fd = {
-        OfferNumber: this.item.offerNumber
-      };
-      const res = await this.$http.post("/api/GetProductOfferByNumber", fd);
-      if (res.data.result.code === 200) {
-        this.handerTabData.push(res.data.result.item);
-        this.itemList = res.data.result.item;
-      } else {
-        this.$message.error(res.data.result.msg);
+      if (this.item.offerNumber.indexOf("S") < 0) {
+        const fd = {
+          OfferNumber: this.item.offerNumber
+        };
+        const res = await this.$http.post("/api/GetProductOfferByNumber", fd);
+        if (res.data.result.code === 200) {
+          this.handerTabData.push(res.data.result.item);
+          this.itemList = res.data.result.item;
+        } else {
+          this.$message.error(res.data.result.msg);
+        }
       }
+      this.getProductOfferDetailPage();
     },
     // 点击产品名字跳转
     goDetails(row) {
@@ -401,22 +360,39 @@ export default {
         label: row.fa_no || "产品详情",
         value: row
       };
-      console.log(row);
       this.$store.commit("myAddTab", fd);
     },
     // 获取列表
     async getProductOfferDetailPage() {
-      const fd = Object.assign(
-        { skipCount: 1, maxResultCount: 9999 },
-        this.item
-      );
+      if (this.item.offerNumber.indexOf("S") < 0) {
+        const fd = Object.assign(
+          { skipCount: this.currentPage, maxResultCount: this.pageSize },
+          this.item
+        );
 
-      const res = await this.$http.post("/api/ProductOfferDetailPage", fd);
-      if (res.data.result.code === 200) {
-        this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        const res = await this.$http.post("/api/ProductOfferDetailPage", fd);
+        if (res.data.result.code === 200) {
+          this.totalCount = res.data.result.item.totalCount;
+          this.tableData = res.data.result.item.items;
+        } else {
+          this.$message.error(res.data.result.msg);
+        }
       } else {
-        this.$message.error(res.data.result.msg);
+        const fd_s = {
+          skipCount: this.currentPage,
+          maxResultCount: this.pageSize,
+          sampleNumber: this.item.offerNumber
+        };
+        const res = await this.$http.post(
+          "/api/CompanySamplelistByNumber",
+          fd_s
+        );
+        if (res.data.result.code === 200) {
+          this.totalCount = res.data.result.item.totalCount;
+          this.tableData = res.data.result.item.items;
+        } else {
+          this.$message.error(res.data.result.msg);
+        }
       }
     },
     // 导出找样
@@ -436,12 +412,12 @@ export default {
         this.currentPage != 1
       )
         return false;
-      this.getVendorListPage();
+      this.getProductOfferDetailPage();
     },
     // 修改当前页
     handleCurrentChange(page) {
       this.currentPage = page;
-      this.getVendorListPage();
+      this.getProductOfferDetailPage();
     },
 
     isInteger(obj) {
@@ -538,8 +514,8 @@ export default {
       return this.multiply(boxNumber, ou_lo);
     },
     // 单个产品总价
-    priceCount(unitPrice, ou_lo, boxNumber) {
-      return this.multiply(this.multiply(unitPrice, ou_lo), boxNumber);
+    priceCount(price, ou_lo, boxNumber) {
+      return this.multiply(this.multiply(price, ou_lo), boxNumber);
     },
     // 计算总净重
     totalJingzhong() {
@@ -582,7 +558,6 @@ export default {
         outerBoxFeet
       };
     },
-    onSubmit() {},
     // 计算总箱数量
     myTotalQuantity() {
       let number = 0;
@@ -594,11 +569,12 @@ export default {
     // 计算总价
     myTotalPrice(list) {
       let price = 0;
+
       for (let i = 0; i < list.length; i++) {
         price = this.add(
           price,
           this.multiply(
-            this.multiply(list[i].unitPrice, list[i].boxNumber),
+            this.multiply(list[i].offerAmount, list[i].boxNumber),
             list[i].ou_lo
           )
         );
@@ -690,39 +666,9 @@ export default {
       transform: translate(0, -50%);
     }
   }
-  .hander {
-    .handerTop {
-      padding-top: 26px;
-      .flex_t {
-        display: flex;
-        align-content: center;
-        margin-bottom: 18px;
-        p {
-          width: 235px;
-          margin-right: 30px;
-          font-weight: 400;
-          .pId {
-            font-weight: 700;
-            font-size: 15px;
-          }
-        }
-      }
-      .flex_b {
-        display: flex;
-        align-content: center;
-        p {
-          margin-right: 30px;
-          width: 235px;
-        }
-      }
-    }
-    .handerTab {
-      margin-top: 25px;
-    }
-  }
-
   .bsSampleTable {
     padding-top: 15px;
+    margin-bottom: 80px;
     .top {
       height: 55px;
       font-size: 15px;
@@ -734,31 +680,6 @@ export default {
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
-    .tableBto {
-      display: flex;
-      align-items: center;
-      height: 80px;
-      padding-left: 10px;
-      box-sizing: border-box;
-      .right {
-        flex: 1;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        .item {
-          margin-right: 15px;
-          display: flex;
-          align-items: center;
-          // .itemTitle {
-          // }
-          .price {
-            color: #eb1515;
-            font-weight: 700;
-            font-size: 18px;
-          }
-        }
-      }
     }
   }
   @{deep} .tableBox {
@@ -796,18 +717,104 @@ export default {
             overflow: hidden; /*超出部分隐藏*/
             white-space: nowrap; /*不换行*/
             text-overflow: ellipsis; /*超出部分文字以...显示*/
-            .factoryName {
-              cursor: pointer;
-            }
           }
           .factory {
             color: #3368a9;
+            display: flex;
+            align-items: center;
+            .factoryName {
+              cursor: pointer;
+            }
+            .icons {
+              display: flex;
+              .cartPhoneIcon,
+              .cartInfoIcon {
+                width: 20px;
+                height: 20px;
+                margin-left: 15px;
+                cursor: pointer;
+              }
+              .cartPhoneIcon {
+                background: url("~@/assets/images/cartPhoneIcon.png") no-repeat
+                  center;
+                background-size: contain;
+              }
+              .cartInfoIcon {
+                background: url("~@/assets/images/cartInfoIcon.png") no-repeat
+                  center;
+                background-size: contain;
+              }
+            }
           }
           .name {
             margin-top: 8px;
           }
         }
       }
+    }
+  }
+  .tableBtoBox {
+    width: 1652px;
+    position: fixed;
+    right: 27px;
+    bottom: 0px;
+    z-index: 30;
+    .tableBto {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      height: 80px;
+      padding: 0 30px;
+      box-sizing: border-box;
+      .right {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        .item {
+          margin-right: 15px;
+          display: flex;
+          align-items: center;
+          // .itemTitle {
+          // }
+          .price {
+            color: #eb1515;
+            font-weight: 700;
+            font-size: 18px;
+          }
+        }
+      }
+    }
+  }
+}
+// 表格样式
+.el-table {
+  /*
+	 *改变浏览器默认的滚动条样式
+	 */
+  .el-table__body-wrapper::-webkit-scrollbar-track {
+    background-color: #f8f8f8;
+  }
+  .el-table__body-wrapper::-webkit-scrollbar-track-piece {
+    background-color: #f8f8f8;
+  }
+  .el-table__body-wrapper::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+  .el-table__body-wrapper::-webkit-scrollbar-thumb {
+    background-color: #dddddd;
+    border-radius: 3px;
+  }
+  .el-table__body-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb;
+  }
+  .el-table__header {
+    .cell {
+      font-weight: 400;
+      font-size: 14px;
+      color: #666;
     }
   }
 }

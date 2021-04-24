@@ -9,8 +9,8 @@
           :key="i"
         >
           {{ item.name }}
-          <span v-if="isDiyu === i">({{ totalCount }})</span>
-          <span v-else>(0)</span>
+          <span v-if="i === 0">({{ oneCount }})</span>
+          <span v-else-if="i === 1">({{ twoCount }})</span>
         </div>
       </div>
       <div class="right">
@@ -41,14 +41,15 @@
     </div>
     <div class="searchBox">
       <div class="left">
-        <div class="item">
+        <div class="item" style="min-width:350px">
           <span class="label">关键字：</span>
           <el-input
+            v-focus
             type="text"
             size="medium"
             v-model="keyword"
             clearable
-            placeholder="请输入关键词"
+            placeholder="输入关键词+空格可模糊搜索"
             @keyup.native.enter="search"
           ></el-input>
         </div>
@@ -122,6 +123,7 @@ export default {
     return {
       currentChildren: null,
       currentTabs: {},
+      TwoTabs: {},
       floorList: [],
       isGrid: "bsGridComponent",
       keyword: null,
@@ -129,6 +131,8 @@ export default {
       isDiyu: 0,
       tableData: [],
       totalCount: 0,
+      oneCount: 0,
+      twoCount: 0,
       pageSize: 12,
       currentPage: 1
     };
@@ -140,7 +144,10 @@ export default {
       if (res.data.result.code === 200) {
         this.floorList = res.data.result.item.vipRegionItem;
         this.currentTabs = res.data.result.item.vipRegionItem[0];
+        this.TwoTabs = res.data.result.item.vipRegionItem[1];
         this.getProductsList();
+        this.getTwoProductsList();
+        this.getOneProductsList();
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -208,6 +215,31 @@ export default {
         this.tableData = res.data.result.item.items;
       }
     },
+    // 获取列表
+    async getTwoProductsList() {
+      const fd = {
+        skipCount: this.currentPage,
+        maxResultCount: this.pageSize,
+        parentCode: this.TwoTabs.code,
+        typeId: 1
+      };
+      const res = await this.$http.post("/api/GetProductsByTypePage", fd);
+      if (res.data.result.code === 200) {
+        this.twoCount = res.data.result.item.totalCount;
+      }
+    },
+    async getOneProductsList() {
+      const fd = {
+        skipCount: this.currentPage,
+        maxResultCount: this.pageSize,
+        parentCode: this.currentTabs.code,
+        typeId: 1
+      };
+      const res = await this.$http.post("/api/GetProductsByTypePage", fd);
+      if (res.data.result.code === 200) {
+        this.oneCount = res.data.result.item.totalCount;
+      }
+    },
     // 切换产品列表样式
     handerIsGrid(type) {
       this.isGrid = type;
@@ -237,22 +269,11 @@ export default {
   mounted() {
     this.getVipRegions();
     // 取消收藏
-    eventBus.$on("resetProducts", list => {
-      if (list.length) {
-        for (let i = 0; i < this.tableData.length; i++) {
-          for (let j = 0; j < list.length; j++) {
-            if (this.tableData[i].productNumber == list[j].productNumber) {
-              this.tableData[i].isFavorite = true;
-              break;
-            } else {
-              this.tableData[i].isFavorite = false;
-            }
-          }
+    eventBus.$on("resetProducts", item => {
+      for (let i = 0; i < this.tableData.length; i++) {
+        if (this.tableData[i].productNumber == item.productNumber) {
+          this.tableData[i].isFavorite = item.isFavorite;
         }
-      } else {
-        this.tableData.forEach(val => {
-          val.isFavorite = false;
-        });
       }
     });
     // 删除购物车
@@ -279,6 +300,9 @@ export default {
     ...mapGetters({
       shoppingList: "myShoppingList"
     })
+  },
+  beforeDestroy() {
+    eventBus.$off("resetProducts");
   }
 };
 </script>

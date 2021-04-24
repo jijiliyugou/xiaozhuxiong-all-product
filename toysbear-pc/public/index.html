@@ -4,21 +4,32 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="format-detection" content="telephone=yes"/>
+  <meta name="format-detection" content="telephone=yes" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <!-- 把所有http静态资源请求统一转换为https请求资源 -->
   <!-- <meta http-equiv='Content-Security-Policy' content='upgrade-insecure-requests'> -->
+  <!-- 清缓存 -->
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Cache-Control" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <link rel="icon" href="favicon.ico">
   <title>小竹熊 云科技</title>
   <link rel="stylesheet" href="https://at.alicdn.com/t/font_1900734_acftjuo5ms.css">
   <!-- 地图 -->
   <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=Sq9k6GvxctKQIyW4wKWaasFDz5AdlFNH"></script>
-  <!-- 引入样式 -->
-  <!-- <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> -->
-  <!-- cdn引入vue -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
-  <!-- 引入组件库 -->
-  <!-- <script src="https://unpkg.com/element-ui/lib/index.js"></script> -->
+  <script>
+    var userAgent = navigator.userAgent;
+    // 判断是否为小于IE11的浏览器
+    var isLessIE11 =
+      userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1;
+    console.log(window.location.href);
+    if (isLessIE11 && window.location.href == "https://www.toysbear.com/#/erphome") {
+      // this._message('请升级至IE11或更换其他浏览器，才能使用发布公告功能', 'warn')
+      window.location.href =
+        "https://www.toysbear.com/erpProduct/erpPage/erpHome/erpHome.html";
+    }
+  </script>
 </head>
 
 <body>

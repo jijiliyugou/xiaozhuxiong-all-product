@@ -61,9 +61,9 @@
         </div>
         <div class="right"></div>
       </div>
-      <div class="text-item">
+      <!-- <div class="text-item">
         产品数量：<span>{{ companyInfo && companyInfo.productCount }}</span>
-      </div>
+      </div> -->
       <div class="text-item lianxi">
         我要联系：
         <a :href="tel">{{

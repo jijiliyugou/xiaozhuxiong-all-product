@@ -3,9 +3,24 @@ import VueRouter from "vue-router";
 import store from "@/store";
 import axios from "axios";
 import { staticRouters, setMenuTree } from "./routers";
+// const originalPush = VueRouter.prototype.push;
+// VueRouter.prototype.push = function push(location) {
+//   return originalPush.call(this, location).catch(err => err);
+// };
+//解决编程式路由往同一地址跳转时会报错的情况
 const originalPush = VueRouter.prototype.push;
-VueRouter.prototype.push = function push(location) {
+const originalReplace = VueRouter.prototype.replace;
+//push
+VueRouter.prototype.push = function push(location, onResolve, onReject) {
+  if (onResolve || onReject)
+    return originalPush.call(this, location, onResolve, onReject);
   return originalPush.call(this, location).catch(err => err);
+};
+//replace
+VueRouter.prototype.replace = function push(location, onResolve, onReject) {
+  if (onResolve || onReject)
+    return originalReplace.call(this, location, onResolve, onReject);
+  return originalReplace.call(this, location).catch(err => err);
 };
 Vue.use(VueRouter);
 function getToken() {
@@ -44,7 +59,6 @@ export const router = new VueRouter({
 export async function getMenuFuc() {
   const list = store.state.routers;
   const routers = await setMenuTree(list);
-  console.log(routers, 1233456);
   router.addRoutes(routers);
 }
 // 拦截

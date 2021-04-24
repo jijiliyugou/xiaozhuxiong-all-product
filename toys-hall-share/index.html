@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+  <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品详情</title>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="./static/css/base.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+    <script src="./static/js/jquery.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="title">
+            <span id="factoryTp"></span>
+        </div>
+        <div class="contact">
+            <p>联系人： <span id="linkmanTp"></span></p>
+            <p>联系电话： <span id="handsetTp"></span></p>
+        </div>
+    </div>
+    <div class="main">
+        <div id="mainBox">
+            <ul id="slideshow">
+            </ul>
+        </div>
+        <div class="search">
+            <div class="sork">
+                <div>
+                    <p>时间</p> <span id="isTime" class="arrowsFlag"></span>
+                </div>
+                <div>
+                    <p>价格</p> <span id="isPrice" class="arrowsFlag"></span>
+                </div>
+            </div>
+            <div class="searchInput">
+                <div class="searchInput_l">
+                    <img src="./static/images/fdj.png" alt="">
+                    <input id="keyWord" type="text" placeholder="请输入关键字">
+                </div>
+                <div class="searchInput_r">搜索</div>
+            </div>
+            <div class="triggerIcon">
+                <div id="cutGridIcon" class="gridActiveIcon"></div>
+                <div id="cutColumnIcon" class="columnIcon"></div>
+            </div>
+        </div>
+    </div>
+    <div class="tableBox">
+        <ul id="gridList" style="display:block;">
+        </ul>
+        <!-- 一行两个 -->
+        <ul id="columnList" style="display:none;">
+        </ul>
+        <!-- 分页 -->
+        <div class="pageBox">
+            <ul>
+                <li> <select id="changePage" onChange="handelChangePage()">
+                        <option value="12">12</option>
+                        <option value="24">24</option>
+                        <option value="36">36</option>
+                    </select></li>
+                <li style="border: 0;"> 共</li>
+                <li style="border: 0;">
+                    <input id="totalCountPage" type="text" value="0">
+                </li>
+                <li style="border: 0;"> 条</li>
+                <li onclick="previousPage()">
+                    上一页
+                </li>
+                <li style="margin: 5px 10px;">
+                    <input id="numberPage" type="text" value="1">
+                </li>
+                <li onclick="nextPage()">
+                    下一页
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer">
+        <div>
+            <p>资料来源： <span>耀昇展厅</span></p>
+            <p> 技术支持：<span>深圳宏升软件技术开发有限公司</span></p>
+        </div>
+
+    </div>
+</body>
+
+<script>
+    var url = "https://hall.toysbear.com"
+    // 初始化
+    var data = {
+        pageIndex: 1,
+        pageSize: 12,
+        keyWord: ""
+    }
+    var tableDate = [];
+    $(document).ready(function () {
+        getProductList()
+        getProductkeyGuid()
+    })
+
+    // 请求厂商信息
+    function getProductkeyGuid() {
+        var keyGuid = window.localStorage.getItem("keyGuid");
+        $.get("https://hall.toysbear.com/api/Manufacturer/ManufacturerInfo?keyGuid=" + (keyGuid ||
+            "BE9757F5-E2B7-43DC-BABC-09251BCE3C72"), function (res) {
+            if (res.Code == 1) {
+                // 厂商
+                document.getElementById('factoryTp').innerHTML = res.Data.ma_na
+                //  <!-- 联系人 -->
+                document.getElementById('linkmanTp').innerHTML = res.Data.linkman
+                //  <!-- 电话 -->
+                document.getElementById('handsetTp').innerHTML = res.Data.handset
+
+            } else {
+                alert(res.Message);
+            }
+        })
+    }
+    // 请求列表
+    function getProductList() {
+        $.get(url + "/api/Product/ProductList", data, function (res) {
+            if (res.Code == 1) {
+                tableDate = res.Data.ProductInfo.Items;
+                if (document.getElementById('slideshow').scrollWidth < 1300) {
+                    getSlideshowList(tableDate)
+                }
+                if (document.getElementById('gridList').style.display === "block") {
+                    getGridList(tableDate)
+                } else {
+                    getColumnList(tableDate)
+                }
+                $("#totalCountPage").val(res.Data.ProductInfo.TotalCount)
+                $("#keyWord").val("");
+                data.keyWord = "";
+                delete data.keyWord
+            } else {
+                alert(res.Message);
+            }
+        });
+    }
+    // 渲染滚动列表
+    function getSlideshowList(list) {
+        $("#slideshow").empty();
+        for (var i = 0; i < list.length; i++) {
+            var html = ""
+            switch (list[i].ProductImages) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].imgUrlVal = ""
+                    break;
+                default:
+                    list[i].imgUrlVal = list[i].ProductImages[0]
+            }
+            html += " <li onclick='toDetails(" + i + ")' class='item'><div class='itemMain'> <img alt='' src=" + list[i]
+                .imgUrlVal +
+                "><p class='itemMainName'>" + list[i]
+                .ProductName +
+                "</p><p class='itemMainPrice'>￥<span>" +
+                list[i].FactoryPrice + "</span></p></div></li>"
+            $("#slideshow").append(html);
+        }
+        if (list.length > 4) {
+            slideList()
+        }
+    }
+    // 滚动事件
+    function slideList() {
+        //定义一个变量存储边距
+        var num = 0;
+        //让边距不停减小，左移
+        var timeer
+        var mainBox = document.getElementById('mainBox').clientWidth
+        var scrollWidth = document.getElementById('slideshow').scrollWidth
+
+        function autoPlay() {
+            timeer = setInterval(function () {
+                num -= 1
+                //当移动四张图片后，边距为-2000，这时候让Ul跳转回初始位置
+                if (num <= -(scrollWidth - mainBox)) {
+                    num = 0
+                };
+                $('#slideshow').css('marginLeft', num);
+            }, 10)
+        }
+        autoPlay();
+        //鼠标移入清除移动，离开时继续运行
+        $('.item').hover(function () {
+            //停止滚动
+            clearInterval(timeer);
+            //给相邻的元素添加淡入效果0.5的透明度
+            $(this).siblings().fadeTo(0, 0.5);
+        }, function () {
+            //继续滚动
+            autoPlay(),
+                //鼠标移出相邻图片的透明度改成1
+                $(this).siblings().fadeTo(0, 1);
+        })
+    }
+    // 渲染列表
+    function getGridList(list) {
+        // var gridList = document.getElementById('gridList');
+        $("#gridList").empty();
+        for (var i = 0; i < list.length; i++) {
+            var html = ""
+            switch (list[i].ProductImages) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].imgUrlVal = ""
+                    break;
+                default:
+                    list[i].imgUrlVal = list[i].ProductImages[0]
+            }
+            html += "<li onclick='toDetails(" + i + ")'><div   class='itemMain'> <img alt='' src=" + list[i].imgUrlVal +
+                "><p class='itemMainName'>" +
+                list[i]
+                .ProductName +
+                "</p><p class='itemMainPrice'>￥<span>" +
+                list[i].FactoryPrice + "</span></p></div></li>"
+            $("#gridList").append(html);
+        }
+    }
+    // 渲染列表gridTable
+    function getColumnList(list) {
+        // var columnList = document.getElementById('columnList');
+        $("#columnList").empty();
+        for (var i = 0; i < list.length; i++) {
+            var html = ""
+            switch (list[i].FactoryPrice) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].FactoryPrice = "  "
+                    break;
+                default:
+                    list[i].FactoryPriceVal = list[i].FactoryPrice
+            }
+            switch (list[i].ProductImages) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].imgUrlVal = ""
+                    break;
+                default:
+                    list[i].imgUrlVal = list[i].ProductImages[0]
+            }
+            switch (list[i].ProductLength) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].ProductLengthVal = "  "
+                    break;
+                default:
+                    list[i].ProductLengthVal = list[i].ProductLength
+            }
+            switch (list[i].ProductWidth) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].ProductWidthVal = "  "
+                    break;
+                default:
+                    list[i].ProductWidthVal = list[i].ProductWidth
+            }
+            switch (list[i].ProductHeight) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].ProductHeightVal = "  "
+                    break;
+                default:
+                    list[i].ProductHeightVal = list[i].ProductHeight
+            }
+            switch (list[i].InnerBoxLength) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].InnerBoxLengthVal = "  "
+                    break;
+                default:
+                    list[i].InnerBoxLengthVal = list[i].InnerBoxLength
+            }
+            switch (list[i].InnerBoxWidth) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].InnerBoxWidthVal = "  "
+                    break;
+                default:
+                    list[i].InnerBoxWidthVal = list[i].InnerBoxWidth
+            }
+            switch (list[i].InnerBoxHeight) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].InnerBoxHeightVal = "  "
+                    break;
+                default:
+                    list[i].InnerBoxHeightVal = list[i].InnerBoxHeight
+            }
+            switch (list[i].OuterBoxGrossWeight) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].OuterBoxGrossWeightVal = "  "
+                    break;
+                default:
+                    list[i].OuterBoxGrossWeightVal = list[i].OuterBoxGrossWeight
+            }
+            switch (list[i].OuterBoxNetWeight) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                    list[i].OuterBoxNetWeightVal = "  "
+                    break;
+                default:
+                    list[i].OuterBoxNetWeightVal = list[i].OuterBoxNetWeight
+            }
+
+
+            html += " <li onclick='toDetails(" + i + ")'> <div class='listLeft'><img  alt='' src=" + list[i].imgUrlVal +
+                "><p>￥<span>" +
+                list[i]
+                .FactoryPriceVal +
+                "</span></p></div><div class='listRight'><h3>" +
+                list[i].ProductName + "</h3><p>出厂货号：<span>" + list[i].FactoryNo +
+                "</span></p><p> 包装：<span>" + list[i]
+                .ChinesePack +
+                "</span></p><p>产品规格：<span>" + list[i].ProductLengthVal + "/" + list[i].ProductWidthVal + "/" +
+                list[i]
+                .ProductHeightVal + "(CM)</span></p><p>外箱规格：<span>" +
+                list[i].OuterBoxLength + "/" + list[i].OuterBoxWidth + "/" + list[i].OuterBoxHeight +
+                "(CM)</span></p> <p> 包装规格： <span> " + list[i].InnerBoxLengthVal + "/" + list[i].InnerBoxWidthVal +
+                "/" + list[
+                    i].InnerBoxHeightVal +
+                "(CM)</span></p><p> 装箱量：<span>" + list[i].OuterBoxLoadCapa + "(" + list[i].BoxUnit +
+                ")</span></p><p> 体积 / 材积：<span> " + list[i].OuterBoxBulkStere + "(CBM)/" + list[i]
+                .OuterBoxBulkFeet +
+                "(CUFT)</span></p><p>毛重 / 净重：<span>" + list[i].OuterBoxGrossWeight + "/" + list[i]
+                .OuterBoxNetWeight +
+                " (kg)</span></p></div></li>"
+            $("#columnList").append(html);
+        }
+    }
+    // 跳转产品详情
+    function toDetails(index) {
+        window.localStorage.setItem("CompanyNumber", tableDate[index].CompanyNumber);
+        window.location.href = "./productDetails.html"
+        // window.open = "https://www.baidu.com"
+    }
+    //切换产品样式
+    $("#cutGridIcon").click(function () {
+        document.getElementById('gridList').style.display = 'block';
+        document.getElementById('columnList').style.display = 'none';
+
+        $('#cutGridIcon').removeClass().addClass("gridActiveIcon")
+        $('#cutColumnIcon').removeClass().addClass("columnIcon")
+        getProductList()
+    });
+
+    $("#cutColumnIcon").click(function () {
+        document.getElementById('gridList').style.display = 'none';
+        document.getElementById('columnList').style.display = 'block';
+        $('#cutGridIcon').removeClass().addClass("gridIcon")
+        $('#cutColumnIcon').removeClass().addClass("columnActiveIcon")
+        getProductList()
+    });
+    //   搜索
+    $(".searchInput_r").click(function () {
+        if ($("#keyWord").val()) data.keyWord = $("#keyWord").val();
+        data.pageIndex = 1;
+        data.pageSize = 12;
+        $("#numberPage").val(1);
+        $("#changePage").val(12);
+        getProductList()
+    })
+    //分页条数请求
+    function handelChangePage() {
+        data.pageSize = $("#changePage").val()
+        getProductList()
+    }
+    // 上一页
+    function previousPage() {
+        var numberPage = $("#numberPage").val()
+        numberPage--
+        if (numberPage < 1) {
+            alert("已经是第一页了");
+            $("#numberPage").val(1);
+        } else {
+            $("#numberPage").val(numberPage)
+            data.pageIndex = numberPage;
+            getProductList()
+        }
+    }
+    // 下一页
+    function nextPage() {
+        var numberPage = $("#numberPage").val()
+        if (tableDate.length < data.pageSize) {
+            return false
+        } else {
+            numberPage++
+            $("#numberPage").val(numberPage)
+            var totalCount = $("#totalCountPage").val()
+            if (numberPage * data.pageSize > totalCount) {
+                if (numberPage >= Math.ceil(totalCount / data.pageSize) + 1) {
+                    numberPage--;
+                    $("#numberPage").val(numberPage)
+                    return false
+                }
+            }
+            data.pageIndex = numberPage;
+            getProductList()
+        }
+    }
+    // 时间排序
+    $("#isTime").click(function () {
+        if ($('#isTime').attr('class') === "arrowsTrue") {
+            $('#isTime').removeClass().addClass("arrowsFlag")
+            data.isTime = false;
+            getProductList()
+        } else {
+            data.isTime = true;
+            $('#isTime').removeClass().addClass("arrowsTrue")
+            getProductList()
+        }
+    })
+    // 价格排序
+    $("#isPrice").click(function () {
+        if ($('#isPrice').attr('class') === "arrowsTrue") {
+            data.isPrice = false;
+            $('#isPrice').removeClass().addClass("arrowsFlag")
+            getProductList()
+        } else {
+            data.isPrice = true;
+            $('#isPrice').removeClass().addClass("arrowsTrue")
+            getProductList()
+        }
+
+
+    })
+</script>
+
+</html>

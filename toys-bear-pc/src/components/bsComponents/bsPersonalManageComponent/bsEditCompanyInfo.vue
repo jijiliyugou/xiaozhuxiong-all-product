@@ -154,7 +154,11 @@
           ></el-input>
         </el-form-item>
       </div>
-      <el-form-item label="公司API" prop="api">
+      <el-form-item
+        label="公司API"
+        prop="api"
+        v-if="userInfo.commparnyList[0].companyType == 'Admin'"
+      >
         <el-input
           type="text"
           v-model="myEditClientForm.companyAPI"
@@ -172,7 +176,11 @@
           "
         ></el-input>
       </el-form-item>
-      <el-form-item label="备注" prop="remark">
+      <el-form-item
+        label="备注"
+        prop="remark"
+        v-if="userInfo.commparnyList[0].companyType == 'Admin'"
+      >
         <el-input
           type="textarea"
           size="medium"
@@ -206,6 +214,7 @@
 
 <script>
 import BMapComponent from "@/components/commonComponent/attrsMap/attrsMap.vue";
+import { mapState } from "vuex";
 export default {
   props: ["editClientForm"],
   components: {
@@ -467,6 +476,9 @@ export default {
       ]);
     }
     this.isShowAttrsList = false;
+  },
+  computed: {
+    ...mapState(["userInfo"])
   }
 };
 </script>

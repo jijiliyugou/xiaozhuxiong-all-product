@@ -26,6 +26,13 @@
         display: flex;
         align-items: center;
         color: #2B6AA8;
+        @{deep} .el-image {
+          .el-image__inner--center {
+            transform: none;
+            margin-left: -38px;
+            margin-top: -38px;
+          }
+        }
         .titleBox{
           margin-left: 20px;
           .chTitle{
@@ -94,7 +101,9 @@
     left: 50%;
     top: 50%;
     background-color: #fff;
-    transform: translate(-50%, -50%);
+    // transform: translate(-50%, -50%);
+    margin-left: -600px;
+    margin-top: -266px;
     .loginBox{
       width: 100%;
       height: 100%;
@@ -113,7 +122,7 @@
       }
       .middel{
         width: 330px;
-        height: 100%;
+        height: 532px;
         background-color: #fff;
         position: relative;
         .qrCodeWrap{
@@ -122,7 +131,10 @@
           height: 270px;
           left: 50%;
           top: 50%;
-          transform: translate(-50%, -43%);
+          // transform: translate(-50%, -43%);
+          transform: none;
+          margin-left: -165px;
+          margin-top: -133px;
           border-right: 1px solid #e9e9e9;
           .qrCodeBox{
             height: 270px;
@@ -130,7 +142,9 @@
             position: absolute;
             left: 50%;
             top: 50%;
-            transform: translate(-50%, -50%);
+            margin-top: -135px;
+            margin-left: -99px;
+            // transform: translate(-50%, -50%);
             .title{
               color: #333333;
               padding-left: 15px;
@@ -286,7 +300,8 @@
             width: 20px;
             height: 20px;
             z-index: 1;
-            transform: translate(0, -50%);
+            margin-top: -10px;
+            // transform: translate(0, -50%);
             &.mobile {
               background: url("~@/assets/images/手机 (2).png") no-repeat center;
               background-size: contain;

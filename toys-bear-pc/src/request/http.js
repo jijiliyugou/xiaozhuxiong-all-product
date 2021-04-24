@@ -117,13 +117,14 @@ myAxios.install = function(Vue) {
     startDate: 0, // 请求开始时间
     endDate: 0 // 请求结束时间
   });
+  // 超过一秒没有返回请求数据的才出现loading
+  // const loaddingOptions = {};
   // 推送请求拦截
   push_instance.interceptors.request.use(
     config => {
       config.headers.Utoken =
         $Store.state.userInfo && $Store.state.userInfo.accessToken;
       config.headers["content-type"] = "application/json";
-      $Store.commit("updateAppLoading", true);
       return config;
     },
     error => {
@@ -168,10 +169,22 @@ myAxios.install = function(Vue) {
       config.headers.Utoken =
         $Store.state.userInfo && $Store.state.userInfo.accessToken;
       config.headers["content-type"] = "application/json";
-      $Store.commit("updateAppLoading", true);
+      // loaddingOptions[config.url] = true;
+      // setTimeout(() => {
+      //   if (loaddingOptions[config.url])
+      if (
+        !config.url.includes("SelectProductOfferFormulaList") &&
+        !config.url.includes("CreateProductCollection") &&
+        !config.url.includes("ExportSampleOfferToExcel") &&
+        !config.url.includes("ExportCustomerOrderDetailToExcel") &&
+        !config.url.includes("GetSampleOrderExcel")
+      ) {
+        $Store.commit("updateAppLoading", true);
+      }
+      // }, 500);
       // 屏蔽不需要验证code的请求，如下载导出等
       // if (
-      //   config.url.includes("GetOfferOrderExcel") ||
+      //   config.url.includes("GetSampleOrderExcel") ||
       //   config.url.includes("GetProductOfferOrderExcel") ||
       //   config.url.includes("LittleBearInstallDownload") ||
       //   config.url.includes("LittleBearInstallRepeatDownload") ||
@@ -221,7 +234,10 @@ myAxios.install = function(Vue) {
   // 响应拦截
   instance.interceptors.response.use(
     res => {
-      $Store.commit("updateAppLoading", false);
+      // loaddingOptions[res.config.url] = false;
+      v.prototype.$nextTick(() => {
+        $Store.commit("updateAppLoading", false);
+      });
       /** 全局设置请求时长和请求内容 */
       const myUrl = res.config.url;
       let httpDate;
@@ -254,6 +270,7 @@ myAxios.install = function(Vue) {
         // 不需要loading的请求
         !res.config.url.includes("GetHotWord") &&
         !res.config.url.includes("CreateLogRecord") &&
+        !res.config.url.includes("ExportSampleOfferToExcel") &&
         // !res.config.url.includes('ProductCategoryList') &&
         !res.config.url.includes("UserConfirm") &&
         !res.config.url.includes("OrgCompanyList") &&
@@ -264,7 +281,7 @@ myAxios.install = function(Vue) {
       // 屏蔽不需要验证code的请求，如下载导出等
       if (
         res.config.url.includes("ExportSampleOfferToExcel") ||
-        res.config.url.includes("GetOfferOrderExcel") ||
+        res.config.url.includes("GetSampleOrderExcel") ||
         res.config.url.includes("GetProductOfferOrderExcel") ||
         res.config.url.includes("LittleBearInstallDownload") ||
         res.config.url.includes("LittleBearInstallRepeatDownload") ||
@@ -342,6 +359,7 @@ myAxios.install = function(Vue) {
               !error.response.config.url.includes("CreateLogRecord") &&
               !error.response.config.url.includes("UserConfirm") &&
               !error.response.config.url.includes("OrgCompanyList") &&
+              !error.response.config.url.includes("ExportSampleOfferToExcel") &&
               !error.response.config.url.includes("SampleOrderTotal")
             ) {
               $Store.commit("updateAppLoading", false);

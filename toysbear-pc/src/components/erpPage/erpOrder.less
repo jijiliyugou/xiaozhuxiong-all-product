@@ -26,6 +26,13 @@
         display: flex;
         align-items: center;
         color: #2B6AA8;
+        @{deep} .el-image {
+          .el-image__inner--center {
+            transform: none;
+            margin-left: -38px;
+            margin-top: -38px;
+          }
+        }
         .titleBox{
           margin-left: 20px;
           .chTitle{
@@ -87,10 +94,17 @@
         .signOutBox{
           display: flex;
           align-items: center;
-          .userImg{
+          @{deep} .userImg{
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            position: relative;
+            img {
+              transform: none;
+              position: absolute;
+              left: 0;
+              top: 0;
+            }
           }
           .signOut{
             color: #666666;
@@ -113,12 +127,16 @@
     .el-form {
       width: 100%;
       height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
+      // display: flex;
+      // flex-direction: column;
+      // justify-content: space-evenly;
       .items {
         display: flex;
+        margin-top: 10px;
         align-items: center;
+        &:first-of-type {
+          margin-top: 20px;
+        }
         .itemBox {
           .el-form-item {
             margin: 0;
@@ -165,4 +183,17 @@
       }
     }
   }
+}
+.remarkClass {
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap; /*不换行*/
+  text-overflow: ellipsis; /*超出部分文字以...显示*/
+}
+@{deep} .el-checkbox__input.is-checked .el-checkbox__inner::after {
+  transform:rotate(45deg);
+  -ms-transform:rotate(45deg); /* IE 9 */
+  -moz-transform:rotate(45deg);/* Firefox */
+  -webkit-transform:rotate(45deg);/* Safari 和 Chrome */
+  -o-transform:rotate(45deg);/* Opera */
 }

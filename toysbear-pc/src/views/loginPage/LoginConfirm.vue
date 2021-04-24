@@ -59,6 +59,8 @@ export default {
   },
   data() {
     return {
+      loginUrl: "https://www.toysbear.com/new/#/bsIndex",
+      // loginUrl: "http://139.9.71.135:8080/new/#/bsIndex",
       radioValue: null,
       commparnyList: []
     };
@@ -88,6 +90,9 @@ export default {
         CompanyNumber: item.companyNumber
       });
       if (res.data.result.isLogin) {
+        // 保存数据到cookit
+        this.$cookies.set("userInfo", res.data.result.accessToken);
+        console.log(this.$cookies.get("userInfo"));
         // 设置token
         this.$store.commit("setToken", res.data.result);
         this.$store.commit(
@@ -103,7 +108,6 @@ export default {
         } else {
           this.$store.commit("initShoppingCart", []);
         }
-        await this.waitTime(1);
         // 登录成功获取系统参数
         const Json = {};
         Json.MessageRestriction = await this.getClientTypeList(
@@ -137,8 +141,8 @@ export default {
           }
           switch (item.companyType) {
             case "Sales":
-              // this.$router.push("/bsIndex");
-              location.href = "https://www.toysbear.com/new/#/bsIndex";
+              location.href = this.loginUrl;
+              // location.href = "http://139.9.71.135:8080/new/#/bsIndex";
               break;
             default:
               this.$router.push("/me");

@@ -21,6 +21,8 @@
         ref="collecTable"
         :header-cell-style="{ backgroundColor: '#f9fafc' }"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <el-table-column prop="sort" label="排序" width="100"></el-table-column>
         <el-table-column prop="title" label="主题"></el-table-column>
         <el-table-column prop="content" label="内容"></el-table-column>
@@ -38,19 +40,23 @@
             >编辑</el-button
           >
           <template slot-scope="scope">
-            <el-popconfirm
+            <!-- <el-popconfirm
               style="margin-left: 10px;"
               title="确定要删除此消息吗？"
               @confirm="handleDelete(scope.row)"
+            > -->
+            <el-button
+              size="mini"
+              type="warning"
+              @click.stop="handleDelete(scope.row)"
+              slot="reference"
+              >删除</el-button
             >
-              <el-button size="mini" type="warning" @click.stop slot="reference"
-                >删除</el-button
-              >
-            </el-popconfirm>
+            <!-- </el-popconfirm> -->
           </template>
         </el-table-column>
       </el-table>
-      <center style="padding:20px 0;">
+      <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[10, 20, 30, 40]"
@@ -162,21 +168,33 @@ export default {
     },
     // 删除推送
     async handleDelete(row) {
-      const res = await this.$http.post("/api/PushSettings/Delete", {
-        id: row.id
-      });
-      if (res.data.result.code === 200) {
-        this.$common.handlerMsgState({
-          msg: "删除成功",
-          type: "success"
+      this.$confirm("确定要删除吗?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const res = await this.$http.post("/api/PushSettings/Delete", {
+            id: row.id
+          });
+          if (res.data.result.code === 200) {
+            this.$common.handlerMsgState({
+              msg: "删除成功",
+              type: "success"
+            });
+            this.getPushSettingsPage();
+          } else {
+            this.$common.handlerMsgState({
+              msg: res.data.result.msg,
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "已取消删除",
+            type: "warning"
+          });
         });
-        this.getPushSettingsPage();
-      } else {
-        this.$common.handlerMsgState({
-          msg: res.data.result.msg,
-          type: "danger"
-        });
-      }
     },
     // 切換頁容量
     handleSizeChange(pageSize) {

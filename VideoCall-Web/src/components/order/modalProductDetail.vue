@@ -4,45 +4,45 @@
  * @Author: gaojiahao
  * @Date: 2020-11-03 16:35:57
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-04-07 11:35:59
+ * @LastEditTime: 2021-04-22 16:45:17
 -->
 <template>
     <Modal v-model="show" title="  " @on-ok="ok" @on-cancel="cancel" width="1048" class="modalDetail">
         <div class="product_info_panel">
             <div class="product_info_wrap item" v-if="show">
-                <XCarousel v-model="value1" loop v-if="show" :imgList="imgList">
+                <XCarousel v-model="value1" loop v-if="show" :imgList="modalProductInfo.productImages">
                     <CarouselItem v-if="show">
                         <div class="product_info_img">
                             <div class="product_info_img_border">
-                                <img :src="test"/>
+                                <img :src="modalProductInfo.productImages.length&&modalProductInfo.productImages[0]||test"/>
                             </div>
                         </div>
                     </CarouselItem>
                     <CarouselItem v-if="show">
                         <div class="product_info_img">
                             <div class="product_info_img_border">
-                                <img :src="test"/>
+                                <img :src="modalProductInfo.productImages.length&&modalProductInfo.productImages[0]||test"/>
                             </div>
                         </div>
                     </CarouselItem>
                     <CarouselItem v-if="show">
                         <div class="product_info_img">
                             <div class="product_info_img_border">
-                                <img :src="test"/>
+                                <img :src="modalProductInfo.productImages.length&&modalProductInfo.productImages[0]||test"/>
                             </div>
                         </div>
                     </CarouselItem>
                     <CarouselItem v-if="show">
                         <div class="product_info_img">
                             <div class="product_info_img_border">
-                                <img :src="test"/>
+                                <img :src="modalProductInfo.productImages.length&&modalProductInfo.productImages[0]||test"/>
                             </div>
                         </div>
                     </CarouselItem>
                     <CarouselItem v-if="show">
                         <div class="product_info_img">
                             <div class="product_info_img_border">
-                                <img :src="test"/>
+                                <img :src="modalProductInfo.productImages.length&&modalProductInfo.productImages[0]||test"/>
                             </div>
                         </div>
                     </CarouselItem>
@@ -51,67 +51,67 @@
             <div class="product_info_list item">
                 <Row class="product_info_list_item">
                     <Col span="24">
-                        <div class="active">Guess who I am?</div>
+                        <div class="active">{{modalProductInfo.productName}}</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">单价：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items red"><span>$</span><span class="font_size_20">17.00</span></div>
+                        <div class="product_info_list_items red"><span>$</span><span class="font_size_20">{{modalProductInfo.quoteThePrice||0}}</span></div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">公司编号：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.companyNumber}}</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">产商编号：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.factoryNo}}</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">包装：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.chinesePack}}</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">产品规格：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.productLength||0}}*{{modalProductInfo.productWidth||0}}*{{modalProductInfo.productHeight||0}}(CM)</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">包装规格：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.innerBoxLength||0}}*{{modalProductInfo.innerBoxWidth||0}}*{{modalProductInfo.innerBoxHeight||0}}(CM)</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">外箱规格：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.outerBoxLength||0}}*{{modalProductInfo.outerBoxWidth||0}}*{{modalProductInfo.outerBoxHeight||0}}(CM)</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">内箱/装箱量：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.innerBoxCount||0}}/{{modalProductInfo.outerBoxLoadCapa||0}}(PCS)</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">体积/材积：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.outerBoxBulkFeet||0}}(CBM)/{{modalProductInfo.outerBoxBulkStere||0}}(CUFT)</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items">price：</div>
+                        <div class="product_info_list_items">毛重/净重：</div>
                     </Col>
                     <Col span="12">
-                        <div class="product_info_list_items"><span>$</span>17.00</div>
+                        <div class="product_info_list_items"><span></span>{{modalProductInfo.outerBoxGrossWeight||0}}/{{modalProductInfo.outerBoxNetWeight||0}}(KG)</div>
                     </Col>
                 </Row>
             </div>
@@ -135,6 +135,12 @@ export default {
             type: Boolean,
             default: false,
         },
+        modalProductInfo:{
+            type:Object,
+            default () {
+                return {}
+            }
+        }
     },
     data() {
         return {

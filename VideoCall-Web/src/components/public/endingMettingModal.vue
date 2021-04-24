@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-08 14:46:21
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\public\endingMettingModal.vue
- * @LastEditTime: 2021-04-08 15:54:33
+ * @LastEditTime: 2021-04-22 17:53:29
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -36,8 +36,23 @@
     </div>
 </template>
 <script>
+import * as Cookies from "js-cookie";
 export default {
     name:'EndingMettingModal',
+    props:{
+        isShow: {
+            type: Boolean,
+            default: false
+        },
+    },
+    watch:{
+        isShow:{
+            handler(val){
+                debugger
+                this.show = val;
+            }
+        }
+    },
     data() {
         return {
             currentTime:5,
@@ -46,7 +61,8 @@ export default {
             myMinutes: '00', // 我定义来接收计算出来的 分钟 的
             mySeconds: '00',// 我定义来接收计算出来的 秒钟 的
             count:null,
-            show:true
+            show:false,
+            endTime:null
         };
     },
     methods:{
@@ -73,7 +89,8 @@ export default {
         },
     },
     created() {
-        this.testTimer();
+        //this.testTimer();
+        this.endTime = Cookies.get("endTime");
     }
 }
 </script>
@@ -126,7 +143,7 @@ export default {
             margin-right: 5px;
             }
             .closeOff {
-                background: url('~@assets/images/close.webp');
+                background: url('~@assets/images/close.png');
                 background-repeat: no-repeat;
                 width: 33px;
                 height: 33px;

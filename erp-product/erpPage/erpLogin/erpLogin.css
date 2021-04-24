@@ -1,0 +1,411 @@
+#loginFrom {
+  width: 100%;
+  background-color: #F5F5F5;
+  height: 100%;
+}
+#loginFrom .header {
+  height: 90px;
+  width: 100%;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+.header .toplauot {
+  height: 100%;
+  width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+.header .toplauot .left {
+  flex: 1;
+  display: flex;
+  width: 50%;
+  align-items: center;
+  color: #2B6AA8;
+  position: relative;
+}
+.header .toplauot .left .leftImg {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+}
+.header .toplauot .left .titleBox {
+  position: absolute;
+  left: 86px;
+  top: 15px;
+}
+.header .toplauot .left .titleBox .enTitle {
+  font-size: 12px;
+  -webkit-transform: translateX(-10px) scale(0.9);
+  -moz-transform: translateX(-10px) scale(0.9);
+  -ms-transform: translateX(-10px) scale(0.9);
+  transform: translateX(-10px) scale(0.9);
+}
+.header .toplauot .left .titleBox .chTitle {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 37px;
+}
+.header .toplauot .right {
+  flex: 1;
+  width: 40%;
+  position: absolute;
+  right: 0;
+  top: 25px;
+}
+.header .toplauot .right .shouyeBox {
+  float: right;
+  margin-right: 60px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+.header .toplauot .right .toHome {
+  float: right;
+  margin-right: 60px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+.header .toplauot .right .toHome .homeText{
+  color: #999999;
+}
+.header .toplauot .right .shouyeBox .sampleText{
+  color: #999999;
+}
+.header .toplauot .right .toHome .homeIcon{
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: -5px;
+  width: 21px;
+  height: 21px;
+  margin-right: 10px;
+  background: url('/erpProduct/static/images/erpHomeIcon.png') no-repeat center;
+}
+.header .toplauot .right .shouyeBox .mySampleIcon{
+  display: inline-block;
+  vertical-align: middle;
+  width: 21px;
+  height: 21px;
+  margin-right: 10px;
+  background: url('/erpProduct/static/images/mySampleIcon.png') no-repeat center;
+}
+.header .toplauot .right .signOutBox {
+  display: flex;
+  align-items: center;
+}
+.header .toplauot .right .signOutBox .userImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.header .toplauot .right .signOutBox .signOut {
+  color: #666666;
+  margin-left: 17px;
+  cursor: pointer;
+}
+.header .toplauot .right .loginBtn {
+  cursor: pointer;
+  width: 120px;
+  height: 36px;
+  background: #2D60B3;
+  opacity: 1;
+  border-radius: 100px;
+  font-weight: 400;
+  line-height: 36px;
+  text-align: center;
+  color: #FFFFFF;
+  float: right;
+}
+/* 登录内容样式 */
+  .loginWrap{
+    width: 1200px;
+    height: 532px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background-color: #fff;
+    margin-left: -600px;
+    margin-top: -220px;
+    border-radius: 5px;
+    /* overflow: hidden; */
+  }
+  .loginWrap .erweimaBox{
+    position: absolute;
+    right: -130px;
+    bottom: 0;
+    pointer-events: auto;
+    cursor: pointer;
+    width: 114px;
+    height: 152px;
+    background-color: #fff;
+    border: 1px solid #e9e9e9;
+    border-radius: 5px;
+  }
+  .loginWrap .erweimaBox .qr .qrImg{
+    width: 102px;
+    height: 93px;
+    margin: 10px;
+    box-sizing: border-box;
+    padding-bottom: 0;
+}
+  .loginWrap .erweimaBox .qr .qrImg img{
+    width: 92px;
+    height: 92px;
+}
+  .loginWrap .erweimaBox .qr p{
+    color: #333;
+    text-align: center;
+    line-height: 17px;
+}
+  .loginWrap .loginBox {
+    width: 100%;
+    height: 100%;
+  }
+  .loginWrap .loginBox .left, .loginWrap .loginBox .middle , .loginWrap .loginBox .right {
+    float: left;
+  }
+  .loginWrap .loginBox .left {
+    width: 330px;
+    height: 100%;
+    background: url("/erpProduct/static/images/erpLogoImg.png") no-repeat 50%;
+    background-size: 100% 100%;
+  }
+  .loginWrap .loginBox .left .yijian {
+    padding-top: 86px;
+    text-align: center;
+    font-size: 30px;
+    box-sizing: border-box;
+    color: #fff;
+  }
+  .loginWrap .loginBox .middle {
+    width: 330px;
+    height: 100%;
+    position: relative;
+  }
+  .loginWrap .loginBox .middle .qrcodeBox {
+    height: 270px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin-top: -135px;
+    border-right: 1px solid #e9e9e9;
+  }
+  .loginWrap .loginBox .middle .qrcodeBox .refresh {
+    width: 198px;
+    height: 198px;
+    position: absolute;
+    display: none;
+    left: 50%;
+    top: 50%;
+    margin-top: -98px;
+    margin-left: -98px;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  .loginWrap .loginBox .middle .qrcodeBox .refresh .refreshIcon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background-color: #fff;
+    margin-top: -40px;
+    margin-left: -40px;
+    font-size: 50px;
+  }
+  .loginWrap .loginBox .middle .qrcodeBox .refresh .refreshIcon i {
+    font-size: 40px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-top: -20px;
+    margin-left: -20px;
+  }
+  .loginWrap .loginBox .middle .qrcodeBox .qrTitle {
+    color: #333;
+    padding-left: 15px;
+    font-size: 18px;
+    font-weight: 700;
+    position: absolute;
+    left: 66px;
+  }
+  .loginWrap .loginBox .middle .qrcodeBox .qrTitle .icon {
+    display: inline-block;
+    content: "";
+    width: 5px;
+    height: 20px;
+    border-radius: 5px;
+    background-color: #165af8;
+    position: absolute;
+    left: 0;
+    top: 2px;
+  }
+  .loginWrap .loginBox .middle .qrcodeBox #qrcode {
+    border: 1px solid #e9e9e9;
+    width: 198px;
+    height: 198px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-top: -99px;
+    margin-left: -99px;
+  }
+  .loginWrap .loginBox .middle .qrcodeBox .qrInfo {
+    width: 100%;
+    bottom: 5px;
+    color: #666;
+    text-align: center;
+    position: absolute;
+  }
+  .loginWrap .loginBox .right {
+    width: 540px;
+    height: 100%;
+  }
+  .loginWrap .loginBox .right .loginTitle {
+    margin-top: 56px;
+    margin-left: 48px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+  }
+  .loginWrap .loginBox .right .loginFormBox {
+    margin-top: 38px;
+    width: 100%;
+    height: 270px;
+    font-size: 16px;
+  }
+  .loginWrap .loginBox .right .loginFormBox .logFormTitle {
+    margin-left: 48px;
+    color: #333;
+    font-size: 18px;
+    padding-left: 15px;
+    font-weight: 700;
+    position: absolute;
+  }
+  .loginWrap .loginBox .right .loginFormBox .logFormTitle .icon {
+    display: inline-block;
+    content: "";
+    width: 5px;
+    height: 20px;
+    border-radius: 5px;
+    background-color: #165af8;
+    position: absolute;
+    left: 0;
+    top: 2px;
+  }
+  .loginWrap .loginBox .right .loginFormBox .phoneBox {
+    position: absolute;
+    width: 350px;
+    box-sizing: border-box;
+    margin-top: 50px;
+    margin-left: 80px;
+  }
+  .loginWrap .loginBox .right .loginFormBox .phoneBox .inputWrap {
+    height: 44px;
+    border-radius: 4px;
+    float: left;
+    position: relative;
+    margin-left: 10px !important;
+    border: 1px solid #c0c4cc;
+    overflow: hidden;
+  }
+  .loginWrap .loginBox .right .loginFormBox .phoneBox .inputWrap .phoneIcon {
+    width: 14px;
+    height: 20px;
+    left: 10px;
+    top: 12px;
+    position: absolute;
+    background: url("/erpProduct/static/images/shouji.png") no-repeat center;
+    background-size: contain;
+  }
+  .loginWrap .loginBox .right .loginFormBox .phoneBox .title {
+    float: left;
+    height: 44px;
+    border-radius: 4px;
+    line-height: 44px;
+  }
+  .loginWrap .loginBox .right .loginFormBox .phoneBox .inputWrap .phoneInput {
+    height: 44px;
+    line-height: 44px;
+    width: 290px;
+    border: none;
+    outline-style: none;
+    padding-left: 40px;
+    box-sizing: border-box;
+  }
+  .loginWrap .loginBox .right .loginFormBox .codeBox {
+    position: absolute;
+    width: 350px;
+    box-sizing: border-box;
+    margin-top: 140px;
+    margin-left: 80px;
+  }
+  .loginWrap .loginBox .right .loginFormBox .codeBox .title {
+    float: left;
+    height: 44px;
+    border-radius: 4px;
+    line-height: 44px;
+  }
+  .loginWrap .loginBox .right .loginFormBox .codeBox .inputWrap {
+    height: 44px;
+    border-radius: 4px;
+    float: left;
+    margin-left: 10px !important;
+    border: 1px solid #c0c4cc;
+    overflow: hidden;
+    position: relative;
+  }
+  .loginWrap .loginBox .right .loginFormBox .codeBox .inputWrap .codeIcon {
+    width: 14px;
+    height: 20px;
+    left: 10px;
+    top: 12px;
+    position: absolute;
+    background: url("/erpProduct/static/images/suotou.png") no-repeat center;
+    background-size: contain;
+  }
+  .loginWrap .loginBox .right .loginFormBox .codeBox .inputWrap .codeInput {
+    height: 44px;
+    line-height: 44px;
+    width: 150px;
+    padding-left: 40px;
+    box-sizing: border-box;
+    border: none;
+    outline-style: none;
+  }
+  .loginWrap .loginBox .right .loginFormBox .codeBox .getCode {
+    height: 44px;
+    line-height: 44px;
+    width: 130px;
+    position: absolute;
+    border: 1px solid #84aef2;
+    background-color: #84aef2;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
+    right: 0;
+  }
+  .loginWrap .loginBox .right .loginFormBox .submitBtn {
+    position: absolute;
+    width: 378px;
+    margin-top: 222px;
+    margin-left: 135px;
+    background-color: #2e58bc;
+    height: 44px;
+    border-radius: 22px;
+    width: 304px;
+    color: #fff;
+    text-align: center;
+    line-height: 44px;
+    cursor: pointer;
+  }

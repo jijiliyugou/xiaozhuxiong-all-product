@@ -4,7 +4,7 @@
  * @Author: gaojiahao
  * @Date: 2020-10-19 15:27:12
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-04-02 12:30:19
+ * @LastEditTime: 2021-04-22 11:09:50
  */
 import Vue from "vue";
 import VueRouter from "vue-router";
@@ -39,7 +39,7 @@ const routes = [
     component: resolve=>(require(["@views/meeting/addMeeting"],resolve)),
     meta: {
       title: "进入会议",
-      auth: true
+      // auth: true
     },
   },
   {
@@ -75,13 +75,16 @@ const router = new VueRouter({
  */
 router.beforeEach((to, from, next) => {
   if (to.matched.some(m => m.meta.auth)) {
+    if(to.name == "Login"){
+      tokenService.clean();  
+    }
     // 对路由进行验证
     if (tokenService.getToken() != "" && to.name !== "Login") {
       // 已经登陆
       next(); // 正常跳转到你设置好的页面
     } else {
-      //next({ path: "/login" });
-      next();
+      next({ path: "/login" });
+      // next();
     }
   } else {
     next();

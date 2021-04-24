@@ -4,6 +4,9 @@ const BsSiteLlis = () =>
 // 客户订单
 const BsCustomerOrder = () =>
   import("@/views/bsPage/bsSiteSharing/bsCustomerOrder/BsCustomerOrder.vue");
+// 站点设置
+const BsSiteSettings = () =>
+  import("@/views/bsPage/bsSiteSharing/bsSiteSettings/BsSiteSettings.vue");
 // 浏览记录
 const BsBrowsingHistory = () =>
   import(
@@ -23,6 +26,14 @@ export default [
     path: "/bsIndex/bsCustomerOrder",
     name: "bsCustomerOrder",
     component: BsCustomerOrder,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsSiteSettings",
+    name: "siteSettings",
+    component: BsSiteSettings,
     meta: {
       keepAlive: true
     }

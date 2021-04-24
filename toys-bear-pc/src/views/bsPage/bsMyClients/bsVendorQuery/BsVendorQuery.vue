@@ -8,6 +8,7 @@
         <div class="item">
           <span class="label">关键字：</span>
           <el-input
+            v-focus
             type="text"
             size="medium"
             v-model="keyword"
@@ -43,11 +44,13 @@
         :header-cell-style="{ backgroundColor: '#f9fafc' }"
         @row-click="handleDetail"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <el-table-column label="厂商">
           <template slot-scope="scope">
             <div class="nameBox">
               <el-avatar
-                style="background-color:#E4EFFF;"
+                style="background-color: #e4efff"
                 :size="40"
                 :src="scope.row.companyLogo"
               >
@@ -55,7 +58,7 @@
                   {{ scope.row.linkman }}
                 </p>
               </el-avatar>
-              <span style="margin-left:10px" class="name">{{
+              <span style="margin-left: 10px" class="name">{{
                 scope.row.companyName
               }}</span>
               <span class="isMain" v-if="scope.row.isMain"><i>主账号</i></span>
@@ -64,7 +67,7 @@
         </el-table-column>
         <el-table-column
           align="center"
-          prop="ContactsMan"
+          prop="contactsMan"
           label="联系人"
           width="180"
         >
@@ -78,7 +81,7 @@
         </el-table-column>
         <el-table-column
           align="center"
-          prop="phoneNumber"
+          prop="telePhoneNumber"
           label="电话"
           width="180"
         >
@@ -87,14 +90,14 @@
         </el-table-column>
         <el-table-column
           align="center"
-          prop="ProductCount"
+          prop="productCount"
           label="产品数量"
           width="200"
         >
         </el-table-column>
       </el-table>
       <!-- 分页 -->
-      <center style="padding:20px 0;">
+      <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[12, 24, 36, 48]"
@@ -140,10 +143,12 @@ export default {
       if (res.data.result.code === 200) {
         this.tableData = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
+        console.log("contactsMan", this.tableData);
       }
     },
     //点击详情
     async handleDetail(e) {
+      console.log(e);
       const fd = {
         name: e.companyName,
         linkUrl: "/bsIndex/bsVendorQuery",

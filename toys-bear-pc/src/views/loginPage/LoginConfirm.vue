@@ -155,10 +155,17 @@ export default {
             });
             this.$store.commit("removeLoginItems");
           }
+          const fd = {
+            component: "bsHome",
+            label: "后台首页",
+            linkUrl: "/bsIndex/bsHome",
+            name: "/bsIndex/bsHome",
+            refresh: true
+          };
           switch (item.companyType) {
             case "Sales":
-              this.$store.commit("closeTabAll");
-              this.$router.push("/bsIndex");
+              this.$store.commit("updateActiveTab", fd);
+              this.$store.commit("closeTabAll", this.$router);
               break;
             default:
               location.href =

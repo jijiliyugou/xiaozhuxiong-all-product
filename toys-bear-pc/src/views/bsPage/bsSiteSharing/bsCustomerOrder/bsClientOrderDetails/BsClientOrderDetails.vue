@@ -7,7 +7,40 @@
         <span class="orderNumber">{{ item.orderNumber }}</span>
       </li>
       <div class="clientContentBox">
-        <div class="left">
+        <li class="clientItem">
+          <span>客户：</span>
+          <span class="content">{{ item.customerName }}</span>
+        </li>
+        <li class="clientItem">
+          <span>业务员：</span>
+          <span class="content">{{ item.createdBy }}</span>
+        </li>
+        <li class="clientItem">
+          <span>公司名称：</span>
+          <span class="content">{{ item.companyName }}</span>
+        </li>
+        <li class="clientItem">
+          <span>联系人：</span>
+          <span class="content">{{ item.email }}</span>
+        </li>
+        <li class="clientItem">
+          <span>邮箱：</span>
+          <span class="content">{{ item.remark }}</span>
+        </li>
+      </div>
+      <div class="clientContentBox">
+        <li class="clientItem">
+          <span>择样时间：</span>
+          <span class="content">
+            {{ item.createdOn && item.createdOn.replace(/T/, " ") }}
+          </span>
+        </li>
+        <li class="remark">
+          <span>备注：</span>
+          <span class="content">{{ item.remark }}</span>
+        </li>
+      </div>
+      <!-- <div class="left">
           <li class="clientItem">
             <span>客户：</span>
             <span class="content">{{ item.customerName }}</span>
@@ -21,9 +54,15 @@
         </div>
         <div class="middle">
           <li class="clientItem">
-            <span>联系人：</span>
-            <span class="content">{{ item.contactName }}</span>
+            <span>业务员：</span>
+            <span class="content">{{ item.createdBy }}</span>
           </li>
+          <li class="clientItem">
+            <span>备注：</span>
+            <span class="content">{{ item.remark }}</span>
+          </li>
+        </div>
+        <div class="right">
           <li class="clientItem">
             <span>公司名称：</span>
             <span class="content">{{ item.companyName }}</span>
@@ -31,15 +70,10 @@
         </div>
         <div class="right">
           <li class="clientItem">
-            <span>邮箱：</span>
+            <span>联系人：</span>
             <span class="content">{{ item.email }}</span>
           </li>
-          <li class="clientItem">
-            <span>备注：</span>
-            <span class="content">{{ item.remark }}</span>
-          </li>
-        </div>
-      </div>
+        </div> -->
     </ul>
     <div class="tableBox">
       <div class="tableTitle">
@@ -64,15 +98,16 @@
           'font-weight': '400'
         }"
       >
-        <ex-table-column :autoFit="true" label="产品" width="300">
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
+        <el-table-column label="产品" width="300">
           <template slot-scope="scope">
             <div class="imgBox">
               <el-image
                 fit="contain"
                 @click.native="goDetails(scope.row)"
-                style="width:80px;height:60px;cursor: pointer;"
+                style="width: 80px; height: 60px; cursor: pointer"
                 :src="scope.row.productImage"
-                :preview-src-list="[scope.row.productImage]"
               >
                 <div slot="placeholder" class="errorImg">
                   <img src="~@/assets/images/imgError.png" alt />
@@ -104,24 +139,30 @@
               </div>
             </div>
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="资料来源">
+        </el-table-column>
+        <el-table-column width="100" label="资料来源">
           <template slot-scope="scope">
             <div
-              style="width:110px;overflow:hidden;max-width: 100px;white-space: nowrap;text-overflow: ellipsis;"
+              style="
+                width: 100px;
+                overflow: hidden;
+                max-width: 100px;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              "
             >
               {{ scope.row.exhibitionName }}
             </div>
           </template>
-        </ex-table-column>
-        <ex-table-column
-          :autoFit="true"
+        </el-table-column>
+        <el-table-column
           prop="fa_no"
           label="出厂货号"
-        ></ex-table-column>
-        <ex-table-column :autoFit="true" prop="ch_pa" label="包装">
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="产品规格" min-width="100">
+          align="center"
+        ></el-table-column>
+        <el-table-column prop="ch_pa" label="包装" align="center">
+        </el-table-column>
+        <el-table-column label="产品规格" min-width="100" align="center">
           <template slot-scope="scope">
             <span>
               {{ scope.row.pr_le }}x{{ scope.row.pr_wi }}x{{
@@ -129,8 +170,8 @@
               }}(cm)
             </span>
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="包装规格" min-width="100">
+        </el-table-column>
+        <el-table-column label="包装规格" min-width="100" align="center">
           <template slot-scope="scope">
             <span>
               {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
@@ -138,8 +179,8 @@
               }}(cm)
             </span>
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="外箱规格" min-width="100">
+        </el-table-column>
+        <el-table-column label="外箱规格" min-width="100" align="center">
           <template slot-scope="scope">
             <span>
               {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -147,48 +188,69 @@
               }}(cm)
             </span>
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="体积/材积" min-width="150">
+        </el-table-column>
+        <el-table-column label="体积/材积" min-width="150" align="center">
           <template slot-scope="scope">
             <span>
               {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
             </span>
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="毛重/净重">
+        </el-table-column>
+        <el-table-column label="毛重/净重" align="center">
           <template slot-scope="scope">
             <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="装箱量">
+        </el-table-column>
+        <el-table-column label="装箱量" align="center">
           <template slot-scope="scope">
             <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="箱数">
+        </el-table-column>
+        <el-table-column
+          prop="productCount"
+          width="50"
+          align="center"
+          label="箱数"
+        >
+        </el-table-column>
+        <el-table-column width="80" align="center" label="总数量">
           <template slot-scope="scope">
-            <span> {{ scope.row.in_en }} </span>
+            {{ scope.row.productCount * scope.row.ou_lo }}
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" label="总数量">
+        </el-table-column>
+        <el-table-column prop="costPrice" align="center" label="参考单价">
           <template slot-scope="scope">
-            <span> {{ scope.row.in_en }} </span>
-          </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" prop="costPrice" label="参考单价">
-          <template slot-scope="scope">
-            <span style="color:#3368A9">
+            <span style="color: #3368a9">
               {{ options.currencyType + scope.row.costPrice }}
             </span>
           </template>
-        </ex-table-column>
-        <ex-table-column :autoFit="true" prop="productPrice" label="报出价">
+        </el-table-column>
+        <el-table-column prop="productPrice" align="center" label="报出价">
           <template slot-scope="scope">
-            <span style="color:#f56c6c">
+            <span style="color: #f56c6c">
               {{ options.currencyType + scope.row.productPrice }}
             </span>
           </template>
-        </ex-table-column>
+        </el-table-column>
+        <el-table-column
+          prop="OfferTotalAmount"
+          label="报出总价"
+          align="center"
+          width="100"
+        >
+          <template slot-scope="scope">
+            <span style="color: #f56c6c">{{ scope.row.cu_de }}</span>
+            <span style="color: #f56c6c">
+              {{
+                priceCount(
+                  scope.row.productCount,
+                  scope.row.ou_lo,
+                  scope.row.productPrice
+                )
+              }}
+            </span>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="totalBox">
         <p class="item">
@@ -214,11 +276,11 @@
         </p>
         <p class="item">
           <span class="itemTitle">总出厂价/总金额：</span>
-          <span style="color: #3368A9;">
+          <span style="color: #3368a9">
             {{ options.currencyType }}
           </span>
-          <span style="color: #3368A9;">{{ options.totalCostPrice }}</span>
-          <span style="margin:5px;"></span>
+          <span style="color: #3368a9">{{ options.totalCostPrice }}</span>
+          <span style="margin: 5px"></span>
           <span class="price">
             {{ options.currencyType }}
           </span>
@@ -227,7 +289,7 @@
       </div>
     </div>
 
-    <center style="margin-top:20px;">
+    <center style="margin-top: 20px">
       <el-pagination
         layout="total, sizes, prev, pager, next, jumper"
         background
@@ -313,13 +375,12 @@ export default {
         linkUrl: "/bsIndex/bsVendorQuery",
         component: "bsMyClientsDetail",
         refresh: true,
-        noPush: true,
         label: item.supplierName,
         value: {
           companyNumber: item.supplierNumber,
           companyLogo: item.productImage,
-          companyName: item.productName,
-          contactsMan: item.supplierName,
+          companyName: item.supplierName,
+          contactsMan: item.productName,
           phoneNumber: item.supplierPhone,
           address: item.supplierAddres || item.supplierAddress || ""
         }
@@ -387,6 +448,103 @@ export default {
       )
         return false;
       this.getSearchCompanyShareOrderDetailsPage();
+    },
+    isInteger(obj) {
+      return Math.floor(obj) === obj;
+    },
+    /*
+     * 将一个浮点数转成整数，返回整数和倍数。如 3.14 >> 314，倍数是 100
+     * @param floatNum {number} 小数
+     * @return {object}
+     *   {times:100, num: 314}
+     */
+    toInteger(floatNum) {
+      const ret = { times: 1, num: 0 };
+      if (this.isInteger(floatNum)) {
+        ret.num = floatNum;
+        return ret;
+      }
+      const strfi = floatNum + "";
+      const dotPos = strfi.indexOf(".");
+      const len = strfi.substr(dotPos + 1).length;
+      const times = Math.pow(10, len);
+      const intNum = parseInt(floatNum * times + 0.5, 10);
+      ret.times = times;
+      ret.num = intNum;
+      return ret;
+    },
+    /*
+     * 核心方法，实现加减乘除运算，确保不丢失精度
+     * 思路：把小数放大为整数（乘），进行算术运算，再缩小为小数（除）
+     *
+     * @param a {number} 运算数1
+     * @param b {number} 运算数2
+     * @param digits {number} 精度，保留的小数点数，比如 2, 即保留为两位小数
+     * @param op {string} 运算类型，有加减乘除（add/subtract/multiply/divide）
+     *
+     */
+    operation(a, b, digits, op) {
+      const o1 = this.toInteger(a);
+      const o2 = this.toInteger(b);
+      const n1 = o1.num;
+      const n2 = o2.num;
+      const t1 = o1.times;
+      const t2 = o2.times;
+      const max = t1 > t2 ? t1 : t2;
+      let result = null;
+      switch (op) {
+        case "add":
+          if (t1 === t2) {
+            // 两个小数位数相同
+            result = n1 + n2;
+          } else if (t1 > t2) {
+            // o1 小数位 大于 o2
+            result = n1 + n2 * (t1 / t2);
+          } else {
+            // o1 小数位 小于 o2
+            result = n1 * (t2 / t1) + n2;
+          }
+          return result / max;
+        case "subtract":
+          if (t1 === t2) {
+            result = n1 - n2;
+          } else if (t1 > t2) {
+            result = n1 - n2 * (t1 / t2);
+          } else {
+            result = n1 * (t2 / t1) - n2;
+          }
+          return result / max;
+        case "multiply":
+          result = (n1 * n2) / (t1 * t2);
+          return result;
+        case "divide":
+          result = (n1 / n2) * (t2 / t1);
+          return result;
+      }
+    },
+    // 加
+    add(a, b, digits) {
+      return this.operation(a, b, digits, "add");
+    },
+    // 减
+    subtract(a, b, digits) {
+      return this.operation(a, b, digits, "subtract");
+    },
+    // 乘
+    multiply(a, b, digits) {
+      return this.operation(a, b, digits, "multiply");
+    },
+    // 除
+    divide(a, b, digits) {
+      return this.operation(a, b, digits, "divide");
+    },
+    // 总数量
+    sumPriceCount(boxNumber, ou_lo) {
+      return this.multiply(boxNumber, ou_lo);
+    },
+    // 单个产品总价
+    priceCount(price, ou_lo, boxNumber) {
+      return this.multiply(this.multiply(price, ou_lo), boxNumber);
     }
   }
 };
@@ -418,23 +576,25 @@ export default {
     }
   }
   .customerInfoBox {
-    padding: 20px 0;
+    // padding: 20px 0;
     .itemBox {
       line-height: 34px;
+      margin-top: 20px;
       .orderNumber {
         font-weight: 700;
       }
     }
     .clientContentBox {
+      margin-top: 12px;
       display: flex;
-      .left,
-      .middle,
-      .right {
-        min-width: 250px;
-        .clientItem {
-          line-height: 34px;
-          margin-right: 20px;
-        }
+      .clientItem {
+        width: 300px;
+      }
+      .remark {
+        flex: 1;
+      }
+      &:last-of-type {
+        padding-bottom: 20px;
       }
     }
   }
@@ -457,10 +617,10 @@ export default {
       .el-table__header-wrapper .el-checkbox {
         display: none;
       }
-      .cell {
-        white-space: nowrap;
-        width: fit-content;
-      }
+      // .cell {
+      // white-space: nowrap;
+      // width: fit-content;
+      // }
       font-size: 12px;
       .inputNumber {
         width: 50px;

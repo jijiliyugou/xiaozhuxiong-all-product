@@ -18,6 +18,7 @@ function myForEach(oList, yList) {
 const store = new Vuex.Store({
   state: {
     myColles: [],
+    isJindu: false,
     activeTab: "/bsIndex/bsHome",
     oldTabName: "/bsIndex/bsHome", //上一次点击的url
     showGlobalMsg: false,
@@ -72,6 +73,10 @@ const store = new Vuex.Store({
     handlerOldTabName(state, payLoad) {
       state.oldTabName = payLoad;
     },
+    // 修改进度条状态
+    handlerIsJindu(state, payLoad) {
+      state.isJindu = payLoad;
+    },
     // 添加收藏
     addMyCollec(state, payLoad) {
       console.log(payLoad);
@@ -116,15 +121,13 @@ const store = new Vuex.Store({
       const key = state.userInfo.uid;
       Vue.prototype.$set(state, key, payLoad);
     },
-    //修改报价商品
+    // 提交报价
+    initOfferProductList(state) {
+      Vue.prototype.$set(state, "offerProductList", []);
+    },
+    // 请求修改报价商品接口赋值
     updataOfferProductList(state, payLoad) {
-      if (state.offerProductList.length || !payLoad) {
-        Vue.prototype.$set(state, "offerProductList", []);
-      } else {
-        for (let i = 0; i < payLoad.length; i++) {
-          state.offerProductList.push(payLoad[i]);
-        }
-      }
+      Vue.prototype.$set(state, "offerProductList", payLoad);
     },
     //添加报价商品
     pushOfferProductList(state, payLoad) {
@@ -276,29 +279,40 @@ const store = new Vuex.Store({
     },
     // 测试
     //关闭全部tab页
-    closeTabAll(state) {
+    closeTabAll(state, router) {
+      console.log(state.activeTab, state.tabList);
+      // let activeTab;
+      // for (let i = 0; i < state.tabList.length; i++) {
+      //   if (state.tabList[i].name === state.activeTab) {
+      //     activeTab = state.tabList[i];
+      //     break;
+      //   }
+      // }
+      const activeTab = state.tabList.find(val => val.name === state.activeTab);
+      console.log(activeTab, router);
       v.$set(state, "tabList", []);
-      const fd = {
-        component: "bsHome",
-        label: "后台首页",
-        linkUrl: "/bsIndex/bsHome",
-        name: "/bsIndex/bsHome",
-        refresh: true
-      };
-      state.tabList.push(fd);
-      state.activeTab = "/bsIndex/bsHome";
+      state.tabList.push(activeTab);
+      router.push(activeTab.linkUrl);
+      // const fd = {
+      //   component: "bsHome",
+      //   label: "后台首页",
+      //   linkUrl: "/bsIndex/bsHome",
+      //   name: "/bsIndex/bsHome",
+      //   refresh: true
+      // };
+      // state.activeTab = "/bsIndex/bsHome";
     },
 
     //关闭tab页
     closeTab(state, n) {
       let tab = state.tabList;
+      console.log(n, state.oldTabName);
       tab.forEach((val, i) => {
         if (val.name == n) {
           tab.splice(i, 1);
           const currentOption = tab.find(va => va.name == state.oldTabName);
           if (currentOption) {
             state.activeTab = state.oldTabName;
-            console.log(currentOption);
             router.push(currentOption.linkUrl);
           } else {
             state.activeTab = tab[tab.length - 1].name;
@@ -306,6 +320,21 @@ const store = new Vuex.Store({
           }
         }
       });
+    },
+    // 不需要回到上一次历史记录的关闭标签
+    closeOfferTab(state, n) {
+      let tab = state.tabList;
+      let currentTab;
+      for (let i = 0; i < tab.length; i++) {
+        if (tab[i].name == n.toName) {
+          currentTab = tab[i];
+        }
+        if (tab[i].name == n.name) {
+          tab.splice(i, 1);
+        }
+      }
+      state.activeTab = currentTab.name;
+      router.push(currentTab.linkUrl);
     },
     //新增tab页
     myAddTab(state, n) {

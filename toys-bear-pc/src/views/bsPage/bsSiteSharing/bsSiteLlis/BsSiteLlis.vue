@@ -6,6 +6,7 @@
         <div class="item">
           <span class="label">关键字：</span>
           <el-input
+            v-focus
             type="text"
             size="medium"
             v-model="keyword"
@@ -13,6 +14,54 @@
             placeholder="请输入关键词"
             @keyup.native.enter="search"
           ></el-input>
+        </div>
+        <div class="item">
+          <span class="label">站点：</span>
+          <el-select
+            v-model="websiteInfoId"
+            size="medium"
+            clearable
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in sitesList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </div>
+        <div class="item" v-if="userInfo.userInfo.isMain">
+          <span class="label">业务员：</span>
+          <el-select
+            v-model="userId"
+            filterable
+            size="medium"
+            clearable
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in staffList"
+              :key="item.id"
+              :label="item.linkman"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </div>
+        <div class="item">
+          <span class="label">时间段：</span>
+          <el-date-picker
+            size="medium"
+            value-format="yyyy-MM-ddTHH:mm:ss"
+            v-model="dateTime"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+          >
+          </el-date-picker>
         </div>
         <div class="item">
           <el-button
@@ -37,15 +86,17 @@
     <div class="tableBox">
       <el-table
         :data="tableData"
-        style="width: 100%;"
+        style="width: 100%"
         ref="collecTable"
         :header-cell-style="{ backgroundColor: '#f9fafc' }"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <el-table-column label="站点" width="150" prop="siteRegion">
           <template slot-scope="scope">
             <div>
               <i
-                style="color: #3368A9; margin-right: 15px;"
+                style="color: #3368a9; margin-right: 15px"
                 class="iconfont icon-hulianwang"
               ></i>
               <span>{{ scope.row.siteRegion }}</span>
@@ -81,7 +132,6 @@
           prop="customerName"
           label="客户"
           align="center"
-          width="180"
         ></el-table-column>
         <el-table-column label="登录码" align="center">
           <template slot-scope="scope">
@@ -92,17 +142,19 @@
               <i
                 @click="resetLoginCode(scope.row)"
                 class="el-icon-refresh"
-                style="font-size: 14px;cursor: pointer;"
+                style="font-size: 14px; cursor: pointer"
               ></i>
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" align="center">
+        <el-table-column label="创建时间" align="center" width="100">
           <template slot-scope="scope">
             <span> {{ scope.row.createdOn.replace(/T.*/, "") }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="有效期" align="center">
+        <el-table-column label="业务员" align="center" prop="createdBy">
+        </el-table-column>
+        <el-table-column label="有效期" align="center" width="100">
           <template slot-scope="scope">
             {{
               (scope.row.expireTime && scope.row.expireTime.split("T")[0]) ||
@@ -118,24 +170,23 @@
         >
           <template slot-scope="scope">
             <el-button
-              style="margin-right:10px;"
+              style="margin-right: 10px"
               size="mini"
               type="success"
               @click.stop="openEdit(scope.row)"
               >编辑</el-button
             >
-            <el-popconfirm
-              title="确定要删除此分享吗？"
-              @confirm="handleDelete(scope.row)"
+            <el-button
+              size="mini"
+              type="warning"
+              @click.stop="handleDelete(scope.row)"
+              slot="reference"
+              >删除</el-button
             >
-              <el-button size="mini" type="warning" @click.stop slot="reference"
-                >删除</el-button
-              >
-            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
-      <center style="padding:20px 0;">
+      <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[10, 20, 30, 40]"
@@ -163,16 +214,20 @@
         :model="clienFormData"
       >
         <el-form-item label="站点域名：" prop="url">
-          <div style="display:flex;margin-bottom:10px;">
+          <div>
             <el-tag
-              @click="clienFormData.url = item"
-              style="margin-right: 10px;cursor: pointer;"
-              v-for="(item, key) of defaultShareDomain"
-              :key="item"
-              >{{ key }}</el-tag
+              @click="handlerTag(item)"
+              style="margin-right: 10px; cursor: pointer"
+              :effect="
+                clienFormData.websiteInfoId == item.id ? 'dark' : 'plain'
+              "
+              v-for="item in handSitesList"
+              :key="item.id"
+              >{{ item.name }}</el-tag
             >
           </div>
           <el-input
+            style="display:none;"
             v-model="clienFormData.url"
             placeholder="请输入站点域名"
             clearable
@@ -196,7 +251,7 @@
               </el-option>
             </el-select>
             <el-button
-              style="margin-left:10px;"
+              style="margin-left: 10px"
               type="primary"
               @click.stop="openAddMyClient"
               >新增客户</el-button
@@ -362,12 +417,26 @@
           >
           </el-date-picker>
         </el-form-item>
-        <center>
-          <template>
-            <el-button type="primary" @click="subProcessingLog"
-              >提 交</el-button
+        <div class="isData">
+          <div class="label">
+            <span>客户提交订单，是否需填资料：</span>
+            <el-radio v-model="clienFormData.isCustomerInfo" :label="true"
+              >是</el-radio
             >
-            <el-button plain @click="addClienDialog = false">取 消</el-button>
+            <el-radio v-model="clienFormData.isCustomerInfo" :label="false"
+              >否</el-radio
+            >
+          </div>
+        </div>
+        <center style="margin-top: 10px;">
+          <template>
+            <el-button type="primary" @click="subProcessingLog">确定</el-button>
+            <el-button
+              style="margin-left: 30px;"
+              plain
+              @click="addClienDialog = false"
+              >取消</el-button
+            >
           </template>
         </center>
       </el-form>
@@ -421,7 +490,7 @@
     <!-- 生成二维码 -->
     <el-dialog :visible.sync="QRCodeDialog" v-if="QRCodeDialog" width="20%">
       <vue-qr
-        style="width:100%;"
+        style="width: 100%"
         :text="QRCodeUrl"
         colorLight="#fff"
         colorDark="#000"
@@ -433,6 +502,7 @@
 
 <script>
 import VueQr from "vue-qr";
+import { mapState } from "vuex";
 export default {
   name: "bsSiteLlis",
   components: {
@@ -440,6 +510,12 @@ export default {
   },
   data() {
     return {
+      dateTime: null,
+      handSitesList: [],
+      websiteInfoId: null,
+      userId: null,
+      sitesList: [],
+      staffList: [],
       clientCurrentPage: 1,
       clientPageSize: 99,
       clientKeyword: "",
@@ -464,7 +540,7 @@ export default {
       clientListTotalCount: 0,
       clientList: [],
       addClienDialog: false,
-      dialogTitle: "新增分享",
+      dialogTitle: "新增站点",
       defaultShareDomain: [],
       clienFormData: {
         miniPrice: 0,
@@ -481,7 +557,9 @@ export default {
         exchange: 0,
         size: "24",
         decimalPlaces: 3,
-        rejectionMethod: "四舍五入"
+        rejectionMethod: "四舍五入",
+        websiteInfoId: null,
+        isCustomerInfo: true
       },
       options: {
         // 报价配置项
@@ -525,6 +603,40 @@ export default {
     };
   },
   methods: {
+    // 点击站点选中站点
+    handlerTag(item) {
+      this.clienFormData.url = item.url;
+      this.clienFormData.websiteInfoId = item.id;
+    },
+    // 获取站点列表
+    async getDefaultSites() {
+      const res = await this.$http.post("/api/SearchDropdownWebsiteInfos", {});
+      console.log(res);
+      if (res.data.result.code === 200) {
+        this.sitesList = [{ name: "全部", id: null }, ...res.data.result.item];
+        this.handSitesList = res.data.result.item;
+        console.log(this.handSitesList, 123);
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.$store.state.userInfo.commparnyList[0].commparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
     // 获取系统配置项
     async getSelectCompanyOffer() {
       const res = await this.$http.post("/api/GetSelectCompanyOffer", {
@@ -543,7 +655,11 @@ export default {
       const fd = {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
-        keyword: this.keyword
+        keyword: this.keyword,
+        websiteInfoId: this.websiteInfoId,
+        userId: this.userId,
+        startTime: this.dateTime && this.dateTime[0],
+        endTime: this.dateTime && this.dateTime[1]
       };
       for (const key in fd) {
         if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
@@ -552,10 +668,8 @@ export default {
       }
       const res = await this.$http.post("/api/SearchWebsiteShareInfosPage", fd);
       if (res.data.result.code === 200) {
-        this.totalCount = res.data.result.item.shareInfos.totalCount;
-        this.tableData = res.data.result.item.shareInfos.items;
-        this.defaultShareDomain = res.data.result.item.defaultShareDomain;
-        console.log(this.tableData);
+        this.totalCount = res.data.result.item.totalCount;
+        this.tableData = res.data.result.item.items;
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -565,22 +679,34 @@ export default {
     },
     // 删除分享
     async handleDelete(row) {
-      const res = await this.$http.post(
-        "/api/DeleteWebsiteShareInfo?id=" + row.id,
-        {}
-      );
-      if (res.data.result.code === 200) {
-        this.$common.handlerMsgState({
-          msg: "删除成功",
-          type: "success"
+      this.$confirm("确定要删除吗?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const res = await this.$http.post(
+            "/api/DeleteWebsiteShareInfo?id=" + row.id,
+            {}
+          );
+          if (res.data.result.code === 200) {
+            this.$common.handlerMsgState({
+              msg: "删除成功",
+              type: "success"
+            });
+            this.getDataList();
+          } else {
+            this.$common.handlerMsgState({
+              msg: "删除失败,请联系管理员！",
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "已取消删除",
+            type: "warning"
+          });
         });
-        this.getDataList();
-      } else {
-        this.$common.handlerMsgState({
-          msg: "删除失败,请联系管理员！",
-          type: "danger"
-        });
-      }
     },
     // 切換頁容量
     handleSizeChange(pageSize) {
@@ -611,10 +737,29 @@ export default {
     },
     // 打开新增分享
     openAddClien() {
+      this.clienFormData = {
+        miniPrice: 0,
+        miniPriceDecimalPlaces: 1,
+        url: null,
+        isExportExcel: false,
+        profit: 0,
+        expireTime: null,
+        customerInfoId: null,
+        offerMethod: "汕头",
+        currencyType: "¥",
+        currencyTypeName: "RMB",
+        totalCost: "0",
+        exchange: 0,
+        size: "24",
+        decimalPlaces: 3,
+        rejectionMethod: "四舍五入",
+        websiteInfoId: null,
+        isCustomerInfo: true
+      };
       this.clienFormData.totalCost = 0;
       this.clienFormData.url = null;
       this.clienFormData.customerInfoId = null;
-      this.dialogTitle = "新增分享";
+      this.dialogTitle = "新增站点";
       this.defaultFormula = JSON.stringify(this.customerTemplate[0]);
       this.$nextTick(() => {
         this.addClienDialog = true;
@@ -637,12 +782,35 @@ export default {
     },
     // 打开编辑分享
     openEdit(row) {
+      this.clienFormData = {
+        miniPrice: 0,
+        miniPriceDecimalPlaces: 1,
+        url: null,
+        isExportExcel: false,
+        profit: 0,
+        expireTime: null,
+        customerInfoId: null,
+        offerMethod: "汕头",
+        currencyType: "¥",
+        currencyTypeName: "RMB",
+        totalCost: "0",
+        exchange: 0,
+        size: "24",
+        decimalPlaces: 3,
+        rejectionMethod: "四舍五入",
+        websiteInfoId: null,
+        isCustomerInfo: true
+      };
       this.defaultFormula = null;
-      this.dialogTitle = "编辑分享";
+      this.dialogTitle = "编辑站点";
       for (const key in row) {
         this.clienFormData[key] = row[key];
       }
-      this.clienFormData.customerInfoId = row.customerId;
+      for (let i = 0; i < this.clientList.length; i++) {
+        if (this.clientList[i].id == row.customerId) {
+          this.clienFormData.customerInfoId = row.customerId;
+        }
+      }
       this.addClienDialog = true;
     },
     // 生成二维码
@@ -726,7 +894,7 @@ export default {
       this.$refs.addClientFormRef.validate(async valid => {
         if (valid) {
           let url = "/api/CreateWebsiteShareInfo";
-          if (this.dialogTitle === "编辑分享")
+          if (this.dialogTitle === "编辑站点")
             url = "/api/UpdateWebsiteShareInfo";
           console.log(this.clienFormData);
           const res = await this.$http.post(url, this.clienFormData);
@@ -761,6 +929,7 @@ export default {
       const res = await this.$http.post("/api/SearchCustomerInfosPage", fd);
       if (res.data.result.code === 200) {
         this.clientList = res.data.result.item.items;
+        console.log(this.clientList);
         this.clientListTotalCount = res.data.result.item.totalCount;
       }
     },
@@ -770,9 +939,14 @@ export default {
       this.getDataList();
     }
   },
+  computed: {
+    ...mapState(["userInfo"])
+  },
   created() {
     this.getDataList();
     this.getClientList();
+    this.getStaffList();
+    this.getDefaultSites();
     this.getSelectProductOfferFormulaList();
   },
   mounted() {
@@ -906,5 +1080,8 @@ export default {
     padding-top: 20px;
     border-top: 1px solid #dcdfe6;
   }
+}
+.isData {
+  margin-left: 20px;
 }
 </style>

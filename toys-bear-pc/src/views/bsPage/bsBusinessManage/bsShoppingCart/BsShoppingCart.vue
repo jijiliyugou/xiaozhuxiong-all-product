@@ -16,19 +16,18 @@
           lable="选择"
           type="selection"
         ></el-table-column>
+        <el-table-column label="序号" type="index" align="center" width="60">
+        </el-table-column>
         <el-table-column :autoFit="true" label="产品" width="300">
           <template slot-scope="scope">
             <div class="imgBox">
               <el-image
+                @click.native="goDetails(scope.row)"
                 fit="contain"
-                style="width:80px;height:60px;"
+                style="width: 80px; height: 60px"
                 :src="scope.row.img"
               >
-                <div
-                  slot="placeholder"
-                  class="errorImg"
-                  @click="goDetails(scope.row)"
-                >
+                <div slot="placeholder" class="errorImg">
                   <img src="~@/assets/images/imgError.png" alt />
                 </div>
                 <div
@@ -66,7 +65,12 @@
         <el-table-column align="center" label="资料来源" min-width="80">
           <template slot-scope="scope">
             <div
-              style="overflow:hidden;width:80px;white-space: nowrap;text-overflow: ellipsis;"
+              style="
+                overflow: hidden;
+                width: 80px;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              "
             >
               {{ scope.row.exhibitionName }}
             </div>
@@ -150,7 +154,7 @@
           min-width="60"
         >
           <template slot-scope="scope">
-            <span style="color:#f56c6c">
+            <span style="color: #f56c6c">
               {{ scope.row.cu_de + scope.row.price }}
             </span>
           </template>
@@ -181,23 +185,24 @@
           >
             全选
           </el-checkbox>
-          <el-popconfirm
+          <!-- <el-popconfirm
             class="deleteBtn"
             title="确定要删除选中的产品吗？"
             @confirm="removeMyShoppingCart"
+          > -->
+          <el-button
+            slot="reference"
+            type="primary"
+            :disabled="
+              $refs.myTableRef && $refs.myTableRef.selection.length < 1
+            "
+            style="margin-left: 20px"
+            size="small"
+            @click.stop="removeMyShoppingCart"
+            plain
+            >删除</el-button
           >
-            <el-button
-              slot="reference"
-              type="primary"
-              :disabled="
-                $refs.myTableRef && $refs.myTableRef.selection.length < 1
-              "
-              style="margin-left: 20px;"
-              size="small"
-              plain
-              >删除</el-button
-            >
-          </el-popconfirm>
+          <!-- </el-popconfirm> -->
         </div>
         <div class="right">
           <p class="item">
@@ -223,7 +228,7 @@
           <el-button
             type="warning"
             @click="openSubOrder"
-            style="margin-left: 10px;"
+            style="margin-left: 10px"
             size="small"
             >生成报价</el-button
           >
@@ -260,7 +265,7 @@
                   </el-option>
                 </el-select>
                 <el-button
-                  style="margin-left:10px;"
+                  style="margin-left: 10px"
                   type="primary"
                   @click.stop="openAddMyClient"
                   >新增客户</el-button
@@ -270,7 +275,7 @@
             <el-form-item label="默认公式：" prop="defaultFormula">
               <el-select
                 v-model="clienFormData.defaultFormula"
-                style="width:100%;"
+                style="width: 100%"
                 placeholder="请选择"
               >
                 <el-option
@@ -292,7 +297,7 @@
                 </el-form-item>
                 <el-form-item label="币种：" prop="cu_de">
                   <el-select
-                    style="width:100%;"
+                    style="width: 100%"
                     v-model="clienFormData.cu_de"
                     placeholder="请选择币种"
                   >
@@ -313,7 +318,7 @@
                 </el-form-item>
                 <el-form-item label="小数位数：" prop="decimalPlaces">
                   <el-select
-                    style="width:100%;"
+                    style="width: 100%"
                     v-model="clienFormData.decimalPlaces"
                     placeholder="请选择小数位数"
                   >
@@ -344,7 +349,7 @@
                 <el-form-item label="每车尺码：" prop="size">
                   <el-select
                     v-model="clienFormData.size"
-                    style="width:100%;"
+                    style="width: 100%"
                     placeholder="请选择尺码"
                   >
                     <el-option
@@ -359,7 +364,7 @@
                 <el-form-item label="取舍方式：" prop="rejectionMethod">
                   <el-select
                     v-model="clienFormData.rejectionMethod"
-                    style="width:100%;"
+                    style="width: 100%"
                     placeholder="请选择取舍方式"
                   >
                     <el-option
@@ -389,7 +394,7 @@
                 <el-form-item label="小数位数：" prop="miniPriceDecimalPlaces">
                   <el-select
                     v-model="clienFormData.miniPriceDecimalPlaces"
-                    style="width:100%;"
+                    style="width: 100%"
                     placeholder="请选择取舍方式"
                   >
                     <el-option
@@ -405,8 +410,9 @@
             </div>
             <el-form-item label="报价备注：">
               <el-input
-                maxlength="255"
-                v-model="clienFormData.remark"
+                maxlength="50"
+                show-word-limit
+                v-model="clienFormData.title"
               ></el-input>
             </el-form-item>
           </el-form>
@@ -414,7 +420,7 @@
             <el-button
               size="medium"
               @click="submitOrder"
-              style="width:120px;"
+              style="width: 120px"
               type="primary"
             >
               确定
@@ -422,7 +428,7 @@
             <el-button
               size="medium"
               @click="closeSub"
-              style="width:120px;margin-left: 24px;"
+              style="width: 120px; margin-left: 24px"
             >
               取消
             </el-button>
@@ -516,6 +522,7 @@ export default {
         size: []
       },
       clienFormData: {
+        title: null,
         defaultFormula: null,
         customerId: null,
         customerName: null,
@@ -592,17 +599,17 @@ export default {
           required: true,
           message: "请选择取舍方式",
           trigger: "change"
-        },
-        miniPrice: {
-          required: true,
-          message: "请输入价格",
-          trigger: "blur"
-        },
-        miniPriceDecimalPlaces: {
-          required: true,
-          message: "请选择小数位数",
-          trigger: "change"
         }
+        // miniPrice: {
+        //   required: true,
+        //   message: "请输入价格",
+        //   trigger: "blur"
+        // },
+        // miniPriceDecimalPlaces: {
+        //   required: true,
+        //   message: "请选择小数位数",
+        //   trigger: "change"
+        // }
       },
       customerTemplate: [],
       isIndeterminate: false,
@@ -829,6 +836,7 @@ export default {
           address: item.supplierAddres || item.supplierAddress
         }
       };
+      this.$router.push("/bsIndex/bsVendorQuery");
       this.$store.commit("myAddTab", fd);
     },
 
@@ -885,23 +893,35 @@ export default {
     },
     // 删除购物车
     removeMyShoppingCart() {
-      const selectProducts = this.$refs.myTableRef.selection;
-      for (let i = 0; i < selectProducts.length; i++) {
-        for (let j = 0; j < this.tableData.length; j++) {
-          if (
-            selectProducts[i].productNumber === this.tableData[j].productNumber
-          ) {
-            this.tableData.splice(j, 1);
+      this.$confirm("确定要删除选中的产品吗？", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const selectProducts = this.$refs.myTableRef.selection;
+          for (let i = 0; i < selectProducts.length; i++) {
+            for (let j = 0; j < this.tableData.length; j++) {
+              if (
+                selectProducts[i].productNumber ===
+                this.tableData[j].productNumber
+              ) {
+                this.tableData.splice(j, 1);
+              }
+            }
           }
-        }
-      }
-      this.$common.handlerMsgState({
-        msg: "删除成功",
-        type: "success"
-      });
-      console.log(this.tableData);
-      eventBus.$emit("resetMyCart", this.tableData);
-      this.$store.commit("resetShoppingCart", selectProducts);
+          this.$common.handlerMsgState({
+            msg: "删除成功",
+            type: "success"
+          });
+          eventBus.$emit("resetMyCart", this.tableData);
+          this.$store.commit("resetShoppingCart", selectProducts);
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "已取消删除",
+            type: "warning"
+          });
+        });
     },
     // 修改购物车数量
     changeInputNumber(e, val) {
@@ -1002,6 +1022,9 @@ export default {
           if (this.userInfo.commparnyList[0].companyType == "Sales") {
             this.clienFormData.productOfferType = "company";
           }
+          this.clienFormData.miniPrice = this.clienFormData.miniPrice || 0;
+          this.clienFormData.miniPriceDecimalPlaces =
+            this.clienFormData.miniPriceDecimalPlaces || 0;
           const res = await this.$http.post(
             "/api/CreateProductOffer",
             this.clienFormData
@@ -1044,7 +1067,10 @@ export default {
     // 关闭提交订单
     closeSub() {
       this.clienFormData = {
+        title: null,
         defaultFormula: null,
+        customerId: null,
+        customerName: null,
         quotationProductList: [],
         profit: 0,
         offerMethod: "汕头",
@@ -1056,7 +1082,7 @@ export default {
         decimalPlaces: 3,
         rejectionMethod: "四舍五入",
         miniPrice: 0,
-        miniPriceDecimalPlaces: 0
+        miniPriceDecimalPlaces: 1
       };
       this.subDialogVisible = false;
     },

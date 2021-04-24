@@ -7,11 +7,6 @@
       </div>
       <div class="rightContent">
         <div class="views">
-          <el-collapse-transition>
-            <div class="positionSearchBox" v-show="showSearch">
-              <bsProductSearch />
-            </div>
-          </el-collapse-transition>
           <el-tabs
             v-model="activeTab"
             @tab-remove="closeTab"
@@ -27,16 +22,21 @@
               :label="item.label"
             >
               <span slot="label">
-                <i class="el-icon-refresh" @click.stop="refresh()"></i>
-                {{ item.label }}
+                <el-tooltip
+                  class="item"
+                  effect="dark"
+                  :content="item.label"
+                  placement="top"
+                >
+                  <span style="width:90px;padding:0;">
+                    {{ item.label }}
+                  </span>
+                </el-tooltip>
               </span>
 
-              <div
-                class="myScrollbar"
-                style="height: 100%;overflow-y:auto;"
-                ref="myScrollbar"
-              >
+              <div class="myScrollbar" ref="myScrollbar">
                 <component
+                  class="componentContent"
                   :item="item.value"
                   v-if="item.refresh"
                   :is="item.component"
@@ -71,6 +71,9 @@ import bsHallBusinessOrderDetails from "@/views/bsPage/bsBusinessManage/bsHallBu
 // 站点列表
 import bsSiteLlis from "@/views/bsPage/bsSiteSharing/bsSiteLlis/BsSiteLlis.vue";
 
+// 站点设置
+import bsSiteSettings from "@/views/bsPage/bsSiteSharing/bsSiteSettings/BsSiteSettings.vue";
+
 // 客户订单
 import bsCustomerOrder from "@/views/bsPage/bsSiteSharing/bsCustomerOrder/BsCustomerOrder.vue";
 
@@ -85,6 +88,8 @@ import bsMyCollection from "@/views/bsPage/bsProductSearch/bsMyCollection/BsMyCo
 //  最新产品
 import bsLatestProducts from "@/views/bsPage/bsProductSearch/bsLatestProducts/BsLatestProducts.vue";
 
+// 浏览足迹
+import bsBrowsingFootprints from "@/views/bsPage/bsProductSearch/bsBrowsingFootprints/BsBrowsingFootprints.vue";
 //  现货产品
 import bsSpotProducts from "@/views/bsPage/bsProductSearch/bsSpotProducts/BsSpotProducts.vue";
 
@@ -135,9 +140,11 @@ import bsPurchaseOrder from "@/views/bsPage/bsBusinessManage/bsPurchaseOrder/BsP
 // 采购订单详情
 import bsPurchaseOrderDetails from "@/views/bsPage/bsBusinessManage/bsPurchaseOrder/bsPurchaseOrderDetails/BsPurchaseOrderDetails.vue";
 
+// 相似产品
+import bsSimilarProduct from "@/components/bsComponents/bsProductSearchComponent/bsSimilarProduct.vue";
+
 import bsTop from "@/components/bsComponents/bsTopComponent/BsTop";
 import bsMenu from "@/components/bsComponents/bsMenuComponent/BsMenu";
-import bsProductSearch from "@/components/bsComponents/bsProductSearchComponent/bsProductSearch";
 import eventBus from "@/assets/js/common/eventBus.js";
 import { mapState } from "vuex";
 export default {
@@ -147,6 +154,7 @@ export default {
     bsClientOrderDetails,
     bsHallBusinessOrderDetails,
     bsSiteLlis,
+    bsSiteSettings,
     bsCustomerOrder,
     bsBrowsingHistory,
     bsProductSearchIndex,
@@ -154,6 +162,7 @@ export default {
     bsLatestProducts,
     bsSpotProducts,
     bsVIPProducts,
+    bsBrowsingFootprints,
     bsAccountManage,
     bsQuotationSettings,
     bsPushSettings,
@@ -173,49 +182,59 @@ export default {
     bsPurchaseOrder,
     bsTop,
     bsMenu,
-    bsProductSearch,
-    bsPurchaseOrderDetails
+    bsPurchaseOrderDetails,
+    bsSimilarProduct
   },
   data() {
     return {
-      isCollapse: false,
-      showSearch: false
+      isCollapse: false
     };
   },
   methods: {
     // 滚动事件
     handleScroll() {
-      const myScrollbarList = this.$refs.myScrollbar;
-      myScrollbarList.forEach(val => {
-        const fun = () => {
-          console.log(val.scrollTop, this.activeTab);
-          if (this.activeTab == "/bsIndex/bsProductSearchIndex") {
-            if (val.scrollTop >= 200) {
-              eventBus.$emit("showCart", true);
-            } else {
-              eventBus.$emit("showCart", false);
-            }
-          } else if (
-            this.tabList.find(val => val.name == this.activeTab).linkUrl ==
-            "/bsIndex/bsProductSearchIndex"
-          ) {
-            eventBus.$emit("showCart", true);
-          } else if (
-            this.activeTab == "/bsIndex/bsLatestProducts" ||
-            this.activeTab == "/bsIndex/bsSpotProducts" ||
-            this.activeTab == "/bsIndex/bsVIPProducts"
-          ) {
-            eventBus.$emit("showCart", true);
-          } else {
-            eventBus.$emit("showCart", false);
-          }
-        };
-        if (this.activeTab == "/bsIndex/bsProductSearchIndex") {
-          val.onscroll = fun;
-        } else {
-          val.removeEventListener("scroll", fun, false);
-        }
-      });
+      eventBus.$emit("showCart", false);
+      const newN = this.$route.path;
+      if (
+        newN == "/bsIndex/bsProductSearchIndex" ||
+        newN == "/bsIndex/bsLatestProducts" ||
+        newN == "/bsIndex/bsSpotProducts" ||
+        newN == "/bsIndex/bsVIPProducts" ||
+        newN == "/bsIndex/bsMyCollection"
+      ) {
+        eventBus.$emit("showCart", true);
+      }
+      // const myScrollbarList = this.$refs.myScrollbar;
+      // myScrollbarList.forEach(val => {
+      //   const fun = () => {
+      //     if (this.activeTab == "/bsIndex/bsProductSearchIndex") {
+      //       if (val.scrollTop >= 200) {
+      //         eventBus.$emit("showCart", true);
+      //       } else {
+      //         eventBus.$emit("showCart", false);
+      //       }
+      //     } else if (
+      //       this.tabList.find(val => val.name == this.activeTab).linkUrl ==
+      //       "/bsIndex/bsProductSearchIndex"
+      //     ) {
+      //       eventBus.$emit("showCart", true);
+      //     } else if (
+      //       this.activeTab == "/bsIndex/bsLatestProducts" ||
+      //       this.activeTab == "/bsIndex/bsSpotProducts" ||
+      //       this.activeTab == "/bsIndex/bsVIPProducts" ||
+      //       this.activeTab == "/bsIndex/bsMyCollection"
+      //     ) {
+      //       eventBus.$emit("showCart", true);
+      //     } else {
+      //       eventBus.$emit("showCart", false);
+      //     }
+      //   };
+      //   if (this.activeTab == "/bsIndex/bsProductSearchIndex") {
+      //     val.onscroll = fun;
+      //   } else {
+      //     val.removeEventListener("scroll", fun, false);
+      //   }
+      // });
     },
     // 刷新tab标签
     triggerTab() {
@@ -238,7 +257,6 @@ export default {
       len > 1 && this.$store.commit("closeTab", e);
     },
     refresh() {
-      console.log("点击");
       this.$common.refreshTab();
     },
     // 关闭所有tab标签
@@ -248,8 +266,7 @@ export default {
         cancelButtonText: "取消"
       })
         .then(() => {
-          this.$store.commit("closeTabAll");
-          this.$router.push("/bsIndex/bsHome");
+          this.$store.commit("closeTabAll", this.$router);
           this.$common.handlerMsgState({
             msg: "关闭成功!",
             type: "success"
@@ -282,37 +299,30 @@ export default {
   watch: {
     activeTab(newN, oldN) {
       this.$store.commit("handlerOldTabName", oldN);
-      if (newN == "/bsIndex/bsProductSearchIndex") {
-        this.handleScroll();
+      // if (newN == "/bsIndex/bsProductSearchIndex") {
+      //   // this.handleScroll();
+      // } else {
+      if (
+        newN == "/bsIndex/bsProductSearchIndex" ||
+        newN == "/bsIndex/bsLatestProducts" ||
+        newN == "/bsIndex/bsSpotProducts" ||
+        newN == "/bsIndex/bsVIPProducts" ||
+        newN == "/bsIndex/bsMyCollection"
+      ) {
+        eventBus.$emit("showCart", true);
       } else {
-        if (
-          newN == "/bsIndex/bsLatestProducts" ||
-          newN == "/bsIndex/bsSpotProducts" ||
-          newN == "/bsIndex/bsVIPProducts"
-        ) {
-          // this.showSearch = false;
-          eventBus.$emit("showCart", true);
-        } else if (
-          this.tabList.find(val => val.name == newN).linkUrl ==
-          "/bsIndex/bsProductSearchIndex"
-        ) {
-          // this.showSearch = false;
-          eventBus.$emit("showCart", true);
-        } else {
-          // this.showSearch = false;
-          eventBus.$emit("showCart", false);
-        }
+        eventBus.$emit("showCart", false);
       }
     }
   },
   created() {},
   mounted() {
-    eventBus.$on("startScroll", () => {
-      this.handleScroll();
-    });
+    this.handleScroll();
+    // eventBus.$on("startScroll", () => {
+    //   this.handleScroll();
+    // });
   },
   beforeDestroy() {
-    this.showSearch = false;
     eventBus.$emit("showCart", false);
   }
 };
@@ -320,19 +330,20 @@ export default {
 <style scoped lang="less">
 @deep: ~">>>";
 .bsIndex {
-  width: 100%;
+  // width: 100%;
   height: 100%;
   .content {
-    width: 100%;
+    // width: 100%;
     height: calc(100% - 72px);
     display: flex;
-    min-width: 1350px;
     background-color: #fff;
     box-sizing: border-box;
     .leftMenu {
       height: 100%;
       box-sizing: border-box;
-      box-shadow: 0px 0px 3px 0px rgba(42, 69, 116, 0.16);
+      // box-shadow: 0px 0px 3px 0px rgba(42, 69, 116, 0.16);
+      z-index: 99;
+      box-shadow: 1px 0px 0px #dcdfe6;
       .bsMenu {
         box-shadow: 0px 0px 3px 0px rgba(42, 69, 116, 0.16);
       }
@@ -340,12 +351,12 @@ export default {
     @{deep} .rightContent {
       flex: 1;
       height: 100%;
-      width: 800px;
+      overflow: hidden;
       .views {
         height: 100%;
         position: relative;
         .positionSearchBox {
-          width: calc(100% - 1px);
+          // width: calc(100% - 1px);
           background-color: #fff;
           position: absolute;
           left: 1px;
@@ -364,6 +375,9 @@ export default {
             box-sizing: border-box;
             box-shadow: 0px 0px 3px 0px rgba(42, 69, 116, 0.16);
             .el-tabs__nav-wrap {
+              margin-bottom: 0px !important;
+              box-shadow: 0px 1px 0px #dcdfe6;
+              z-index: 99;
               &.is-scrollable {
                 padding: 0 30px;
               }
@@ -436,12 +450,12 @@ export default {
             }
           }
           .el-tabs__content {
-            height: calc(100% - 90px);
+            height: calc(100% - 50px);
             box-sizing: border-box;
             background-color: #f1f3f6;
             overflow: hidden;
             box-sizing: border-box;
-            margin: 20px;
+            margin: 0 0 0 20px;
             padding: 0;
             box-sizing: border-box;
             .el-tab-pane {
@@ -535,16 +549,24 @@ export default {
   }
 }
 .myScrollbar {
+  padding: 20px 0;
+  height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+  padding-right: 20px;
+  .componentContent {
+    min-width: 1500px;
+  }
   /*-------滚动条整体样式----*/
   &::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 10px;
+    height: 12px;
   }
   /*滚动条里面小方块样式*/
   &::-webkit-scrollbar-thumb {
     border-radius: 100px;
     // -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-    background: #d3d5d8;
+    background: #c8c8c9;
   }
   /*滚动条里面轨道样式*/
   &::-webkit-scrollbar-track {

@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-08 14:53:35
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\public\reconnectionModal.vue
- * @LastEditTime: 2021-04-08 15:52:09
+ * @LastEditTime: 2021-04-21 20:13:49
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -16,16 +16,18 @@
                 <div>异常退出，是否重新链接？</div>
             </div>
             <div class="content">
-                上一次会议室：1008，进行中...    
+                上一次会议室：{{roomNumber}}，进行中...    
             </div>
             <div class="action">
-                <Button type="primary" shape="circle" style="width:88px;margin:0 14px 0 78px;background:#2684D1;border-color:#2684D1" @click="close">重新链接</Button>
+                <Button type="primary" shape="circle" style="width:88px;margin:0 14px 0 78px;background:#2684D1;border-color:#2684D1" @click="reconnection">重新链接</Button>
                 <Button type="warning" shape="circle" style="width:88px;margin:0 78px 0 14px;background:#FF5151;border-color:#FF5151" @click="close">结束关闭</Button>
             </div>
         </div>
     </div>
 </template>
 <script>
+import * as Cookies from "js-cookie";
+
 export default {
     name:'ReconnectionModal',
     props:{
@@ -37,20 +39,27 @@ export default {
     watch:{
         isShowReconnection:{
             handler(val){
+                debugger
                 this.show = val;
             },
-            immediate:true
         }
     },
     data() {
         return {
-            show:false
+            show:false,
+            roomNumber:null
         }
     },
     methods:{
+        reconnection(){
+            this.$emit('reconnection-close');    
+        },
         close(){
             this.$emit('cancel-reconnection');
         }
+    },
+    created(){
+        this.roomNumber = Cookies.get("channel");
     }
 }
 </script>

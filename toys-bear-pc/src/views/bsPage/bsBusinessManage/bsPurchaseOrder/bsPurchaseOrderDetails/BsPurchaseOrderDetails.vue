@@ -30,12 +30,8 @@
         <div class="right">
           <li class="clientItem">
             <span class="itemTitle">状态：</span>
-            <span class="content state" v-if="item.readStatus">
-              已读
-            </span>
-            <span class="content state" v-else>
-              未读
-            </span>
+            <span class="content state" v-if="item.readStatus"> 已读 </span>
+            <span class="content state" v-else> 未读 </span>
           </li>
           <li class="clientItem">
             <span class="itemTitle">报价备注：</span>
@@ -67,13 +63,15 @@
           'font-weight': '400'
         }"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <ex-table-column :autoFit="true" label="产品" width="300">
           <template slot-scope="scope">
             <div class="imgBox">
               <el-image
                 fit="contain"
                 @click.native="toProductDetails(scope.row)"
-                style="width:80px;height:60px;"
+                style="width: 80px; height: 60px"
                 :src="scope.row.imgUrl && scope.row.imgUrl[0]"
                 :preview-src-list="scope.row.imgUrl || []"
               >
@@ -111,7 +109,13 @@
         <ex-table-column :autoFit="true" label="资料来源">
           <template slot-scope="scope">
             <div
-              style="width:110px;overflow:hidden;max-width: 100px;white-space: nowrap;text-overflow: ellipsis;"
+              style="
+                width: 110px;
+                overflow: hidden;
+                max-width: 100px;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+              "
             >
               {{ scope.row.exhibitionName }}
             </div>
@@ -170,7 +174,7 @@
         </ex-table-column>
         <ex-table-column :autoFit="true" prop="fa_pr" label="参考单价">
           <template slot-scope="scope">
-            <span style="color:#3368A9">
+            <span style="color: #3368a9">
               <span>{{ scope.row.cu_de }}</span>
               {{ scope.row.fa_pr }}
             </span>
@@ -178,7 +182,7 @@
         </ex-table-column>
         <ex-table-column :autoFit="true" prop="fa_pr_pr" label="报出价">
           <template slot-scope="scope">
-            <span style="color:#f56c6c">
+            <span style="color: #f56c6c">
               <span>{{ scope.row.cu_de }}</span>
               {{ scope.row.fa_pr_pr }}
             </span>
@@ -210,7 +214,7 @@
       </div>
     </div>
 
-    <center style="margin-top:20px;">
+    <center style="margin-top: 20px">
       <el-pagination
         layout="total, sizes, prev, pager, next, jumper"
         background
@@ -236,7 +240,7 @@
             orderNumber: item.orderNumber,
             the_nu: item.the_nu,
             name: item.fromCompanyName,
-            api: '/api/GetOfferOrderExcel'
+            api: '/api/GetSampleOrderExcel'
           }"
         />
       </el-dialog>

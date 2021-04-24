@@ -270,6 +270,10 @@ export default {
     subDefaultForm() {
       this.$refs.addDefaultFormRef.validate(async valid => {
         if (valid) {
+          console.log(this.addDefaultForm);
+          //       this.addDefaultForm.miniPrice = this.addDefaultForm.miniPrice || 0;
+          //   this.addDefaultForm.miniPriceDecimalPlaces =
+          //     this.addDefaultForm.miniPriceDecimalPlaces || 0;
           this.$emit("submit", this.addDefaultForm);
         }
       });

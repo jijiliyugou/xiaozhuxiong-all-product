@@ -13,6 +13,12 @@ const BsLatestProducts = () =>
     "@/views/bsPage/bsProductSearch/bsLatestProducts/BsLatestProducts.vue"
   );
 
+// 浏览足迹
+const BsBrowsingFootprints = () =>
+  import(
+    "@/views/bsPage/bsProductSearch/bsBrowsingFootprints/BsBrowsingFootprints.vue"
+  );
+
 //  现货产品
 const BsSpotProducts = () =>
   import("@/views/bsPage/bsProductSearch/bsSpotProducts/BsSpotProducts.vue");
@@ -42,6 +48,14 @@ export default [
     path: "/bsIndex/bsLatestProducts",
     name: "bsLatestProducts",
     component: BsLatestProducts,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsBrowsingFootprints",
+    name: "bsBrowsingFootprints",
+    component: BsBrowsingFootprints,
     meta: {
       keepAlive: true
     }

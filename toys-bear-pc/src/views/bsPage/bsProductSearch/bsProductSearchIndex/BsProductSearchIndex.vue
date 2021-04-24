@@ -2,8 +2,177 @@
   <div class="productSearch">
     <template v-if="!imageSearchValue">
       <div class="advancedSearchBox">
-        <bsProductSearch />
-        <div class="standardScreening">
+        <bsProductSearch
+          ref="searchRef"
+          @handleSynthesis="handleSynthesis"
+          @screeningShow="screeningShow"
+        />
+        <!-- 高级筛选 -->
+        <div class="advancedScreening" v-show="screeningFlag == true">
+          <div class="title">高级筛选:</div>
+          <div class="queryCondition">
+            <!-- <div>
+              <span class="text">综合：</span>
+              <el-checkbox
+                v-model="synthesis"
+                @change="handleSynthesis"
+                style="margin-right: 30px;"
+              >
+                综合查询
+              </el-checkbox>
+            </div> -->
+            <div class="item">
+              <span class="text">搜索类型：</span>
+              <el-checkbox
+                @change="handleCheckedScreensChange"
+                v-model="searchForm.fa_no"
+              >
+                货号
+              </el-checkbox>
+              <el-checkbox
+                @change="handleCheckedScreensChange"
+                v-model="searchForm.name"
+              >
+                名称
+              </el-checkbox>
+              <el-checkbox
+                @change="handleCheckedScreensChange"
+                v-model="searchForm.number"
+              >
+                编号
+              </el-checkbox>
+            </div>
+            <div class="item">
+              <span class="text">是否精准：</span>
+              <el-radio-group v-model="isAccurate" @change="handleIsAccurate">
+                <el-radio label="模糊"></el-radio>
+                <el-radio label="精准"></el-radio>
+              </el-radio-group>
+            </div>
+          </div>
+          <div class="parameter">
+            <el-form :model="advancedFormdata">
+              <div class="left">
+                <el-form-item label="产品规格：">
+                  <el-input
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    size="medium"
+                    placeholder="长"
+                    style="width: 55px"
+                    v-model="advancedFormdata.pr_le"
+                  ></el-input
+                  ><span>-</span>
+                  <el-input
+                    size="medium"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    placeholder="宽"
+                    style="width: 55px"
+                    v-model="advancedFormdata.pr_wi"
+                  ></el-input
+                  ><span>-</span>
+                  <el-input
+                    size="medium"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    placeholder="高"
+                    style="width: 55px"
+                    v-model="advancedFormdata.pr_hi"
+                  ></el-input>
+                  &nbsp;<span>CM</span>
+                </el-form-item>
+                <el-form-item label="外箱规格：">
+                  <el-input
+                    size="medium"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    placeholder="长"
+                    style="width: 55px"
+                    v-model="advancedFormdata.ou_le"
+                  ></el-input
+                  ><span>-</span>
+                  <el-input
+                    size="medium"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    placeholder="宽"
+                    style="width: 55px"
+                    v-model="advancedFormdata.ou_wi"
+                  ></el-input
+                  ><span>-</span>
+                  <el-input
+                    size="medium"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    placeholder="高"
+                    style="width: 55px"
+                    v-model="advancedFormdata.ou_hi"
+                  ></el-input>
+                  &nbsp;<span>CM</span>
+                </el-form-item>
+                <el-form-item label="包装规格：">
+                  <el-input
+                    size="medium"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    placeholder="长"
+                    style="width: 55px"
+                    v-model="advancedFormdata.in_le"
+                  ></el-input
+                  ><span>-</span>
+                  <el-input
+                    size="medium"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    placeholder="宽"
+                    style="width: 55px"
+                    v-model="advancedFormdata.in_wi"
+                  ></el-input
+                  ><span>-</span>
+                  <el-input
+                    size="medium"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    placeholder="高"
+                    style="width: 55px"
+                    v-model="advancedFormdata.in_hi"
+                  ></el-input>
+                  &nbsp;<span>CM</span>
+                </el-form-item>
+              </div>
+              <div class="left">
+                <el-form-item label="包装方式：">
+                  <el-select
+                    filterable
+                    size="medium"
+                    style="width: 200px; heigth: 35px"
+                    clearable
+                    v-model="advancedFormdata.ch_pa"
+                    placeholder="请选择"
+                  >
+                    <el-option
+                      v-for="item in chpaList"
+                      :key="item.pa_nu"
+                      :label="item.ch_pa"
+                      :value="item.ch_pa"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="是否图片：">
+                  <el-radio-group v-model="advancedFormdata.isUpInsetImg">
+                    <el-radio label="是"></el-radio>
+                    <el-radio label="否"></el-radio>
+                  </el-radio-group>
+                </el-form-item>
+                <el-form-item style="margin: 0; " label="">
+                  <el-button
+                    type="primary"
+                    size="medium"
+                    style="color: #fff;"
+                    @click="confirmAdvanced"
+                  >
+                    确 定
+                  </el-button>
+                </el-form-item>
+              </div>
+            </el-form>
+          </div>
+        </div>
+        <!-- 标准筛选 -->
+        <!-- <div class="standardScreening" v-show="screeningFlag == false">
           <span class="myLabel">标准筛选:</span>
           <el-checkbox
             v-model="synthesis"
@@ -36,7 +205,7 @@
           >
             包装
           </el-checkbox>
-        </div>
+        </div> -->
         <div class="productClass">
           <span class="myLabel">产品分类:</span>
           <div :class="{ tags: true, showOneCate: isOneDownCate }">
@@ -155,9 +324,9 @@
               </div>
             </div>
             <el-button
-              @click="getProductList"
+              @click="getProductList(false)"
               type="primary"
-              style="margin-left: 10px;"
+              style="margin-left: 10px"
               size="mini"
             >
               确定
@@ -216,7 +385,7 @@
           <el-input
             size="medium"
             @keyup.native.enter="textSearchProducts"
-            style="width: 340px; margin: 0 15px;"
+            style="width: 340px; margin: 0 15px"
             placeholder="请输入关键词"
             v-model="searchForm.keyword"
             clearable
@@ -232,7 +401,7 @@
                 :on-change="uploadPic"
               >
                 <i
-                  style="font-size: 20px;"
+                  style="font-size: 20px"
                   class="el-input__icon el-icon-camera-solid"
                 ></i>
               </el-upload>
@@ -246,9 +415,7 @@
             >搜 索</el-button
           >
         </div>
-        <div class="resultTitle">
-          搜索图片
-        </div>
+        <div class="resultTitle">搜索图片</div>
         <div class="resultBox">
           <div class="left">
             <p class="totalCountBox">
@@ -294,7 +461,7 @@
     <el-dialog title="图片剪裁" :visible.sync="isShowCropper" destroy-on-close>
       <div class="cropperWrap">
         <div class="cropper-content">
-          <div class="cropper" style="text-align:center">
+          <div class="cropper" style="text-align: center">
             <vueCropper
               ref="cropper"
               :img="option.img"
@@ -366,6 +533,10 @@ export default {
       baseImg: null,
       fileinfo: null,
       isShowCropper: false,
+      advancedFormdata: {}, //高级搜索条件
+      screeningFlag: false,
+      isAccurate: "模糊",
+      chpaList: [],
       // 裁剪组件的基础配置option
       option: {
         img: "", // 裁剪图片的地址
@@ -394,7 +565,7 @@ export default {
       isRedu: null,
       sortOrder: null,
       sortType: null,
-      synthesis: true,
+      synthesis: false,
       productList: [],
       isGrid: "bsGridComponent",
       currentPage: 1,
@@ -406,9 +577,9 @@ export default {
         maxPrice: "",
         categoryNumber: null,
         time: [],
-        fa_no: 0,
+        fa_no: true,
         number: 0,
-        name: 0,
+        name: true,
         packName: 0
       },
       currentTwoTag: null,
@@ -446,7 +617,7 @@ export default {
     // 文字搜
     textSearchProducts() {
       this.currentPage = 1;
-      this.getProductList();
+      this.getProductList(false);
     },
     // 确定裁剪图片
     onCubeImg() {
@@ -531,11 +702,12 @@ export default {
           this.sortOrder = null;
           break;
       }
-      this.getProductList();
+      this.getProductList(false);
     },
     // 获取产品列表请求
-    async getProductList() {
+    async getProductList(flag) {
       this.$store.commit("searchValues", null);
+
       const fd = {
         name: this.searchForm.keyword,
         skipCount: this.currentPage,
@@ -545,19 +717,51 @@ export default {
         maxPrice: this.searchForm.maxPrice,
         startTime: this.searchForm.time.length ? this.searchForm.time[0] : null,
         endTime: this.searchForm.time.length ? this.searchForm.time[1] : null,
-        precisionSearch: JSON.stringify({
-          fa_no: this.searchForm.fa_no ? 1 : 0,
-          number: this.searchForm.number ? 1 : 0,
-          name: this.searchForm.name ? 1 : 0,
-          packName: this.searchForm.packName ? 1 : 0
-        }),
+        // precisionSearch: JSON.stringify({
+        //   fa_no: this.searchForm.fa_no ? 1 : 0,
+        //   number: this.searchForm.number ? 1 : 0,
+        //   name: this.searchForm.name ? 1 : 0,
+        //   packName: this.searchForm.packName ? 1 : 0
+        // }),
         sortOrder: this.sortOrder,
-        sortType: this.sortType
+        sortType: this.sortType,
+        // 高级搜索条件
+        fa_no: this.advancedFormdata.fa_no,
+        isUpInsetImg: this.advancedFormdata.isUpInsetImg == "是" ? true : false,
+        ch_pa: this.advancedFormdata.ch_pa,
+        pr_le: this.advancedFormdata.pr_le,
+        pr_wi: this.advancedFormdata.pr_wi,
+        pr_hi: this.advancedFormdata.pr_hi,
+        ou_le: this.advancedFormdata.ou_le,
+        ou_wi: this.advancedFormdata.ou_wi,
+        ou_hi: this.advancedFormdata.ou_hi,
+        in_le: this.advancedFormdata.in_le,
+        in_wi: this.advancedFormdata.in_wi,
+        in_hi: this.advancedFormdata.in_hi
       };
+      switch (this.isAccurate) {
+        case "精准":
+          fd.precisionSearch = JSON.stringify({
+            fa_no: this.searchForm.fa_no ? 2 : 0,
+            name: this.searchForm.name ? 2 : 0,
+            number: this.searchForm.number ? 2 : 0,
+            packName: this.searchForm.packName ? 2 : 0
+          });
+          break;
+        default:
+          fd.precisionSearch = JSON.stringify({
+            fa_no: this.searchForm.fa_no ? 1 : 0,
+            name: this.searchForm.name ? 1 : 0,
+            number: this.searchForm.number ? 1 : 0,
+            packName: this.searchForm.packName ? 1 : 0
+          });
+          break;
+      }
       for (const key in fd) {
         if (fd[key] === null || fd[key] === undefined || fd[key] === "")
           delete fd[key];
       }
+      console.log(fd);
       const res = await this.$http.post("/api/SearchBearProductPage", fd);
       const { code, item, msg } = res.data.result;
       if (code === 200) {
@@ -581,6 +785,8 @@ export default {
           type: "danger"
         });
       }
+      if (flag) this.getProductCategoryList();
+      this.GetProductChpaList();
     },
     // 切換頁容量
     handleSizeChange(pageSize) {
@@ -590,13 +796,13 @@ export default {
         this.currentPage != 1
       )
         return false;
-      this.getProductList();
+      this.getProductList(false);
     },
     // 修改当前页
     handleCurrentChange(page) {
       eventBus.$emit("toTop");
       this.currentPage = page;
-      this.getProductList();
+      this.getProductList(false);
     },
     // 获取产品类目列表
     async getProductCategoryList() {
@@ -610,20 +816,57 @@ export default {
         });
       }
     },
+    //   获取包装方式
+    async GetProductChpaList() {
+      const res = await this.$http.post("/api/GetProductChpaList", {});
+      if (res.data.result.code === 200) {
+        this.chpaList = res.data.result.item;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+
     // 选择综合
-    handleSynthesis(flag) {
-      if (flag) {
+    async handleSynthesis() {
+      this.synthesis = !this.synthesis;
+      if (!this.synthesis) {
+        this.isAccurate = "模糊";
         this.searchForm.fa_no = 0;
         this.searchForm.number = 0;
         this.searchForm.name = 0;
         this.searchForm.packName = 0;
+      } else {
+        this.isAccurate = "精准";
       }
     },
     // 选择筛选
     handleCheckedScreensChange(flag) {
       if (flag) {
-        this.synthesis = null;
+        this.synthesis = false;
       }
+    },
+    //是否精准
+    handleIsAccurate(flag) {
+      this.isAccurate = flag;
+      if (flag === "模糊") {
+        this.synthesis = false;
+        this.$refs.searchRef.synthesis = false;
+      } else {
+        this.synthesis = true;
+        this.$refs.searchRef.synthesis = true;
+      }
+    },
+    //高级搜索
+    async screeningShow() {
+      this.screeningFlag = !this.screeningFlag;
+    },
+    // 确认高级搜索
+    confirmAdvanced() {
+      this.searchForm.keyword = this.$refs.searchRef.searchForm.keyword;
+      this.getProductList(false);
     },
     // 切换产品列表样式
     handerIsGrid(type) {
@@ -639,7 +882,7 @@ export default {
         return false;
       }
       this.currentPage--;
-      this.getProductList();
+      this.getProductList(false);
     },
     // 下一页
     nextEvent() {
@@ -652,7 +895,7 @@ export default {
         return false;
       }
       this.currentPage++;
-      this.getProductList();
+      this.getProductList(false);
     },
     // 一级分类点击事件
     oneTagEvent(item) {
@@ -680,44 +923,33 @@ export default {
     }
   },
   created() {
-    this.getProductCategoryList();
-    this.getProductList();
+    this.getProductList(true);
   },
   mounted() {
     // 点击搜索-文字搜索
     eventBus.$on("searchProducts", form => {
       this.searchForm.keyword = form.keyword;
       this.currentPage = 1;
-      this.getProductList();
+      this.getProductList(false);
     });
     // 图搜
     eventBus.$on("openUpload", file => {
       this.uploadPic(file);
     });
+    eventBus.$on("resetMyCollection", () => {
+      this.getCollectList();
+    });
     // 取消收藏
-    eventBus.$on("resetProducts", list => {
-      if (list.length) {
-        for (let i = 0; i < this.productList.length; i++) {
-          for (let j = 0; j < list.length; j++) {
-            if (this.productList[i].productNumber == list[j].productNumber) {
-              this.productList[i].isFavorite = true;
-              break;
-            } else {
-              this.productList[i].isFavorite = false;
-            }
-          }
+    eventBus.$on("resetProducts", item => {
+      for (let i = 0; i < this.productList.length; i++) {
+        if (this.productList[i].productNumber == item.productNumber) {
+          this.productList[i].isFavorite = item.isFavorite;
         }
-      } else {
-        this.productList.forEach(val => {
-          val.isFavorite = false;
-        });
       }
     });
     eventBus.$on("resetProductCollection", item => {
       for (let i = 0; i < this.productList.length; i++) {
-        if (
-          this.productList[i].productNumber == item.bearProduct.productNumber
-        ) {
+        if (this.productList[i].productNumber == item.productNumber) {
           this.productList[i].isFavorite = item.isFavorite;
         }
       }
@@ -786,6 +1018,7 @@ export default {
   },
   beforeDestroy() {
     this.clearRootEvent();
+    eventBus.$off("resetProducts");
   }
 };
 </script>
@@ -795,6 +1028,7 @@ export default {
   .advancedSearchBox {
     background-color: #fff;
     width: 100%;
+    .advancedScreening,
     .standardScreening,
     .productClass,
     .twoLevelClass {
@@ -811,6 +1045,66 @@ export default {
           border-radius: 50%;
           .el-checkbox__inner {
             border-radius: 50%;
+          }
+        }
+      }
+    }
+    @{deep} .advancedScreening {
+      display: flex;
+      height: 147px;
+      .el-checkbox {
+        .el-checkbox__input {
+          border-radius: 50%;
+          .el-checkbox__inner {
+            border-radius: 50%;
+          }
+        }
+      }
+      .title {
+        display: flex;
+        align-items: center;
+      }
+      .queryCondition {
+        width: 468px;
+        height: 147px;
+        opacity: 1;
+        border: 1px solid #dcdfe6;
+        border-radius: 5px;
+        padding: 20px 0;
+        margin: 0 20px;
+        box-sizing: border-box;
+        .item {
+          display: flex;
+          align-items: center;
+          padding: 15px 0;
+          .text {
+            width: 80px;
+            text-align: right;
+          }
+        }
+      }
+      .parameter {
+        width: 660px;
+        form {
+          display: flex;
+          .el-form-item {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            color: #999999;
+            text-align: center;
+            .el-form-item__content {
+              line-height: 36px;
+            }
+          }
+          span {
+            text-align: center;
+          }
+          .left {
+            flex: 1;
+          }
+          .right {
+            flex: 1;
           }
         }
       }
@@ -847,6 +1141,7 @@ export default {
         padding-top: 13px;
         .itemTag {
           padding: 5px 12px;
+          margin-bottom: 2px;
           border-radius: 4px;
           cursor: pointer;
           &.isActive {
@@ -855,11 +1150,11 @@ export default {
           }
         }
         &.showOneCate {
-          max-height: 66px;
+          max-height: 61px;
           overflow: hidden;
         }
         &.showTwoCate {
-          max-height: 33px;
+          max-height: 30px;
           overflow: hidden;
         }
       }

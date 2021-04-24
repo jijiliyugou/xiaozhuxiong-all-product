@@ -1,0 +1,181 @@
+#erpLoginConfirm {
+  width: 100%;
+  background-color: #F5F5F5;
+  height: 100%;
+}
+#erpLoginConfirm .header {
+  height: 90px;
+  width: 100%;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+.header .toplauot {
+  height: 100%;
+  width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+.header .toplauot .left {
+  flex: 1;
+  display: flex;
+  width: 50%;
+  align-items: center;
+  color: #2B6AA8;
+  position: relative;
+}
+.header .toplauot .left .leftImg {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+.header .toplauot .left .titleBox {
+  position: absolute;
+  left: 86px;
+  top: 15px;
+}
+.header .toplauot .left .titleBox .enTitle {
+  font-size: 12px;
+  -webkit-transform: translateX(-10px) scale(0.9);
+  -moz-transform: translateX(-10px) scale(0.9);
+  -ms-transform: translateX(-10px) scale(0.9);
+  transform: translateX(-10px) scale(0.9);
+}
+.header .toplauot .left .titleBox .chTitle {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 37px;
+}
+.header .toplauot .right {
+  flex: 1;
+  width: 40%;
+  position: absolute;
+  right: 0;
+  top: 25px;
+}
+.header .toplauot .right .shouyeBox {
+  float: right;
+  margin-right: 60px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+.header .toplauot .right .toHome {
+  float: right;
+  margin-right: 60px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+.header .toplauot .right .toHome .homeText{
+  color: #999999;
+}
+.header .toplauot .right .shouyeBox .sampleText{
+  color: #999999;
+}
+.header .toplauot .right .toHome .homeIcon{
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: -5px;
+  width: 21px;
+  height: 21px;
+  margin-right: 10px;
+  background: url('/erpProduct/static/images/erpHomeIcon.png') no-repeat center;
+}
+.header .toplauot .right .shouyeBox .mySampleIcon{
+  display: inline-block;
+  vertical-align: middle;
+  width: 21px;
+  height: 21px;
+  margin-right: 10px;
+  background: url('/erpProduct/static/images/mySampleIcon.png') no-repeat center;
+}
+.header .toplauot .right .signOutBox {
+  display: flex;
+  align-items: center;
+}
+.header .toplauot .right .signOutBox .userImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.header .toplauot .right .signOutBox .signOut {
+  color: #666666;
+  margin-left: 17px;
+  cursor: pointer;
+}
+.header .toplauot .right .loginBtn {
+  cursor: pointer;
+  width: 120px;
+  height: 36px;
+  background: #2D60B3;
+  opacity: 1;
+  border-radius: 100px;
+  font-weight: 400;
+  line-height: 36px;
+  text-align: center;
+  color: #FFFFFF;
+  float: right;
+}
+#erpLoginConfirm .userInfoWrap {
+  width: 1200px;
+  height: 532px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background-color: #fff;
+  margin-left: -600px;
+  margin-top: -266px;
+  border-radius: 5px;
+  overflow: hidden;
+  padding: 30px 0 0 30px;
+  box-sizing: border-box;
+}
+#erpLoginConfirm .userInfoWrap .userInfoBox {
+  height: 100%;
+  overflow-y: auto;
+}
+#erpLoginConfirm .userInfoWrap .userIten {
+  width: 208px;
+  height: 92px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 9px;
+  box-sizing: border-box;
+  cursor: pointer;
+  float: left;
+  margin-right: 22px;
+  margin-bottom: 22px;
+  position: relative;
+}
+#erpLoginConfirm .userInfoWrap .userIten .leftImg {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  left: 16px;
+  top: 16px;
+  border-radius: 30px;
+}
+#erpLoginConfirm .userInfoWrap .userIten .leftImg img {
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+}
+#erpLoginConfirm .userInfoWrap .userIten .rightContent {
+  position: absolute;
+  left: 90px;
+  top: 13px;
+  width: 100px;
+  height: 60px;
+  
+}
+#erpLoginConfirm .userInfoWrap .userIten p {
+  margin-top: 15px;
+}

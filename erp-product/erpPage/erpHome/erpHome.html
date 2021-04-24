@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=7">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/erpProduct/static/images/favicon.ico">
+  <title>小竹熊云科技</title>
+  <link rel="stylesheet" href="/erpProduct/static/css/base.css">
+  <link rel="stylesheet" href="./erpHome.css">
+  <script src="/erpProduct/static/js/jquery-1.8.3.min.js"></script>
+  <script src="/erpProduct/static/js/json2.js"></script>
+  <script src="/erpProduct/static/js/template.js"></script>
+</head>
+
+<body>
+  <div id="erpHome">
+    <div class="header">
+      <div class="toplauot">
+        <div class="left">
+          <img class="leftImg" src="/erpProduct/static/images/logo.png" alt="">
+          <div class="titleBox">
+            <div class="chTitle">
+              小竹熊订单同步管理
+            </div>
+            <div class="enTitle">
+              Shenzhen Little Bamboo Bear Technology co.,Ltd.
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="loginBtn">登录系统</div>
+          <div class="shouyeBox">
+            <i class="mySampleIcon"></i>
+            <span class="sampleText">
+              我的订单
+            </span>
+          </div>
+          <div class="toHome">
+            <i class="homeIcon"></i>
+            <span class="homeText">首页</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="banner">
+      <div class="bannerContext">
+        <div class="contentBox">
+          <p class="title">小竹熊订单同步宏升erp</p>
+          <p class="explain">让办公更快捷 更畅通 更高效</p>
+        </div>
+      </div>
+    </div>
+    <div class="floorBox">
+      <div class="flootTitle">
+        <span class="text">小竹熊合作展厅</span>
+        <span class="more">更多合作展厅<i class="moreIcon">></i></span>
+      </div>
+      <div class="exhibitionList">
+        <div class="bigExhibitions" id="bigTempWrap">
+        </div>
+        <div class="minExhibitions" id="minTempWrap">
+        </div>
+      </div>
+    </div>
+    <!-- 新品推荐 -->
+    <div class="floorBox">
+      <div class="flootTitle">
+        <span class="text">新品推荐</span>
+        <span class="more">更多新品<i class="el-icon-arrow-right moreIcon">></i></span>
+      </div>
+      <div class="newArrivals" id="newTempWrap">
+      </div>
+    </div>
+  </div>
+  <!-- 广告层 -->
+  <div class="advertisingLayer">
+    <div class="editionCenter">
+      <div class="erweimaBox">
+        <div class="qr">
+          <div class="qrImg">
+            <img src="/erpProduct/static/images/ErWeiMa.png" alt="">
+          </div>
+          <p>扫码下载</p>
+          <p>小竹熊APP</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<!-- 大展厅 -->
+<script id="tpBigHall" type="text/html">
+  <%for(var i = 0; i < bigHallList.length; i++) {%>
+    <div class="bigExhibitionItem">
+      <div class="imgBox">
+        <img class="leftImg" src="<%=bigHallList[i].bgImg%>" alt="">
+      </div>
+      <div class="hallName">
+        <%=bigHallList[i].adTitle %>
+      </div>
+    </div>
+  <%}%>
+</script>
+<!-- 小展厅 -->
+<script id="tpMinHall" type="text/html">
+  <%for(var i = 0; i < minHallList.length; i++) {%>
+    <div class="minExhibitionItem">
+      <div class="imgBox">
+        <img class="leftImg" src="<%=minHallList[i].bgImg%>" alt="">
+      </div>
+      <div class="hallName">
+        <%=minHallList[i].adTitle%>
+      </div>
+    </div>
+  <%}%>
+</script>
+<!-- 新品 -->
+<script id="newItem" type="text/html">
+    <%for(var i = 0; i < list.length; i++) {%>
+    <div class="itemBox">
+      <div class="imgBox">
+        <img class="leftImg" src="<%=list[i].img%>" alt="">
+      </div>
+      <div class="contentText">
+        <div class="hallName">
+          <p class="name">
+            <%=list[i].name%>
+          </p>
+          <p class="textItem">
+            出厂货号：<span><%=list[i].fa_no%></span>
+          </p>
+          <p class="textItem">
+            参考单价：<span class="price"
+              ><span><%=list[i].cu_de%></span> <%=list[i].price%></span
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+    <%}%>
+  </script>
+
+<script>
+  $(function () {
+    // var baseUrl = "https://www.toysbear.com";
+    var baseUrl = "https://www.toysbear.com";
+    $.ajax({
+      type: "post",
+      url: baseUrl + "/api/GetToken",
+      contentType: "application/json; charset=utf-8",
+      data: JSON.stringify({
+        companyNum: 'LittleBearWeb',
+        platForm: 'PC'
+      })
+    }).then(function (res) {
+
+      sessionStorage.setItem("token", res.result.item)
+      var token = res.result.item
+      $.ajax({
+        type: "post",
+        url: baseUrl + "/api/GetExhibitionList",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+          companyType: "Exhibition"
+        }),
+        headers: {
+          Utoken: token
+        }
+      }).then(function (res) {
+        if (res.result.code === 200) {
+          var data = res.result.item;
+          // var minHalls = res.result.item.bigHallList;
+          // var minHalls = res.result.item.smallHallList;
+          var bigHtml = template(document.getElementById('tpBigHall').innerHTML, {
+            bigHallList: data.bigHallList || []
+          });
+          document.getElementById("bigTempWrap").innerHTML = bigHtml;
+          // 小展厅
+          var minHtml = template(document.getElementById('tpMinHall').innerHTML, {
+            minHallList: data.smallHallList || []
+          });
+          document.getElementById("minTempWrap").innerHTML = minHtml;
+        }
+      })
+      // 获取新品推荐
+      $.ajax({
+        type: "post",
+        url: baseUrl + "/api/GetProductsByTypePage",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+          skipCount: 1,
+          maxResultCount: 5,
+          typeId: 2
+        }),
+        headers: {
+          Utoken: token
+        }
+      }).then(function (res) {
+        if (res.result.code === 200) {
+          var data = res.result.item.items;
+          var newHtml = template(document.getElementById('newItem').innerHTML, {
+            list: data
+          });
+          document.getElementById("newTempWrap").innerHTML = newHtml;
+        }
+      })
+    })
+    $(".loginBtn").click(function () {
+      window.location.href = 'https://www.toysbear.com/erpProduct/erpPage/erpLogin/erpLogin.html';
+    })
+    // 我的订单
+    $(".shouyeBox").click(function () {
+      window.location.href = 'https://www.toysbear.com/erpProduct/erpPage/erpLogin/erpLogin.html';
+    })
+  })
+</script>
+
+</html>

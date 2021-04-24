@@ -5,6 +5,7 @@
       <div class="item">
         <span class="label">关键字：</span>
         <el-input
+          v-focus
           type="text"
           size="medium"
           v-model="keyword"
@@ -13,19 +14,37 @@
           @keyup.native.enter="search"
         ></el-input>
       </div>
-      <div class="item" style="width:200px;">
+      <div class="item" style="width: 200px">
         <span class="label">站点：</span>
         <el-select
-          v-model="zhandian"
+          v-model="websiteInfoId"
           size="medium"
           clearable
           placeholder="请选择"
         >
           <el-option
             v-for="item in sitesList"
-            :key="item.value"
-            :label="item.key"
-            :value="item.value"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
+      </div>
+      <div class="item" v-if="userInfo.userInfo.isMain">
+        <span class="label">业务员：</span>
+        <el-select
+          v-model="userId"
+          filterable
+          size="medium"
+          clearable
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in staffList"
+            :key="item.id"
+            :label="item.linkman"
+            :value="item.id"
           >
           </el-option>
         </el-select>
@@ -57,28 +76,29 @@
     <div class="tableBox">
       <el-table
         :data="tableData"
-        style="width:100%;"
+        style="width: 100%"
         :header-cell-style="{ backgroundColor: '#f9fafc' }"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <el-table-column label="客户">
           <template slot-scope="scope">
             <i class="el-icon-view"></i>
-            <span style="margin-left: 15px;">{{ scope.row.customerName }}</span>
+            <span style="margin-left: 15px">{{ scope.row.customerName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="siteRegion" label="站点"></el-table-column>
         <el-table-column
-          prop="shareUrl"
-          width="350"
-          label="网址"
-        ></el-table-column>
-        <el-table-column prop="email" label="登录邮箱"></el-table-column>
-        <el-table-column
-          prop="createdOn"
-          label="登录时间"
-          width="150"
+          prop="createdBy"
+          label="业务员"
           align="center"
-        >
+        ></el-table-column>
+        <el-table-column
+          prop="email"
+          label="登录邮箱"
+          align="center"
+        ></el-table-column>
+        <el-table-column prop="createdOn" label="浏览时间" align="center">
           <template slot-scope="scope">
             <span>
               {{ scope.row.createdOn.replace(/T/, " ") }}
@@ -86,7 +106,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <center style="padding:20px 0;">
+      <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[10, 20, 30, 40]"
@@ -103,11 +123,14 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "bsBrowsingHistory",
   data() {
     return {
-      zhandian: null,
+      staffList: [],
+      userId: null,
+      websiteInfoId: null,
       keyword: null,
       dateTime: null,
       tableData: [],
@@ -118,13 +141,28 @@ export default {
     };
   },
   methods: {
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.$store.state.userInfo.commparnyList[0].commparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
     // 获取列表
     async getSearchCompanyShareOrdersPage() {
       const fd = {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyword: this.keyword,
-        url: this.zhandian,
+        userId: this.userId,
+        websiteInfoId: this.websiteInfoId,
         startTime: this.dateTime && this.dateTime[0],
         endTime: this.dateTime && this.dateTime[1]
       };
@@ -161,18 +199,17 @@ export default {
     },
     // 获取站点列表
     async getDefaultSites() {
-      const res = await this.$http.post("/api/GetDefaultSites", {});
+      const res = await this.$http.post("/api/SearchDropdownWebsiteInfos", {});
+      console.log(res);
       if (res.data.result.code === 200) {
-        this.sitesList = [
-          { key: "全部", value: null },
-          ...res.data.result.item
-        ];
+        this.sitesList = [{ name: "全部", id: null }, ...res.data.result.item];
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
           type: "danger"
         });
       }
+      this.getSearchCompanyShareOrdersPage();
     },
     // 搜索
     search() {
@@ -182,9 +219,13 @@ export default {
   },
   created() {
     this.getDefaultSites();
-    this.getSearchCompanyShareOrdersPage();
   },
-  mounted() {}
+  mounted() {
+    this.getStaffList();
+  },
+  computed: {
+    ...mapState(["userInfo"])
+  }
 };
 </script>
 <style scoped lang="less">

@@ -27,78 +27,169 @@ d<!--
               </Col>
             </Row>
           </div>
-          <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" label-colon class="form">
-            <FormItem label="会议ID" prop="id">
-              <Input v-model="formValidate['id']" :style="{width:'300px',marginLeft: '-50px'}" :maxlength="11" disabled></Input>
+          <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" label-colon class="create_form_wrap">
+            <FormItem label="会议ID" prop="channel">
+              <Input v-model="formValidate['channel']" :style="{width:'300px',marginLeft: '-50px'}" :maxlength="11" disabled></Input>
+            </FormItem>
+            <FormItem label="选择展厅" prop="companyId">
+              <Select v-model="formValidate['companyId']" :style="{width:'300px',marginLeft: '-50px'}" clearable>
+                  <Option v-for="(item,index) in companys" :value="item.companyId" :key="index">{{ item.companyName }}</Option>
+              </Select>
             </FormItem>
             <FormItem label="昵称" prop="nickName">
               <Input v-model="formValidate['nickName']" :style="{width:'300px',marginLeft: '-50px'}" placeholder="请输入您的昵称"></Input>
             </FormItem>
             <FormItem label="开始时间" prop="startTime">
-              <DatePicker v-model="formValidate['startTime']" @on-change="formValidate['startTime']=$event" format="yyyy-MM-dd HH:mm" type="date" placeholder="选择开始时间" style="width: 300px;margin-left:-50px"></DatePicker> 
+              <DatePicker type="datetime" v-model="formValidate['startTime']" @on-change="formValidate['startTime']=$event" format="yyyy-MM-dd HH:mm" placeholder="选择开始时间" style="width: 300px;margin-left:-50px"></DatePicker> 
             </FormItem>
             <FormItem label="结束时间" prop="endTime">
-              <DatePicker v-model="formValidate['endTime']" @on-change="formValidate['endTime']=$event" format="yyyy-MM-dd HH:mm" type="date" placeholder="选择结束时间" style="width: 300px;margin-left:-50px"></DatePicker> 
+              <DatePicker type="datetime" v-model="formValidate['endTime']" @on-change="formValidate['endTime']=$event" format="yyyy-MM-dd HH:mm" placeholder="选择结束时间" style="width: 300px;margin-left:-50px"></DatePicker> 
             </FormItem>
             <FormItem label="入会人数" prop="mettingNumber">
-              <Input v-model="formValidate['mettingNumber']" :style="{width:'300px',marginLeft: '-27px'}" placeholder="请输入1-8" :maxlength="4"></Input><span style="margin-left:10px;color:#666666">人</span>
+              <Input v-model="formValidate['mettingNumber']" type="number" :style="{width:'300px',marginLeft: '-27px'}" placeholder="请输入1-8" :maxlength="4"></Input><span style="margin-left:10px;color:#666666">人</span>
             </FormItem>
             <FormItem prop="settings">
-              <CheckboxGroup v-model="formValidate.settings" :style="{marginLeft: '-150px'}">
-                <Checkbox label="isM">打开麦克风</Checkbox>
-                <Checkbox label="isC">打开摄像头</Checkbox>
-              </CheckboxGroup>    
+                <Checkbox v-model="formValidate.settings.isMic" :style="{marginLeft: '-150px'}">打开麦克风</Checkbox>
+                <Checkbox v-model="formValidate.settings.isCar">打开摄像头</Checkbox>
             </FormItem>
             <FormItem>
-              <Button type="primary" @click="save" :style="{width:'300px',marginLeft: '-50px'}" >{{$t("createMeeting.button")}}</Button>
+              <Button type="primary" @click="save" :style="{width:'300px',marginLeft: '-50px',height:'36px'}" >{{$t("createMeeting.button")}}</Button>
             </FormItem>
           </Form>
         </div>
       </div>
     </div>
-    <div class="footer">
-      <div class="footer_wrap">
-        <div class="footer_wrap_first">
-          <div style="margin-right:10px">技术支持：0754-89671122</div> 
-          <div class="qq"></div>
-          <div style="margin-left:10px">客服001</div>
-          <div class="qq" style="margin-left:10px"></div>
-          <div style="margin-left:10px">客服002</div>
-        </div>
-        <div>Copyright © 2021深圳宏升软件技术开发有限公司  粤ICP备13031421号-4</div>
-      </div>
-    </div>
+    <LoginFooter></LoginFooter>
   </div>
 </template>
 
 <script>
+import * as Cookies from "js-cookie";
+import LoginFooter from "@components/footer/loginFooter";
+import {
+  CreateMeetingRoom
+} from "@service/meetingService"
+
 export default {
   name: "createMeeting",
   components: {
-      
+    LoginFooter     
   },
   data() {
+    const startTimeVail = (rule, value, callback) => {
+      if (value == ''||value === undefined) {
+        callback(new Error('请选择开始时间'));
+      } else {
+        callback();
+      }
+    };
+    const endTimeVail = (rule, value, callback) => {
+      if (value == ''||value === undefined) {
+        callback(new Error('请选择结束时间'));
+      } else {
+        callback();
+      }
+    };
+    const companyIdVali = (rule, value, callback) => {
+      if (value == ''||value === undefined) {
+        callback(new Error('请选择展厅'));
+      } else {
+        callback();
+      }
+    };
     return {
       logUrl: require("@assets/default/logo.png"),
-      titleUrl: require("@assets/images/title_s.webp"),
+      titleUrl: require("@assets/images/title_s.png"),
       formValidate:{
-        id:'111111111111111',
+        channel:'111111111111111',
+        companyId:'',
         nickName:'',
         startTime:'',
         endTime:'',
         mettingNumber:'',
-        settings:['isM','isC']
+        settings:{
+          isMic:true,
+          isCar:true
+        }
       },
       ruleValidate:{
-
-      }
+        companyId: [
+          { required: true, message: '请选择展厅', trigger: 'change', validator: companyIdVali }
+        ],
+        nickName: [
+          { required: true, message: '请输入昵称', trigger: 'blur' }
+        ],
+        startTime: [
+          { required: true, message: '请选择开始时间', trigger: 'blur', validator: startTimeVail }
+        ],
+        endTime: [
+          { required: true, message: '请选择结束时间', trigger: 'blur', validator: endTimeVail }
+        ],
+        mettingNumber: [
+          { required: true, message: '请输入入会人数', trigger: 'blur' }
+        ],
+      },
+      channel: "10001",
+      baseMode: "avc",
+      transcode: "interop",
+      attendeeMode: "video",
+      videoProfile: "720p_6",  //省流量测试
+      companys:[]
     };
   },
   methods: {
     save(){
-      this.$router.push('/');
+      var params = {
+        roomNumber:this.formValidate.channel,
+        companyId:this.formValidate.companyId,
+        nickName:this.formValidate.nickName,
+        startTime:this.formValidate.startTime,
+        endTime:this.formValidate.endTime,
+        count:this.formValidate.mettingNumber,
+        code:window.localStorage.getItem("mac")
+      };
+      this.$refs['formValidate'].validate((valid) => {
+        if (valid) {
+          return new Promise((resolve, reject) => {
+            this.$FromLoading.show();
+            CreateMeetingRoom(params).then(res => {
+              if (res.success) {
+                Cookies.set("channel", this.formValidate.channel);
+                Cookies.set("baseMode", this.baseMode);
+                Cookies.set("transcode", this.transcode);
+                Cookies.set("attendeeMode", this.attendeeMode);
+                Cookies.set("videoProfile", this.videoProfile);
+                Cookies.set("uid", res.data.meetingRoomMemberId);
+                Cookies.set("companyName", res.data.companyName);
+                Cookies.set("endTime", this.formValidate.endTime);
+                window.sessionStorage.setItem("isMic",this.formValidate.settings.isMic);
+                window.sessionStorage.setItem("isCar",this.formValidate.settings.isCar); 
+                this.$router.push('/');
+              } else {
+                this.$Message.error({
+                  background: true,
+                  content: res.message
+                });
+                this.$FromLoading.hide();
+              }
+            });
+          }).catch(err=>{
+            this.$Message.error({
+              background: true,
+              content: err.message
+            });
+            this.$FromLoading.hide();  
+          });
+        }
+      })
     }  
   },
+  created(){
+    this.$loading.hide();
+    var config = JSON.parse(window.sessionStorage.getItem("SPHY_LOGIN_TOKEN"));
+    this.companys = config.companyInfos;
+    this.formValidate.channel = config.roomNumber;
+  }
 };
 </script>
 
@@ -141,7 +232,7 @@ export default {
     }
     .login_wrapper{
       position: absolute;
-      top: 15%;
+      top: 8%;
       left: calc((100% - 1277px) / 2);
       width: 1277px;
       height: 726px;
@@ -173,7 +264,7 @@ export default {
       .login_box {
           // border-radius: 10px;
           width: 450px;
-          height: 500px;
+          height: 600px;
           background: rgba(255,255,255,0.6);
           box-shadow:  0 1px 6px rgb(0 0 0 / 20%);
           text-align: center;
@@ -209,7 +300,7 @@ export default {
           }
 
           .type {
-            margin-top: 40px;
+            margin: 24px 0;
             height: 32px;
             display: inline-block;
             width: 100%;
@@ -218,7 +309,6 @@ export default {
             line-height: normal;
             font-size: 18px;
             color: #666666;
-            margin-bottom: 40px;
             .active {
               color: #57a3f3;
             }
@@ -226,40 +316,6 @@ export default {
               font-weight: 600;
             }
           }
-          .form{
-            .ivu-form-item {
-              margin-bottom: 18px;
-              vertical-align: top;
-              zoom: 1;
-            }
-          }
-      }
-    }
-  }
-  .footer {
-    position: relative;
-    width: 100%;
-    text-align: center;
-    line-height: 24px;
-    margin-top: -70px;
-    height: 107px;
-    padding: 14px 15px 0 15px;
-    color:#fff;
-    background: #2684D1;
-    border-top: solid 1px #ddd;
-    overflow: hidden;
-    .footer_wrap{
-      padding-top:18px;
-      .footer_wrap_first{
-        display: flex;
-        justify-content:center;
-        .qq {
-          background: url('~@assets/images/qq2.webp');
-          background-repeat: no-repeat;
-              margin-top: 4px;
-          width: 13px;
-          height: 16px;
-        }
       }
     }
   }

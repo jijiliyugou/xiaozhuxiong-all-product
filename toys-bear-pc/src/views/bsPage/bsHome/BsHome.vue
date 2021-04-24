@@ -14,7 +14,7 @@
             :key="i"
           >
             <el-image
-              style="width: 30px; height: 32px;"
+              style="width: 30px; height: 32px"
               :src="item.icon"
               fit="contain"
             >
@@ -32,10 +32,75 @@
           <span>数据统计</span>
         </div>
         <div class="content">
-          <div class="item" v-for="item in 4" :key="item">
+          <!-- <div class="item" v-for="item in 4" :key="item">
             <p class="total">敬请期待</p>
             <p :class="{ today: true, active: item > 2 }">今日:敬请期待</p>
             <p class="text">敬请期待</p>
+          </div> -->
+
+          <div class="item">
+            <p class="total">{{ statisticsData.hallOrderTotal }}</p>
+            <p
+              :class="{
+                today: true,
+                active: statisticsData.hallOrderTotalToday > 0
+              }"
+            >
+              <img
+                :src="statisticsData.hallOrderTotalToday > 0 ? up_t : up_f"
+                alt=""
+              />
+              今日:{{ statisticsData.hallOrderTotalToday }}
+            </p>
+            <p class="text">展厅业务总数</p>
+          </div>
+          <div class="item">
+            <p class="total">{{ statisticsData.sampleOfferTotal }}</p>
+            <p
+              :class="{
+                today: true,
+                active: statisticsData.sampleOfferTotalToday > 0
+              }"
+            >
+              <img
+                :src="statisticsData.sampleOfferTotalToday > 0 ? up_t : up_f"
+                alt=""
+              />
+              今日:{{ statisticsData.sampleOfferTotalToday }}
+            </p>
+            <p class="text">找样报价总数</p>
+          </div>
+          <div class="item">
+            <p class="total">{{ statisticsData.purchaseTotal }}</p>
+            <p
+              :class="{
+                today: true,
+                active: statisticsData.purchaseTotalToday > 0
+              }"
+            >
+              <img
+                :src="statisticsData.purchaseTotalToday > 0 ? up_t : up_f"
+                alt=""
+              />
+              今日:{{ statisticsData.purchaseTotalToday }}
+            </p>
+            <p class="text">采购订单总数</p>
+          </div>
+          <div class="item">
+            <p class="total">{{ statisticsData.shareTotal }}</p>
+            <p
+              :class="{
+                today: true,
+                active: statisticsData.shareTotalToday > 0
+              }"
+            >
+              <img
+                :src="statisticsData.shareTotalToday > 0 ? up_t : up_f"
+                alt=""
+              />
+              今日:{{ statisticsData.shareTotalToday }}
+            </p>
+            <p class="text">客户订单总数</p>
           </div>
         </div>
       </div>
@@ -49,7 +114,7 @@
       >
         <div class="imgBox">
           <el-image
-            style="width: 54px; height: 54px;"
+            style="width: 54px; height: 54px"
             :src="item.icon"
             fit="contain"
           >
@@ -75,7 +140,7 @@
           <div class="item" v-for="(item, i) in bigHalls" :key="i">
             <div class="imgBox">
               <el-image
-                style="width: 302px; height: 133px;"
+                style="width: 302px; height: 133px"
                 :src="item.bgImg || item.img"
                 fit="contain"
               >
@@ -85,23 +150,29 @@
           </div>
         </div>
         <div class="minHall">
-          <div class="item" v-for="(item, i) in minHalls" :key="i">
-            <div class="imgBox">
-              <el-image
-                style="width: 222px; height: 108px;"
-                :src="item.bgImg || item.img"
-                fit="contain"
-              >
-              </el-image>
-            </div>
-            <div class="name">{{ item.companyName || item.adTitle }}</div>
-          </div>
+          <slider :options="sliderinit" @slide="slide">
+            <slideritem v-for="(item, i) in minHalls" :key="i">
+              <div class="minHallItem">
+                <div class="imgBox">
+                  <el-image
+                    style="width: 221px; height: 108px"
+                    :src="item.bgImg || item.img"
+                    fit="contain"
+                  >
+                  </el-image>
+                </div>
+                <div class="name">
+                  {{ item.companyName || item.adTitle || 123456 }}
+                </div>
+              </div>
+            </slideritem>
+          </slider>
         </div>
       </div>
       <div class="right">
-        <!-- <div class="titleBox">
+        <div class="titleBox">
           <div class="hotBox">
-            <el-radio-group v-model="hotValue">
+            <el-radio-group v-model="hotValue" @change="changeHot">
               <el-radio-button
                 v-for="(item, i) in hotList"
                 :key="i"
@@ -110,7 +181,7 @@
             </el-radio-group>
           </div>
           <div class="dayBox">
-            <el-radio-group v-model="dayValue" size="mini">
+            <el-radio-group v-model="dayValue" size="mini" @change="changeTime">
               <el-radio-button
                 v-for="(item, i) in dayList"
                 :key="i"
@@ -121,8 +192,8 @@
         </div>
         <div class="contentBox">
           <el-table
+            v-show="hotValue === '热门择样'"
             :data="tableData"
-            style="width: 100%"
             height="375"
             :header-row-style="{ height: '40px', padding: '0' }"
             :header-cell-style="{ backgroundColor: '#f9fafc', padding: '0' }"
@@ -130,10 +201,10 @@
             <el-table-column prop="date" label="" width="50">
               <template slot-scope="scope">
                 <div class="tableIndex">
-                  <i class="oneIcon" v-if="scope.row.id == 1"></i>
-                  <i class="twoIcon" v-else-if="scope.row.id == 2"></i>
-                  <i class="threeIcon" v-else-if="scope.row.id == 3"></i>
-                  <span v-else>{{ scope.row.id }}</span>
+                  <i class="oneIcon" v-if="scope.$index == 0"></i>
+                  <i class="twoIcon" v-else-if="scope.$index == 1"></i>
+                  <i class="threeIcon" v-else-if="scope.$index == 2"></i>
+                  <span v-else>{{ scope.$index + 1 }}</span>
                 </div>
               </template>
             </el-table-column>
@@ -141,98 +212,142 @@
               <template slot-scope="scope">
                 <div class="productInfo">
                   <el-image
-                    style="width: 70px; height: 54px;"
-                    :src="scope.row.img"
+                    style="width: 70px; height: 54px"
+                    :src="scope.row.imgUrl"
                     fit="contain"
                   >
+                    <div slot="placeholder" class="image-slot">
+                      <img
+                        style="width: 70px; height: 54px"
+                        :src="require('@/assets/images/imgError.png')"
+                      />
+                    </div>
+                    <div slot="error" class="image-slot">
+                      <img
+                        style="width: 70px; height: 54px"
+                        :src="require('@/assets/images/imgError.png')"
+                      />
+                    </div>
                   </el-image>
                   <div class="infoBox">
                     <div class="name">{{ scope.row.name }}</div>
                     <div class="price">
-                      <span>{{ scope.row.pr_no }}</span>
-                      <span>{{ scope.row.price }}</span>
+                      <span>￥{{ scope.row.price }}</span>
                     </div>
                   </div>
                 </div>
               </template>
             </el-table-column>
             <el-table-column
-              prop="cate"
+              prop="categoryName"
               label="玩具分类"
               width="110"
               align="center"
             >
               <template slot-scope="scope">
-                <span style="font-size: 13px;">
-                  {{ scope.row.cate }}
+                <span style="font-size: 13px">
+                  {{ scope.row.categoryName }}
                 </span>
               </template>
             </el-table-column>
             <el-table-column
-              prop="number"
+              prop="count"
               label="择样次数"
               width="100"
               align="center"
             >
               <template slot-scope="scope">
-                <span style="font-sizr: 12px;">
-                  {{ scope.row.number }} 次
-                </span>
+                <span style="font-sizr: 12px"> {{ scope.row.count }} 次 </span>
               </template>
             </el-table-column>
           </el-table>
-        </div> -->
+          <el-table
+            v-if="hotValue === '热门搜索'"
+            :data="HotTableData"
+            style="width: 100%"
+            height="375"
+            :header-row-style="{ height: '40px', padding: '0' }"
+            :header-cell-style="{ backgroundColor: '#f9fafc', padding: '0' }"
+          >
+            <el-table-column label="排名" width="70">
+              <template slot-scope="scope">
+                <div class="pnIndex">
+                  <p :class="{ pnIndexRed: scope.$index < 3 }">
+                    {{ scope.$index + 1 }}
+                  </p>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="keyWord" label="关键词" width="420">
+              <template slot-scope="scope">
+                <span style="font-size: 13px">
+                  {{ scope.row.keyWord }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="count"
+              label="搜索次数"
+              width="110"
+              align="center"
+            >
+              <template slot-scope="scope">
+                <span style="font-sizr: 12px"> {{ scope.row.count }} 次 </span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { calculateDate } from "@/assets/js/common/common.js";
+import { slider, slideritem } from "vue-concise-slider"; // 引入slider组件
 export default {
   name: "bsHome",
+  components: {
+    slider: slider,
+    slideritem: slideritem
+  },
   data() {
     return {
-      tableData: [
-        {
-          id: 1,
-          img: require("@/assets/images/imgError.png"),
-          name: "99式坦克军事系列积木套装99式坦克军事系列积木套装",
-          price: "2932.00",
-          pr_no: "￥",
-          cate: "电玩玩具/坦克",
-          number: "588454"
-        },
-        {
-          id: 2,
-          img: require("@/assets/images/imgError.png"),
-          name: "99式坦克军事系列积木套装99式坦克军事系列积木套装",
-          price: "2932.00",
-          pr_no: "￥",
-          cate: "电玩玩具/坦克",
-          number: "588454"
-        },
-        {
-          id: 3,
-          img: require("@/assets/images/imgError.png"),
-          name: "99式坦克军事系列积木套装99式坦克军事系列积木套装",
-          price: "2932.00",
-          pr_no: "￥",
-          cate: "电玩玩具/坦克",
-          number: "588454"
-        },
-        {
-          id: 4,
-          img: require("@/assets/images/imgError.png"),
-          name: "99式坦克军事系列积木套装99式坦克军事系列积木套装",
-          price: "2932.00",
-          pr_no: "￥",
-          cate: "电玩玩具/坦克",
-          number: "588454"
-        }
-      ],
+      //滑动配置[obj]
+      sliderinit: {
+        currentPage: 0, //当前页码
+        thresholdDistance: 500, //滑动判定距离
+        thresholdTime: 100, //滑动判定时间
+        autoplay: 4000, //自动滚动[ms]
+        loop: false, //循环滚动
+        direction: "horizontal", //方向设置，垂直滚动
+        infinite: 1, //无限滚动前后遍历数
+        slidesToScroll: 1, // 每次滑动项数
+        pagination: 1, // 每次滑动项数
+        loopedSlides: 1,
+        speed: 300
+      },
+      up_f: require("@/assets/images/up_f.png"),
+      up_t: require("@/assets/images/up_t.png"),
+      statisticsData: {
+        hallOrderTotal: "", //展厅业务
+        hallOrderTotalToday: "", //展厅今日
+        sampleOfferTotal: "", //找样报价
+        sampleOfferTotalToday: "", //找样报价今日
+        purchaseTotal: "", //采购订单
+        purchaseTotalToday: "", //采购今日
+        shareTotal: "", //客户订单
+        shareTotalToday: "" //客户订单今日
+      },
+      timeData: {
+        startTime: "",
+        endTime: ""
+      },
+      HotTableData: [],
+      tableData: [],
       bigHalls: [],
       minHalls: [],
-      hotValue: "热门择样",
+      hotValue: "热门搜索",
       hotList: [
         {
           value: "热门择样"
@@ -321,6 +436,9 @@ export default {
     };
   },
   methods: {
+    slide(data) {
+      console.log(data);
+    },
     // 点击label
     openLabel(title) {
       let fd = {};
@@ -415,14 +533,19 @@ export default {
           };
           break;
         case "浏览足迹":
-          fd = {
-            name: "/bsIndex/bsBrowsingHistory",
-            linkUrl: "/bsIndex/bsBrowsingHistory",
-            component: "bsBrowsingHistory",
-            refresh: true,
-            label: "浏览记录"
-          };
-          break;
+          this.$common.handlerMsgState({
+            msg: "敬请期待",
+            type: "warning"
+          });
+          return false;
+        // fd = {
+        //   name: "/bsIndex/bsBrowsingFootprints",
+        //   linkUrl: "/bsIndex/bsBrowsingFootprints",
+        //   component: "bsBrowsingFootprints",
+        //   refresh: true,
+        //   label: title
+        // };
+        // break;
         case "站点分享":
           fd = {
             name: "/bsIndex/bsSiteLlis",
@@ -461,13 +584,64 @@ export default {
       });
       if (res.data.result.code === 200) {
         this.bigHalls = res.data.result.item.bigHallList.splice(0, 3);
-        this.minHalls = res.data.result.item.smallHallList.splice(0, 4);
+        this.minHalls = res.data.result.item.smallHallList;
+      }
+    },
+    // 获取统计数据
+    async getGetSalesOrderDataStatistics() {
+      const res = await this.$http.post("/api/GetSalesOrderDataStatistics", {});
+      if (res.data.result.code === 200) {
+        this.statisticsData = res.data.result.item;
+      }
+    },
+    // 热门搜索排行
+    async getGetSalesHotSearch() {
+      const res = await this.$http.post(
+        "/api/GetSalesHotSearch",
+        this.timeData
+      );
+      if (res.data.result.code === 200) {
+        console.log(res.data.result.item);
+        this.HotTableData = res.data.result.item;
+      }
+    },
+    // 热门择样排行
+    async getGetSalesHotSample() {
+      console.log(this.timeData);
+      const res = await this.$http.post(
+        "/api/GetSalesHotSample",
+        this.timeData
+      );
+      if (res.data.result.code === 200) {
+        console.log(res);
+        this.tableData = res.data.result.item;
+      }
+    },
+    // 天数请求
+    changeTime(Value) {
+      this.timeData = Object.assign(calculateDate(Value));
+      if (this.hotValue === "热门择样") {
+        this.getGetSalesHotSample();
+      } else {
+        this.getGetSalesHotSearch();
+      }
+    },
+    // 热门泽洋和热门搜索切换
+    changeHot(Value) {
+      if (Value === "热门择样") {
+        this.getGetSalesHotSample();
+      } else {
+        this.getGetSalesHotSearch();
       }
     }
   },
-  created() {},
+  created() {
+    this.timeData = Object.assign(calculateDate(this.dayValue));
+  },
   mounted() {
     this.getOrgCompany();
+    this.getGetSalesOrderDataStatistics();
+    this.getGetSalesHotSearch();
   }
 };
 </script>
@@ -479,10 +653,16 @@ export default {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    .dataInfo {
+      margin-left: 10px;
+    }
+    .myWorkbench {
+      margin-right: 10px;
+    }
     .dataInfo,
     .myWorkbench {
-      width: 821px;
-      height: 190px;
+      flex: 1;
+      min-height: 190px;
       background: #ffffff;
       border-radius: 4px;
       margin-bottom: 20px;
@@ -525,6 +705,7 @@ export default {
           display: flex;
           align-items: center;
           cursor: pointer;
+
           .text {
             margin-left: 20px;
           }
@@ -551,12 +732,19 @@ export default {
         padding-top: 5px;
         box-sizing: border-box;
         display: flex;
+        flex-wrap: wrap;
         .item {
           width: 185px;
           text-align: center;
           cursor: pointer;
+          margin-bottom: 20px;
           p {
             line-height: 34px;
+            img {
+              width: 10px;
+              height: 15px;
+              margin-right: 10px;
+            }
             &.total {
               font-size: 24px;
               font-weight: 700;
@@ -582,7 +770,8 @@ export default {
     .item {
       height: 110px;
       background-color: #fff;
-      width: 261px;
+      width: 15.7%;
+      // min-width: 261px;
       border-radius: 4px;
       margin-bottom: 20px;
       padding: 0 25px;
@@ -600,12 +789,18 @@ export default {
         .title {
           font-size: 20px;
           font-weight: 700;
+          overflow: hidden; /*超出部分隐藏*/
+          white-space: nowrap; /*不换行*/
+          text-overflow: ellipsis; /*超出部分文字以...显示*/
         }
         .text {
           font-size: 14px;
           font-weight: 400;
           color: #999999;
           line-height: 34px;
+          overflow: hidden; /*超出部分隐藏*/
+          white-space: nowrap; /*不换行*/
+          text-overflow: ellipsis; /*超出部分文字以...显示*/
         }
       }
       .imgBox {
@@ -634,7 +829,7 @@ export default {
   }
   .brandBox {
     display: flex;
-    flex-wrap: wrap;
+    // flex-wrap: wrap;
     justify-content: space-between;
     .left {
       width: 987px;
@@ -643,7 +838,6 @@ export default {
       border-radius: 4px;
       box-sizing: border-box;
       padding: 0 20px;
-      margin-bottom: 20px;
       .title {
         height: 50px;
         display: flex;
@@ -688,17 +882,33 @@ export default {
           }
         }
       }
-      .minHall {
+      @{deep} .minHall {
         display: flex;
         justify-content: space-between;
-        margin-top: 10px;
-        .item {
-          width: 222px;
+        height: 208px;
+        .swiper-container-horizontal .slider-wrapper,
+        .swiper-container-vertical .slider-wrapper {
+          align-items: flex-start !important;
+        }
+        .slider-item {
+          width: 221px;
+          height: 158px;
+          margin-right: 20px;
+          cursor: pointer;
+          &:last-of-type {
+            margin-right: 0;
+          }
+        }
+        .minHallItem {
+          width: 221px;
+          height: 158px;
           .imgBox {
-            width: 222px;
+            width: 221px;
             height: 108px;
-            overflow: hidden;
+            // overflow: hidden;
             .el-image {
+              width: 221px;
+              height: 108px;
               transition: all 1s;
             }
           }
@@ -713,6 +923,8 @@ export default {
           .name {
             height: 50px;
             display: flex;
+            font-size: 14px;
+            color: #333;
             align-items: center;
             justify-content: center;
           }
@@ -720,13 +932,13 @@ export default {
       }
     }
     .right {
-      width: 652px;
+      flex: 1;
       height: 440px;
       background-color: #fff;
       border-radius: 4px;
       padding: 0 20px;
+      margin-left: 20px;
       box-sizing: border-box;
-      margin-bottom: 20px;
       .titleBox {
         height: 50px;
         display: flex;
@@ -796,11 +1008,27 @@ export default {
             background-size: contain;
           }
         }
+        .pnIndex {
+          p {
+            width: 22px;
+            height: 22px;
+            background: #dcdfe6;
+            border-radius: 2px;
+            text-align: center;
+            line-height: 22px;
+            color: #666666;
+            &.pnIndexRed {
+              color: #fff;
+              background-color: #ff4848;
+            }
+          }
+        }
+
         .productInfo {
           display: flex;
           .infoBox {
             height: 54px;
-            width: 193px;
+            // width: 193px;
             margin-left: 16px;
 
             div {

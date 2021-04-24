@@ -1,166 +1,82 @@
 <template>
   <div class="bsMyCollection">
-    <div class="title">我的收藏 ({{ totalCount }})</div>
-    <div class="searchBox">
-      <div class="item">
-        <span class="label">关键字：</span>
-        <el-input
-          type="text"
-          size="medium"
-          v-model="keyword"
-          placeholder="请输入关键词"
-          clearable
-          @keyup.native.enter="search"
-        ></el-input>
+    <div class="title">
+      <div class="titleLeft">
+        <span>我的收藏 ({{ totalCount }})</span>
       </div>
-      <div class="item">
-        <span class="label">时间段：</span>
-        <el-date-picker
-          size="medium"
-          value-format="yyyy-MM-ddTHH:mm:ss"
-          v-model="dateTime"
-          type="datetimerange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        >
-        </el-date-picker>
-      </div>
-      <div class="item">
-        <el-button
-          @click="search"
-          type="primary"
-          icon="el-icon-search"
-          size="medium"
-        >
-          搜索
+      <div class="right">
+        <el-button type="warning" size="medium" @click="toShoppingCart">
+          <i class="whiteCart"></i>
+          <span>购物车</span>
+          <span>({{ shoppingList.length }})</span>
         </el-button>
       </div>
     </div>
-    <div class="tableBox">
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="collecTable"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column prop="img" label="产品" width="300">
-          <template slot-scope="scope">
-            <div class="imgBox">
-              <el-image
-                fit="contain"
-                style="width:80px;min-width: 80px;height:60px;"
-                :src="scope.row.img"
-                :preview-src-list="scope.row.imgUrlList"
-              >
-                <div
-                  @click="handleDetail(scope.row)"
-                  slot="placeholder"
-                  class="errorImg"
-                >
-                  <img src="~@/assets/images/imgError.png" alt />
-                </div>
-                <div
-                  @click="handleDetail(scope.row)"
-                  slot="error"
-                  class="errorImg"
-                >
-                  <img src="~@/assets/images/imgError.png" alt />
-                </div>
-              </el-image>
-              <div class="productName">
-                <div class="name" @click="handleDetail(scope.row)">
-                  {{ scope.row.name }}
-                </div>
-                <div class="factory" @click="toFactory(scope.row)">
-                  {{ scope.row.supplierName }}
-                </div>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="资料来源">
-          <template slot-scope="scope">
-            {{ scope.row.exhibitionName }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="fa_no"
-          label="出厂货号"
-          width="100"
-          align="center"
-        ></el-table-column>
-        <el-table-column prop="ch_pa" label="包装" align="center" width="100">
-        </el-table-column>
-        <el-table-column label="外箱规格" align="center">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
-                scope.row.ou_hi
-              }}(cm)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="包装规格" align="center">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
-                scope.row.in_hi
-              }}(cm)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="装箱量" align="center" width="100">
-          <template slot-scope="scope">
-            <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="体积/材积" align="center">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="毛重/净重" align="center" width="100">
-          <template slot-scope="scope">
-            <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="price" label="单价" align="center" width="100">
-          <template slot-scope="scope">
-            <span style="color:#f56c6c">
-              {{ scope.row.cu_de + scope.row.price.toFixed(2) }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          header-align="center"
-          align="center"
-          width="100"
-        >
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              type="warning"
-              @click="handleDelete(scope.row)"
-              >取消收藏</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
-      <center style="padding:20px 0;">
+    <div class="searchBox">
+      <div class="left">
+        <div class="item" style="min-width:350px">
+          <span class="label">关键字：</span>
+          <el-input
+            v-focus
+            type="text"
+            size="medium"
+            v-model="keyword"
+            clearable
+            placeholder="输入关键词+空格可模糊搜索"
+            @keyup.native.enter="search"
+          ></el-input>
+        </div>
+        <div class="item">
+          <span class="label">时间段：</span>
+          <el-date-picker
+            size="medium"
+            value-format="yyyy-MM-ddTHH:mm:ss"
+            v-model="dateTime"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+          >
+          </el-date-picker>
+        </div>
+        <div class="item">
+          <el-button
+            @click="search"
+            type="primary"
+            icon="el-icon-search"
+            size="medium"
+          >
+            搜索
+          </el-button>
+        </div>
+      </div>
+      <div class="right">
+        <div
+          :class="{ grid: true, active: isGrid === 'bsGridComponent' }"
+          @click="handerIsGrid('bsGridComponent')"
+        ></div>
+        <div
+          :class="{ column: true, active: isGrid === 'bsColumnComponent' }"
+          @click="handerIsGrid('bsColumnComponent')"
+        ></div>
+      </div>
+    </div>
+    <div class="productListBox">
+      <!-- 产品列表 -->
+      <component :is="isGrid" :productList="productList"></component>
+      <!-- 分页 -->
+      <center class="myPagination">
         <el-pagination
-          layout="total, sizes, prev, pager, next, jumper"
-          :page-sizes="[10, 20, 30, 40]"
           background
-          :total="totalCount"
-          :page-size="pageSize"
-          :current-page.sync="currentPage"
-          @current-change="handleCurrentChange"
           @size-change="handleSizeChange"
-        ></el-pagination>
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[12, 24, 36, 48]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="totalCount"
+        >
+        </el-pagination>
       </center>
     </div>
   </div>
@@ -168,40 +84,32 @@
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
+import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
+import { mapGetters } from "vuex";
 export default {
   name: "bsMyCollection",
+  components: {
+    bsColumnComponent,
+    bsGridComponent
+  },
   data() {
     return {
+      isGrid: "bsGridComponent",
       keyword: null,
       dateTime: null,
-      tableData: [],
       totalCount: 0,
-      pageSize: 10,
-      currentPage: 1
+      pageSize: 12,
+      currentPage: 1,
+      productList: []
     };
   },
+  computed: {
+    ...mapGetters({
+      shoppingList: "myShoppingList"
+    })
+  },
   methods: {
-    // 去厂商
-    toFactory(item) {
-      const fd = {
-        name: item.supplierNumber,
-        linkUrl: "/bsIndex/bsVendorQuery",
-        component: "bsMyClientsDetail",
-        refresh: true,
-        noPush: true,
-        label: item.supplierName,
-        value: {
-          companyNumber: item.supplierNumber,
-          companyLogo: item.supplierPersonnelLogo,
-          companyName: item.supplierName,
-          contactsMan: item.supplierPersonnelName,
-          phoneNumber: item.supplierPhone,
-          address: item.supplierAddres || item.supplierAddress
-        }
-      };
-      this.$store.commit("myAddTab", fd);
-      this.$router.push("/bsIndex/bsVendorQuery");
-    },
     // 获取列表
     async getCollectList() {
       const fd = {
@@ -217,51 +125,38 @@ export default {
         }
       }
       const res = await this.$http.post("/api/ProductCollectionPage", fd);
-      if (res.data.result.code === 200) {
+      const { code, item, msg } = res.data.result;
+      if (code === 200) {
+        if (this.shoppingList) {
+          for (let i = 0; i < item.items.length; i++) {
+            for (let j = 0; j < this.shoppingList.length; j++) {
+              if (
+                item.items[i].productNumber ===
+                this.shoppingList[j].productNumber
+              )
+                item.items[i].isShopping = true;
+            }
+          }
+        }
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        this.productList = res.data.result.item.items;
+      } else {
+        this.totalCount = 0;
+        this.$common.handlerMsgState({
+          msg: msg,
+          type: "danger"
+        });
       }
     },
-    // 取消收藏
-    async handleDelete(row) {
-      this.$confirm("确定要取消该收藏吗？", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      })
-        .then(async () => {
-          const res = await this.$http.post("/api/CreateProductCollection", {
-            productNumber: row.productNumber
-          });
-          if (res.data.result.code === 200) {
-            this.$common.handlerMsgState({
-              msg: "取消收藏",
-              type: "success"
-            });
-            await this.getCollectList();
-            eventBus.$emit("resetProducts", this.tableData);
-          } else {
-            this.$common.handlerMsgState({
-              msg: res.data.result.msg,
-              type: "danger"
-            });
-          }
-        })
-        .catch(() => {
-          this.$common.handlerMsgState({
-            msg: "取消成功",
-            type: "warning"
-          });
-        });
-    },
-    //点击跳转详情
-    async handleDetail(row) {
+    // 去购物车
+    toShoppingCart() {
+      this.$router.push("/bsIndex/bsShoppingCart");
       const fd = {
-        name: row.productNumber,
-        linkUrl: "/bsIndex/bsMyCollection",
-        component: "bsProductDetails",
+        name: "/bsIndex/bsShoppingCart",
+        linkUrl: "/bsIndex/bsShoppingCart",
+        component: "bsShoppingCart",
         refresh: true,
-        label: row.fa_no || "产品详情",
-        value: row
+        label: "购物车"
       };
       this.$store.commit("myAddTab", fd);
     },
@@ -284,14 +179,42 @@ export default {
     search() {
       this.currentPage = 1;
       this.getCollectList();
+    },
+    // 切换产品列表样式
+    handerIsGrid(type) {
+      this.isGrid = type;
     }
   },
   created() {},
   mounted() {
-    eventBus.$on("resetMyCollection", () => {
+    // 收藏
+    eventBus.$on("resetProducts", () => {
       this.getCollectList();
     });
+    // 删除购物车
+    eventBus.$on("resetMyCart", list => {
+      if (list.length) {
+        for (let i = 0; i < this.productList.length; i++) {
+          for (let j = 0; j < list.length; j++) {
+            if (this.productList[i].productNumber == list[j].productNumber) {
+              this.productList[i].isShopping = true;
+              break;
+            } else {
+              this.productList[i].isShopping = false;
+            }
+          }
+        }
+      } else {
+        this.productList.forEach(val => {
+          val.isShopping = false;
+        });
+      }
+    });
     this.getCollectList();
+  },
+  beforeDestroy() {
+    eventBus.$off("resetProducts");
+    eventBus.$off("resetMyCart");
   }
 };
 </script>
@@ -303,13 +226,18 @@ export default {
   padding: 0 20px;
   .title {
     height: 55px;
-    line-height: 55px;
     font-size: 15px;
     font-weight: 700;
     padding-left: 15px;
     box-sizing: border-box;
     position: relative;
     border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .titleLeft {
+      flex: 1;
+    }
     &::before {
       width: 4px;
       height: 14px;
@@ -320,58 +248,74 @@ export default {
       content: "";
       transform: translate(0, -50%);
     }
+    .right {
+      .whiteCart {
+        display: inline-block;
+        vertical-align: bottom;
+        width: 14px;
+        height: 14px;
+        background: url("~@/assets/images/whiteCart.png") no-repeat center;
+        background-size: contain;
+        margin-right: 10px;
+      }
+    }
   }
   .searchBox {
     height: 76px;
     display: flex;
     align-items: center;
-    .item {
+    .left {
+      flex: 1;
       display: flex;
       align-items: center;
-      max-width: 290px;
-      margin-right: 20px;
-      .label {
-        width: 58px;
-        min-width: 58px;
-      }
-    }
-  }
-  @{deep} .tableBox {
-    .el-table {
-      font-size: 13px;
-      .imgBox {
-        text-align: left;
+      .item {
         display: flex;
-        font-size: 14px;
-        .productName {
-          // width: 160px;
-          cursor: pointer;
-          height: 60px;
-          margin-left: 15px;
-          .name,
-          .factory {
-            width: 160px;
-            max-width: 160px;
-            cursor: pointer;
-            overflow: hidden; /*超出部分隐藏*/
-            white-space: nowrap; /*不换行*/
-            text-overflow: ellipsis; /*超出部分文字以...显示*/
-          }
-          .factory {
-            color: #3368a9;
-          }
-          .name {
-            margin-top: 8px;
-          }
+        align-items: center;
+        max-width: 290px;
+        margin-right: 20px;
+        .label {
+          width: 58px;
+          min-width: 58px;
         }
       }
     }
-    .errorImg {
-      cursor: pointer;
-      img {
-        width: 80px;
-        height: 60px;
+    .right {
+      display: flex;
+      width: 60px;
+      min-width: 60px;
+      .grid,
+      .column {
+        width: 17px;
+        height: 17px;
+        cursor: pointer;
       }
+      .grid {
+        margin-right: 25px;
+        background: url("~@/assets/images/gridIcon.png") no-repeat center;
+        background-size: contain;
+        &.active {
+          background: url("~@/assets/images/gridActiveIcon.png") no-repeat
+            center;
+          background-size: contain;
+        }
+      }
+      .column {
+        background: url("~@/assets/images/columnIcon.png") no-repeat center;
+        background-size: contain;
+        &.active {
+          background: url("~@/assets/images/columnActiveIcon.png") no-repeat
+            center;
+          background-size: contain;
+        }
+      }
+    }
+  }
+  .productListBox {
+    background-color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    .myPagination {
+      padding: 30px 0;
     }
   }
 }

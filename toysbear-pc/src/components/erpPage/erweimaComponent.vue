@@ -27,6 +27,7 @@ export default {
 };
 </script>
 <style scoped lang="less">
+@deep: ~">>>";
 .wrapBox {
   width: 112px;
   height: 147px;
@@ -39,6 +40,19 @@ export default {
     padding: 10px;
     padding-bottom: 0;
     box-sizing: border-box;
+    @{deep} .el-image {
+      position: relative;
+      width: 92px;
+      height: 92px;
+      img {
+        width: 92px !important;
+        height: 92px !important;
+        position: absolute;
+        transform: none !important;
+        left: 0;
+        top: 0;
+      }
+    }
   }
   .conText {
     height: 44px;

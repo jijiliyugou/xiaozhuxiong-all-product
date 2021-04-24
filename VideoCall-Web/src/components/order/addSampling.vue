@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-06 11:58:11
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\order\addSampling.vue
- * @LastEditTime: 2021-04-06 12:04:22
+ * @LastEditTime: 2021-04-23 12:22:32
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -18,7 +18,7 @@
         </div>   
         <div class="content">
             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="0">
-                <FormItem  prop="number">
+                <FormItem prop="number">
                     <Input v-model="formValidate.number" placeholder="请输入择样单号"></Input>
                 </FormItem>
                 <FormItem prop="code">
@@ -43,13 +43,23 @@ export default {
                 code:''    
             },
             ruleValidate:{
-
+                number: [
+                    { required: true, message: '请输入择样单号', trigger: 'blur' }
+                ],
+                code: [
+                    { required: true, message: '请输入验证码', trigger: 'blur' }
+                ],
             },
         }
     },
     methods:{
         save(){
-            this.$emit('save');
+            this.$refs['formValidate'].validate((valid) => {
+                if (valid) {
+                    this.$emit('save',this.formValidate);
+                }
+            });
+            //this.$emit('save',this.formValidate);
         },
     }
 }
@@ -69,7 +79,7 @@ export default {
         .head {
             display: flex;
             .active {
-                background: url('~@assets/images/tab_active.webp');
+                background: url('~@assets/images/tab_active.png');
                 background-size: cover;//注意：一定要把这个属性配合fixed使用；
                 background-repeat: no-repeat;
                 height: 35px;
@@ -82,9 +92,8 @@ export default {
                 }
             }
             .title {
-                margin-top: 10px;
                 margin-left: 10px;
-                line-height: 35px;
+                line-height: 45px;
             }
             .right {
                 margin-left: auto;

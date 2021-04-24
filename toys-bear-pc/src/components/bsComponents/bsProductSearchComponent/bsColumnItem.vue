@@ -2,7 +2,7 @@
   <div class="bsGridItem" @click="toProductDetails">
     <div class="itemImg">
       <el-image
-        style="width:222px;height:166px;"
+        style="width: 222px; height: 166px"
         fit="contain"
         :src="item.img"
         lazy
@@ -14,6 +14,13 @@
           <img :src="require('@/assets/images/imgError.png')" />
         </div>
       </el-image>
+      <div
+        @click.stop="handlerDeleteBrowsing(item)"
+        class="BrowsingFootprintsIcon"
+        v-if="$route.path === '/bsIndex/bsBrowsingFootprints'"
+      >
+        <i class="el-icon-delete"></i>
+      </div>
       <div
         class="spotProductIcon"
         v-if="$route.path === '/bsIndex/bsSpotProducts'"
@@ -28,14 +35,21 @@
       ></div>
       <i
         v-show="item.isFavorite"
-        class="iconClient iconfont icon-wujiaoxing-"
+        class="iconClient activeClientIcon"
         @click.stop="addCollect(item)"
       ></i>
       <i
         v-show="!item.isFavorite"
-        class="iconClient iconfont icon-wujiaoxingkong"
+        class="iconClient clientIcon"
         @click.stop="addCollect(item)"
       ></i>
+      <!-- 找相似，找同款 -->
+      <div class="similaritySame">
+        <div class="simiBox">
+          <div class="similarity" @click.stop="similarityEvent">找相似</div>
+          <div class="same" @click.stop="sameEvent">找同款</div>
+        </div>
+      </div>
     </div>
     <div class="content">
       <div class="productName">
@@ -118,6 +132,7 @@
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
+import { mapGetters } from "vuex";
 export default {
   props: {
     item: {
@@ -130,6 +145,45 @@ export default {
     };
   },
   methods: {
+    // 找相似
+    similarityEvent() {
+      this.$common.handlerMsgState({
+        msg: "敬请期待",
+        type: "warning"
+      });
+      return false;
+      // const value = JSON.parse(JSON.stringify(this.item));
+      // value.type = "similarity";
+      // const fd = {
+      //   name: "similarity" + this.item.productNumber,
+      //   linkUrl: "/bsIndex/bsProductSearchIndex",
+      //   component: "bsSimilarProduct",
+      //   refresh: true,
+      //   label: "相似产品" + this.item.fa_no,
+      //   value: value
+      // };
+      // this.$store.commit("myAddTab", fd);
+    },
+    // 找同款
+    sameEvent() {
+      this.$common.handlerMsgState({
+        msg: "敬请期待",
+        type: "warning"
+      });
+      return false;
+      // const value = JSON.parse(JSON.stringify(this.item));
+      // value.type = "same";
+      // const fd = {
+      //   name: "same" + this.item.productNumber,
+      //   linkUrl: "/bsIndex/bsProductSearchIndex",
+      //   component: "bsSimilarProduct",
+      //   refresh: true,
+      //   label: "同款产品" + this.item.fa_no,
+      //   value: value
+      // };
+      // this.$store.commit("myAddTab", fd);
+    },
+    // 去产品详情
     async toProductDetails() {
       const fd = {
         name: this.item.productNumber,
@@ -143,28 +197,39 @@ export default {
     },
     // 收藏
     async addCollect(item) {
+      if (item.isFavorite) {
+        this.$common.handlerMsgState({
+          msg: "取消收藏",
+          type: "warning"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: "收藏成功",
+          type: "success"
+        });
+      }
+      item.isFavorite = !item.isFavorite;
       const res = await this.$http.post("/api/CreateProductCollection", {
         productNumber: item.productNumber
       });
       if (res.data.result.code === 200) {
-        if (item.isFavorite) {
-          this.$common.handlerMsgState({
-            msg: "取消收藏",
-            type: "warning"
-          });
-        } else {
-          this.$common.handlerMsgState({
-            msg: "收藏成功",
-            type: "success"
-          });
-        }
-        item.isFavorite = !item.isFavorite;
-        eventBus.$emit("resetMyCollection");
+        eventBus.$emit("resetProducts", item);
+      } else {
+        this.$common.handlerMsgState({
+          msg: "收藏失败",
+          type: "danger"
+        });
       }
     },
     // 加购
     handlerShopping(item) {
-      // this.$set(item, "isShopping", !item.isShopping);
+      if (this.shoppingList.length >= 500 && !item.isShopping) {
+        this.$common.handlerMsgState({
+          msg: "购物车已满500条",
+          type: "warning"
+        });
+        return;
+      }
       item.isShopping = !item.isShopping;
       if (item.isShopping) {
         item.shoppingCount = 1;
@@ -182,7 +247,18 @@ export default {
         });
       }
       this.$forceUpdate();
+      eventBus.$emit("resetMyShoppingCart");
+      eventBus.$emit("resetProducts", this.item);
+    },
+    // 删除浏览记录
+    handlerDeleteBrowsing(item) {
+      console.log(item);
     }
+  },
+  computed: {
+    ...mapGetters({
+      shoppingList: "myShoppingList"
+    })
   },
   created() {},
   mounted() {}
@@ -211,8 +287,21 @@ export default {
       position: absolute;
       right: 25px;
       top: 25px;
-      color: #fb6055;
+      width: 20px;
+      height: 20px;
       cursor: pointer;
+      &.activeClientIcon {
+        background: url("~@/assets/images/activeClientIcon.png") no-repeat
+          center;
+      }
+      &.clientIcon {
+        background: url("~@/assets/images/clientIcon.png") no-repeat center;
+      }
+      &.clientIcon,
+      &.activeClientIcon {
+        background-size: contain;
+      }
+      background-size: contain;
     }
     .el-image {
       img {
@@ -226,6 +315,7 @@ export default {
         -ms-interpolation-mode: nearest-neighbor;
       }
     }
+    .BrowsingFootprintsIcon,
     .spotProductIcon,
     .newProductIcon,
     .vipProductIcon {
@@ -234,6 +324,20 @@ export default {
       top: 16px;
       width: 45px;
       height: 45px;
+    }
+    .BrowsingFootprintsIcon {
+      width: 40px;
+      height: 40px;
+      opacity: 0.68;
+      background: #333333;
+      border-bottom-right-radius: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .BrowsingFootprintsIcon i {
+      font-size: 20px;
+      color: #ffffff;
     }
     .spotProductIcon {
       width: 40px;
@@ -248,6 +352,40 @@ export default {
     .vipProductIcon {
       background: url("~@/assets/images/vipProductIcon.png") center no-repeat;
       background-size: contain;
+    }
+    .similaritySame {
+      position: absolute;
+      box-sizing: border-box;
+      padding: 0 15px;
+      width: 100%;
+      left: 0;
+      bottom: 0;
+      transition: all 1s;
+      opacity: 0;
+      .simiBox {
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        .similarity,
+        .same {
+          width: 110px;
+          height: 34px;
+          background-color: #f9723e;
+          color: #fff;
+          opacity: 0.8;
+          line-height: 34px;
+          text-align: center;
+          &:hover {
+            background-color: #ec644a;
+          }
+        }
+      }
+    }
+  }
+  &:hover {
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.16);
+    .itemImg .similaritySame {
+      opacity: 1;
     }
   }
   .content {

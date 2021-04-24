@@ -5,6 +5,7 @@
       <div class="item">
         <span class="label">关键字：</span>
         <el-input
+          v-focus
           type="text"
           size="medium"
           v-model="searchForm.keyword"
@@ -99,10 +100,12 @@
         ref="collecTable"
         :header-cell-style="{ backgroundColor: '#f9fafc' }"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <el-table-column label="择样单号" min-width="180">
           <template slot-scope="scope">
             <div
-              style="color:#3368A9;cursor: pointer;"
+              style="color: #3368a9; cursor: pointer"
               @click="toDetails(scope.row)"
             >
               {{ scope.row.orderNumber }}
@@ -141,10 +144,10 @@
         </el-table-column>
         <el-table-column prop="state" label="状态" align="center" width="100">
           <template slot-scope="scope">
-            <span style="color:#f56c6c" v-if="scope.row.readStatus == 0">
+            <span style="color: #f56c6c" v-if="scope.row.readStatus == 0">
               未读
             </span>
-            <span style="color:#f56c6c" v-else-if="scope.row.readStatus == 1">
+            <span style="color: #f56c6c" v-else-if="scope.row.readStatus == 1">
               已读
             </span>
           </template>
@@ -166,7 +169,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <center style="padding:20px 0;">
+      <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[10, 20, 30, 40]"
@@ -193,7 +196,7 @@
             orderNumber: orderRow.orderNumber,
             the_nu: orderRow.the_nu,
             name: orderRow.fromCompanyName,
-            api: '/api/GetOfferOrderExcel'
+            api: '/api/GetSampleOrderExcel'
           }"
         />
       </el-dialog>

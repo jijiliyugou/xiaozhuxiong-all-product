@@ -30,8 +30,13 @@
     </div>
     <div class="productListBox">
       <!-- 产品列表 -->
+      <!-- <bsProductSearchIndex v-if="typeId === 1"></bsProductSearchIndex> -->
+
+      <!-- <div class="bsGridComponent" v-if="typeId != 1"> -->
       <div class="bsGridComponent">
         <bsSampleOfferProductList
+          @pushOfferProductList="pushOfferProductList"
+          @popOfferProductList="popOfferProductList"
           v-for="item in productList"
           :key="item.productNumber"
           :item="item"
@@ -43,10 +48,11 @@
       </div>
 
       <!-- 分页 -->
+      <!-- <center style="padding:20px 0;" v-if="typeId != 1"> -->
       <center style="padding:20px 0;">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
-          :page-sizes="[10, 20, 30, 40]"
+          :page-sizes="[12, 24, 36, 48]"
           background
           :total="totalCount"
           :page-size="pageSize"
@@ -59,8 +65,11 @@
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
+// import { mapState } from "vuex";
 import bsSampleOfferProductList from "@/components/bsComponents/bsSampleComponent/bsSampleOfferProductList";
+// import bsProductSearchIndex from "@/views/bsPage/bsProductSearch/bsProductSearchIndex/BsProductSearchIndex.vue";
+
+import eventBus from "@/assets/js/common/eventBus.js";
 export default {
   name: "bsSampleOfferCommodity",
   components: {
@@ -75,21 +84,50 @@ export default {
     return {
       num: null,
       typeId: 0,
+      offerProductList: [],
       productList: [],
       isGrid: "bsGridComponent",
       totalCount: 0,
-      pageSize: 10,
+      pageSize: 12,
       currentPage: 1
     };
   },
-  computed: {
-    ...mapState(["offerProductList"])
-  },
-  created() {},
   mounted() {
-    this.getProductList();
+    // this.$set(this, "offerProductList", this.item.list);
+    // this.getProductList();
+    this.getProductOfferDetailPage();
   },
   methods: {
+    // 获取全部列表
+    async getProductOfferDetailPage() {
+      const fd = {
+        skipCount: 1,
+        maxResultCount: 9999,
+        ...this.item
+      };
+      const res = await this.$http.post("/api/ProductOfferDetailPage", fd);
+      if (res.data.result.code === 200) {
+        this.offerProductList = res.data.result.item.items;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.getProductList();
+    },
+    // 删除商品
+    popOfferProductList(item) {
+      for (let i = 0; i < this.offerProductList.length; i++) {
+        if (this.offerProductList[i].productNumber == item.productNumber) {
+          this.offerProductList.splice(i, 1);
+        }
+      }
+    },
+    // 添加商品
+    pushOfferProductList(item) {
+      this.offerProductList.push(item);
+    },
     //   产品列表
     async getProductList() {
       const fd = {
@@ -128,16 +166,47 @@ export default {
       }
     },
     //返回编辑页面
-    handleAffirm() {
-      console.log(this.item.offerNumber);
-      this.$store.commit("closeTab", this.item.offerNumber);
-      // this.$forceUpdate();
+    async handleAffirm() {
+      eventBus.$emit("getSearchForm" + this.item.offerNumber, this.callback);
+      const quotationProductList = this.offerProductList.map(item => ({
+        productNumber: item.productNumber,
+        boxNumber: item.boxNumber
+      }));
+      this.item.topValue.quotationProductList = quotationProductList;
+      const res = await this.$http.post(
+        "/api/UpdateProductOffer",
+        this.item.topValue
+      );
+      if (res.data.result.code === 200) {
+        this.$common.handlerMsgState({
+          msg: "提交成功",
+          type: "success"
+        });
+        eventBus.$emit("resetOffProduct");
+        const option = {
+          name: this.item.offerNumber,
+          toName: "编辑" + this.item.offerNumber
+        };
+        const tabList = this.$store.state.tabList;
+        const flag = tabList.find(
+          val => val.name === "编辑" + this.item.offerNumber
+        );
+        if (tabList.length < 1) {
+          return false;
+        } else {
+          if (flag) this.$store.commit("closeOfferTab", option);
+        }
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          error: "danger"
+        });
+      }
     },
 
     //切换
     checkTabstypeId(num) {
       this.typeId = num;
-      this.myOfferProductList = [];
       this.getProductList();
     },
     // 切換頁容量

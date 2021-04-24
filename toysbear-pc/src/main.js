@@ -17,11 +17,13 @@ import _ from "lodash";
 import ElTreeGrid from "element-tree-grid";
 import wsConnection from "@/store/wsStore";
 import VueClipboard from "vue-clipboard2";
+import PreviewPic from "vue-preview-pictures"; // 预览
 import VueQuillEditor from "vue-quill-editor";
 import "quill/dist/quill.core.css"; // import styles
 import "quill/dist/quill.snow.css"; // for snow theme
 import "quill/dist/quill.bubble.css"; // for bubble theme
 import "@/assets/js/rem.js";
+import VueCookies from "vue-cookies";
 import { NoticeBar } from "vant";
 Vue.use(VueQuillEditor);
 Vue.use(VueClipboard);
@@ -31,9 +33,11 @@ Vue.component(ElTreeGrid.name, ElTreeGrid);
 Vue.prototype.$video = Video;
 Vue.prototype.$_ = _;
 
+Vue.use(VueCookies);
 Vue.use(ElementUI);
 Vue.prototype.$md5 = md5;
 Vue.prototype.$RTM = RTM;
+Vue.prototype.$PreviewPic = PreviewPic;
 
 Vue.use(myAxios);
 Vue.config.productionTip = false;

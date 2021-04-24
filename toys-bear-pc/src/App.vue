@@ -3,7 +3,8 @@
     id="app"
     v-loading="$store.state.AppLoading"
     element-loading-spinner
-    element-loading-background="rgba(200, 200, 200, 0.5)"
+    text="加载中..."
+    element-loading-background="rgba(0, 0, 0, 0.2)"
   >
     <transition name="el-zoom-in-top">
       <message-component
@@ -33,6 +34,10 @@
         </div>
       </div>
     </transition>
+    <!-- 进度条 -->
+    <div class="jindutiaoBox" v-show="isJindu">
+      <div class="jindutiao"></div>
+    </div>
   </div>
 </template>
 <script>
@@ -50,6 +55,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(["isJindu"]),
     ...mapState(["confirmType"]),
     ...mapState(["dialogVisible"]),
     ...mapState(["dialogTitle"]),
@@ -63,6 +69,7 @@ export default {
   },
   mounted() {
     this.$store.commit("handlerShowGlobalMsg", false);
+    this.$store.commit("handlerIsJindu", false);
     eventBus.$on("showCart", flag => {
       this.isShowCartBox = flag;
     });
@@ -126,6 +133,9 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+// #app {
+//   width: 1920px;
+// }
 @deep: ~">>>";
 @{deep} .el-loading-spinner .circular {
   width: 100px;
@@ -144,14 +154,18 @@ export default {
 @{deep} .el-loading-spinner {
   z-index: 9999;
   position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+  border-radius: 8px;
+  overflow: hidden;
+  left: 50%;
+  top: 50%;
   background: url("~@/assets/images/loadding.gif") no-repeat center center;
-  background-size: 100px 100px;
-  width: 100%;
-  height: 100%;
+  .circular {
+    border-radius: 50%;
+  }
 }
 #app {
   position: relative;
@@ -164,6 +178,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    z-index: 2;
     .cart,
     .toTop {
       width: 50px;
@@ -218,6 +233,27 @@ export default {
         font-size: 20px;
       }
     }
+  }
+}
+.jindutiaoBox {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.2);
+  .jindutiao {
+    width: 200px;
+    height: 100px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: url("~@/assets/images/jindutiaoIcon.gif") no-repeat center;
+    background-size: contain;
   }
 }
 </style>

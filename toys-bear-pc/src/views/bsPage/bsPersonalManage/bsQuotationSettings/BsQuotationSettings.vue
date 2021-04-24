@@ -6,6 +6,7 @@
         <div class="item">
           <span class="label">关键字：</span>
           <el-input
+            v-focus
             type="text"
             size="medium"
             clearable
@@ -54,6 +55,8 @@
         ref="collecTable"
         :header-cell-style="{ backgroundColor: '#f9fafc' }"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <el-table-column label="模板名称" prop="name"> </el-table-column>
         <el-table-column label="报价方式" prop="offerMethod" align="center">
         </el-table-column>
@@ -111,19 +114,23 @@
             <el-button type="primary" @click="openEdit(scope.row)" size="mini"
               >编辑</el-button
             >
-            <el-popconfirm
+            <!-- <el-popconfirm
               style="margin-left: 10px;"
               title="确定要删除此公式吗？"
               @confirm="handleDelete(scope.row)"
+            > -->
+            <el-button
+              size="mini"
+              type="danger"
+              @click.stop="handleDelete(scope.row)"
+              slot="reference"
+              >删除</el-button
             >
-              <el-button size="mini" type="danger" @click.stop slot="reference"
-                >删除</el-button
-              >
-            </el-popconfirm>
+            <!-- </el-popconfirm> -->
           </template>
         </el-table-column>
       </el-table>
-      <center style="padding:20px 0;">
+      <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[10, 20, 30, 40]"
@@ -206,22 +213,34 @@ export default {
     },
     // 删除报价公式
     async handleDelete(row) {
-      const res = await this.$http.post("/api/DeleteProductOfferFormula", {
-        isdelete: true,
-        id: row.id
-      });
-      if (res.data.result.code === 200) {
-        this.$common.handlerMsgState({
-          msg: "删除成功",
-          type: "success"
+      this.$confirm("确定要删除吗?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const res = await this.$http.post("/api/DeleteProductOfferFormula", {
+            isdelete: true,
+            id: row.id
+          });
+          if (res.data.result.code === 200) {
+            this.$common.handlerMsgState({
+              msg: "删除成功",
+              type: "success"
+            });
+            this.getOfferFormula();
+          } else {
+            this.$common.handlerMsgState({
+              msg: res.data.result.msg,
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "已取消删除",
+            type: "warning"
+          });
         });
-        this.getOfferFormula();
-      } else {
-        this.$common.handlerMsgState({
-          msg: res.data.result.msg,
-          type: "danger"
-        });
-      }
     },
     // 关闭新增报价公式
     close() {

@@ -57,7 +57,6 @@ myAxios.install = function(Vue) {
       )
         axios.startDate = Date.now();
       // 屏蔽不需要验证code的请求，如下载导出等
-      console.log("config", config);
       // if (
       //   config.url.includes("LittleBearInstallDownload") ||
       //   config.url.includes("LittleBearInstallRepeatDownload") ||

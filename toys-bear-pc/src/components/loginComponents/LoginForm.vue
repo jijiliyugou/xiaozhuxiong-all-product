@@ -204,7 +204,6 @@ export default {
           "setComparnyId",
           res.data.result.commparnyList[0].commparnyId
         );
-        await this.waitTime(1);
         // 二维码登录成功获取菜单
         try {
           const re = await this.$http.post("/api/GetUserRoleMenu", {});
@@ -230,7 +229,17 @@ export default {
             );
             Json.PlatForm = await this.getClientTypeList("PlatForm");
             this.$store.commit("globalJson/setGlobalJson", Json);
-            // this.$router.push("/bsIndex");
+            switch (res.data.result.commparnyList[0].companyType) {
+              case "Sales":
+                this.$router.push("/bsIndex");
+                break;
+              default:
+                location.href =
+                  process.env.NODE_ENV === "production"
+                    ? proEnv.loginUrl
+                    : devEnv.loginUrl;
+                break;
+            }
           } else {
             this.$common.handlerMsgState({
               msg: re.data.result.msg,
@@ -359,6 +368,13 @@ export default {
                 this.$store.commit("removeLoginItems");
               }
               console.log(res.data.result.commparnyList);
+              const fd = {
+                component: "bsHome",
+                label: "后台首页",
+                linkUrl: "/bsIndex/bsHome",
+                name: "/bsIndex/bsHome",
+                refresh: true
+              };
               switch (res.data.result.commparnyList[0].companyType) {
                 // case "Admin":
                 //   break;
@@ -367,7 +383,8 @@ export default {
                 // case "Exhibition":
                 //   break;
                 case "Sales":
-                  this.$router.push("/bsIndex");
+                  this.$store.commit("updateActiveTab", fd);
+                  this.$store.commit("closeTabAll", this.$router);
                   break;
                 default:
                   location.href =
@@ -384,7 +401,6 @@ export default {
                 name: "LoginConfirm"
               });
             }
-            this.$store.commit("closeTabAll");
           } else {
             this.$common.handlerMsgState({
               msg: res.data.result.message,

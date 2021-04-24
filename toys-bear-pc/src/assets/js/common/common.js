@@ -113,3 +113,63 @@ export function getClientTypeList(type, _that) {
       });
   });
 }
+//计算几天
+export function calculateDate(code) {
+  if (code) {
+    var date = new Date();
+    var endTime = formatTime(date);
+    var date1 = Date.parse(date);
+    var start = "";
+    var oneDay = 1000 * 3600 * 24;
+    if (code === "全部") {
+      console.log(date);
+    } else {
+      switch (code) {
+        // 今天
+        case "today":
+          start = new Date();
+          break;
+        // 3天
+        case "3天":
+          start = date1 - oneDay * 3;
+          break;
+        // 最近1周
+        case "7天":
+          start = date1 - oneDay * 7;
+          break;
+        // 最近15天
+        case "15天":
+          start = date1 - oneDay * 15;
+          break;
+        // 最近1月
+        case "30天":
+          start = new Date();
+          start.setMonth(start.getMonth() - 1);
+          break;
+        // 最近3月
+        case "lastThreeMonth":
+          start = new Date();
+          start.setMonth(start.getMonth() - 3);
+          break;
+        // 最近半年
+        case "lastHalfYear":
+          start = date1 - oneDay * 183;
+          break;
+      }
+      const timeData = {
+        startTime: formatTime(new Date(start)) + "T00:00:00",
+        endTime: endTime + "T23:59:59"
+      };
+      return timeData;
+    }
+  }
+}
+// 格式化时间
+function formatTime(param) {
+  var y = param.getFullYear();
+  var m = param.getMonth() + 1;
+  var d = param.getDate();
+  m = m < 10 ? "0" + m : m;
+  d = d < 10 ? "0" + d : d;
+  return y + "-" + m + "-" + d;
+}

@@ -6,6 +6,7 @@
         <div class="item">
           <span class="label">报价单号：</span>
           <el-input
+            v-focus
             type="text"
             size="medium"
             clearable
@@ -36,7 +37,7 @@
             @keyup.native.enter="search"
           ></el-input>
         </div>
-        <div class="item" style=" max-width:300px">
+        <div class="item" style="max-width: 300px">
           <span class="label">时间段：</span>
           <el-date-picker
             size="medium"
@@ -67,11 +68,13 @@
           ref="collecTable"
           :header-cell-style="{ backgroundColor: '#f9fafc' }"
         >
+          <el-table-column label="序号" type="index" align="center" width="70">
+          </el-table-column>
           <el-table-column label="报价单号" min-width="150">
             <template slot-scope="scope">
               <span
                 @click="goDetails(scope.row)"
-                style="color:#3368A9;cursor: pointer;"
+                style="color: #3368a9; cursor: pointer"
               >
                 {{ scope.row.offerNumber }}
               </span>
@@ -109,10 +112,10 @@
           </el-table-column>
           <el-table-column label="总金额" align="center" width="100">
             <template slot-scope="scope">
-              <span style="color:#EB1515;">
+              <span style="color: #eb1515">
                 {{ scope.row.cu_de }}
               </span>
-              <span style="color:#EB1515;">
+              <span style="color: #eb1515">
                 {{ scope.row.offerTotalAmount }}
               </span>
             </template>
@@ -160,12 +163,18 @@
           >
             <template slot-scope="scope">
               <el-button
+                v-show="scope.row.offerNumber.indexOf('S') < 0"
                 size="mini"
                 type="success"
                 @click="handleEdit(scope.$index, scope.row)"
                 >编辑</el-button
               >
-              <el-button size="mini" type="info">推送</el-button>
+              <el-button
+                v-show="scope.row.offerNumber.indexOf('S') < 0"
+                size="mini"
+                type="info"
+                >推送</el-button
+              >
               <el-button
                 size="mini"
                 @click="exportOrder(scope.row)"
@@ -174,7 +183,8 @@
                 导出
               </el-button>
               <el-button
-                style="margin-left: 10px;"
+                v-show="scope.row.offerNumber.indexOf('S') < 0"
+                style="margin-left: 10px"
                 size="mini"
                 type="danger"
                 @click="handleDelete(scope.row)"
@@ -183,7 +193,7 @@
             </template>
           </el-table-column>
         </el-table>
-        <center style="padding:20px 0;">
+        <center style="padding: 20px 0">
           <el-pagination
             layout="total, sizes, prev, pager, next, jumper"
             :page-sizes="[10, 20, 30, 40]"
@@ -214,6 +224,7 @@
 
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent";
+import eventBus from "@/assets/js/common/eventBus.js";
 export default {
   name: "bsSampleQuotation",
   components: {
@@ -242,13 +253,18 @@ export default {
   methods: {
     // 导出找样
     exportOrder(row) {
-      console.log(row);
+      if (!row.total) {
+        this.$common.handlerMsgState({
+          msg: "该报价单没有产品信息",
+          type: "danger"
+        });
+        return false;
+      }
       this.orderRow = {
         sampleNumber: row.offerNumber,
         name: row.customerName,
         api: "/api/ExportSampleOfferToExcel"
       };
-      console.log(this.orderRow);
       this.exportTemplateDialog = true;
     },
     // 获取列表
@@ -320,7 +336,6 @@ export default {
     },
     // 报价详情跳转
     async goDetails(row) {
-      console.log(row);
       const fd = {
         name: "详情" + row.offerNumber,
         linkUrl: "/bsIndex/bsSampleQuotation",
@@ -354,6 +369,12 @@ export default {
   created() {},
   mounted() {
     this.getCompanySamplelistPage();
+    eventBus.$on("resetSamplelist", () => {
+      this.getCompanySamplelistPage();
+    });
+  },
+  beforeDestroy() {
+    eventBus.$off("resetSamplelist");
   }
 };
 </script>

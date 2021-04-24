@@ -4,7 +4,7 @@
  * @Author: gaojiahao
  * @Date: 2020-10-19 15:37:14
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-04-05 10:18:10
+ * @LastEditTime: 2021-04-13 14:38:18
  */
 const os = require('os');
 const path = require("path");
@@ -61,7 +61,8 @@ module.exports = {
           "@less": path.resolve(__dirname, "./src/less"),
           "@mixins": path.resolve(__dirname, "./src/mixins"),
           "@utils": path.resolve(__dirname, "./src/utils"),
-          "@lang": path.resolve(__dirname, "./src/lang")
+          "@lang": path.resolve(__dirname, "./src/lang"),
+          "@root": path.resolve(__dirname, "./"),
         } // 别名配置
       },
     });
@@ -84,13 +85,13 @@ module.exports = {
   pwa: {}, // PWA 插件相关配置 see https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa
   // webpack-dev-server 相关配置
   devServer: {
-    open: true, // 开启自动打开浏览器
-    host: "0.0.0.0", // 地址
-    port: "8080", // 端口
+    // open: true, // 开启自动打开浏览器
+    // host: "0.0.0.0", // 地址
+    // port: "8081", // 端口
     // proxy: {
     //   //配置跨域
     //   "/api": {
-    //     target: "http://cbapi.com", //这里后台的地址模拟的;应该填写你们真实的后台接口
+    //     target: "http://139.9.71.135:8099", //这里后台的地址模拟的;应该填写你们真实的后台接口
     //     //ws: true,
     //     changOrigin: true, //允许跨域
     //     pathRewrite: {

@@ -4,7 +4,7 @@ class RMT {
   constructor({ groupNumber, token, uid }) {
     this.addId = "5de91f02f12c41c2b276c9accb4679c7";
     this.uid = uid || null;
-    this.groupNumber = groupNumber;
+    this.groupNumber = groupNumber||null;
     this.token = token || null;
     this.AgoraRTM = AgoraRTM;
     this.client = null; // 视频通话实例对象
@@ -131,6 +131,35 @@ class RMT {
     });
     // 离开频道。
     await this.client.leave();
+  }
+
+  async getDevices(){
+    return new Promise((resolve, reject) => {
+      this.AgoraRTM.getDevices()
+        .then(devices => {
+          var audioDevices = [];
+          var videoDevices = [];
+          for(var i in devices){
+            if(devices[i]['kind']=='audioinput'){
+              audioDevices.push({
+                deviceId:devices[i]['deviceId'],
+                groupId:devices[i]['groupId'],
+                kind:devices[i]['kind'],
+                label:devices[i]['label'],
+              });
+            }
+            if(devices[i]['kind']=='videoinput'){
+              videoDevices.push({
+                deviceId:devices[i]['deviceId'],
+                groupId:devices[i]['groupId'],
+                kind:devices[i]['kind'],
+                label:devices[i]['label'],
+              });
+            }
+          }
+          resolve({audioDevices:audioDevices,videoDevices:videoDevices});
+        });
+    });
   }
 }
 export default RMT;

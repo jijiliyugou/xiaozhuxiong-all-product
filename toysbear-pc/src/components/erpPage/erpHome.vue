@@ -57,7 +57,7 @@
     </div>
     <div class="floorBox">
       <div class="flootTitle">
-        <span>宏升合作展厅</span>
+        <span>小竹熊合作展厅</span>
         <span class="more"
           >更多合作展厅<i class="el-icon-arrow-right moreIcon"></i
         ></span>

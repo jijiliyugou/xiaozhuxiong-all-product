@@ -27,15 +27,20 @@ d<!--
               </Col>
             </Row>
           </div>
-          <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" label-colon>
+          <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" label-colon class="input_form_wrap">
             <!-- <FormItem label="会议ID" prop="id">
               <Input v-model="formValidate['id']" :style="{width:'300px',marginLeft: '-50px'}" :maxlength="11" disabled></Input>
             </FormItem> -->
             <FormItem label="公司名称" prop="company">
               <Input v-model="formValidate['company']" :style="{width:'300px',marginLeft: '-47px'}" placeholder="请输入公司名称"></Input>
             </FormItem>
-            <FormItem label="昵称" prop="name">
-              <Input v-model="formValidate['name']" :style="{width:'300px',marginLeft: '-47px'}" placeholder="请输入您的昵称"></Input>
+            <FormItem label="昵称" prop="nickName">
+              <Input v-model="formValidate['nickName']" :style="{width:'300px',marginLeft: '-47px'}" placeholder="请输入您的昵称"></Input>
+            </FormItem>
+            <FormItem label="摄像头" prop="videoId">
+              <Select v-model="formValidate['videoId']" :style="{width:'300px',marginLeft: '-47px'}" clearable @on-select="onChangeVideoDevice">
+                <Option v-for="(item,index) in videoDevices" :value="item.deviceId" :key="index">{{ item.label }}</Option>
+             </Select>
             </FormItem>
             <FormItem prop="settings">
               <CheckboxGroup v-model="formValidate.settings" :style="{marginLeft: '-150px'}">
@@ -44,53 +49,128 @@ d<!--
               </CheckboxGroup>    
             </FormItem>
             <FormItem>
-              <Button type="primary" @click="save" :style="{width:'300px',marginLeft: '-50px'}" >{{$t("createMeeting.button")}}</Button>
+              <Button type="primary" @click="save" :style="{width:'300px',marginLeft: '-50px',height:'36px'}" >{{$t("createMeeting.button")}}</Button>
             </FormItem>
           </Form>
         </div>
       </div>
     </div>
-    <div class="footer">
-      <div class="footer_wrap">
-        <div class="footer_wrap_first">
-          <div style="margin-right:10px">技术支持：0754-89671122</div> 
-          <div class="qq"></div>
-          <div style="margin-left:10px">客服001</div>
-          <div class="qq" style="margin-left:10px"></div>
-          <div style="margin-left:10px">客服002</div>
-        </div>
-        <div>Copyright © 2021深圳宏升软件技术开发有限公司  粤ICP备13031421号-4</div>
-      </div>
-    </div>
+    <LoginFooter></LoginFooter>
   </div>
 </template>
 
 <script>
+import RMT from "@/assets/js/signalROptions/signalROptions";
+import * as Cookies from "js-cookie";
+import LoginFooter from "@components/footer/loginFooter";
+import {
+  JoinMeetingRoom
+} from "@service/meetingService";
+
 export default {
   name: "addMeeting",
   components: {
-      
+    LoginFooter    
   },
   data() {
     return {
       logUrl: require("@assets/default/logo.png"),
-      titleUrl: require("@assets/images/title_s.webp"),
+      titleUrl: require("@assets/images/title_s.png"),
       formValidate:{
-        id:'111111111111111',
         company:'',
-        name:'',
-        settings:['isM','isC']
+        nickName:'',
+        settings:['isM','isC'],
+        videoId:'',
       },
+      baseMode: "avc",
+      transcode: "interop",
+      attendeeMode: "video",
+      videoProfile: "720p_6",  //省流量测试
       ruleValidate:{
 
-      }
+      },
+      videoDevices:[],
+      roomNumber:'',
+      mac:''
     };
   },
   methods: {
     save(){
-      this.$router.push('/');
-    }  
+      var params = {
+        company:this.formValidate.company,
+        nickName:this.formValidate.nickName,
+        code:window.localStorage.getItem("mac"),
+        roomNumber:this.roomNumber
+      };
+      this.$refs['formValidate'].validate((valid) => {
+        if(valid) {
+          return new Promise((resolve, reject) => {
+            this.$FromLoading.show();
+            JoinMeetingRoom(params).then(res => {
+              if (res.success) {
+                Cookies.set("isAdmin", false);
+                Cookies.set("baseMode", this.baseMode);
+                Cookies.set("transcode", this.transcode);
+                Cookies.set("attendeeMode", this.attendeeMode);
+                Cookies.set("videoProfile", this.videoProfile);
+                Cookies.set("uid", res.data.meetingRoomMemberId);
+                Cookies.set("videoId", this.formValidate.videoId);
+                Cookies.set("companyName", res.data.companyName);
+                this.$router.push('/');  
+              } else {
+                this.$Message.error({
+                  background: true,
+                  content: res.result.msg
+                });
+                this.$FromLoading.hide();
+              }
+            });
+          });
+        }
+      })
+    },
+    onChangeVideoDevice(){
+
+    },
+    async initRMT() {
+      this.rtc = new RMT({ groupNumber:null, token:null, uid:null });
+      this.videoDevices = this.rtc
+        .getDevices()
+        .then(res => {
+          this.videoDevices = res.videoDevices;
+          this.formValidate['videoId'] = this.videoDevices[0]&&this.videoDevices[0]['deviceId'];
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    tempSetToken(){
+      var globalToken = {
+        token : this.generateUUID(),
+      };
+      window.sessionStorage.setItem('SPHY_LOGIN_TOKEN', JSON.stringify(globalToken));
+    },
+    generateUUID() {
+      var d = new Date().getTime();
+      var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+      });
+      return uuid;
+    },
   },
+  created(){
+    this.initRMT();
+    this.roomNumber = this.$route.query.roomNumber;
+    this.mac = window.localStorage.getItem('mac') || '';
+    if(!this.mac){
+      this.mac = this.generateUUID();
+      window.localStorage.setItem('mac',this.mac);
+    }
+    Cookies.set("channel", this.roomNumber);
+    this.tempSetToken();
+  }
 };
 </script>
 
@@ -165,7 +245,7 @@ export default {
       .login_box {
           // border-radius: 10px;
           width: 450px;
-          height: 369px;
+          height: 470px;
           background: rgba(255,255,255,0.6);
           box-shadow:  0 1px 6px rgb(0 0 0 / 20%);
           text-align: center;
@@ -218,33 +298,6 @@ export default {
               font-weight: 600;
             }
           }
-      }
-    }
-  }
-  .footer {
-    position: relative;
-    width: 100%;
-    text-align: center;
-    line-height: 24px;
-    margin-top: -70px;
-    height: 107px;
-    padding: 14px 15px 0 15px;
-    color:#fff;
-    background: #2684D1;
-    border-top: solid 1px #ddd;
-    overflow: hidden;
-    .footer_wrap{
-      padding-top:18px;
-      .footer_wrap_first{
-        display: flex;
-        justify-content:center;
-        .qq {
-          background: url('~@assets/images/qq2.webp');
-          background-repeat: no-repeat;
-              margin-top: 4px;
-          width: 13px;
-          height: 16px;
-        }
       }
     }
   }

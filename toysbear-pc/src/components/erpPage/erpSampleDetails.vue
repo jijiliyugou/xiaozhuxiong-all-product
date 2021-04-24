@@ -20,15 +20,15 @@
             {{ option.the_nu }}
           </div>
           <div class="item">
-            <div class="title">择样数量：</div>
+            <div class="title">产品款数：</div>
             {{ totalCount }}
           </div>
           <div class="item">
-            <div class="title">择样编号：</div>
+            <div class="title">订单编号：</div>
             {{ option.number }}
           </div>
           <div class="item">
-            <div class="title">择样时间：</div>
+            <div class="title">日期：</div>
             {{ option.happenDate.split("T")[0] }}
           </div>
           <div class="item">
@@ -70,6 +70,7 @@
           >
             <template slot-scope="scope">
               <el-image
+                class="tableImg"
                 style="width: 57px; height: 47px;"
                 :preview-src-list="scope.row.imgUrl"
                 :src="scope.row.imgUrl && scope.row.imgUrl[0]"
@@ -88,25 +89,35 @@
             prop="pr_na"
             fixed="left"
             align="center"
+            min-width="150"
             label="产品名称"
           >
             <template slot-scope="scope">
-              {{ scope.row.pr_na || "--" }}
+              <el-tooltip
+                class="item"
+                effect="dark"
+                :content="scope.row.pr_na"
+                placement="top"
+              >
+                <div class="productName">
+                  {{ scope.row.pr_na + "是的连接方式雷锋精神大幅降低了" }}
+                </div>
+              </el-tooltip>
             </template>
           </el-table-column>
           <el-table-column prop="client_nu" align="center" label="公司编号">
             <template slot-scope="scope">
-              {{ scope.row.client_nu || "--" }}
+              {{ scope.row.client_nu }}
             </template>
           </el-table-column>
           <el-table-column prop="fa_no" align="center" label="货号">
             <template slot-scope="scope">
-              {{ scope.row.fa_no || "--" }}
+              {{ scope.row.fa_no }}
             </template>
           </el-table-column>
           <el-table-column prop="ch_pa" align="center" label="包装">
             <template slot-scope="scope">
-              {{ scope.row.ch_pa || "--" }}
+              {{ scope.row.ch_pa }}
             </template>
           </el-table-column>
           <el-table-column
@@ -116,8 +127,8 @@
             label="内盒/装箱数"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.in_en || "--" }}</span
-              >/<span>{{ scope.row.ou_lo || "--" }}</span>
+              <span>{{ scope.row.in_en }}</span
+              >/<span>{{ scope.row.ou_lo }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="fa_pr" align="center" label="出厂价">
@@ -129,88 +140,103 @@
             label="价格"
           >
             <template slot-scope="scope">
-              {{ scope.row.ha_in_qu || "--" }}
+              <span>{{ scope.row.cu_de }}</span>
+              <span>{{ scope.row.ha_in_qu }}</span>
             </template>
           </el-table-column>
           <el-table-column label="产品规格" align="center">
             <el-table-column prop="pr_le" label="长" align="center">
               <template slot-scope="scope">
-                {{ scope.row.pr_le || "--" }}
+                {{ scope.row.pr_le }}
               </template>
             </el-table-column>
             <el-table-column prop="pr_wi" label="宽" align="center">
               <template slot-scope="scope">
-                {{ scope.row.pr_wi || "--" }}
+                {{ scope.row.pr_wi }}
               </template>
             </el-table-column>
             <el-table-column prop="pr_hi" label="高" align="center">
               <template slot-scope="scope">
-                {{ scope.row.pr_hi || "--" }}
+                {{ scope.row.pr_hi }}
               </template>
             </el-table-column>
           </el-table-column>
           <el-table-column label="包装规格" align="center">
             <el-table-column prop="in_le" label="长" align="center">
               <template slot-scope="scope">
-                {{ scope.row.in_le || "--" }}
+                {{ scope.row.in_le }}
               </template>
             </el-table-column>
             <el-table-column prop="in_wi" label="宽" align="center">
               <template slot-scope="scope">
-                {{ scope.row.in_wi || "--" }}
+                {{ scope.row.in_wi }}
               </template>
             </el-table-column>
             <el-table-column prop="in_hi" label="高" align="center">
               <template slot-scope="scope">
-                {{ scope.row.in_hi || "--" }}
+                {{ scope.row.in_hi }}
               </template>
             </el-table-column>
           </el-table-column>
           <el-table-column label="外箱规格" align="center">
             <el-table-column prop="ou_le" label="长" align="center">
               <template slot-scope="scope">
-                {{ scope.row.ou_le || "--" }}
+                {{ scope.row.ou_le }}
               </template>
             </el-table-column>
             <el-table-column prop="ou_wi" label="宽" align="center">
               <template slot-scope="scope">
-                {{ scope.row.ou_wi || "--" }}
+                {{ scope.row.ou_wi }}
               </template>
             </el-table-column>
             <el-table-column prop="ou_hi" label="高" align="center">
               <template slot-scope="scope">
-                {{ scope.row.ou_hi || "--" }}
+                {{ scope.row.ou_hi }}
               </template>
             </el-table-column>
           </el-table-column>
           <el-table-column prop="bulk_stere" align="center" label="体积">
             <template slot-scope="scope">
-              {{ scope.row.bulk_stere || "--" }}
+              {{ scope.row.bulk_stere }}
             </template>
           </el-table-column>
           <el-table-column prop="bulk_feet" align="center" label="材积">
             <template slot-scope="scope">
-              {{ scope.row.bulk_feet || "--" }}
+              {{ scope.row.bulk_feet }}
             </template>
           </el-table-column>
           <el-table-column prop="gr_we" align="center" label="毛重">
             <template slot-scope="scope">
-              {{ scope.row.gr_we || "--" }}
+              {{ scope.row.gr_we }}
             </template>
           </el-table-column>
           <el-table-column prop="ne_we" align="center" label="净重">
             <template slot-scope="scope">
-              {{ scope.row.ne_we || "--" }}
+              {{ scope.row.ne_we }}
             </template>
           </el-table-column>
-          <el-table-column prop="remark" align="center" label="备注">
+          <el-table-column
+            prop="remark"
+            align="center"
+            width="200"
+            label="备注"
+          >
             <template slot-scope="scope">
-              {{ scope.row.remark || "--" }}
+              <el-tooltip
+                class="item"
+                effect="dark"
+                :content="scope.row.remark"
+                placement="top"
+              >
+                <div class="remarkClass">
+                  {{ scope.row.remark }}
+                </div>
+              </el-tooltip>
             </template>
           </el-table-column>
           <el-table-column prop="ma_na" align="center" label="厂家名称">
             <template slot-scope="scope">
-              {{ scope.row.ma_na || "--" }}
+              {{ scope.row.ma_na }}
             </template>
           </el-table-column>
           <el-table-column
@@ -221,13 +247,13 @@
           >
             <template slot-scope="scope">
               <span>
-                {{ scope.row.supplierPhone || "--" }}
+                {{ scope.row.supplierPhone }}
               </span>
             </template>
           </el-table-column>
           <el-table-column prop="ma_nu" align="center" label="厂家编号">
             <template slot-scope="scope">
-              {{ scope.row.ma_nu || "--" }}
+              {{ scope.row.ma_nu }}
             </template>
           </el-table-column>
         </el-table>
@@ -382,9 +408,17 @@ export default {
       height: 110px;
       padding: 15px;
       box-sizing: border-box;
-      .hallLogo {
+      @{deep} .hallLogo {
         width: 80px;
         height: 80px;
+        position: relative;
+        img {
+          width: 80px;
+          height: 80px;
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
       }
     }
     .right {
@@ -444,6 +478,30 @@ export default {
         color: #fff;
       }
     }
+  }
+}
+.remarkClass {
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap; /*不换行*/
+  text-overflow: ellipsis; /*超出部分文字以...显示*/
+}
+.productName {
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap; /*不换行*/
+  text-overflow: ellipsis; /*超出部分文字以...显示*/
+}
+@{deep} .tableImg {
+  width: 57px;
+  height: 47px;
+  position: relative;
+  img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 57px;
+    height: 47px;
   }
 }
 </style>

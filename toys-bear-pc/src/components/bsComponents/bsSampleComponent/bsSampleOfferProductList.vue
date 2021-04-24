@@ -189,13 +189,15 @@ export default {
       if (item.isShopping) {
         this.$set(item, "boxNumber", 1); //默认传一箱过去，不然总金额计算错误
         // item.boxNumber = 1;
-        this.$store.commit("pushOfferProductList", item);
+        // this.$store.commit("pushOfferProductList", item);
+        this.$emit("pushOfferProductList", item);
         this.$common.handlerMsgState({
           msg: "添加报价商品成功",
           type: "success"
         });
       } else {
-        this.$store.commit("popOfferProductList", item);
+        // this.$store.commit("popOfferProductList", item);
+        this.$emit("popOfferProductList", item);
         this.$common.handlerMsgState({
           msg: "删除报价商品成功",
           type: "warning"

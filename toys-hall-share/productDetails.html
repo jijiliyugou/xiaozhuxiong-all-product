@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+  <script src="http://apps.bdimg.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>产品详情</title>
+  <!-- 初始化样式 -->
+  <link rel="stylesheet" href="./static/css/base.css">
+  <link rel="stylesheet" href="http://at.alicdn.com/t/font_1900734_1xnu2j2delu.css">
+  <!-- 文件样式 -->
+  <link rel="stylesheet" href="./static/css/productDetails.css">
+  <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="./static/js/jquery.min.js"></script>
+  <script src="./static/js/template.js"></script>
+  <!-- 封装复制插件 -->
+  <script src="./static/js/myClipboard.js"></script>
+  <script src="./static/js/clipboard.js"></script>
+  <script src="./static/js/json2.js"></script>
+  <script src="./static/js/myLocalStorage.js"></script>
+  <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <div class="header">
+      <div class="headerBox">
+        <div class="factoryName">
+          <span id="ma_na">
+
+          </span>
+          <div class="contactMethod">
+            <span class="item person">联系人：<span class="itemValue" id="linkman"></span></span>
+            <span class="item phone">联系电话：<span class="itemValue" id="handset"></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="breadBox">
+      <ol class="breadcrumb">
+        <li><a href="./index.html">首页</a></li>
+        <li class="middle">></li>
+        <li class="active" id="activeRoute"></li>
+      </ol>
+    </div>
+    <!-- 产品信息轮播图放大镜 -->
+    <div class="productBox">
+      <div class="productBoxWrap">
+        <div class="left">
+          <div class="product">
+            <div class="showimg">
+              <div id="showImgID">
+                <img class="show"  src="./static/images/logo.png">
+              </div>
+              <div class="showbox"></div>
+              <div class="showlarge" id="showlarge">
+                <img src="./static/images/logo.png">
+              </div>
+              <div class="product3D"></div>
+            </div>
+            <div class="product-img">
+              <div class="leftItem" onclick="handlerDirection('left')">
+                <span class="iconfont icon-dajiantouzuo"></span>
+              </div>
+              <div class="itemBox">
+                <div class="imgWrap" id="imgWrap">
+                  <!-- <img src="./static/images/product3.png"> -->
+                </div>
+              </div>
+              <div class="rightItem"  onclick="handlerDirection('right')">
+                <span class="iconfont icon-dajiantouyou"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="right" id="rightContext">
+          <div class="productName">
+            <div class="btns">
+              <i class="fanhui"></i>
+              <i class="fenxiang" id="fuzhi" data-clipboard-text="http://192.168.1.14:8080/"></i>
+            </div>
+          </div>
+          <div class="productPrice">
+          </div>
+          <div class="context">
+            <p>出厂货号：<span class="value"></span></p>
+            <p>包装：<span class="value"></span></p>
+            <p>产品规格：<span class="value"></span></p>
+            <p>外箱规格：<span class="value"></span></p>
+            <p>包装规格：<span class="value"></span></p>
+            <p>装箱量：<span class="value"></span></p>
+            <p>体积/材积：<span class="value"></span></p>
+            <p>体毛重/净重：<span class="value"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 3D弹框 -->
+    <button style="display: none;" type="button" id="open3D" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Large modal</button>
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <!-- <iframe width="100%" height="576px" src="http://img.toysbear.com/360PorductImg/YS0479485/index.html" frameborder="0"></iframe> -->
+            <!-- <iframe width="100%" height="576px" src="" frameborder="0"></iframe> -->
+            <object type="text/html" data="http://img.toysbear.com/360PorductImg/YS0479485/index.html" style="width:100%; height:100%">
+            </object>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 其他产品 -->
+    <div class="otherProducts">
+      <div class="title">
+        <i class="titleIcon"></i>
+        其他产品</div>
+        <div class="otherContent" id="otherItemBox">
+        </div>
+    </div>
+    <!-- 底部 -->
+    <div class="footer">
+      <span class="laiyuan">资料来源：<span class="laiyuanVal">耀昇展厅</span></span>
+      <span>技术支持：深圳小竹熊软件技术开发有限公司</span>
+    </div>
+</body>
+<!-- <%for(var i = 0; i < minHallList.length; i++) {%> 
+  <%=minHallList[i].adTitle%>
+  <%}%>-->
+
+<!-- 工厂名称 -->
+<script id="factoryTp" type="text/html">
+  <%=data.ma_na%>
+</script>
+<!-- 联系人 -->
+<script id="linkmanTp" type="text/html">
+  <%=data.linkman%>
+</script>
+<!-- 联系电话 -->
+<script id="handsetTp" type="text/html">
+  <%=data.handset%>
+</script>
+<!-- 面包屑模板 -->
+<script id="branchTp" type="text/html">
+  <%=data.ProductName%>
+</script>
+<!-- 产品图片模板 -->
+<script id="imgTp" type="text/html">
+  <img class="show"  src="<%=data.ProductImages[0]%>">
+</script>
+<!-- 产品缩略图模板 -->
+<script id="minImgTp" type="text/html">
+  <%for(var i = 0; i < data.ProductImages.length; i++) {%> 
+    <img src="<%=data.ProductImages[i]%>">
+  <%}%>
+</script>
+<!-- 产品放大图模板 -->
+<script id="bigTp" type="text/html">
+    <img src="<%=data.ProductImages[0]%>">
+</script>
+<!-- 其他产品模板 -->
+<script id="otherTp" type="text/html">
+  <%for(var i = 0; i < list.length; i++) {%> 
+  <div class="otherItem" value="<%=i%>">
+    <div class="itemImgBox">
+      <img src="<%=list[i].ProductImages[0]%>" alt="">
+    </div>
+    <div class="itemContext">
+      <div class="name"><%=list[i].ProductName%></div>
+      <div class="price">￥<span class="priceVal"><%=list[i].FactoryPrice%></span></div>
+    </div>
+  </div>
+  <%}%>
+</script>
+<!-- 产品信息模板 -->
+<script id="productInfoTp" type="text/html">
+  <div class="productName">
+    <%=data.ProductName%>
+    <div class="btns">
+      <i class="fanhui"></i>
+      <i class="fenxiang" id="fuzhi" data-clipboard-text="http://192.168.1.14:8080/"></i>
+    </div>
+  </div>
+  <div class="productPrice">
+    ￥<%=data.FactoryPrice%>
+  </div>
+  <div class="context">
+    <p>出厂货号：<span class="value"><%=data.FactoryNo%></span></p>
+    <p>包装：<span class="value"><%=data.ChinesePack%></span></p>
+    <p>产品规格：<span class="value"><%=data.ProductLength%>X<%=data.ProductWidth%>X<%=data.ProductHeight%>(CM)</span></p>
+    <p>外箱规格：<span class="value"><%=data.OuterBoxLength%>X<%=data.OuterBoxWidth%>X<%=data.OuterBoxHeight%>(CM)</span></p>
+    <p>包装规格：<span class="value"><%=data.InnerBoxLength%>X<%=data.InnerBoxWidth%>X<%=data.InnerBoxHeight%>(CM)</span></p>
+    <p>装箱量：<span class="value"><%=data.InnerBoxCount%>/<%=data.OuterBoxLoadCapa%>(PCS)</span></p>
+    <p>体积/材积：<span class="value"><%=data.OuterBoxBulkStere%>(CBM)/<%=data.OuterBoxBulkFeet%>(CUFT)</span></p>
+    <p>毛重/净重：<span class="value"><%=data.OuterBoxGrossWeight%>/<%=data.OuterBoxNetWeight%>(KG)</span></p>
+  </div>
+</script>
+<script>
+  /**该插件的使用基于jQuery**/
+window.onload = function () {
+  if(!document.getElementsByClassName) {
+    document.getElementsByClassName = function (className) {
+      var ele = document.getElementsByTagName("*");
+      var arr = [];
+      for (var i = 0; i < ele.length; i++) {
+        if(ele[i].className == className) {
+          return arr.push(ele[i]);
+        }
+      }
+      return arr;
+    }
+  }
+
+  var mymagnifier=function(opts){
+  opts = mymagnifier.prototype.extendObj(mymagnifier.prototype.defaults,opts);
+  mymagnifier.prototype.magnifier(opts);
+  }
+  /**默认参数块**/ 
+  mymagnifier.prototype.defaults = {
+  img:"img", 
+  bigimg:"bigs",
+  mark:"mark"
+  };
+
+  mymagnifier.prototype.magnifier=function(opts){
+  var img = document.getElementById(opts.img);
+  var bigimg = document.getElementById(opts.bigimg);
+  var mark = document.getElementById(opts.mark);
+  var magnifier=img.parentNode;
+  console.log(magnifier.className+"+"+magnifier.getBoundingClientRect().left+"+"+magnifier.getBoundingClientRect().top);
+  var x,y,l,t,L,T,mL,mT;
+  img.onmouseover=function(){
+  mark.style.display="block";
+  bigimg.style.display="block";
+  }
+  img.onmouseout=function(){
+  mark.style.display="none";
+  bigimg.style.display="none";
+  }
+  img.onmousemove=function(e){
+  //获取鼠标相对浏览器的坐标
+  x=e.clientX;
+  y=e.clientY;
+  //console.log("x"+x,"y"+y)
+  l=img.offsetLeft;
+  t=img.offsetTop;
+  mark.style.left=(x-l-mark.offsetWidth/2-magnifier.getBoundingClientRect().left)+"px";
+  mark.style.top=(y-t-mark.offsetHeight/2-magnifier.getBoundingClientRect().top)+"px";
+  // 移动区边界距离边界的距离
+  mL=mark.offsetLeft;
+  mT=mark.offsetTop;
+  //最小范围
+  /*console.log("mL"+mL,"mT"+mT)*/
+  if(mL<=0){
+  mark.style.left="0";
+  }
+  if(mT<=0){
+  mark.style.top="0"
+  }
+  // 最大范围
+  if(mL>=img.offsetWidth-mark.offsetWidth){
+  mark.style.left=img.offsetWidth-mark.offsetWidth+"px";
+  }
+  if(mT>=img.offsetHeight-mark.offsetHeight){
+  mark.style.top=img.offsetHeight-mark.offsetHeight+"px";
+  }
+  //显示区的宽高
+  L=bigimg.offsetWidth;
+  T=bigimg.offsetHeight;
+  // console.log(L,T);
+  //获取放大的倍数
+  bigimg.style.left="-"+(mL/(img.offsetWidth/L))+"px";
+  bigimg.style.top="-"+(mT/(img.offsetHeight/T))+"px";
+  // console.log(bigimg.style.left,bigimg.style.top)
+  }
+  }
+
+
+  //js继承
+  mymagnifier.prototype.cloneObj=function(oldObj) { //复制对象方法
+  if (typeof(oldObj) != "object") return oldObj;
+  if (oldObj == null) return oldObj;
+  var newObj = new Object();
+  for (var i in oldObj)
+  newObj[i] = mymagnifier.prototype.cloneObj(oldObj[i]);
+  return newObj;
+  };
+  mymagnifier.prototype.extendObj=function() { //扩展对象
+  var args = arguments;
+  if (args.length < 2) return;
+  var temp = mymagnifier.prototype.cloneObj(args[0]); //调用复制对象方法
+  for (var n = 1; n < args.length; n++) {
+  for (var i in args[n]) {
+  temp[i] = args[n][i];
+  }
+  }
+  return temp;
+  }
+  if (!window.HTMLElement || !window.Element) {
+    (function () {
+      var magnifier_box = document.getElementsByClassName("magnifier");
+      for(var i=0;i<magnifier_box.length;i++){
+        magnifier_box[i].MYmagnifier = mymagnifier;
+      }
+  }());
+    
+  } else {
+    HTMLElement.prototype.MYmagnifier = mymagnifier;
+  }
+  var magnifier_box = document.getElementsByClassName("magnifier");
+  for(var i=0;i<magnifier_box.length;i++){
+  magnifier_box[i].MYmagnifier();
+  }
+}
+</script>
+<script>
+$(function() {
+	//鼠标移入产品小图事件
+	$(".product-img img").mouseenter(function(){//鼠标悬浮在不同的产品小图片时外加黑色边框并且主图将其显示出来
+		$(".product-img img").css({"opacity":"0.7"});
+		$(this).css({"opacity":"1"});//this获取的是当前鼠标移入的元素，设置黑色边框
+		var imgsrc=$(this).attr("src");//获取当前鼠标移入元素的src属性值将其赋值给主图元素
+		$(".show").attr("src",imgsrc);
+		$(".showlarge img").attr("src",imgsrc);//将鼠标选中的图传给放大图元素的src属性
+	});
+	//鼠标移入产品主图时出现放大的细节图和小框 
+	$(".showimg").mouseenter(function(){
+		$(".showbox").show();
+		$(".showlarge").show();
+	});
+	//鼠标在产品主图移动事件
+	$(".showimg").mousemove(function(e){
+		var mousex=e.clientX;//获取鼠标当前对于浏览器可视区的X坐标
+		var mousey=e.clientY;
+		var imgx=$(".showimg").offset().left;//获得产品主图对于文档的偏移坐标
+		var imgy=$(".showimg").offset().top;
+		//小框的left值是鼠标位移减去产品图元素偏移坐标减去小框宽度的一半，使鼠标保持位于小框的中间
+		var boxleft=mousex-imgx-$(".showbox").width()/2;//计算小框对于产品主图元素的距离用来定位
+		var boxtop=mousey-imgy-$(".showbox").height()/2;
+		//鼠标移动小框位置跟着变化
+		$(".showbox").css({"top":boxtop,"left":boxleft});
+		//计算小框移动的最大范围
+		var maxtop=$(".showimg").height()-$(".showbox").height();
+		var maxleft=$(".showimg").width()-$(".showbox").width();
+		//判断小框移动的边界
+		if(boxtop<=0){
+			$(".showbox").css("top","0");
+		}else if(boxtop>maxtop){
+			$(".showbox").css("top",maxtop);
+		}
+		if(boxleft<=0){
+			$(".showbox").css("left","0");
+		}else if(boxleft>maxleft){
+			$(".showbox").css("left",maxleft);
+		}
+		//设置放大图的位置偏移量，获取小框偏移量乘放大倍数，注意！！！放大图偏移量应设置为负值
+		var showleft=-$(".showbox").position().left*2;//position()方法返回当前元素相对于父元素的位置（偏移）
+		var showtop=-$(".showbox").position().top*2;
+		//此处获取小框偏移量不应该使用前面计算出来的boxtop和boxleft值，因可能会出现超出移动的边界
+		$(".showlarge img").css({"left":showleft,"top":showtop});
+	});
+	//鼠标离开产品主图元素事件，此处使用mouseleave事件只有在鼠标指针离开被选元素时才会触发，mouseout鼠标指针离开被选元素和其任何子元素都会触发。
+	$(".showimg").mouseleave(function(){
+		$(".showbox").hide();//小框隐藏
+		$(".showlarge").hide();//放大图隐藏
+	});
+	$(".showlarge").mouseenter(function(){
+		$(".showbox").hide();//小框隐藏
+		$(".showlarge").hide();//放大图隐藏
+	});
+});
+</script>
+<script>
+  var isHandlerDirectionTimeID = null;
+  var isHandlerDirection = true;
+    function handlerDirection(direction) {
+      clearTimeout(isHandlerDirectionTimeID);
+      if(isHandlerDirection) {
+        var imgWrapWidth = $(".itemBox").width();
+        var imgWidth = $(".imgWrap").width();
+        var imgLeft = $(".imgWrap").position().left;
+        var imgItemWidth = 95;
+        var difference = imgWidth - imgWrapWidth;
+        switch (direction) {
+          case "left":
+            if (imgLeft >= 0) {
+              return false;
+            }
+            $(".product-img .itemBox .imgWrap").animate({left:(imgLeft += imgItemWidth) + "px"});
+            break;
+          case "right":
+            if (imgLeft <= -difference) {
+              return false;
+            }
+            $(".product-img .itemBox .imgWrap").animate({left:(imgLeft -= imgItemWidth) + "px"});
+            break;
+          }
+          isHandlerDirection = false
+      }
+      isHandlerDirectionTimeID = setTimeout(function() {
+        isHandlerDirection = true
+      }, 500)
+    }
+</script>
+<script>
+  $(function () {
+    var options = {
+        handlerID: 'fuzhi',
+        textID: 'fuzhi',
+        isAttr: true,
+        type:'copy'
+      }
+      try {
+        if(ClipboardJS) {
+          options.Clipboard = ClipboardJS
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    // 复制
+    var c1 = new ClipBoard(options);
+    // 返回
+    $(".fanhui").click(function () {
+      location.href = "/"
+    })
+    // 分享
+    $(".fenxiang").click(function () {
+      c1.attach(); // 触发复制/剪切功能
+    })
+    // 打开3D事件
+    $(".product3D").click(function () {
+      $("#open3D").click();
+      $("#imageFullScreen").css({
+        width: "100%",
+        height: "100%"
+      })
+    })
+  })
+</script>
+<script>
+  var keyGuid = window.localStorage.getItem("keyGuid");
+  $(function () {
+    $.get("https://hall.toysbear.com/api/Manufacturer/ManufacturerInfo?keyGuid=" + (keyGuid || "BE9757F5-E2B7-43DC-BABC-09251BCE3C72"), function (res) {
+      if(res.Code == 1) {
+        var factoryInfo = res.Data;
+        // 厂商
+        var html = template(document.getElementById('factoryTp').innerHTML, {
+          data: factoryInfo
+        });
+        document.getElementById("ma_na").innerHTML = html;
+        // 联系人
+        var html = template(document.getElementById('linkmanTp').innerHTML, {
+          data: factoryInfo
+        });
+        document.getElementById("linkman").innerHTML = html;
+        // 联系电话
+        var html = template(document.getElementById('handsetTp').innerHTML, {
+          data: factoryInfo
+        });
+        document.getElementById("handset").innerHTML = html;
+      } else {
+        alert(res.Message);
+      }
+    });
+    var CompanyNumber = window.localStorage.getItem("CompanyNumber");
+    $.get("https://hall.toysbear.com/api/Product/ProductInfo?companyNumber=" + (CompanyNumber || "TY000001"), function (res) {
+       if(res.Code === 1) {
+        var productValue = res.Data;
+        // 面包屑
+        var html = template(document.getElementById('branchTp').innerHTML, {
+            data: productValue
+          });
+          document.getElementById("activeRoute").innerHTML = html;
+        // 产品图片
+        var html = template(document.getElementById('imgTp').innerHTML, {
+            data: productValue
+          });
+          document.getElementById("showImgID").innerHTML = html;
+        // 缩略图
+        var html = template(document.getElementById('minImgTp').innerHTML, {
+            data: productValue
+          });
+          document.getElementById("imgWrap").innerHTML = html;
+        // 放大图
+        var html = template(document.getElementById('bigTp').innerHTML, {
+            data: productValue
+          });
+          document.getElementById("showlarge").innerHTML = html;
+        // 产品信息
+        var html = template(document.getElementById('productInfoTp').innerHTML, {
+            data: productValue
+          });
+          document.getElementById("rightContext").innerHTML = html;
+          var options = {
+            handlerID: 'fuzhi',
+            textID: 'fuzhi',
+            isAttr: true,
+            type:'copy'
+          }
+          try {
+            if(ClipboardJS) {
+              options.Clipboard = ClipboardJS
+            }
+          } catch (err) {
+            console.log(err);
+          }
+          // 复制
+          var c1 = new ClipBoard(options);
+          // 返回
+          $(".fanhui").click(function () {
+            location.href = "/"
+          })
+          // 分享
+          $(".fenxiang").click(function () {
+            c1.attach(); // 触发复制/剪切功能
+          })
+          // console.log(productValue);
+          $.get("https://hall.toysbear.com/api/Product/ProductList", { keyWord: productValue.ProductName.substring(0, 2), pageIndex: 1, pageSize: 8 }, function (result) {
+            if(result.Code === 1) {
+              var productList = result.Data.ProductInfo.Items
+            // 渲染其他产品
+            var html = template(document.getElementById('otherTp').innerHTML, {
+                list: productList
+              });
+              document.getElementById("otherItemBox").innerHTML = html;
+              $(".otherItem").click(function (e) {
+                console.log(productList[e.currentTarget.getAttribute("value")]);
+                var currentProductDetails = productList[e.currentTarget.getAttribute("value")];
+                // var currentUser = userList[];
+                window.localStorage.setItem("CompanyNumber", currentProductDetails.CompanyNumber);
+                window.open(location.href);
+              })
+            } else {
+              alert(result.Message)
+            }
+          });
+       } else {
+         alert(res.Message)
+       }
+       window.localStorage.removeItem("CompanyNumber");
+    });
+  })
+</script>
+</html>

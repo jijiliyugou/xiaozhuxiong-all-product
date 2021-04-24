@@ -32,6 +32,7 @@
     </div>
     <div class="noticeContent">
       <waterfall
+        v-show="findList.length"
         :col="col"
         ref="findListRef"
         :data="findList"
@@ -384,7 +385,7 @@ export default {
       currentPage: 1,
       pageSize: 20,
       totalCount: 0,
-      col: document.documentElement.clientWidth < 1920 ? 2 : 3
+      col: 3
     };
   },
   methods: {
@@ -436,27 +437,39 @@ export default {
     },
     // 删除我的公告
     async deleteMyNotice(val) {
-      const res = await this.$http.post("/api/DeleteBearBotice", {
-        id: val.bearNotice.id
-      });
-      if (res.data.result.code === 200) {
-        this.$common.handlerMsgState({
-          msg: "删除成功",
-          type: "success"
-        });
-        for (let i = 0; i < this.findList.length; i++) {
-          if (val.bearNotice.id == this.findList[i].bearNotice.id) {
-            this.findList.splice(i, 1);
-            this.showActive = false;
-            break;
+      this.$confirm("确定要删除吗?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const res = await this.$http.post("/api/DeleteBearBotice", {
+            id: val.bearNotice.id
+          });
+          if (res.data.result.code === 200) {
+            this.$common.handlerMsgState({
+              msg: "删除成功",
+              type: "success"
+            });
+            for (let i = 0; i < this.findList.length; i++) {
+              if (val.bearNotice.id == this.findList[i].bearNotice.id) {
+                this.findList.splice(i, 1);
+                this.showActive = false;
+                break;
+              }
+            }
+          } else {
+            this.$common.handlerMsgState({
+              msg: res.data.result.msg,
+              type: "danger"
+            });
           }
-        }
-      } else {
-        this.$common.handlerMsgState({
-          msg: res.data.result.msg,
-          type: "danger"
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "已取消删除",
+            type: "warning"
+          });
         });
-      }
     },
     // 解决图片不加载问题
     upImage() {
@@ -761,19 +774,17 @@ export default {
           delete fd[key];
         }
       }
-      const res = await this.$http.post("/api/BearNoticePage", fd);
+      const res = await this.$http.post("/api/BearNoticePagev2", fd);
       if (res.data.result.code === 200) {
         this.$emit("getNoticeUnreadTotal");
         if (flag) {
-          this.findList = this.findList.concat(
-            res.data.result.item.result.items
-          );
+          this.findList = this.findList.concat(res.data.result.item.items);
         } else {
-          this.findList = res.data.result.item.result.items;
+          this.findList = res.data.result.item.items;
           this.loading = false;
           this.$waterfall.forceUpdate();
         }
-        this.totalCount = res.data.result.item.result.totalCount;
+        this.totalCount = res.data.result.item.totalCount;
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -810,11 +821,11 @@ export default {
   watch: {
     scrollTop(val) {
       console.log(val);
-    },
-    fullWidth(val) {
-      if (val < 1920) this.col = 2;
-      this.fullWidth = val;
     }
+    // fullWidth(val) {
+    //   if (val < 1920) this.col = 2;
+    //   this.fullWidth = val;
+    // }
   }
 };
 </script>
@@ -904,12 +915,15 @@ export default {
   }
   .noticeContent {
     height: calc(100% - 85px);
+    width: 1660px;
+    min-width: 1660;
     position: relative;
     overflow: hidden;
     padding-right: 20px;
     padding-bottom: 20px;
     border-radius: 4px;
     .vue-waterfall {
+      width: 1640px;
       &::-webkit-scrollbar {
         // 谷歌隐藏滚动条
         display: none;

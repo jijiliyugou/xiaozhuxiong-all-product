@@ -11,19 +11,16 @@
     </div>
     <div class="Graphic" v-if="productDetail">
       <div class="left">
-        <div class="swiperList">
+        <div
+          class="swiperList"
+          @click="openImgView(productDetail.bearProduct.imageUrl)"
+        >
           <el-image
             fit="contain"
             :src="
               productDetail &&
                 productDetail.bearProduct &&
                 productDetail.bearProduct.imageUrl
-            "
-            :preview-src-list="
-              productDetail.imglist &&
-                productDetail.imglist.map(
-                  val => val && val.imgUrl.replace(/_MiddlePic/, '_Photo')
-                )
             "
           >
             <div slot="placeholder" class="image-slot">
@@ -300,6 +297,23 @@ export default {
     };
   },
   methods: {
+    // 查看大图
+    openImgView(imageUrl) {
+      console.log(imageUrl);
+      this.$PreviewPic({
+        zIndex: 9999, // 组件的zIndex值 默认为2000
+        index: 0, // 展示第几张图片 默认为0
+        list: [imageUrl], // 需要展示图片list
+        onClose: i => {
+          // 关闭时的回调
+          console.log(i);
+        },
+        onSelect: i => {
+          // 点击某张图片的回调
+          console.log(i);
+        }
+      });
+    },
     // 查积分
     async getIntegralTotal() {
       const res = await this.$http.post("/api/GetIntegralTotal", {});

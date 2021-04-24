@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="exportBox">
     <el-card class="box-card">
       <div
         slot="header"
@@ -221,6 +221,7 @@ export default {
     },
     // 导出模板
     exportOrder(type) {
+      this.$store.commit("handlerIsJindu", true);
       // this.options.templateType = type;
       const fd = {
         excelExportWay: this.exportWay,
@@ -253,6 +254,10 @@ export default {
             URL.revokeObjectURL(link.href); // 释放URL 对象
             document.body.removeChild(link);
           }
+          this.$store.commit("handlerIsJindu", false);
+        })
+        .catch(() => {
+          this.$store.commit("handlerIsJindu", false);
         });
     }
   },

@@ -50,6 +50,13 @@
         display: flex;
         align-items: center;
         color: #2B6AA8;
+        @{deep} .el-image {
+          .el-image__inner--center {
+            transform: none;
+            margin-left: -38px;
+            margin-top: -38px;
+          }
+        }
         .titleBox{
           margin-left: 20px;
           .chTitle{
@@ -211,9 +218,17 @@
           .imgBox{
             width: 273px;
             height: 121px;
-            .hallLogo{
+            @{deep} .hallLogo{
               width: 273px;
               height: 121px;
+              position: relative;
+              img {
+                width: 273px !important;
+                height: 121px !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+              }
             }
           }
           .hallName{
@@ -240,9 +255,17 @@
           .imgBox{
             width: 127px;
             height: 70px;
-            .hallLogo{
+            @{deep} .hallLogo{
               width: 127px;
               height: 70px;
+              position: relative;
+              img {
+                width: 127px !important;
+                height: 70px !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+              }
             }
           }
           .hallName{
@@ -276,9 +299,17 @@
         .imgBox{
           width: 180px;
           height: 136px;
-          .hallLogo{
+          @{deep} .hallLogo{
             width: 180px;
             height: 136px;
+            position: relative;
+            img {
+              width: 180px !important;
+              height: 136px !important;
+              position: absolute;
+              left: 0;
+              top: 0;
+            }
           }
         }
         .contentText{

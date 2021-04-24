@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=7">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/erpProduct/static/images/favicon.ico">
+  <title>小竹熊云科技</title>
+  <link rel="stylesheet" href="/erpProduct/erpProduct/static/css/base.css">
+  <link rel="stylesheet" href="./erpLoginConfirm.css">
+  <script src="/erpProduct/static/js/jquery-1.8.3.min.js"></script>
+  <script src="/erpProduct/static/js/json2.js"></script>
+  <script src="/erpProduct/static/js/template.js"></script>
+  <script src="/erpProduct/static/js/myLocalStorage.js"></script>
+</head>
+
+<body>
+  <div id="erpLoginConfirm">
+    <div class="header">
+      <div class="toplauot">
+        <div class="left">
+          <img class="leftImg" src="/erpProduct/static/images/logo.png" alt="">
+          <div class="titleBox">
+            <div class="chTitle">
+              小竹熊订单同步管理
+            </div>
+            <div class="enTitle">
+              Shenzhen Little Bamboo Bear Technology co.,Ltd.
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="loginBtn">登录系统</div>
+          <div class="shouyeBox">
+            <i class="mySampleIcon"></i>
+            <span class="sampleText">
+              我的订单
+            </span>
+          </div>
+          <div class="toHome">
+            <i class="homeIcon"></i>
+            <span class="homeText">首页</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 选角色内容 -->
+    <div class="userInfoWrap">
+      <div class="userInfoBox" id="tpUserWrap">
+        <div class="userIten">
+          <div class="leftImg">
+            <img src="/erpProduct/static/images/logo.png" alt="">
+          </div>
+          <div class="rightContent">
+            <p>小竹熊云科技</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<!-- 用户角色 -->
+<script id="userItem" type="text/html">
+  <%for(var i = 0; i < list.length; i++) {%>
+    <div class="userIten" value="<%=i%>">
+      <div class="leftImg">
+        <img src="<%=list[i].companyLogo%>" alt="">
+      </div>
+      <div class="rightContent">
+        <p><%=list[i].companyName%></p>
+      </div>
+    </div>
+  <%}%>
+</script>
+
+</html>
+<script>
+  $(function () {
+    var baseUrl = "https://www.toysbear.com";
+    var token = window.localStorage.getItem("token");
+    var userList = JSON.parse(window.localStorage.getItem("userList"));
+    var userId = JSON.parse(window.localStorage.getItem("userId"));
+
+    var html = template(document.getElementById('userItem').innerHTML, {
+      list: userList || []
+    });
+    document.getElementById("tpUserWrap").innerHTML = html;
+    $(".userIten").click(function (e) {
+      var currentUser = userList[e.currentTarget.getAttribute("value")];
+      $.ajax({
+        type: "post",
+        url: baseUrl + "/api/UserAffiliateCompany",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+          UserId: userId,
+          CompanyNumber: currentUser.companyNumber
+        }),
+        headers: {
+          Utoken: token
+        }
+      }).then(function (res) {
+        if (res.result.isLogin) {
+          window.localStorage.setItem("token", res.result.accessToken);
+          window.location.href = 'https://www.toysbear.com/erpProduct/erpPage/erpOrder/erpOrder.html';
+        } else {
+          alert(res.result.message);
+        }
+      });
+    })
+    $(".toHome").click(function () {
+      window.location.href = 'https://www.toysbear.com/erpProduct/erpPage/erpHome/erpHome.html';
+    })
+  })
+</script>

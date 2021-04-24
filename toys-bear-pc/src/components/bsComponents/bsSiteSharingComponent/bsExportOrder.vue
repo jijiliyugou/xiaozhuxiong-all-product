@@ -197,10 +197,7 @@ export default {
     },
     // 导出模板
     exportOrder(type) {
-      // const fd = {
-      //   templateType: type,
-      //   shareOrderNumber: this.orderNumber
-      // };
+      this.$store.commit("handlerIsJindu", true);
       const fd = {
         excelExportWay: this.exportWay,
         imageExportWay: this.imageExportWay ? this.imageExportWay : 0,
@@ -214,7 +211,6 @@ export default {
         })
         .then(res => {
           const time = getCurrentTime();
-          // const fileName = this.customerName + "_" + time + ".xlsx";
 
           const exeName = this.customerName + "_" + time + ".xlsx";
           const zipName = this.customerName + "_" + time + ".zip";
@@ -235,6 +231,10 @@ export default {
             URL.revokeObjectURL(link.href); // 释放URL 对象
             document.body.removeChild(link);
           }
+          this.$store.commit("handlerIsJindu", false);
+        })
+        .catch(() => {
+          this.$store.commit("handlerIsJindu", false);
         });
     }
   },

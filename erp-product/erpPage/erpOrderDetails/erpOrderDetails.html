@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=7">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小竹熊云科技</title>
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1900734_z8ej4ls4eca.css">
+  <link rel="stylesheet" href="/erpProduct/static/css/base.css">
+  <link href="./erpOrderDetails.css" rel="stylesheet" type="text/css" />
+  <script src="/erpProduct/static/js/jquery-1.8.3.min.js"></script>
+  <script src="/erpProduct/static/js/template.js"></script>
+  <script src="/erpProduct/static/js/json2.js"></script>
+</head>
+
+<body>
+  <div class="erpOrderDetails">
+    <!-- 头部 -->
+    <div class="toplauotBox">
+      <div class="toplauot">
+        <div class="left">
+          <img src="/erpProduct/static/images/logo.png" alt="">
+          <div class="titleBox">
+            <div class="chTitle">
+              小竹熊订单同步管理
+            </div>
+            <br>
+            <div class="enTitle">
+              Shenzhen Little Bamboo Bear Technology co.,Ltd.
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="shouyeBox ">
+            <div class=" userImg">
+              <img class="homeIcon" src="/erpProduct/static/images/erpHomeIcon.png" alt="">
+            </div>
+            <span class="homeText" onclick="toHome()">首页</span>
+          </div>
+          <div class="shouyeBox " @click="resetSample">
+            <div class=" userImg">
+              <img class="homeIcon" src="/erpProduct/static/images/activeSampleIcon.png" alt="">
+            </div>
+            <span class="sampleText">
+              我的订单
+            </span>
+          </div>
+          <!-- <div class="loginBtn" @click="toLogins">登录系统</div> -->
+          <div class="shouyeBox ">
+            <div class="userImg">
+              <img class="homeLogo" src="/erpProduct/static/images/logo.png" alt="">
+            </div>
+            <span class="signOut" onclick="signOut()">退出</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="myTable">
+      <div class="toploautMain">
+        <div class="left">
+          <img class="homeLogo" src="/erpProduct/static/images/logo.png" alt="">
+        </div>
+
+        <div class="right">
+          <div class="addrs" id="fromCompanyNameDataVal">
+            <script id="fromCompanyName" type="text/html">
+              <%=fromCompanyName%>
+            </script>
+          </div>
+          <div class="sampleDetail">
+            <div class="item">
+              <div class="title">本次代号：
+                <span id="the_nuVal">
+                  <script id="the_nu" type="text/html">
+                    <%=the_nu%>
+                       </script>
+                </span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="title">订单编号：
+                <span id="numberVal">
+                  <script id="number" type="text/html">
+                    <%=number%>
+                       </script>
+                </span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="title">产品款数：
+                <span id="orderCountVal">
+                  <script id="orderCount" type="text/html">
+                    <%=orderCount%>
+                       </script>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="sampleDetail">
+            <div class="item">
+              <div class="title">厂商数量：
+                <span id="supplierCountVal">
+                  <script id="supplierCount" type="text/html">
+                    <%=supplierCount%>
+                       </script>
+                </span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="title">日期：</div>
+              <span id="happenDateVal">
+                <script id="happenDate" type="text/html">
+                  <%=happenDate%>
+                     </script>
+              </span>
+            </div>
+            <div class="item">
+              <div class="title">是否导入：</div>
+              <input class="checkbox" type="checkbox" name="vehicle" value="true"> 是
+            </div>
+            <div class="item fanhui" style="cursor: pointer;" onclick="fanhui()">
+              <i class="iconfont icon-fanhui" style="margin-right: 5px;"></i>
+              返回
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- table表格区 -->
+      <div class="tableBox">
+        <div class="flowTable">
+          <table id="example" class="display" style="width:100%">
+            <thead>
+              <tr>
+                <th rowspan="2" class="text-center">图片</th>
+                <th rowspan="2" class="text-center">产品名称</th>
+                <th rowspan="2" class="text-center">公司编号</th>
+                <th rowspan="2" class="text-center">货号</th>
+                <th rowspan="2" class="text-center">包装</th>
+                <th rowspan="2" class="text-center">内盒/装箱数</th>
+                <th rowspan="2" class="text-center">出厂价</th>
+                <th rowspan="2" class="text-center thDete ">
+                  <div class="thTxt"> 价钱</div>
+                  <div class="triangle">
+                    <p onclick="sortDete(1)" class="topS"></p>
+                    <p onclick="sortDete(2)" class="btoS"></p>
+                  </div>
+                </th>
+                <th colspan="3" class="text-center thWidth">产品规格
+                </th>
+                <th colspan="3" class="text-center thWidth">包装规格</th>
+                <th colspan="3" class="text-center thWidth">外箱规格</th>
+                <th rowspan="2" class="text-center">体积</th>
+                <th rowspan="2" class="text-center">材积</th>
+                <th rowspan="2" class="text-center">毛重</th>
+                <th rowspan="2" class="text-center">净重</th>
+                <th rowspan="2" class="text-center">备注</th>
+                <th rowspan="2" class="text-center">厂家名称</th>
+                <th rowspan="2" class="text-center">厂商联系方式</th>
+                <th rowspan="2" class="text-center">厂家编号</th>
+              </tr>
+              <tr>
+                <th class="text-center">长</th>
+                <th class="text-center">宽 </th>
+                <th class="text-center">高 </th>
+                <th class="text-center">长</th>
+                <th class="text-center">宽 </th>
+                <th class="text-center">高 </th>
+                <th class="text-center">长</th>
+                <th class="text-center">宽 </th>
+                <th class="text-center">高 </th>
+              </tr>
+            </thead>
+            <tbody id="tbodyData">
+
+            </tbody>
+          </table>
+        </div>
+        <!-- 二维码下载 -->
+        <div class="qr">
+          <div class="qrImg">
+            <img src="/erpProduct/static/images/ErWeiMa.png" alt="">
+          </div>
+          <p>扫码下载</p>
+          <p>小竹熊APP</p>
+        </div>
+      </div>
+      <!-- 分页 -->
+      <div class="pageBox">
+        <ul>
+            <li style="border: 0;"> <select id="changePage" onChange="handelChangePage()">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+              </select></li>
+          <li style="border: 0;"> 共</li>
+          <li style="border: 0;">
+            <input id="totalCountPage" type="text" value="0">
+          </li>
+          <li style="border: 0;"> 条</li>
+          <li onclick="previousPage()">
+            上一页
+          </li>
+          <li style="margin: 5px 10px;">
+            <input id="numberPage" type="text" value="1">
+          </li>
+          <li onclick="nextPage()">
+            下一页
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="clearfix">
+
+    </div>
+  </div>
+  <!-- 隐藏的输入框 -->
+  <div id="tpYincang">
+    <input id="SampleOrder" placeholder="隐藏域" value="{}" type="hidden">
+  </div>
+</body>
+
+</html>
+<script>
+  var url = "https://www.toysbear.com"
+  var orderNumber = window.localStorage.getItem("orderNumber")
+  var userToken = window.localStorage.getItem("token")
+  var orderType = window.localStorage.getItem("orderType")
+  //页面上字段
+  var the_nu = window.localStorage.getItem("the_nu")
+  var number = window.localStorage.getItem("number")
+  var supplierCount = window.localStorage.getItem("supplierCount")
+  var happenDateSting = window.localStorage.getItem("happenDate")
+  var happenDate = happenDateSting.replace(/[T].*/, "");
+  var orderCount = window.localStorage.getItem("orderCount")
+  // 初始化
+  var data = {
+    skipCount: 1,
+    maxResultCount: 10,
+    sampleNumber: orderNumber,
+    orderType: orderType
+  }
+  switch (the_nu) {
+    case "":
+    case null:
+    case undefined:
+    case "null":
+    case "undefined":
+      the_nu = " "
+      break;
+    default:
+      var the_nutHTML = template(document.getElementById('the_nu').innerHTML, {
+        the_nu: the_nu
+      });
+      document.getElementById("the_nuVal").innerHTML = the_nutHTML;
+  }
+
+  switch (number) {
+    case "":
+    case null:
+    case undefined:
+    case "null":
+    case "undefined":
+      number = " "
+      break;
+    default:
+      var numberHTML = template(document.getElementById('number').innerHTML, {
+        number: number
+      });
+      document.getElementById("numberVal").innerHTML = numberHTML;
+  }
+  switch (orderCount) {
+    case "":
+    case null:
+    case undefined:
+    case "null":
+    case "undefined":
+      orderCount = " "
+      break;
+    default:
+      var orderCountHTML = template(document.getElementById('orderCount').innerHTML, {
+        orderCount: orderCount
+      });
+      document.getElementById("orderCountVal").innerHTML = orderCountHTML;
+  }
+  switch (supplierCount) {
+    case "":
+    case null:
+    case undefined:
+    case "null":
+    case "undefined":
+      supplierCount = " "
+      break;
+    default:
+      var supplierCountHTML = template(document.getElementById('supplierCount').innerHTML, {
+        supplierCount: supplierCount
+      });
+      document.getElementById("supplierCountVal").innerHTML = supplierCountHTML;
+  }
+
+  switch (happenDate) {
+    case "":
+    case null:
+    case undefined:
+    case "null":
+    case "undefined":
+      happenDate = " "
+      break;
+    default:
+
+      var happenDateHTML = template(document.getElementById('happenDate').innerHTML, {
+        happenDate: happenDate
+      });
+      document.getElementById("happenDateVal").innerHTML = happenDateHTML;
+  }
+
+
+  // 选中数据
+  var selectFormValue = {
+    orderType: "",
+    number: "",
+    token: userToken
+  }
+
+  $(document).ready(function () {
+    // //订单标号
+    if (orderNumber) {
+      getSampleOrderDetailPageThree()
+    } else {
+      alert("没有订单编号")
+    }
+  })
+
+  // 请求列表数据
+  function getSampleOrderDetailPageThree() {
+    $.ajax({
+      type: "post",
+      url: url + "/api/SampleOrderDetailPageThree",
+      data: JSON.stringify(data),
+      headers: {
+        "Utoken": userToken//此处放置请求到的用户token
+      },
+      contentType: "application/json; charset=utf-8",
+      success: function (res) {
+        if (res.result.code === 200) {
+          $("#totalCountPage").val(res.result.item.totalCount)
+          getTable(res.result.item.items)
+          orderList = res.result.item.items
+
+        }
+      }
+    });
+  }
+  // 渲染列表
+  function getTable(list) {
+    var tbodyData = document.getElementById('tbodyData');
+    $("#tbodyData").empty();
+    for (var i = 0; i < list.length; i++) {
+      var html = ""
+      switch (list[i].client_nu) {
+        case "":
+        case null:
+        case undefined:
+        case "null":
+        case "undefined":
+          list[i].client_nuValue = "  "
+          break;
+        default:
+          list[i].client_nuValue = list[i].client_nu
+      }
+      switch (list[i].remark) {
+        case "":
+        case null:
+        case undefined:
+        case "null":
+        case "undefined":
+          list[i].remarkValue = "  "
+          break;
+        default:
+          list[i].remarkValue = list[i].remark
+      }
+      switch (list[i].supplierPhone) {
+        case "":
+        case null:
+        case undefined:
+        case "null":
+        case "undefined":
+          list[i].supplierPhoneValue = ""
+          break;
+        default:
+          list[i].supplierPhoneValue = list[i].supplierPhone
+      }
+      switch (list[i].imgUrl) {
+        case "":
+        case null:
+        case undefined:
+        case "null":
+        case "undefined":
+          list[i].imgUrlVal = ""
+          break;
+        default:
+          list[i].imgUrlVal = list[i].imgUrl[0]
+      }
+      html += " <tr>" + "<td> <img class='imgUrl' src=" +  list[i].imgUrlVal + " alt=''></td>" +
+        " <td > " + list[i].pr_na + "</td > " +
+        "<td>" + list[i].client_nuValue + "</td>" + "<td>" + list[i].fa_no + "</td>" +
+        "<td>" + list[i].ch_pa + "</td>" + "<td>" + list[i].in_en + "/" + list[i].ou_lo + "</td > " +
+        "<td>"  + list[i].fa_pr + "</td>" + "<td>" + list[i].cu_de + list[i].ha_in_qu + "</td>" +
+        "<td>" + list[i].pr_le + "</td>" + "<td>" + list[i].pr_wi + "</td>" +
+        "<td>" + list[i].pr_hi + "</td>" +
+        "<td>" + list[i].in_le + "</td>" + "<td>" + list[i].in_wi + "</td>" +
+        "<td>" + list[i].in_hi + "</td>" +
+        "<td>" + list[i].ou_le + "</td>" + "<td>" + list[i].ou_wi + "</td>" +
+        "<td>" + list[i].ou_hi + "</td>" +
+        "<td>" + list[i].bulk_stere + "</td>" + "<td>" + list[i].bulk_feet + "</td>" +
+        "<td>" + list[i].gr_we + "</td>" + "<td>" + list[i].ne_we + "</td>" +
+        "<td >" + list[i].remarkValue + "</td>" + "<td>" + list[i].ma_na + "</td>" +
+        "<td>" + list[i].supplierPhoneValue + "</td>" + "<td>" + list[i].ma_nu + "</td>" +
+        "</tr>"
+      $("#tbodyData").append(html);
+
+    }
+  }
+  // 排序  升序
+  function sortDete(num) {
+    data.sortOrder = 1;
+    switch (num) {
+      case num = 2: // 降序
+        data.sortType = 1;
+        break;
+      case num = 1: // 升序
+        data.sortType = 2;
+        break;
+      default:
+        data.sortOrder = null;
+        data.sortType = null;
+        break;
+    }
+    data.skipCount = 1;
+    getSampleOrderDetailPageThree()
+  }
+  //退出
+  function signOut() {
+    window.localStorage.clear()
+    window.location.href = "https://www.toysbear.com/erpProduct/erpPage/erpLogin/erpLogin.html"
+  }
+  // 返回
+  function fanhui() {
+    window.location.href = "https://www.toysbear.com/erpProduct/erpPage/erpOrder/erpOrder.html"
+  }
+  function toHome() {
+    window.location.href = "https://www.toysbear.com/erpProduct/erpPage/erpHome/erpHome.html"
+  }
+  // 选中是否导出事件
+  function changeCheckBox(e) {
+  }
+  $('input:checkbox[name="vehicle"]').click(function () {
+    var checkValue = $('input:checkbox[name="vehicle"]:checked').val();
+    if (checkValue) {
+      selectFormValue = {
+        orderType: orderType,
+        number: orderNumber,
+        token: userToken
+      }
+    } else {
+      selectFormValue = {
+        orderType: "",
+        number: "",
+        token: userToken
+      }
+    }
+    $("#SampleOrder").val(JSON.stringify(selectFormValue))
+  });
+
+  // var table = document.getElementById("tbodyData");//获取第一个表格  
+  // var trList = table.getElementsByTagName("tr")
+  // // 鼠标滑入备注
+  // function onmouseoverShow(index) {
+  //   console.log(index, "滑入");
+  //   if (trList.length > 0) {
+  //     var td = trList[index].getElementsByTagName("td")
+  //     for (var i = 0; i < td.length; i++) {
+  //       if (td[i].className == "trHidden") {
+  //         td[i].classList.remove("trHidden")
+  //         td[i].classList.add("show")
+  //       }
+  //     }
+  //   }
+  // }
+  // // 鼠标滑出备注
+  // function onmouseoutHidden(index) {
+  //   console.log(index, "划出");
+  //   if (trList.length > 0) {
+  //     var td = trList[index].getElementsByTagName("td")
+  //     for (var i = 0; i < td.length; i++) {
+  //       if (td[i].className == "show") {
+  //         td[i].classList.remove("show")
+  //         td[i].classList.add("trHidden")
+  //       }
+  //     }
+  //   }
+  // }
+  //分页条数
+  function handelChangePage(){
+      data.maxResultCount = $("#changePage").val()
+      getSampleOrderDetailPageThree()
+  }
+  // 上一页
+  function previousPage() {
+    var numberPage = $("#numberPage").val()
+    numberPage--
+    if (numberPage < 1) {
+      alert("已经是第一页了");
+      $("#numberPage").val(1);
+    } else {
+      $("#numberPage").val(numberPage)
+      data.skipCount = numberPage;
+      getSampleOrderDetailPageThree()
+    }
+  }
+  // 下一页
+  function nextPage() {
+    var numberPage = $("#numberPage").val()
+    if (orderList.length < data.maxResultCount) {
+      return false
+    } else {
+      numberPage++
+      $("#numberPage").val(numberPage)
+      var totalCount = $("#totalCountPage").val()
+      // var num = numberPage--;
+      // $("#numberPage").val(num)
+      // data.skipCount = num;
+      if (numberPage * data.maxResultCount > totalCount) {
+        if (numberPage >= Math.ceil(totalCount / data.maxResultCount) + 1) {
+          numberPage--;
+          $("#numberPage").val(numberPage)
+          return false
+        }
+      }
+      data.skipCount = numberPage;
+      getSampleOrderDetailPageThree();
+    }
+
+
+  }
+</script>

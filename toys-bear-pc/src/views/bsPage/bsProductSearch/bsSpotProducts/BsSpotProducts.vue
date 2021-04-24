@@ -12,14 +12,15 @@
     </div>
     <div class="searchBox">
       <div class="left">
-        <div class="item">
+        <div class="item" style="min-width:350px">
           <span class="label">关键字：</span>
           <el-input
+            v-focus
             type="text"
             size="medium"
             clearable
             v-model="keyword"
-            placeholder="请输入关键词"
+            placeholder="输入关键词+空格可模糊搜索"
             @keyup.native.enter="search"
           ></el-input>
         </div>
@@ -177,22 +178,11 @@ export default {
   },
   mounted() {
     // 取消收藏
-    eventBus.$on("resetProducts", list => {
-      if (list.length) {
-        for (let i = 0; i < this.tableData.length; i++) {
-          for (let j = 0; j < list.length; j++) {
-            if (this.tableData[i].productNumber == list[j].productNumber) {
-              this.tableData[i].isFavorite = true;
-              break;
-            } else {
-              this.tableData[i].isFavorite = false;
-            }
-          }
+    eventBus.$on("resetProducts", item => {
+      for (let i = 0; i < this.tableData.length; i++) {
+        if (this.tableData[i].productNumber == item.productNumber) {
+          this.tableData[i].isFavorite = item.isFavorite;
         }
-      } else {
-        this.tableData.forEach(val => {
-          val.isFavorite = false;
-        });
       }
     });
     // 删除购物车
@@ -219,6 +209,9 @@ export default {
     ...mapGetters({
       shoppingList: "myShoppingList"
     })
+  },
+  beforeDestroy() {
+    eventBus.$off("resetProducts");
   }
 };
 </script>

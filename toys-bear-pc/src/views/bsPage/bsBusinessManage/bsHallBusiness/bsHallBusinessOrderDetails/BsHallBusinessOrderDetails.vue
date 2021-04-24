@@ -4,40 +4,42 @@
     <ul class="customerInfoBox">
       <div class="infoTop">
         <div class="itemBox">
-          <span>择样类型：</span>
+          <span class="itemTitle">择样类型：</span>
           <span class="type"
             ><span>{{ item.hall_na }}：</span
             >{{ item.messageExt | switchMessageExt }}</span
           >
         </div>
         <div class="itemBox">
-          <span>展厅名称：</span>
+          <span class="itemTitle">展厅名称：</span>
           <span class="name">{{ item.hall_na }}</span>
         </div>
         <div class="itemBox">
-          <span>本次代号：</span>
+          <span class="itemTitle">本次代号：</span>
           <span class="orderNumber">{{ item.the_nu }}</span>
         </div>
         <div class="itemBox">
-          <span>状态：</span>
+          <span class="itemTitle">状态：</span>
           <span class="orderNumber" v-if="item.readStatus == 0">未读</span>
           <span class="orderNumber" v-if="item.readStatus == 1">已读</span>
         </div>
       </div>
       <div class="infoBottom">
         <div class="itemBox">
-          <span>择样时间：</span>
+          <span class="itemTitle">择样时间：</span>
           <span class="orderNumber">
             {{ item.happenDate && item.happenDate.replace(/T/, " ") }}
           </span>
         </div>
         <div class="itemBox">
-          <span>择样单号：</span>
+          <span class="itemTitle">择样单号：</span>
           <span class="orderNumber">{{ item.orderNumber }}</span>
         </div>
-        <div class="itemBox remark">
-          <span>备注：</span>
-          <span class="orderNumber">{{ item.pushContent }}</span>
+      </div>
+      <div class="infoBottom">
+        <div class="itemBox remarkItemBox">
+          <span class="itemTitle">备注：</span>
+          <span class="remark">{{ item.pushContent }}</span>
         </div>
       </div>
     </ul>
@@ -64,13 +66,15 @@
           'font-weight': '400'
         }"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <ex-table-column :autoFit="true" label="产品" width="300">
           <template slot-scope="scope">
             <div class="imgBox">
               <el-image
                 fit="contain"
                 @click.native="goDetails(scope.row)"
-                style="width:80px;height:60px;"
+                style="width: 80px; height: 60px"
                 :src="scope.row.imgUrl && scope.row.imgUrl[0]"
                 :preview-src-list="scope.row.imgUrl || []"
               >
@@ -164,7 +168,7 @@
         </ex-table-column>
         <ex-table-column :autoFit="true" prop="productPrice" label="参考单价">
           <template slot-scope="scope">
-            <span style="color:#f56c6c">
+            <span style="color: #f56c6c">
               {{ scope.row.cu_de + scope.row.fa_pr }}
             </span>
           </template>
@@ -197,7 +201,7 @@
       </div>
     </div>
 
-    <center style="margin-top:20px;">
+    <center style="margin-top: 20px">
       <el-pagination
         layout="total, sizes, prev, pager, next, jumper"
         background
@@ -223,7 +227,7 @@
             orderNumber: item.orderNumber,
             the_nu: item.the_nu,
             name: item.fromCompanyName,
-            api: '/api/GetOfferOrderExcel'
+            api: '/api/GetSampleOrderExcel'
           }"
         />
       </el-dialog>
@@ -304,13 +308,6 @@ export default {
     // 打开选择导出模板
     openSelectTemplate() {
       this.exportTemplateDialog = true;
-      // const str = "http://139.9.71.135:8087/ConversationListIcon.rar";
-      // const link = document.createElement("a");
-      // link.href = str;
-      // link.style.display = "none";
-      // document.body.appendChild(link);
-      // link.click();
-      // document.body.removeChild(link); // 释放元素
     },
     // 获取订单详情总数
     async getERPOrderTotal() {
@@ -422,8 +419,12 @@ export default {
     .infoBottom {
       display: flex;
       .itemBox {
-        flex: 1;
+        width: 300px;
+        min-width: 300px;
         line-height: 34px;
+        .itemTitle {
+          color: #999;
+        }
         &.remark {
           flex: 2;
           overflow: hidden;
@@ -437,6 +438,9 @@ export default {
         .name {
           color: #3368a9;
         }
+      }
+      .remarkItemBox {
+        width: 100%;
       }
     }
   }

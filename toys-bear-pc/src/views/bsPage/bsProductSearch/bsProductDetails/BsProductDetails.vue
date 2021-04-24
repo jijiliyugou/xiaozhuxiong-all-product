@@ -7,18 +7,18 @@
           v-if="productDetail.imgUrlList"
           :middleImgWidth="524"
           :middleImgHeight="393"
-          :thumbnailHeight="55"
-          :thumbnailWidth="78"
+          :thumbnailHeight="65"
+          :thumbnailWidth="96"
           :thumbnailCount="5"
           :imageUrls="productDetail.imgUrlList"
           :videoAddress="productDetail.videoAddress"
         />
       </div>
-      <div class="right" v-if="productDetail.bearProduct">
+      <div class="right">
         <div class="context">
           <div class="productName">
             <span
-              >{{ productDetail.bearProduct.name
+              >{{ productDetail.name
               }}<i class="newIcon" v-if="productDetail.isNew">新品</i>
               <i class="nowIcon" v-if="productDetail.isSpotGoods">现货</i>
               <i class="vipIcon" v-if="productDetail.isVip">VIP</i></span
@@ -27,65 +27,63 @@
           <div class="priceWrap">
             参考单价：
             <span class="priceBox"
-              >{{ productDetail.bearProduct.cu_de
-              }}<span class="price">{{
-                productDetail.bearProduct.price
-              }}</span></span
+              >{{ productDetail.cu_de
+              }}<span class="price">{{ productDetail.price }}</span></span
             >
           </div>
           <div class="textWrap">
             <div class="left">
               <div class="itemText">
-                出厂货号：<span>{{ productDetail.bearProduct.fa_no }}</span>
+                出厂货号：<span>{{ productDetail.fa_no }}</span>
               </div>
               <div class="itemText">
                 产品规格：
                 <span
-                  >{{ productDetail.bearProduct.pr_le }} x
-                  {{ productDetail.bearProduct.pr_wi }} x
-                  {{ productDetail.bearProduct.pr_hi }} (cm)</span
+                  >{{ productDetail.pr_le }} x {{ productDetail.pr_wi }} x
+                  {{ productDetail.pr_hi }} (cm)</span
                 >
               </div>
               <div class="itemText">
                 包装规格：
                 <span
-                  >{{ productDetail.bearProduct.in_le }} x
-                  {{ productDetail.bearProduct.in_wi }} x
-                  {{ productDetail.bearProduct.in_hi }} (cm)</span
+                  >{{ productDetail.in_le }} x {{ productDetail.in_wi }} x
+                  {{ productDetail.in_hi }} (cm)</span
                 >
               </div>
               <div class="itemText">
                 体积/材积：
                 <span
-                  >{{ productDetail.bearProduct.bulk_stere }} (cbm) /
-                  {{ productDetail.bearProduct.bulk_feet }} (cuft)</span
+                  >{{ productDetail.bulk_stere }} (cbm) /
+                  {{ productDetail.bulk_feet }} (cuft)</span
                 >
               </div>
             </div>
             <div class="right">
               <div class="itemText">
-                包装：<span>{{ productDetail.bearProduct.ch_pa }}</span>
+                包装：<span>{{ productDetail.ch_pa }}</span>
               </div>
               <div class="itemText">
                 外箱规格：
                 <span
-                  >{{ productDetail.bearProduct.ou_le }} x
-                  {{ productDetail.bearProduct.ou_wi }} x
-                  {{ productDetail.bearProduct.ou_hi }} (cm)</span
+                  >{{ productDetail.ou_le }} x {{ productDetail.ou_wi }} x
+                  {{ productDetail.ou_hi }} (cm)</span
+                >
+              </div>
+              <div class="itemText">
+                装箱量：
+                <span
+                  >{{ productDetail.in_en }} /
+                  {{ productDetail.ou_lo }} (pcs)</span
                 >
               </div>
               <div class="itemText">
                 毛重/净重：
                 <span
-                  >{{ productDetail.bearProduct.gr_we }} /
-                  {{ productDetail.bearProduct.ne_we }} (kg)</span
+                  >{{ productDetail.gr_we }} /
+                  {{ productDetail.ne_we }} (kg)</span
                 >
               </div>
             </div>
-            <!-- <div class="itemText">
-              内盒/装量：
-              <span>{{ item.in_en }} / {{ item.ou_lo }} (pcs)</span>
-            </div> -->
           </div>
         </div>
         <div class="myCartBox">
@@ -105,35 +103,35 @@
             <span class="newTime">
               上架时间：
               <span>{{
-                productDetail.bearProduct.newTime.replace(/T.*/, "")
+                productDetail.newTime &&
+                  productDetail.newTime.replace(/T.*/, "")
               }}</span>
             </span>
             <span class="stock">
               库存：
-              <span>0</span>
+              <span class="tockValue">--</span>
             </span>
           </p>
           <p>
             产品认证：
-            <i
-              v-if="productDetail.bearProduct.certificateNo"
-              class="proveActiveIcon"
-            ></i>
+            <i v-if="productDetail.certificateNo" class="proveActiveIcon"></i>
             <i v-else class="proveIcon"></i>
-            <span>{{ productDetail.bearProduct.certificateNo }}</span>
+            <span>{{ productDetail.certificateNo }}</span>
           </p>
         </div>
         <!-- 联系方式 -->
         <div class="contactMode">
           <p class="item">
             <i class="factoryIcon"></i>
-            <span>{{ productDetail.supplierName }}</span>
+            <span @click="toFactory(productDetail)">{{
+              productDetail.supplierName
+            }}</span>
           </p>
           <p class="item myHover" @click="toNews(productDetail)">
             <i class="infoIcon"></i>
             <span>在线咨询</span>
           </p>
-          <el-tooltip
+          <!-- <el-tooltip
             class="item"
             effect="dark"
             :content="
@@ -145,7 +143,17 @@
               <i class="phoneIcon"></i>
               <span>联系电话</span>
             </p>
-          </el-tooltip>
+          </el-tooltip> -->
+          <p class="item myHover">
+            <i class="phoneIcon"></i>
+            <span>{{
+              productDetail.supplierPhone || productDetail.exhibitionPhone
+            }}</span>
+          </p>
+          <p class="item myHover" v-if="productDetail.qq">
+            <i class="qqIcon"></i>
+            <span>{{ productDetail.qq }}</span>
+          </p>
           <p class="item myHover" @click="toFactory(productDetail)">
             <i class="shopIcon"></i>
             <span>厂商店铺</span>
@@ -159,11 +167,11 @@
           </p>
           <p class="item">
             展厅编号：
-            <span>{{ productDetail.bearProduct.number }}</span>
+            <span>{{ productDetail.number }}</span>
           </p>
           <p class="item">
             摊位号：
-            <span>{{ productDetail.bearProduct.fa_no }}</span>
+            <span>{{ productDetail.booth_nu_pro }}</span>
           </p>
         </div>
       </div>
@@ -237,6 +245,13 @@ export default {
     },
     // 加购
     handlerShopping(item) {
+      if (this.shoppingList.length >= 500) {
+        this.$common.handlerMsgState({
+          msg: "购物车已满500条",
+          type: "warning"
+        });
+        return;
+      }
       item.isShopping = !item.isShopping;
       if (item.isShopping) {
         item.shoppingCount = 1;
@@ -253,11 +268,12 @@ export default {
           type: "warning"
         });
       }
+      eventBus.$emit("resetMyCart", this.shoppingList);
     },
     // 收藏
     async addCollect(item) {
       const res = await this.$http.post("/api/CreateProductCollection", {
-        productNumber: item.bearProduct.productNumber
+        productNumber: item.productNumber
       });
       if (res.data.result.code === 200) {
         if (item.isFavorite) {
@@ -272,17 +288,18 @@ export default {
           });
         }
         item.isFavorite = !item.isFavorite;
-        eventBus.$emit("resetProductCollection", item);
+        eventBus.$emit("resetProducts", item);
       }
     },
     // 获取产品详情
     async getProductDetails() {
-      const res = await this.$http.post("/api/BearProductByNumber", {
+      const res = await this.$http.post("/api/BearProductByNumberV2", {
         productNumber: this.item.productNumber
       });
       if (res.data.result.code === 200) {
         this.productDetail = res.data.result.item;
-        console.log(this.productDetail);
+        this.productDetail.isShopping = this.item.isShopping;
+        console.log(this.productDetail, "产品详情");
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -303,6 +320,9 @@ export default {
     ...mapGetters({
       shoppingList: "myShoppingList"
     })
+  },
+  beforeDestroy() {
+    eventBus.$off("resetMyCollection");
   }
 };
 </script>
@@ -452,6 +472,9 @@ export default {
           }
           .stock {
             margin-left: 55px;
+            .tockValue {
+              color: #ff3e3e;
+            }
           }
           .proveIcon {
             width: 16px;
@@ -507,6 +530,14 @@ export default {
             margin-right: 15px;
             background: url("~@/assets/images/onlinePhoneIcon.png") no-repeat
               center;
+            background-size: contain;
+          }
+          .qqIcon {
+            min-width: 28px;
+            width: 28px;
+            height: 28px;
+            margin-right: 15px;
+            background: url("~@/assets/images/QQ.png") no-repeat center;
             background-size: contain;
           }
           .shopIcon {
@@ -580,6 +611,10 @@ export default {
       .imgItem {
         width: 100%;
         text-align: center;
+        img {
+          width: 100%;
+          object-fit: contain;
+        }
       }
     }
   }

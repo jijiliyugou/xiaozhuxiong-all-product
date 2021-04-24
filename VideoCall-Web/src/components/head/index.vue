@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-01 14:55:25
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\head\index.vue
- * @LastEditTime: 2021-04-08 16:26:30
+ * @LastEditTime: 2021-04-22 17:46:11
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -22,11 +22,11 @@
                 <div class="center_title">
                     <div class="title">
                         <div class="title_cn">
-                            小竹熊云科技公司
+                            {{companyName}}
                             <i class="iconfont iconzhifeiji" @click="copyUrl"></i>
                         </div>
                         <div class="text">
-                            ID:111111111
+                            ID:{{channel}}
                         </div>
                     </div>    
                 </div>
@@ -50,6 +50,8 @@
     </div>
 </template>
 <script>
+import * as Cookies from "js-cookie";
+import Clipboard from 'clipboard'
 export default {
   name: "Heads",
   components: {
@@ -58,19 +60,33 @@ export default {
   data() {
     return {
       logUrl: require("@assets/default/logo.png"),
-      titleUrl: require("@assets/images/title.webp"),
+      titleUrl: require("@assets/images/title.png"),
+      companyName:"",
+      channel: "",
     };
   },
   methods: {
-      copyUrl(){
-        this.$Message.success({top:250,content:'复制分享链接成功！'});    
-      }
+    copyUrl(){
+        var Url = process.env.VUE_APP_PATH+`/videoMeeting/addMeeting?roomNumber=${this.channel}` // 点击文字复制的地址
+        var clipboard = new Clipboard('.iconzhifeiji', {
+            text: function () {
+                return Url
+            }
+        });
+        clipboard.on('success', e => {
+            this.$Message.success({top:250,content:'复制分享链接成功！'});
+            // 释放内存
+            clipboard.destroy()
+        })
+    }
   },
   created(){
-      this.$Message.config({
+    this.$Message.config({
         top: 50,
         duration: 3
     });
+    this.companyName = Cookies.get("companyName") || "未获取到公司信息";
+    this.channel = Cookies.get("channel") || "未获取到房间号";
   }
 };
 </script>
@@ -130,7 +146,7 @@ export default {
                 margin-left: 10px;
                 display: flex;
                 .qq {
-                    background: url('~@assets/images/qq2.webp');
+                    background: url('~@assets/images/qq2.png');
                     background-repeat: no-repeat;
                     margin-top: 25.5px;
                     width: 13px;

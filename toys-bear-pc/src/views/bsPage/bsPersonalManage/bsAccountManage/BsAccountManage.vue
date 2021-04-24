@@ -4,7 +4,7 @@
     <div class="basicInfo">
       <div class="imgBox">
         <el-avatar
-          style="background-color:#E4EFFF;"
+          style="background-color: #e4efff"
           :size="110"
           :src="myInfo.companyLogo"
         >
@@ -65,11 +65,13 @@
       :header-cell-style="{ backgroundColor: '#f9fafc', color: '#666' }"
       style="width: 100%"
     >
+      <el-table-column label="序号" type="index" align="center" width="70">
+      </el-table-column>
       <el-table-column label="员工" min-width="300">
         <template slot-scope="scope">
           <div class="nameBox">
             <el-avatar
-              style="background-color:#E4EFFF;"
+              style="background-color: #e4efff"
               :size="40"
               :src="scope.row.userImage"
             >
@@ -122,7 +124,11 @@
         label="添加时间"
         min-width="150"
         align="center"
-      ></el-table-column>
+      >
+        <template slot-scope="scope">
+          {{ scope.row.createdOn.replace(/[T].*/, "") }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" min-width="250" align="center">
         <template slot-scope="scope">
           <el-button
@@ -363,7 +369,6 @@ export default {
         this.myInfo = item;
         this.tableData = item.personnels;
         this.totalCount = item.personnels.length;
-        console.log(item);
       } else {
         this.$common.handlerMsgState({
           msg: msg,

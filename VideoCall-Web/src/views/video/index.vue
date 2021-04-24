@@ -3,19 +3,29 @@
  * @Author: gaojiahao
  * @Date: 2021-04-01 16:54:22
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\views\video\index.vue
- * @LastEditTime: 2021-04-09 14:57:29
+ * @LastEditTime: 2021-04-23 15:59:16
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
 -->
 <template>
     <div class="video">
-        <!-- <div class="error">
+        <div class="error">
             <img :src="cameraPic">
             <p class="text">您的设备未检测到摄像头</p> 
-        </div> -->
+        </div>
         <div class="box">
-            <div id="videoBox"></div>
+            <AgoraVideoCall 
+                :videoProfile="videoProfile"
+                :channel="channel"
+                :transcode="transcode"
+                :attendeeMode="attendeeMode"
+                :baseMode="baseMode"
+                :appId="appId"
+                :videoId="videoId"
+                :userlist="userlist"
+                :isAdmin="isAdmin"
+                :uid="uid" ref="video"></AgoraVideoCall>
             <!-- <template v-if="isSelect&&videoList.length==2">
                 <div class="video_wrap">
                     <div :class="[isCollapsed ? 'video_item_2_x':'video_item_2']" v-for="(item,index) in videoList" :key="index">
@@ -54,30 +64,33 @@
             <div class="bg" v-else>
                 <img :src="test" style="width:100%;height:807px;">
             </div> -->
-            <div class="userlist">
-                <div class="user" @click="selectAll(true)"><div class="active"></div></div>
-                <div class="user" @click="selectAll(false)"></div>
-                <div class="user" @click="selectAll(false)"></div>
-                <div class="user" @click="selectAll(false)"></div>
-                <div class="user" @click="selectAll(false)"></div>
-            </div>
         </div>
-        <EndModal></EndModal>
+        <EndModal :isShow="isShow"></EndModal>
     </div> 
 </template>
 <script>
+import * as Cookies from "js-cookie";
 import EndModal from "@components/public/endingMettingModal";
+import AgoraVideoCall from "@components/public/AgoraVideoCall";
+import {AGORA_APP_ID} from "@root/agora.config"
 import videoJs from "@mixins/video.js";
 export default {
     name:'Video',
     components:{
-        EndModal
+        EndModal,
+        AgoraVideoCall
     },
     mixins:[videoJs],
     props:{
         isCollapsed: {
             type: Boolean,
             default: false
+        },
+        userlist: {
+            type: Array,
+            default () {
+                return []
+            }
         },
     },
     data() {
@@ -93,6 +106,15 @@ export default {
                 // {id:5,url:require("@assets/bg/test.jpg")},
                 // {id:6,url:require("@assets/bg/test.jpg")},
             ],
+            videoProfile: Cookies.get("videoProfile").split(",")[0] || "480p_4",
+            channel: Cookies.get("channel") || "test",
+            transcode: Cookies.get("transcode") || "interop",
+            attendeeMode: Cookies.get("attendeeMode") || "video",
+            baseMode: Cookies.get("baseMode") || "avc",
+            uid: Cookies.get("uid") || null,
+            videoId: Cookies.get("videoId") || null,
+            isAdmin: Cookies.get("isAdmin") || false,
+            isShow:false
         };
     },
     methods: {
@@ -104,14 +126,14 @@ export default {
         },
     },
     created() {
-
+        this.appId = AGORA_APP_ID;
     }
 }
 </script>
 <style lang="less" scoped>
     .video{
         width:100%;
-        height: 807px;
+        height: 100%;
         position: relative;
         overflow-y: hidden;
         .error {
@@ -131,7 +153,7 @@ export default {
         .box {
             position: relative;
             width: 100%;
-            height: 807px;
+            height: 100%;
             .userlist {
                 width: 100%;
                 height: 66px;
@@ -149,7 +171,7 @@ export default {
                     border: 1px solid #FFFFFF;
                 }
                 .active {
-                    background: url('~@assets/images/suo.webp');
+                    background: url('~@assets/images/suo.png');
                     background-repeat: no-repeat;
                     width: 97px;
                     height: 64px;

@@ -3,11 +3,12 @@
     <div class="searchInput">
       <span class="label">产品搜索:</span>
       <el-input
+        v-focus
         size="medium"
         ref="focusKeyword"
         @keyup.native.enter="searchProducts"
-        style="width: 340px;margin: 0 15px;"
-        placeholder="请输入关键词"
+        style="width: 340px; margin: 0 15px"
+        placeholder="输入关键词+空格可模糊搜索"
         v-model="searchForm.keyword"
         clearable
       >
@@ -36,11 +37,25 @@
         icon="el-icon-search"
         >搜 索</el-button
       >
+
+      <el-checkbox-group
+        v-model="synthesis"
+        @change="handleSynthesis"
+        style="margin: 0 30px;"
+      >
+        <el-checkbox label="精准查询" name="type"></el-checkbox>
+      </el-checkbox-group>
+      <div class="advancedBox" @click="advancedSearchProducts">
+        高级搜索
+        <i
+          :class="advanced == true ? 'el-icon-arrow-down' : ' el-icon-arrow-up'"
+        ></i>
+      </div>
     </div>
     <el-button type="warning" size="medium" @click="toShoppingCart">
       <i class="whiteCart"></i>
       <span>购物车</span>
-      <span>({{ shoppingList.length }})</span>
+      <span>({{ shoppingList && shoppingList.length }})</span>
     </el-button>
   </div>
 </template>
@@ -51,6 +66,8 @@ import { mapGetters } from "vuex";
 export default {
   data() {
     return {
+      synthesis: false,
+      advanced: true,
       searchForm: {
         keyword: ""
       }
@@ -81,6 +98,10 @@ export default {
       // };
       // this.$store.commit("myAddTab", fd);
     },
+    // 选择综合
+    handleSynthesis() {
+      this.$emit("handleSynthesis");
+    },
     // 去购物车
     toShoppingCart() {
       this.$router.push("/bsIndex/bsShoppingCart");
@@ -92,6 +113,11 @@ export default {
         label: "购物车"
       };
       this.$store.commit("myAddTab", fd);
+    },
+    // 切换高级搜索
+    advancedSearchProducts() {
+      this.advanced = !this.advanced;
+      this.$emit("screeningShow");
     }
   },
   created() {},
@@ -121,6 +147,22 @@ export default {
     flex: 1;
     display: flex;
     align-items: center;
+    .advancedBox {
+      width: 90px;
+      height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      line-height: 36px;
+      cursor: pointer;
+      i {
+        margin-left: 5px;
+        width: 10px;
+        height: 10px;
+        color: #666666;
+        display: inline-block;
+      }
+    }
   }
   .upload-demo {
     margin-top: 7px;

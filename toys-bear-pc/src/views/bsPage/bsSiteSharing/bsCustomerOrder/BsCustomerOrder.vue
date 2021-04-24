@@ -5,6 +5,7 @@
       <div class="item">
         <span class="label">关键字：</span>
         <el-input
+          v-focus
           type="text"
           size="medium"
           v-model="keyword"
@@ -13,19 +14,37 @@
           @keyup.native.enter="search"
         ></el-input>
       </div>
-      <div class="item" style="width:200px;">
+      <div class="item">
         <span class="label">站点：</span>
         <el-select
-          v-model="zhandian"
+          v-model="websiteInfoId"
           size="medium"
           clearable
           placeholder="请选择"
         >
           <el-option
             v-for="item in sitesList"
-            :key="item.value"
-            :label="item.key"
-            :value="item.value"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
+      </div>
+      <div class="item" v-if="userInfo.userInfo.isMain">
+        <span class="label">业务员：</span>
+        <el-select
+          v-model="userId"
+          size="medium"
+          filterable
+          clearable
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in staffList"
+            :key="item.id"
+            :label="item.linkman"
+            :value="item.id"
           >
           </el-option>
         </el-select>
@@ -36,10 +55,10 @@
           size="medium"
           value-format="yyyy-MM-ddTHH:mm:ss"
           v-model="dateTime"
-          type="daterange"
+          type="datetimerange"
           range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          start-placeholder="开始时间"
+          end-placeholder="结束时间"
         >
         </el-date-picker>
       </div>
@@ -57,14 +76,16 @@
     <div class="tableBox">
       <el-table
         :data="tableData"
-        style="width:100%;"
+        style="width: 100%"
         :header-cell-style="{ backgroundColor: '#f9fafc' }"
       >
+        <el-table-column label="序号" type="index" align="center" width="70">
+        </el-table-column>
         <el-table-column prop="orderNumber" label="订单编号" width="220">
           <template slot-scope="scope">
             <div class="orderNumberBox" @click="toOrderDetails(scope.row)">
               <i class="el-icon-tickets"></i>
-              <span style="margin-left: 15px;">
+              <span style="margin-left: 15px">
                 {{ scope.row.orderNumber }}
               </span>
             </div>
@@ -77,13 +98,13 @@
           align="center"
         ></el-table-column>
         <el-table-column
-          prop="shareUrl"
-          width="350"
-          label="网址"
-        ></el-table-column>
-        <el-table-column
           prop="customerName"
           label="客户"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          prop="createdBy"
+          label="业务员"
           align="center"
         ></el-table-column>
         <el-table-column
@@ -98,7 +119,7 @@
           align="center"
         >
           <template slot-scope="scope">
-            <span style="color:#ff0b00;">
+            <span style="color: #ff0b00">
               {{ scope.row.totalAmount }}
             </span>
           </template>
@@ -118,7 +139,7 @@
         <el-table-column label="操作" align="center" width="150">
           <template slot-scope="scope">
             <el-button
-              style="margin-right:10px;"
+              style="margin-right: 10px"
               size="mini"
               type="warning"
               @click="openSelectTemplate(scope.row)"
@@ -127,7 +148,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <center style="padding:20px 0;">
+      <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[10, 20, 30, 40]"
@@ -152,7 +173,11 @@
         <el-card class="box-card">
           <div
             slot="header"
-            style="display:flex; align-items:center; justify-content:space-between"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
           >
             <span class="headerTitle">报出价(带工厂信息)</span>
             <div>
@@ -196,7 +221,11 @@
         <el-card class="box-card">
           <div
             slot="header"
-            style="display:flex; align-items:center; justify-content:space-between"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
           >
             <span class="headerTitle">报出价(不带工厂信息)</span>
             <div>
@@ -240,7 +269,11 @@
         <el-card class="box-card">
           <div
             slot="header"
-            style="display:flex; align-items:center; justify-content:space-between"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
           >
             <span class="headerTitle">出厂价(带工厂信息)</span>
             <div>
@@ -284,7 +317,11 @@
         <el-card class="box-card">
           <div
             slot="header"
-            style="display:flex; align-items:center; justify-content:space-between"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
           >
             <span class="headerTitle">出厂价+报出价+工厂信息</span>
             <div>
@@ -348,11 +385,15 @@
 <script>
 import bsExportOrder from "@/components/bsComponents/bsSiteSharingComponent/bsExportOrder";
 import { getCurrentTime } from "@/assets/js/common/common.js";
+import { mapState } from "vuex";
 export default {
   name: "bsCustomerOrder",
   components: { bsExportOrder },
   data() {
     return {
+      websiteInfoId: null,
+      userId: null,
+      staffList: [],
       imageExportWayList: [
         { value: 0, label: "请选择" },
         { value: 2, label: "按厂商单独导图片" },
@@ -363,7 +404,6 @@ export default {
       exportTemplateDialog: false,
       exportDialog: false,
       currentOrder: {},
-      zhandian: null,
       keyword: null,
       dateTime: null,
       tableData: [],
@@ -376,10 +416,7 @@ export default {
   methods: {
     // 导出模板
     exportOrder(type) {
-      // const fd = {
-      //   templateType: type,
-      //   shareOrderNumber: this.currentOrder.orderNumber
-      // };
+      this.$store.commit("handlerIsJindu", true);
       const fd = {
         excelExportWay: this.exportWay,
         imageExportWay: this.imageExportWay ? this.imageExportWay : 0,
@@ -417,6 +454,10 @@ export default {
             URL.revokeObjectURL(link.href); // 释放URL 对象
             document.body.removeChild(link);
           }
+          this.$store.commit("handlerIsJindu", false);
+        })
+        .catch(() => {
+          this.$store.commit("handlerIsJindu", false);
         });
     },
     // 预览导出模板
@@ -435,13 +476,28 @@ export default {
         }
       });
     },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.$store.state.userInfo.commparnyList[0].commparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
     // 获取列表
     async getSearchCompanyShareOrdersPage() {
       const fd = {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyword: this.keyword,
-        url: this.zhandian,
+        websiteInfoId: this.websiteInfoId,
+        userId: this.userId,
         startTime: this.dateTime && this.dateTime[0],
         endTime: this.dateTime && this.dateTime[1]
       };
@@ -461,12 +517,10 @@ export default {
     },
     // 获取站点列表
     async getDefaultSites() {
-      const res = await this.$http.post("/api/GetDefaultSites", {});
+      const res = await this.$http.post("/api/SearchDropdownWebsiteInfos", {});
+      console.log(res);
       if (res.data.result.code === 200) {
-        this.sitesList = [
-          { key: "全部", value: null },
-          ...res.data.result.item
-        ];
+        this.sitesList = [{ name: "全部", id: null }, ...res.data.result.item];
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -515,9 +569,13 @@ export default {
   },
   created() {
     this.getDefaultSites();
+    this.getStaffList();
   },
   mounted() {
     this.getSearchCompanyShareOrdersPage();
+  },
+  computed: {
+    ...mapState(["userInfo"])
   }
 };
 </script>
