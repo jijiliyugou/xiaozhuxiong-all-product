@@ -42,6 +42,25 @@ function getToken() {
       });
   });
 }
+// 获取系统参数
+function getClientTypeList(type) {
+  return new Promise((result, reject) => {
+    axios
+      .post("/api/ServiceConfigurationList", {
+        basisParameters: type
+      })
+      .then(res => {
+        if (res.data.result.code === 200) {
+          result(res.data.result.item);
+        } else {
+          reject(res.data.result.item);
+        }
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
 // 刷新个人登录信息
 function resetPersonInfo(token) {
   return new Promise((result, reject) => {
@@ -134,47 +153,49 @@ router.beforeEach(async (to, from, next) => {
       console.log("有cookit_token", res, token);
       Vue.prototype.$cookies.remove("userInfo");
       console.log("删除了 cookit_token", token);
-      if (res.data.result.isLogin) {
-        console.log("有登录成功标识符");
-        store.commit("handlerLogin", true);
-        // 设置token
-        store.commit("setToken", res.data.result);
-        store.commit(
-          "setComparnyId",
-          res.data.result.commparnyList[0].commparnyId
-        );
-        const localKey = res.data.result.uid;
-        console.log(localKey);
-        let localShoppingCart = localStorage.getItem(localKey);
-        if (localShoppingCart && localKey != "undefined") {
-          localShoppingCart = JSON.parse(localShoppingCart);
-          store.commit("initShoppingCart", localShoppingCart);
-        } else {
-          store.commit("initShoppingCart", []);
-        }
-        // 登录成功获取系统参数
-        // const Json = {};
-        // Json.MessageRestriction = await getClientTypeList("MessageRestriction");
-        // Json.UserRestrictions = await getClientTypeList("UserRestrictions");
-        // Json.NoticeRestrictions = await getClientTypeList("NoticeRestrictions");
-        // Json.CompanyRestrictions = await getClientTypeList(
-        //   "CompanyRestrictions"
-        // );
-        // Json.PlatForm = await getClientTypeList("PlatForm");
-        // Json.packageManage = await getClientTypeList("packageManage");
-        // console.log(Json);
-        // store.commit("globalJson/setGlobalJson", Json);
-        // 登录成功获取菜单
-        const menus = await getUserRoleMenu(token);
-        if (menus.data.result.code === 200) {
-          store.commit("setRouters", menus.data.result.item.modulesList || []);
-          await getMenuFuc();
-        }
-        next();
+      store.commit("handlerLogin", true);
+      // 设置token
+      store.commit("setToken", res.data.result);
+      store.commit(
+        "setComparnyId",
+        res.data.result.commparnyList[0].commparnyId
+      );
+      const localKey = res.data.result.uid;
+      console.log(localKey);
+      let localShoppingCart = localStorage.getItem(localKey);
+      if (localShoppingCart && localKey != "undefined") {
+        localShoppingCart = JSON.parse(localShoppingCart);
+        store.commit("initShoppingCart", localShoppingCart);
       } else {
-        console.log("刷新token失败");
-        return next({ path: "/login" });
+        store.commit("initShoppingCart", []);
       }
+      // 清空菜单状态
+      const fd = {
+        component: "bsHome",
+        label: "后台首页",
+        linkUrl: "/bsIndex/bsHome",
+        name: "/bsIndex/bsHome",
+        refresh: true
+      };
+      store.commit("updateActiveTab", fd);
+      store.commit("closeTabAll");
+      // 登录成功获取系统参数
+      const Json = {};
+      Json.MessageRestriction = await getClientTypeList("MessageRestriction");
+      Json.UserRestrictions = await getClientTypeList("UserRestrictions");
+      Json.NoticeRestrictions = await getClientTypeList("NoticeRestrictions");
+      Json.CompanyRestrictions = await getClientTypeList("CompanyRestrictions");
+      Json.PlatForm = await getClientTypeList("PlatForm");
+      Json.packageManage = await getClientTypeList("packageManage");
+      console.log(Json);
+      store.commit("globalJson/setGlobalJson", Json);
+      // 登录成功获取菜单
+      const menus = await getUserRoleMenu(token);
+      if (menus.data.result.code === 200) {
+        store.commit("setRouters", menus.data.result.item.modulesList || []);
+        await getMenuFuc();
+      }
+      next();
     } else {
       console.log("没有cookit_token", store.state);
       const res = await getToken();

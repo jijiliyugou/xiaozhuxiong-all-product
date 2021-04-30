@@ -1,13 +1,16 @@
 import Fly from "flyio/dist/npm/fly";
 import router from "../router";
 import store from "../store";
+import {AGORA_APP_KEY,AGORA_APP_SECRET} from "@root/agora.config"
 
 const fly = new Fly();
 // fly请求 设置拦截器
 const storage = window["sessionStorage"]; //window[isPC||window.isApp ? 'localStorage' : 'sessionStorage'];
 const SPHY_TOKEN_KEY = "SPHY_LOGIN_TOKEN";
+const AGORA_TOKEN = "AGORA_TOKEN";
 
 let globalToken;
+let Base64 = require('js-base64').Base64;
 
 let tokenService = {
   // 清除token
@@ -26,6 +29,7 @@ let tokenService = {
       timestamp: data.expiration
     };
     storage.setItem(SPHY_TOKEN_KEY, JSON.stringify(globalToken));
+    this.setAgoraToken();
   },
   // 获取token
   getToken() {
@@ -203,5 +207,14 @@ let tokenService = {
         });
     });
   },
+  //生成声网token认证，处理RESTful API的控制用户的设备状态
+  setAgoraToken(){
+    var customerKey  = AGORA_APP_KEY;
+    var customerSecret = AGORA_APP_SECRET;
+    var plainCredentials  = customerKey+":"+customerSecret;
+    var base64Credentials = Base64.encode(plainCredentials);
+    var authorizationHeader = "Basic " + base64Credentials;
+    storage.setItem(AGORA_TOKEN, authorizationHeader);
+  }
 };
 export default tokenService;

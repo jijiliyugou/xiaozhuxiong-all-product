@@ -21,36 +21,37 @@ d<!--
               <Col span="8">
               </Col>
               <Col span="8">
-                <div class="item active">创建会议</div>
+                <div class="item active">{{$t("createMeeting.title")}}</div>
               </Col>
               <Col span="8">
               </Col>
             </Row>
           </div>
           <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" label-colon class="create_form_wrap">
-            <FormItem label="会议ID" prop="channel">
+            <FormItem :label="$t('createMeeting.meetingId')" prop="channel">
               <Input v-model="formValidate['channel']" :style="{width:'300px',marginLeft: '-50px'}" :maxlength="11" disabled></Input>
             </FormItem>
-            <FormItem label="选择展厅" prop="companyId">
+            <FormItem :label="$t('createMeeting.companyId')" prop="companyId">
               <Select v-model="formValidate['companyId']" :style="{width:'300px',marginLeft: '-50px'}" clearable>
                   <Option v-for="(item,index) in companys" :value="item.companyId" :key="index">{{ item.companyName }}</Option>
               </Select>
             </FormItem>
-            <FormItem label="昵称" prop="nickName">
-              <Input v-model="formValidate['nickName']" :style="{width:'300px',marginLeft: '-50px'}" placeholder="请输入您的昵称"></Input>
+            <FormItem :label="$t('createMeeting.nickName')" prop="nickName">
+              <Input v-model="formValidate['nickName']" :style="{width:'300px',marginLeft: '-50px'}" :placeholder="$t('createMeeting.nickNameText')"></Input>
             </FormItem>
-            <FormItem label="开始时间" prop="startTime">
-              <DatePicker type="datetime" v-model="formValidate['startTime']" @on-change="formValidate['startTime']=$event" format="yyyy-MM-dd HH:mm" placeholder="选择开始时间" style="width: 300px;margin-left:-50px"></DatePicker> 
+            <FormItem :label="$t('createMeeting.startTime')" prop="startTime">
+              <DatePicker type="datetime" v-model="formValidate['startTime']" @on-change="formValidate['startTime']=$event" format="yyyy-MM-dd HH:mm" :placeholder="$t('createMeeting.startTimeText')" style="width: 300px;margin-left:-50px"></DatePicker> 
             </FormItem>
-            <FormItem label="结束时间" prop="endTime">
-              <DatePicker type="datetime" v-model="formValidate['endTime']" @on-change="formValidate['endTime']=$event" format="yyyy-MM-dd HH:mm" placeholder="选择结束时间" style="width: 300px;margin-left:-50px"></DatePicker> 
+            <FormItem :label="$t('createMeeting.endTime')" prop="endTime">
+              <DatePicker type="datetime" v-model="formValidate['endTime']" @on-change="formValidate['endTime']=$event" format="yyyy-MM-dd HH:mm" :placeholder="$t('createMeeting.endTimeText')" style="width: 300px;margin-left:-50px"></DatePicker> 
             </FormItem>
-            <FormItem label="入会人数" prop="mettingNumber">
-              <Input v-model="formValidate['mettingNumber']" type="number" :style="{width:'300px',marginLeft: '-27px'}" placeholder="请输入1-8" :maxlength="4"></Input><span style="margin-left:10px;color:#666666">人</span>
+            <FormItem :label="$t('createMeeting.mettingNumber')" prop="mettingNumber">
+              <Input v-model="formValidate['mettingNumber']" type="number" :style="{width:'300px',marginLeft: '-27px'}" :placeholder="$t('createMeeting.mettingNumberText')" :maxlength="4"></Input><span style="margin-left:10px;color:#666666;width: 20px;
+              display: inline-block;">{{$t('createMeeting.people')}}</span>
             </FormItem>
-            <FormItem prop="settings">
-                <Checkbox v-model="formValidate.settings.isMic" :style="{marginLeft: '-150px'}">打开麦克风</Checkbox>
-                <Checkbox v-model="formValidate.settings.isCar">打开摄像头</Checkbox>
+            <FormItem prop="settings" :style="{float: 'left'}">
+                <Checkbox v-model="formValidate.settings.isMic">{{$t("createMeeting.audio")}}</Checkbox>
+                <Checkbox v-model="formValidate.settings.isCar">{{$t("createMeeting.camera")}}</Checkbox>
             </FormItem>
             <FormItem>
               <Button type="primary" @click="save" :style="{width:'300px',marginLeft: '-50px',height:'36px'}" >{{$t("createMeeting.button")}}</Button>
@@ -67,7 +68,8 @@ d<!--
 import * as Cookies from "js-cookie";
 import LoginFooter from "@components/footer/loginFooter";
 import {
-  CreateMeetingRoom
+  CreateMeetingRoom,
+  Update
 } from "@service/meetingService"
 
 export default {
@@ -97,6 +99,13 @@ export default {
         callback();
       }
     };
+    const meetingNumberVail = (rule, value, callback) => {
+      if (value > 8||value<1) {
+        callback(new Error(this.$t('createMeeting.mettingNumberText')));
+      } else {
+        callback();
+      }
+    };
     return {
       logUrl: require("@assets/default/logo.png"),
       titleUrl: require("@assets/images/title_s.png"),
@@ -114,26 +123,26 @@ export default {
       },
       ruleValidate:{
         companyId: [
-          { required: true, message: '请选择展厅', trigger: 'change', validator: companyIdVali }
+          { required: true, message: this.$t('createMeeting.companyIdText'), trigger: 'change', validator: companyIdVali }
         ],
         nickName: [
-          { required: true, message: '请输入昵称', trigger: 'blur' }
+          { required: true, message: this.$t('createMeeting.nickNameText'), trigger: 'blur' }
         ],
         startTime: [
-          { required: true, message: '请选择开始时间', trigger: 'blur', validator: startTimeVail }
+          { required: true, message: this.$t('createMeeting.startTimeText'), trigger: 'blur', validator: startTimeVail }
         ],
         endTime: [
-          { required: true, message: '请选择结束时间', trigger: 'blur', validator: endTimeVail }
+          { required: true, message: this.$t('createMeeting.endTimeText'), trigger: 'blur', validator: endTimeVail }
         ],
         mettingNumber: [
-          { required: true, message: '请输入入会人数', trigger: 'blur' }
+          { required: true, message: this.$t('createMeeting.mettingNumberText'), trigger: 'blur', validator: meetingNumberVail }
         ],
       },
       channel: "10001",
       baseMode: "avc",
       transcode: "interop",
       attendeeMode: "video",
-      videoProfile: "720p_6",  //省流量测试
+      videoProfile: "1080p_2",  //省流量测试
       companys:[]
     };
   },
@@ -178,11 +187,11 @@ export default {
               background: true,
               content: err.message
             });
-            this.$FromLoading.hide();  
+            this.$FromLoading.hide();
           });
         }
       })
-    }  
+    },
   },
   created(){
     this.$loading.hide();

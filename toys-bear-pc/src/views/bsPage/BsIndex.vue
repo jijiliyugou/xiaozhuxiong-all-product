@@ -28,7 +28,7 @@
                   :content="item.label"
                   placement="top"
                 >
-                  <span style="width:90px;padding:0;">
+                  <span style="width: 90px; padding: 0">
                     {{ item.label }}
                   </span>
                 </el-tooltip>
@@ -42,6 +42,9 @@
                   :is="item.component"
                   :ref="item.name"
                 ></component>
+                <!-- <div class="contentFooter">
+                  <img src="~@/assets/images/contentFooter.png" alt="" />
+                </div> -->
               </div>
               <!-- </el-scrollbar> -->
             </el-tab-pane>
@@ -102,6 +105,9 @@ import bsAccountManage from "@/views/bsPage/bsPersonalManage/bsAccountManage/BsA
 // 报价设置
 import bsQuotationSettings from "@/views/bsPage/bsPersonalManage/bsQuotationSettings/BsQuotationSettings.vue";
 
+// 推送详情
+import bsPushIndex from "@/components/commonComponent/pushDetailsComponent/bsPushIndex.vue";
+
 // 推送设置
 import bsPushSettings from "@/views/bsPage/bsPersonalManage/bsPushSettings/BsPushSettings.vue";
 
@@ -120,6 +126,9 @@ import bsVendorQuery from "@/views/bsPage/bsMyClients/bsVendorQuery/BsVendorQuer
 // 厂商查询-详情页
 import bsMyClientsDetail from "@/components/bsComponents/bsMyClientsComponent/bsMyClientsDetail.vue";
 
+// 货场查询
+import bsGoodsYardSearch from "@/views/bsPage/bsMyClients/bsGoodsYardSearch/BsGoodsYardSearch.vue";
+
 // 展厅择样
 import bsHallSample from "@/views/bsPage/bsBusinessManage/bsHallSample/BsHallSample.vue";
 // 展厅业务
@@ -130,7 +139,7 @@ import bsShoppingCart from "@/views/bsPage/bsBusinessManage/bsShoppingCart/BsSho
 import bsSampleQuotation from "@/views/bsPage/bsBusinessManage/bsSampleQuotation/BsSampleQuotation.vue";
 // 找样报价-报价详情
 import bsSampleQuotationDetails from "@/components/bsComponents/bsSampleComponent/bsSampleQuotationDetails";
-// 找样报价-选择报价商品
+// 找样报价-选择报价产品
 import bsSampleOfferCommodity from "@/components/bsComponents/bsSampleComponent/bsSampleOfferCommodity";
 
 // 找样报价-编辑详情
@@ -140,8 +149,11 @@ import bsPurchaseOrder from "@/views/bsPage/bsBusinessManage/bsPurchaseOrder/BsP
 // 采购订单详情
 import bsPurchaseOrderDetails from "@/views/bsPage/bsBusinessManage/bsPurchaseOrder/bsPurchaseOrderDetails/BsPurchaseOrderDetails.vue";
 
-// 相似产品
+// 相似产品 | 同款产品
 import bsSimilarProduct from "@/components/bsComponents/bsProductSearchComponent/bsSimilarProduct.vue";
+
+// 展厅主页
+import bsExhibitionHallHome from "@/components/bsComponents/bsExhibitionHallHomeComponent/BsExhibitionHallHome.vue";
 
 import bsTop from "@/components/bsComponents/bsTopComponent/BsTop";
 import bsMenu from "@/components/bsComponents/bsMenuComponent/BsMenu";
@@ -165,6 +177,7 @@ export default {
     bsBrowsingFootprints,
     bsAccountManage,
     bsQuotationSettings,
+    bsPushIndex,
     bsPushSettings,
     bsNews,
     bsMyGoodFriend,
@@ -172,6 +185,7 @@ export default {
     bsMyClients,
     bsVendorQuery,
     bsMyClientsDetail,
+    bsGoodsYardSearch,
     bsHallSample,
     bsHallBusiness,
     bsShoppingCart,
@@ -183,7 +197,8 @@ export default {
     bsTop,
     bsMenu,
     bsPurchaseOrderDetails,
-    bsSimilarProduct
+    bsSimilarProduct,
+    bsExhibitionHallHome
   },
   data() {
     return {
@@ -200,41 +215,11 @@ export default {
         newN == "/bsIndex/bsLatestProducts" ||
         newN == "/bsIndex/bsSpotProducts" ||
         newN == "/bsIndex/bsVIPProducts" ||
-        newN == "/bsIndex/bsMyCollection"
+        newN == "/bsIndex/bsMyCollection" ||
+        newN == "/bsIndex/bsBrowsingFootprints"
       ) {
         eventBus.$emit("showCart", true);
       }
-      // const myScrollbarList = this.$refs.myScrollbar;
-      // myScrollbarList.forEach(val => {
-      //   const fun = () => {
-      //     if (this.activeTab == "/bsIndex/bsProductSearchIndex") {
-      //       if (val.scrollTop >= 200) {
-      //         eventBus.$emit("showCart", true);
-      //       } else {
-      //         eventBus.$emit("showCart", false);
-      //       }
-      //     } else if (
-      //       this.tabList.find(val => val.name == this.activeTab).linkUrl ==
-      //       "/bsIndex/bsProductSearchIndex"
-      //     ) {
-      //       eventBus.$emit("showCart", true);
-      //     } else if (
-      //       this.activeTab == "/bsIndex/bsLatestProducts" ||
-      //       this.activeTab == "/bsIndex/bsSpotProducts" ||
-      //       this.activeTab == "/bsIndex/bsVIPProducts" ||
-      //       this.activeTab == "/bsIndex/bsMyCollection"
-      //     ) {
-      //       eventBus.$emit("showCart", true);
-      //     } else {
-      //       eventBus.$emit("showCart", false);
-      //     }
-      //   };
-      //   if (this.activeTab == "/bsIndex/bsProductSearchIndex") {
-      //     val.onscroll = fun;
-      //   } else {
-      //     val.removeEventListener("scroll", fun, false);
-      //   }
-      // });
     },
     // 刷新tab标签
     triggerTab() {
@@ -242,11 +227,6 @@ export default {
         if (this.activeTab == this.tabList[i].name) {
           this.$store.commit("updataUrl", this.activeTab);
           this.$router.push(this.tabList[i].linkUrl);
-          // if (this.tabList[i].linkUrl == "/bsIndex/bsProductDetails") {
-          //   eventBus.$emit("showCart", true);
-          // } else {
-          //   eventBus.$emit("showCart", false);
-          // }
           break;
         }
       }
@@ -290,7 +270,6 @@ export default {
         return this.$store.state.activeTab;
       },
       set(val) {
-        // this.showSearch = false;
         this.$store.commit("setActiveTab", val);
       }
     },
@@ -298,16 +277,15 @@ export default {
   },
   watch: {
     activeTab(newN, oldN) {
+      //   console.log(newN,"现在", oldN,"上一次");
       this.$store.commit("handlerOldTabName", oldN);
-      // if (newN == "/bsIndex/bsProductSearchIndex") {
-      //   // this.handleScroll();
-      // } else {
       if (
         newN == "/bsIndex/bsProductSearchIndex" ||
         newN == "/bsIndex/bsLatestProducts" ||
         newN == "/bsIndex/bsSpotProducts" ||
         newN == "/bsIndex/bsVIPProducts" ||
-        newN == "/bsIndex/bsMyCollection"
+        newN == "/bsIndex/bsMyCollection" ||
+        newN == "/bsIndex/bsBrowsingFootprints"
       ) {
         eventBus.$emit("showCart", true);
       } else {
@@ -554,6 +532,10 @@ export default {
   overflow: auto;
   box-sizing: border-box;
   padding-right: 20px;
+  .contentFooter {
+    text-align: center;
+    margin-top: 20px;
+  }
   .componentContent {
     min-width: 1500px;
   }

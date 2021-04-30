@@ -17,10 +17,10 @@
     ></bsSampleQuotationTopComponent>
     <div class="bsSampleTable">
       <div class="top">
-        <div class="left">报价商品列表({{ offerProductList.length }})</div>
+        <div class="left">报价产品列表({{ offerProductList.length }})</div>
         <div class="right">
           <el-button @click="handleSelect" class="el-icon-plus" type="primary">
-            选择报价商品</el-button
+            选择报价产品</el-button
           >
         </div>
       </div>
@@ -309,6 +309,13 @@
                 >
               </div>
             </el-form-item>
+            <el-form-item label="报价备注：" prop="title">
+              <el-input
+                maxlength="50"
+                show-word-limit
+                v-model="clienFormData.title"
+              ></el-input>
+            </el-form-item>
             <el-form-item label="默认公式：">
               <el-select
                 v-model="clienFormData.defaultFormula"
@@ -327,10 +334,19 @@
             <div class="wrapBox">
               <div class="left">
                 <el-form-item label="报价方式：" prop="offerMethod">
-                  <el-input
-                    maxlength="30"
+                  <el-select
+                    style="width: 100%"
                     v-model="clienFormData.offerMethod"
-                  ></el-input>
+                    placeholder="请选择报价方式"
+                  >
+                    <el-option
+                      v-for="(item, i) in options.offerMethod"
+                      :key="i"
+                      :label="item.itemCode"
+                      :value="item.parameter"
+                    >
+                    </el-option>
+                  </el-select>
                 </el-form-item>
                 <el-form-item label="币种：" prop="cu_de">
                   <el-select
@@ -371,9 +387,25 @@
               </div>
               <div class="right">
                 <el-form-item label="利润率：" prop="profit">
-                  <el-input maxlength="30" v-model="clienFormData.profit">
+                  <!-- <el-input maxlength="30" v-model="clienFormData.profit">
                     <span slot="suffix">%</span>
-                  </el-input>
+                  </el-input> -->
+                  <div style="display: flex; justify-content:space-between;">
+                    <el-input
+                      maxlength="30"
+                      style="flex:1;"
+                      v-model="clienFormData.profit"
+                    >
+                      <span slot="suffix">%</span>
+                    </el-input>
+                    <el-radio-group
+                      style="flex:1;display:flex; align-items:center;margin-left: 20px;"
+                      v-model="clienFormData.profitCalcMethod"
+                    >
+                      <el-radio :label="2">除法</el-radio>
+                      <el-radio :label="1">乘法</el-radio>
+                    </el-radio-group>
+                  </div>
                 </el-form-item>
                 <el-form-item label="总费用：" prop="totalCost">
                   <el-input
@@ -385,9 +417,13 @@
                 </el-form-item>
                 <el-form-item label="每车尺码：" prop="size">
                   <el-select
-                    v-model="clienFormData.size"
+                    @change="selectBlur"
+                    v-model.number="clienFormData.size"
+                    filterable
+                    default-first-option
+                    allow-create
                     style="width: 100%"
-                    placeholder="请选择尺码"
+                    placeholder="请输入/选择尺码"
                   >
                     <el-option
                       v-for="(item, i) in options.size"
@@ -415,6 +451,18 @@
                 </el-form-item>
               </div>
             </div>
+            <div
+              class="chengchuTishi"
+              v-show="clienFormData.profitCalcMethod == 2"
+            >
+              {{ chufa }}
+            </div>
+            <div
+              class="chengchuTishi"
+              v-show="clienFormData.profitCalcMethod == 1"
+            >
+              {{ chengfa }}
+            </div>
             <div class="lessThanPrice">
               <div class="left">
                 <el-form-item label="价格小于：" prop="miniPrice">
@@ -425,6 +473,7 @@
                   >
                   </el-input>
                 </el-form-item>
+                <div class="tishi">当价格小于指定值，则调整小数位数</div>
               </div>
               <div class="right">
                 <!-- xiaoshuweishu -->
@@ -445,15 +494,8 @@
                 </el-form-item>
               </div>
             </div>
-            <el-form-item label="报价备注：" prop="title">
-              <el-input
-                maxlength="50"
-                show-word-limit
-                v-model="clienFormData.title"
-              ></el-input>
-            </el-form-item>
           </el-form>
-          <center>
+          <center style="margin-top: 40px;">
             <el-button
               size="medium"
               @click="submitOrder"
@@ -539,6 +581,8 @@ export default {
   },
   data() {
     return {
+      chufa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)/(1-报价利润%)/汇率",
+      chengfa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)*(1+报价利润%)/汇率",
       showEditMethod: true,
       addClientFormData: {
         name: null,
@@ -565,6 +609,7 @@ export default {
         customerId: null,
         customerName: null,
         quotationProductList: [],
+        profitCalcMethod: 2,
         profit: 0,
         offerMethod: "汕头",
         cu_de: "¥",
@@ -691,12 +736,25 @@ export default {
       //     miniPrice: 0,
       //     miniPriceDecimalPlaces: 1
       //   };
-      this.subDialogVisible = true;
+
       await this.getSelectCompanyOffer();
       await this.getSelectProductOfferFormulaList();
       await this.getClientList();
       for (const key in this.itemList) {
         this.clienFormData[key] = this.itemList[key];
+      }
+      const clientItem = this.clientList.find(
+        val => val.id == this.clienFormData.customerId
+      );
+      if (!clientItem) {
+        this.clienFormData.customerId = null;
+      }
+      this.subDialogVisible = true;
+    },
+    // 下拉框输入事件
+    selectBlur(val) {
+      if (isNaN(Number(val))) {
+        this.clienFormData.size = null;
       }
     },
     // 提交新增客户
@@ -811,6 +869,9 @@ export default {
         if (res.data.result.code === 200) {
           this.$set(this.handerTabData, 0, res.data.result.item);
           this.itemList = res.data.result.item;
+          for (const key in this.itemList) {
+            this.clienFormData[key] = this.itemList[key];
+          }
         } else {
           this.$message.error(res.data.result.msg);
         }
@@ -943,7 +1004,7 @@ export default {
           });
         });
     },
-    //选择报价商品
+    //选择报价产品
     handleSelect() {
       // const myValue = {
       //   offerNumber: .offerNumber,
@@ -977,6 +1038,15 @@ export default {
     handleCurrentChange(page) {
       this.currentPage = page;
       this.getProductOfferDetailPage();
+    },
+    // 新增客户
+    openAddMyClient() {
+      this.addClientFormData = {
+        name: null,
+        phoneNumber: null,
+        remark: null
+      };
+      this.addMyClientDialog = true;
     },
     /*
      * 将一个浮点数转成整数，返回整数和倍数。如 3.14 >> 314，倍数是 100
@@ -1211,6 +1281,7 @@ export default {
           this.clienFormData.size = obj.size;
           this.clienFormData.decimalPlaces = obj.decimalPlaces;
           this.clienFormData.rejectionMethod = obj.rejectionMethod;
+          this.clienFormData.profitCalcMethod = obj.profitCalcMethod;
         }
       }
     },
@@ -1386,7 +1457,20 @@ export default {
       .left,
       .right {
         flex: 1;
+        position: relative;
+        .tishi {
+          position: absolute;
+          bottom: -5px;
+          left: 100px;
+          color: #ff4848;
+        }
       }
+    }
+    .chengchuTishi {
+      color: #ff4848;
+      box-sizing: border-box;
+      padding-left: 100px;
+      margin-bottom: 20px;
     }
   }
   .formItemBox {

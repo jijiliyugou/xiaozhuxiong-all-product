@@ -40,8 +40,8 @@
       <!-- v-show="myInfo.isMain" -->
       <div class="editOperation" v-show="myInfo.isMain">
         <span class="editItem" @click="openEditCompany">修改公司资料</span>
-        <span class="line">|</span>
-        <span class="editItem" @click="openBindCompany">绑定公司</span>
+        <!-- <span class="line">|</span>
+        <span class="editItem" @click="openBindCompany">绑定公司</span> -->
       </div>
     </div>
     <div class="tableTitle">
@@ -190,7 +190,7 @@
     </el-dialog>
     <!-- 编辑公司 -->
     <el-dialog
-      top="0"
+      top="60"
       width="70%"
       title="编辑公司"
       v-if="editCompanyDialog"
@@ -284,11 +284,11 @@ export default {
         const msg = this.isEdit ? "编辑成功" : "新增成功";
         this.isEdit = false;
         this.addEmployDialog = false;
+        this.getCompanyUserList();
         this.$common.handlerMsgState({
           msg: msg,
           type: "success"
         });
-        this.getCompanyUserList();
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -541,10 +541,10 @@ export default {
           display: block;
           position: relative;
           top: -3px;
-          -webkit-transform: scale(0.7);
-          -moz-transform: scale(0.7);
-          -ms-transform: scale(0.7);
-          transform: scale(0.7);
+          -webkit-transform: scale(0.8);
+          -moz-transform: scale(0.8);
+          -ms-transform: scale(0.8);
+          transform: scale(0.8);
         }
       }
     }

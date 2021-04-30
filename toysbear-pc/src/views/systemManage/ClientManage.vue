@@ -2174,6 +2174,13 @@ export default {
 
 <style lang="less" scoped>
 @deep: ~">>>";
+// @{deep} .el-upload-list {
+//   .el-upload-list__item {
+//     img {
+//       object-fit: contain;
+//     }
+//   }
+// }
 .searchBox {
   padding-top: 50px;
   .searchItem {

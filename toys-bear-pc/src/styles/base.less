@@ -160,6 +160,19 @@ a:hover {
 		line-height: 50px;
 		padding: 0;
 		padding-left: 20px;
+    border-bottom: 1px solid #dcdfe6 ;
+		.el-dialog__title {
+			font-weight: 700;
+			font-size: 16px;
+		}
+    .el-dialog__headerbtn {
+      top: 16px;
+      .el-dialog__close{
+          color: #999999 ;
+          font-weight:700;
+          font-size: 18px;
+      }
+    }
 	}
 	.el-dialog__body {
 		padding: 20px;
@@ -195,4 +208,12 @@ a:hover {
 			width: 100% !important;
 			object-fit: contain;
 		}
-  } 
+  }
+	// 上传文件el-upload样式
+	.el-upload-list {
+		.el-upload-list__item {
+			img {
+				object-fit: contain;
+			}
+		}
+	}

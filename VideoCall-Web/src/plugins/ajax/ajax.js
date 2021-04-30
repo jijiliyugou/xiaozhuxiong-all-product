@@ -4,7 +4,7 @@
  * @Author: gaojiahao
  * @Date: 2020-10-19 15:30:49
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-04-19 15:31:44
+ * @LastEditTime: 2021-04-27 09:30:19
  */
 import Fly from "flyio/dist/npm/fly";
 // 请求地址引入
@@ -50,7 +50,8 @@ fly.interceptors.request.use(request => {
   // token 存在则赋值在header当中
   if (token) {
     //request.headers.Utoken = token;
-    request.headers.Authorization = 'Bearer '+token;
+    //request.headers.Authorization =  request.headers.Authorization||'Bearer '+token;
+    request.headers.Authorization =  'Bearer '+token;
   } else {
     // token 不存在，锁住请求，优先请求token，后序请求进入队列
     fly.lock();
@@ -175,7 +176,6 @@ let Rxports = {
         });
     });
   },
-
   // POST请求
   post(opts = {}) {
     return new Promise((resolve, reject) => {
@@ -298,6 +298,59 @@ let Rxports = {
       },
       data: param
     });
+  },
+  agoraAjax(opts={}){
+    return new Promise((resolve, reject) => {
+      let params = {
+        method: opts.type || opts.method || "GET",
+        baseURL: process.env.VUE_APP_AGORA_API,
+        url: opts.url,
+        headers: {
+          "accept": opts.contentType || "application/json",
+          "Authorization": window.sessionStorage.getItem('AGORA_TOKEN')
+        },
+        timeout: opts.time || 30 * 1000,
+        responseType: opts.dataType || "json"
+      };
+      if (params.method.toUpperCase() === "POST") {
+        params.data = qs.stringify(opts.data || opts.body) || {};
+        if (opts.contentType === "application/json") {
+          params.data = opts.data;
+        }
+      } else {
+        if (typeof opts.data === "object") {
+          let query = [];
+          for (let [key, value] of Object.entries(opts.data)) {
+            query.push(`${key}=${value}`);
+          }
+          if (params.url.indexOf("?") === -1) {
+            // url上没有?
+            params.url = encodeURI(`${params.url}/${query.join("/")}`);
+          } else {
+            // url上有?，给其拼上&
+            params.url = encodeURI(`${params.url}/${query.join("/")}`);
+          }
+        }
+      }
+      fly
+        .request(params, params.data)
+        .then(res => {
+          if (res) {
+            resolve(res.data);
+          } else {
+            reject();
+          }
+        })
+        .catch(err => {
+          Message.error({
+            background: true,
+            content: "温馨提示："+err.message,
+            duration: 3
+          });
+          // reject(err);
+          // console.log("err:", err);
+        });
+    });  
   }
 };
 function ensureUrl(url) {

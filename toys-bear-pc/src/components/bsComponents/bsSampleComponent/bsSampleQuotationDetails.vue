@@ -7,7 +7,7 @@
     ></bsSampleQuotationTopComponent>
     <div class="bsSampleTable">
       <div class="top">
-        <div class="left">报价商品列表({{ tableData.length }})</div>
+        <div class="left">报价产品列表({{ tableData.length }})</div>
         <div class="right" v-if="tableData.length > 0">
           <el-button @click="exportOrder()" type="warning"> 导出列表</el-button>
         </div>
@@ -263,11 +263,11 @@
     <!-- 导出订单模板dialog -->
     <transition name="el-zoom-in-center">
       <el-dialog
+        class="exportOrder"
         title="订单模板"
         v-if="exportTemplateDialog"
         :visible.sync="exportTemplateDialog"
-        top="60px"
-        width="80%"
+        width="1200px"
       >
         <bsExportOrder :options="orderRow" />
       </el-dialog>
@@ -276,7 +276,7 @@
 </template>
 
 <script>
-import bsExportOrder from "@/components/commonComponent/exportOrderComponent";
+import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gongsizhaoyangbaojia.vue";
 import bsSampleQuotationTopComponent from "@/components/bsComponents/bsSampleComponent/bsSampleQuotationTopComponent";
 export default {
   name: "bsSampleQuotationDetails",
@@ -816,6 +816,11 @@ export default {
       font-size: 14px;
       color: #666;
     }
+  }
+}
+@{deep} .exportOrder {
+  .el-dialog__body {
+    padding: 0;
   }
 }
 </style>

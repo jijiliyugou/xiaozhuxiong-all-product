@@ -12,6 +12,10 @@ const BsQuotationSettings = () =>
 const BsPushSettings = () =>
   import("@/views/bsPage/bsPersonalManage/bsPushSettings/BsPushSettings.vue");
 
+// 推送详情
+const BsPushIndex = () =>
+  import("@/components/commonComponent/pushDetailsComponent/bsPushIndex.vue");
+
 export default [
   {
     path: "/bsIndex/bsAccountManage",
@@ -33,6 +37,14 @@ export default [
     path: "/bsIndex/bsPushSettings",
     name: "bsPushSettings",
     component: BsPushSettings,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsPushIndex",
+    name: "bsPushIndex",
+    component: BsPushIndex,
     meta: {
       keepAlive: true
     }

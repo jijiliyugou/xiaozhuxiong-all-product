@@ -116,7 +116,7 @@ export default {
       }
       this.getProductList();
     },
-    // 删除商品
+    // 删除产品
     popOfferProductList(item) {
       for (let i = 0; i < this.offerProductList.length; i++) {
         if (this.offerProductList[i].productNumber == item.productNumber) {
@@ -124,7 +124,7 @@ export default {
         }
       }
     },
-    // 添加商品
+    // 添加产品
     pushOfferProductList(item) {
       this.offerProductList.push(item);
     },

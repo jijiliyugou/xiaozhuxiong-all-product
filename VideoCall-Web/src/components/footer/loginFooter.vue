@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-13 15:56:18
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\footer\loginFooter.vue
- * @LastEditTime: 2021-04-22 17:46:03
+ * @LastEditTime: 2021-04-28 18:04:54
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -12,7 +12,7 @@
     <div class="footer">
       <div class="footer_wrap">
         <div class="footer_wrap_first">
-          <div style="margin-right:10px">技术支持：0754-89671122</div> 
+          <div style="margin-right:10px">{{$t("other.technicalSupport")}}：0754-89671122</div> 
           <div class="qq"></div>
           <div style="margin-left:10px">客服001</div>
           <div class="qq" style="margin-left:10px"></div>

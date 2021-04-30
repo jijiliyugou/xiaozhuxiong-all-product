@@ -35,6 +35,9 @@ const store = new Vuex.Store({
     ],
     offerProductList: [], //报价数据
     historyNames: [],
+    searchTxt: "",
+    imgSearch: false,
+    searchHallCate: null,
     httpTime: 0, // 请求时长
     httpContent: "", // 请求内容
     screenWidth: document.documentElement.clientWidth, // 屏幕宽度
@@ -73,13 +76,24 @@ const store = new Vuex.Store({
     handlerOldTabName(state, payLoad) {
       state.oldTabName = payLoad;
     },
+    // 首页图搜
+    handlerimgSearch(state, payLoad) {
+      state.imgSearch = payLoad;
+    },
+    //修改查询值
+    handlerSearchTxt(state, payLoad) {
+      state.searchTxt = payLoad;
+    },
+    // 展厅带分类查产品
+    handlerHallSearchCate(state, payLoad) {
+      state.searchHallCate = payLoad;
+    },
     // 修改进度条状态
     handlerIsJindu(state, payLoad) {
       state.isJindu = payLoad;
     },
     // 添加收藏
     addMyCollec(state, payLoad) {
-      console.log(payLoad);
       state.myColles.push(payLoad);
     },
     // 删除收藏
@@ -125,16 +139,15 @@ const store = new Vuex.Store({
     initOfferProductList(state) {
       Vue.prototype.$set(state, "offerProductList", []);
     },
-    // 请求修改报价商品接口赋值
+    // 请求修改报价产品接口赋值
     updataOfferProductList(state, payLoad) {
       Vue.prototype.$set(state, "offerProductList", payLoad);
     },
-    //添加报价商品
+    //添加报价产品
     pushOfferProductList(state, payLoad) {
-      console.log(payLoad);
       state.offerProductList.push(payLoad);
     },
-    // 删除报价商品
+    // 删除报价产品
     popOfferProductList(state, payLoad) {
       for (let i = 0; i < state.offerProductList.length; i++) {
         if (state.offerProductList[i].productNumber == payLoad.productNumber) {
@@ -183,7 +196,7 @@ const store = new Vuex.Store({
       localStorage.setItem(key, JSON.stringify(state[key]));
     },
 
-    // 删除购物车某指定一个商品
+    // 删除购物车某指定一个产品
     popShopping(state, payLoad) {
       const key = state.userInfo.uid;
       for (let i = 0; i < state[key].length; i++) {
@@ -280,33 +293,15 @@ const store = new Vuex.Store({
     // 测试
     //关闭全部tab页
     closeTabAll(state, router) {
-      console.log(state.activeTab, state.tabList);
-      // let activeTab;
-      // for (let i = 0; i < state.tabList.length; i++) {
-      //   if (state.tabList[i].name === state.activeTab) {
-      //     activeTab = state.tabList[i];
-      //     break;
-      //   }
-      // }
       const activeTab = state.tabList.find(val => val.name === state.activeTab);
-      console.log(activeTab, router);
       v.$set(state, "tabList", []);
       state.tabList.push(activeTab);
-      router.push(activeTab.linkUrl);
-      // const fd = {
-      //   component: "bsHome",
-      //   label: "后台首页",
-      //   linkUrl: "/bsIndex/bsHome",
-      //   name: "/bsIndex/bsHome",
-      //   refresh: true
-      // };
-      // state.activeTab = "/bsIndex/bsHome";
+      router && router.push(activeTab.linkUrl);
     },
 
     //关闭tab页
     closeTab(state, n) {
       let tab = state.tabList;
-      console.log(n, state.oldTabName);
       tab.forEach((val, i) => {
         if (val.name == n) {
           tab.splice(i, 1);

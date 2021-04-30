@@ -4,7 +4,7 @@
  * @Author: gaojiahao
  * @Date: 2020-10-28 10:36:16
  * @LastEditors: sueRimn
- * @LastEditTime: 2020-12-04 16:28:23
+ * @LastEditTime: 2021-04-28 09:13:02
 -->
 <template>
 <!--<div style="background:#eee;padding: 20px">
@@ -36,7 +36,6 @@ export default {
             });
             setTimeout(() => {
                 this.$Spin.hide();
-                this.$store.commit('setMenuRouter', {});
                 this.$router.replace('/');
             }, 2000);
         }

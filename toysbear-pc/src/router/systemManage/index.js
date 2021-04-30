@@ -20,6 +20,7 @@ const DownloadStatistics = () =>
   import("@/views/systemManage/downloadStatistics.vue");
 const VipSpotNewProductsMan = () =>
   import("@/views/systemManage/vipSpotNewProductsMan.vue");
+const YardManage = () => import("@/views/systemManage/yardManage.vue");
 
 export default [
   {
@@ -111,5 +112,10 @@ export default [
     path: "/vipSpotNewProductsMan",
     name: "vipSpotNewProductsMan",
     component: VipSpotNewProductsMan
+  },
+  {
+    path: "/yardManage",
+    name: "yardManage",
+    component: YardManage
   }
 ];

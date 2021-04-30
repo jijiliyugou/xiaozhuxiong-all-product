@@ -74,12 +74,13 @@ export default {
       if(!$.videoDevices.length){
         this.$Message.error({
           background: true,
-          content: '温馨提示：未检测到摄像头'
+          content: this.$t("video.tipCamera")
         });
         return false;
       } else {
         // debugger
-        this.havecCamera = true;
+        //this.havecCamera = true;
+        this.$emit('set-img',false);
         if(!$.videoId){
           $.nowVideoId = $.videoDevices[0]['deviceId'];
         } else {
@@ -87,33 +88,54 @@ export default {
         }
       }
       AgoraRTC.setLogLevel(0);  //日志级别0,1,2,3,4
-      $.client.enableDualStream().then(() => {
-        console.log("Enable Dual stream success!");
-      }).catch(err => {
-        console.log(err);
-      });
+      // $.client.enableDualStream().then(() => {
+      //   console.log("Enable Dual stream success!");
+      // }).catch(err => {
+      //   console.log(err);
+      // });
       // this.client.setRemoteVideoStreamType();
       $.client.on("user-published", this.handleUserPublished);
       $.client.on("user-unpublished", this.handleUserUnpublished);
       $.client.on("connection-state-change",(cur,rev,reason)=>{
+        if(reason=='UID_BANNED'){
+          this.leaveMeetingRoom();  
+        }
         console.log('链接状态',cur);
       });
       $.client.on("user-joined",(user)=>{
+        var name = '';
+        if(this.userlist.length){
+            for(var i=0;i<this.userlist.length;i++){
+                if(user.uid==this.userlist[i]['id']){
+                    name = this.userlist[i]['nickname'];
+                    break;
+                }
+            }
+        }
         this.$Message.info({
           background: true,
-          content: user.uid+'用户加入了会议室!'
+          content: this.$t("video.user")+name+this.$t("video.join")
         });
         this.$parent.$parent.$parent.$parent.$parent.getQueryMeetingRoomMembers();
       });
       $.client.on("user-left",(user)=>{
+        var name = '';
+        if(this.userlist.length){
+            for(var i=0;i<this.userlist.length;i++){
+                if(user.uid==this.userlist[i]['id']){
+                    name = this.userlist[i]['nickname'];
+                    break;
+                }
+            }
+        }
         this.$Message.info({
           background: true,
-          content: user.uid+'用户离开了会议室!'
+          content: this.$t("video.user")+name+this.$t("video.leave")
         });
         this.$parent.$parent.$parent.$parent.$parent.getQueryMeetingRoomMembers();
       });
       [ $.userId, $.localAudioTrack, $.localVideoTrack ] = await Promise.all([
-        $.client.join($.appId, $.channel, $.token || null,$.uid),
+        $.client.join($.appId, $.channel, $.token || null,parseInt($.uid)),
         AgoraRTC.createMicrophoneAudioTrack(),
         AgoraRTC.createCameraVideoTrack(
           {encoderConfig: $.videoProfile,cameraId:$.nowVideoId}   //只有谷歌支持最低的，别的浏览器最低480p
@@ -132,6 +154,7 @@ export default {
       await $.client.publish([this.localAudioTrack, this.localVideoTrack]);
       console.log("publish success");
       this.testNetWork();
+      //this.initDevices();
     },
     async leave(){
       this.$FromLoading.show();
@@ -170,14 +193,13 @@ export default {
           items.push(itemList[i]);
         }
       };
-      var userLength = items.length;
+      var userLength = ((items.length-1 <=0) ?1:(items.length-1))+1;
       console.log("subscribe success");
       if (mediaType === 'video') {
         const remoteVideoTrack = user.videoTrack;
         // 动态插入一个 DIV 节点作为播放远端视频轨道的容器。
         for(var i=0;i<$.userlist.length;i++){
           if(uid==$.userlist[i]['id']){
-            console.log($.userlist);
             // if($.userlist[i]['isMaster']){
             const playerContainer = document.createElement("div");
             playerContainer.id = user.uid.toString();
@@ -268,7 +290,6 @@ export default {
     },
     //用户发布订阅
     handleUserPublished(user, mediaType) {
-      // debugger
       const id = user.uid;
       // remoteUsers[id] = user;
       this.subscribe(user, mediaType);
@@ -278,12 +299,20 @@ export default {
       }
     },
     //用户取消发布订阅
-    handleUserUnpublished(user,mediaType) {
+    async handleUserUnpublished(user,mediaType) {
       if (mediaType === "video") {
         // 获取刚刚动态创建的 DIV 节点。
         const playerContainer = document.getElementById(user.uid.toString());
         // 销毁这个节点。
-        playerContainer.remove();
+        // await this.client.unsubscribe(user,'video');
+        var my = document.getElementById("ag-canvas");
+        if(my != null)
+          my.removeChild(playerContainer);
+        // playerContainer.remove();
+      } else if(mediaType === "audio"){
+        // await this.client.unsubscribe(user,'audio');
+      } else {
+        // await this.client.unsubscribe(user); 
       }
     },
     //结束会议
@@ -315,20 +344,22 @@ export default {
       var $=this;
       $.client.on("network-quality", (quality) => {
         //console.log("上行网络质量：", quality.uplinkNetworkQuality);
+        $.$store.commit('setNetworkUp', quality.uplinkNetworkQuality);
       });
 
       // 获取下行网络质量
       $.client.on("network-quality", (quality) => {
         //console.log("下行网络质量：", quality.downlinkNetworkQuality);
+        $.$store.commit('setNetworkDown', quality.downlinkNetworkQuality);
       });
 
       // 获取上行统计数据
-      var uplinkVideoStats = $.client.getLocalVideoStats();
+      //var uplinkVideoStats = $.client.getLocalVideoStats();
       // 获取下行统计数据
-      var downlinkVideoStats =  $.client.getRemoteVideoStats();
+      //var downlinkVideoStats =  $.client.getRemoteVideoStats();
 
-      // console.log("uplink video stats", uplinkVideoStats);
-      // console.log("downlink video stats", downlinkVideoStats);
+      //console.log("uplink video stats", uplinkVideoStats);
+      //console.log("downlink video stats", downlinkVideoStats);
     },
     //通话前设备检测
     async testDevices(){
@@ -388,6 +419,16 @@ export default {
     setVolum(value){
       this.localAudioTrack.setVolume(value);
     },
+    initDevices(){
+      var isMic = window.sessionStorage.getItem("isMic")=='true' ?true:false;
+      var isCar = window.sessionStorage.getItem("isCar")=='true' ?true:false;
+      if(!isMic){
+        this.$parent.$parent.$parent.$parent.$parent.$refs.footer.setMic();
+      }
+      if(!isCar){
+        this.$parent.$parent.$parent.$parent.$parent.$refs.footer.setCar();
+      }
+    },
     //开启/关闭摄像头
     async setEnabledCamera(value){
       await this.localVideoTrack.setEnabled(value);
@@ -401,11 +442,57 @@ export default {
       this.localVideoTrack.setEncoderConfiguration(value).then(res => {
         this.$Message.info({
           background: true,
-          content: '温馨提示：切换清晰度成功'
+          content: this.$t("video.definition")
         });   
       }).catch(e=>{
         console.log(e);
       })
+    },
+    //关闭发布视频
+    async closeVideo(flag){
+      if(flag){
+        await client.unpublish(this.localVideoTrack);
+      } else {
+        await client.publish(this.localVideoTrack);  
+      }
+    },
+    //关闭发布音频
+    async closeAudio(flag){
+      if(flag){
+        await client.unpublish(this.localAudioTrack);
+      } else {
+        await client.publish(this.localAudioTrack);  
+      }  
+    },
+    //用户取消发布订阅
+    async closeUserVideo(user,mediaType) {
+      if (mediaType === "video") {
+        // 获取刚刚动态创建的 DIV 节点。
+        const playerContainer = document.getElementById(user.uid.toString());
+        // 销毁这个节点。
+        await this.client.unsubscribe(user,'video');
+        playerContainer.remove();
+      } else if(mediaType === "audio"){
+        await this.client.unsubscribe(user,'audio');
+      } else {
+        await this.client.unsubscribe(user); 
+      }
+    },
+    //关闭订阅用户视频
+    setUserVideo(uid,type,status){
+      var me = this,
+      obj={};
+      for(var i=0;i<me.client.remoteUsers.length;i++){
+        if(uid==me.client.remoteUsers[i]['uid']){
+          obj = me.client.remoteUsers[i];
+          break;
+        }
+      }
+      if(status){
+        this.closeUserVideo(obj,type);
+      } else {
+        this.subscribe(obj,type);
+      }
     },
     //初始化
     async init(){
@@ -416,23 +503,22 @@ export default {
         if (changedDevice.state === "ACTIVE") {
           this.$Message.info({
             background: true,
-            content: '温馨提示：设备已插入'
+            content: this.$t("video.deviceIn")
           });
-          debugger
           $.localVideoTrack&&$.localVideoTrack.setDevice(changedDevice.device.deviceId);
           location.reload();
         // 拔出设备为当前设备时，切换到一个已有的设备。
         } else if (changedDevice.device.label === $.localVideoTrack&&$.localVideoTrack.getTrackLabel()) {
           this.$Message.info({
             background: true,
-            content: '温馨提示：设备已切换'
+            content: this.$t("video.deviceChange")
           });
           const oldCameras = await AgoraRTC.getCameras();
           oldCameras[0] &&  $.localVideoTrack.setDevice(oldCameras[0].deviceId);
         } else if(changedDevice.state === "INACTIVE") {
           this.$Message.error({
             background: true,
-            content: '温馨提示：设备已拔出'
+            content: this.$t("video.deviceOut")
           });  
         }
       };
@@ -444,6 +530,9 @@ export default {
       // await this.testDevices();
       // await this.join();
     }
+  },
+  mounted(){
+    
   },
   created() {
     this.init();

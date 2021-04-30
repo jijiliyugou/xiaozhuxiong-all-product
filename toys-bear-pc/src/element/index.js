@@ -31,6 +31,8 @@ import {
   Pagination,
   Card,
   Col,
+  Carousel,
+  CarouselItem,
   Tag,
   Tooltip,
   Badge
@@ -68,6 +70,8 @@ const element = {
     Vue.use(Col);
     Vue.use(Tag);
     Vue.use(Card);
+    Vue.use(Carousel);
+    Vue.use(CarouselItem);
     Vue.use(Scrollbar);
     Vue.use(Badge);
 

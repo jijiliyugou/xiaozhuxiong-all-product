@@ -171,9 +171,7 @@
           size="medium"
           rows="1"
           v-model="myEditClientForm.homepage"
-          :maxlength="
-            $store.state.globalJson.Json.CompanyRestrictions[1].itemCode
-          "
+          :maxlength="500"
         ></el-input>
       </el-form-item>
       <el-form-item
@@ -186,21 +184,18 @@
           size="medium"
           rows="1"
           v-model="myEditClientForm.remark"
-          :maxlength="$store.state.globalJson.Json.UserRestrictions[0].itemCode"
+          :maxlength="500"
         ></el-input>
         <p class="textareaLength">
           最多可输入
-          <span>{{
-            $store.state.globalJson.Json.UserRestrictions[0].itemCode
-          }}</span
+          <span>{{ 500 }}</span
           >字，当前输入
           <span>{{
             myEditClientForm.remark && myEditClientForm.remark.length
           }}</span
           >，还可输入
           <span>{{
-            $store.state.globalJson.Json.UserRestrictions[0].itemCode -
-              (myEditClientForm.remark && myEditClientForm.remark.length)
+            500 - (myEditClientForm.remark && myEditClientForm.remark.length)
           }}</span>
         </p>
       </el-form-item>

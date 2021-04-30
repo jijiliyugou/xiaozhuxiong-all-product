@@ -42,7 +42,7 @@ const pluginsProduction = [
     test: new RegExp("\\.(" + productionGzipExtensions.join("|") + ")$"), // 所有匹配该正则的资源都会被处理。默认值是全部资源。
     // threshold: 10240,  // 只有大小大于该值的资源会被处理。单位是 bytes。默认值是 0
     minRatio: 0.8, // 只有压缩率小于这个值的资源才会被处理。默认值是 0.8。
-    deleteOriginalAssets: true // 删除原文件
+    deleteOriginalAssets: false // 删除原文件
   })
 ];
 console.log(pluginsProduction);
@@ -64,8 +64,8 @@ const configureWebpack = {
   }
 };
 if (env === "production") {
-  configureWebpack.plugins = plugins;
-  // configureWebpack.plugins = pluginsProduction;
+  // configureWebpack.plugins = plugins;
+  configureWebpack.plugins = pluginsProduction;
 } else {
   configureWebpack.plugins = plugins;
 }

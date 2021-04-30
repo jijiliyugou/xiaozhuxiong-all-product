@@ -21,11 +21,11 @@
         </li>
         <li class="clientItem">
           <span>联系人：</span>
-          <span class="content">{{ item.email }}</span>
+          <span class="content">{{ item.contactName }}</span>
         </li>
         <li class="clientItem">
           <span>邮箱：</span>
-          <span class="content">{{ item.remark }}</span>
+          <span class="content">{{ item.email }}</span>
         </li>
       </div>
       <div class="clientContentBox">
@@ -40,45 +40,11 @@
           <span class="content">{{ item.remark }}</span>
         </li>
       </div>
-      <!-- <div class="left">
-          <li class="clientItem">
-            <span>客户：</span>
-            <span class="content">{{ item.customerName }}</span>
-          </li>
-          <li class="clientItem">
-            <span>择样时间：</span>
-            <span class="content">
-              {{ item.createdOn && item.createdOn.replace(/T/, " ") }}
-            </span>
-          </li>
-        </div>
-        <div class="middle">
-          <li class="clientItem">
-            <span>业务员：</span>
-            <span class="content">{{ item.createdBy }}</span>
-          </li>
-          <li class="clientItem">
-            <span>备注：</span>
-            <span class="content">{{ item.remark }}</span>
-          </li>
-        </div>
-        <div class="right">
-          <li class="clientItem">
-            <span>公司名称：</span>
-            <span class="content">{{ item.companyName }}</span>
-          </li>
-        </div>
-        <div class="right">
-          <li class="clientItem">
-            <span>联系人：</span>
-            <span class="content">{{ item.email }}</span>
-          </li>
-        </div> -->
     </ul>
     <div class="tableBox">
       <div class="tableTitle">
         <div class="titleText">
-          <span class="title">商品列表</span>
+          <span class="title">产品列表</span>
           ({{ totalCount }})
         </div>
         <el-button size="medium" @click="openSelectTemplate" type="warning">
@@ -293,7 +259,7 @@
       <el-pagination
         layout="total, sizes, prev, pager, next, jumper"
         background
-        :page-sizes="[10, 20, 30, 50]"
+        :page-sizes="[10, 20, 30, 40]"
         :page-size="pageSize"
         :total="totalCount"
         :current-page.sync="currentPage"
@@ -305,10 +271,10 @@
     <transition name="el-zoom-in-center">
       <el-dialog
         title="订单模板"
+        class="exportOrder"
         v-if="exportTemplateDialog"
         :visible.sync="exportTemplateDialog"
-        top="60px"
-        width="80%"
+        width="1200px"
       >
         <bsExportOrder
           :orderNumber="item.orderNumber"
@@ -727,6 +693,11 @@ export default {
         height: 60px;
       }
     }
+  }
+}
+@{deep} .exportOrder {
+  .el-dialog__body {
+    padding: 0;
   }
 }
 </style>

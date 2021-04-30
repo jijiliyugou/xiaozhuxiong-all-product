@@ -540,7 +540,10 @@ export default {
         fd.append("companynumber", companyNumber);
         fd.append("file", file);
         try {
-          const res = await this.$http.post("/api/File/SearchPicture", fd);
+          const res = await this.$http.post(
+            "/api/File/ProductSearchByPicture",
+            fd
+          );
           if (res.data.result.code === 200) {
             this.cropperCancel();
             this.$store.commit(

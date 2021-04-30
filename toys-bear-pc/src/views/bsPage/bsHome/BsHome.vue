@@ -32,12 +32,6 @@
           <span>数据统计</span>
         </div>
         <div class="content">
-          <!-- <div class="item" v-for="item in 4" :key="item">
-            <p class="total">敬请期待</p>
-            <p :class="{ today: true, active: item > 2 }">今日:敬请期待</p>
-            <p class="text">敬请期待</p>
-          </div> -->
-
           <div class="item">
             <p class="total">{{ statisticsData.hallOrderTotal }}</p>
             <p
@@ -137,36 +131,93 @@
           <span>品牌展厅</span>
         </div>
         <div class="bigHall">
-          <div class="item" v-for="(item, i) in bigHalls" :key="i">
+          <div
+            class="item"
+            v-for="(item, i) in bigHalls"
+            :key="i"
+            @mouseenter.stop="getHallTotalCount(item)"
+            @click.stop="topHallHome(item)"
+          >
             <div class="imgBox">
               <el-image
                 style="width: 302px; height: 133px"
-                :src="item.bgImg || item.img"
+                :src="item.img || item.bgImg"
                 fit="contain"
               >
               </el-image>
+              <div class="hoverBox">
+                <div class="box">
+                  <div class="boxLeft">
+                    <p class="changshang changshangCount">
+                      {{ factoryCount }}
+                    </p>
+                    <p class="changshang">
+                      <i class="changshangIcon"></i> 厂商数
+                    </p>
+                  </div>
+                  <div class="boxRight">
+                    <p class="changshang changshangCount">
+                      {{ productCount }}
+                    </p>
+                    <p class="changshang"><i class="chanpinIcon"></i> 产品数</p>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="name">{{ item.companyName || item.adTitle }}</div>
           </div>
         </div>
         <div class="minHall">
-          <slider :options="sliderinit" @slide="slide">
-            <slideritem v-for="(item, i) in minHalls" :key="i">
-              <div class="minHallItem">
-                <div class="imgBox">
-                  <el-image
-                    style="width: 221px; height: 108px"
-                    :src="item.bgImg || item.img"
-                    fit="contain"
-                  >
-                  </el-image>
-                </div>
-                <div class="name">
-                  {{ item.companyName || item.adTitle || 123456 }}
+          <el-carousel
+            indicator-position="outside"
+            arrow="never"
+            :interval="4000"
+            direction="horizontal"
+          >
+            <el-carousel-item v-for="(children, i) in minHalls" :key="i">
+              <div class="minHall">
+                <div
+                  class="minHallItem"
+                  @click="topHallHome(item)"
+                  @mouseenter.stop="getHallTotalCount(item)"
+                  v-for="item in children"
+                  :key="item.id"
+                >
+                  <div class="imgBox">
+                    <el-image
+                      style="width: 221px; height: 108px"
+                      :src="item.img || item.bgImg"
+                      fit="contain"
+                    >
+                    </el-image>
+                    <div class="hoverBox">
+                      <div class="box">
+                        <div class="boxLeft">
+                          <p class="changshang changshangCount">
+                            {{ factoryCount }}
+                          </p>
+                          <p class="changshang">
+                            <i class="changshangIcon"></i> 厂商数
+                          </p>
+                        </div>
+                        <div class="boxRight">
+                          <p class="changshang changshangCount">
+                            {{ productCount }}
+                          </p>
+                          <p class="changshang">
+                            <i class="chanpinIcon"></i> 产品数
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="name">
+                    {{ item.companyName || item.adTitle }}
+                  </div>
                 </div>
               </div>
-            </slideritem>
-          </slider>
+            </el-carousel-item>
+          </el-carousel>
         </div>
       </div>
       <div class="right">
@@ -194,7 +245,10 @@
           <el-table
             v-show="hotValue === '热门择样'"
             :data="tableData"
-            height="375"
+            height="365"
+            style="width:100%;"
+            @row-click="toProductDetails"
+            :row-style="rowStyle"
             :header-row-style="{ height: '40px', padding: '0' }"
             :header-cell-style="{ backgroundColor: '#f9fafc', padding: '0' }"
           >
@@ -208,11 +262,11 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="name" label="商品信息" width="350">
+            <el-table-column prop="name" label="产品信息" width="280">
               <template slot-scope="scope">
                 <div class="productInfo">
                   <el-image
-                    style="width: 70px; height: 54px"
+                    style="width: 70px; height: 54px; min-width: 70px;"
                     :src="scope.row.imgUrl"
                     fit="contain"
                   >
@@ -264,8 +318,10 @@
           <el-table
             v-if="hotValue === '热门搜索'"
             :data="HotTableData"
-            style="width: 100%"
-            height="375"
+            style="width: 100%;"
+            height="365"
+            @row-click="rowClick"
+            :row-style="rowStyle"
             :header-row-style="{ height: '40px', padding: '0' }"
             :header-cell-style="{ backgroundColor: '#f9fafc', padding: '0' }"
           >
@@ -278,9 +334,9 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="keyWord" label="关键词" width="420">
+            <el-table-column prop="keyWord" label="关键词" width="350">
               <template slot-scope="scope">
-                <span style="font-size: 13px">
+                <span style="font-size: 13px;">
                   {{ scope.row.keyWord }}
                 </span>
               </template>
@@ -304,29 +360,13 @@
 
 <script>
 import { calculateDate } from "@/assets/js/common/common.js";
-import { slider, slideritem } from "vue-concise-slider"; // 引入slider组件
+
 export default {
   name: "bsHome",
-  components: {
-    slider: slider,
-    slideritem: slideritem
-  },
   data() {
     return {
-      //滑动配置[obj]
-      sliderinit: {
-        currentPage: 0, //当前页码
-        thresholdDistance: 500, //滑动判定距离
-        thresholdTime: 100, //滑动判定时间
-        autoplay: 4000, //自动滚动[ms]
-        loop: false, //循环滚动
-        direction: "horizontal", //方向设置，垂直滚动
-        infinite: 1, //无限滚动前后遍历数
-        slidesToScroll: 1, // 每次滑动项数
-        pagination: 1, // 每次滑动项数
-        loopedSlides: 1,
-        speed: 300
-      },
+      factoryCount: 0,
+      productCount: 0,
       up_f: require("@/assets/images/up_f.png"),
       up_t: require("@/assets/images/up_t.png"),
       statisticsData: {
@@ -347,7 +387,7 @@ export default {
       tableData: [],
       bigHalls: [],
       minHalls: [],
-      hotValue: "热门搜索",
+      hotValue: "热门择样",
       hotList: [
         {
           value: "热门择样"
@@ -394,7 +434,7 @@ export default {
         },
         {
           title: "VIP区",
-          content: "品牌厂家不容错过",
+          content: "品牌厂商不容错过",
           icon: require("@/assets/images/vipqu.png")
         },
         {
@@ -436,8 +476,83 @@ export default {
     };
   },
   methods: {
-    slide(data) {
-      console.log(data);
+    // 获取产品数和厂商数
+    async getHallTotalCount(item) {
+      const key = item.companyNumber || item.content;
+      if (!key) {
+        return false;
+      }
+      let companyOptions = sessionStorage.getItem(key);
+      if (companyOptions) {
+        companyOptions = JSON.parse(companyOptions);
+        this.factoryCount = companyOptions.firmTotalCount;
+        this.productCount = companyOptions.productTotalCount;
+      } else {
+        const res = await this.$http.post("/api/GetHallStatisticsCount", {
+          hallNumber: item.companyNumber || item.content
+        });
+        if (res.data.result.code === 200) {
+          this.factoryCount = res.data.result.item.firmTotalCount;
+          this.productCount = res.data.result.item.productTotalCount;
+          sessionStorage.setItem(key, JSON.stringify(res.data.result.item));
+        }
+      }
+    },
+    // 去展厅主页
+    // topHallHome() {
+    // this.$common.handlerMsgState({
+    //   msg: "敬请期待",
+    //   type: "warning"
+    // });
+    // return false;
+    topHallHome(item) {
+      if (!item.companyNumber && !item.content) {
+        this.$common.handlerMsgState({
+          msg: "展厅信息有误,请联系管理员",
+          type: "warning"
+        });
+        return false;
+      }
+      const fd = {
+        name: item.companyNumber || item.content,
+        linkUrl: "/bsIndex/bsHome",
+        component: "bsExhibitionHallHome",
+        refresh: true,
+        label: item.companyName || item.adTitle,
+        value: item
+      };
+      this.$store.commit("myAddTab", fd);
+    },
+    // 去产品详情
+    toProductDetails(row) {
+      const fd = {
+        name: row.productNumber,
+        linkUrl: "/bsIndex/bsProductSearchIndex",
+        component: "bsProductDetails",
+        refresh: true,
+        label: row.fa_no || "产品详情",
+        value: row
+      };
+      this.$store.commit("myAddTab", fd);
+    },
+    // 点击了行
+    rowClick(row) {
+      const fd = {
+        name: "/bsIndex/bsProductSearchIndex",
+        linkUrl: "/bsIndex/bsProductSearchIndex",
+        component: "bsProductSearchIndex",
+        refresh: true,
+        label: "产品查询"
+      };
+      this.$store.commit("myAddTab", fd);
+      this.$router.push(fd.linkUrl);
+      this.$store.commit("handlerSearchTxt", row.keyWord);
+    },
+    // 行样式
+    rowStyle() {
+      return {
+        cursor: "pointer"
+      };
     },
     // 点击label
     openLabel(title) {
@@ -455,11 +570,13 @@ export default {
         case "按图找样":
           fd = {
             name: "/bsIndex/bsProductSearchIndex",
-            linkUrl: "/bsIndex/bsProductSearchIndex?id=imgSearch",
+            linkUrl: "/bsIndex/bsProductSearchIndex",
             component: "bsProductSearchIndex",
             refresh: true,
             label: "产品查询"
           };
+          this.$store.commit("handlerHallSearchCate", null);
+          this.$store.commit("handlerimgSearch", true);
           break;
         case "新品区":
           fd = {
@@ -533,19 +650,19 @@ export default {
           };
           break;
         case "浏览足迹":
-          this.$common.handlerMsgState({
-            msg: "敬请期待",
-            type: "warning"
-          });
-          return false;
-        // fd = {
-        //   name: "/bsIndex/bsBrowsingFootprints",
-        //   linkUrl: "/bsIndex/bsBrowsingFootprints",
-        //   component: "bsBrowsingFootprints",
-        //   refresh: true,
-        //   label: title
-        // };
-        // break;
+          // this.$common.handlerMsgState({
+          //   msg: "敬请期待",
+          //   type: "warning"
+          // });
+          // return false;
+          fd = {
+            name: "/bsIndex/bsBrowsingFootprints",
+            linkUrl: "/bsIndex/bsBrowsingFootprints",
+            component: "bsBrowsingFootprints",
+            refresh: true,
+            label: title
+          };
+          break;
         case "站点分享":
           fd = {
             name: "/bsIndex/bsSiteLlis",
@@ -577,6 +694,14 @@ export default {
       this.$store.commit("myAddTab", fd);
       this.$router.push(fd.linkUrl);
     },
+    group(array, subGroupLength) {
+      let index = 0;
+      let newArray = [];
+      while (index < array.length) {
+        newArray.push(array.slice(index, (index += subGroupLength)));
+      }
+      return newArray;
+    },
     // 获取大小展厅
     async getOrgCompany() {
       const res = await this.$http.post("/api/GetExhibitionList", {
@@ -584,7 +709,8 @@ export default {
       });
       if (res.data.result.code === 200) {
         this.bigHalls = res.data.result.item.bigHallList.splice(0, 3);
-        this.minHalls = res.data.result.item.smallHallList;
+        const list = res.data.result.item.smallHallList;
+        this.minHalls = this.group(list, 4);
       }
     },
     // 获取统计数据
@@ -601,25 +727,22 @@ export default {
         this.timeData
       );
       if (res.data.result.code === 200) {
-        console.log(res.data.result.item);
         this.HotTableData = res.data.result.item;
       }
     },
     // 热门择样排行
     async getGetSalesHotSample() {
-      console.log(this.timeData);
       const res = await this.$http.post(
         "/api/GetSalesHotSample",
         this.timeData
       );
       if (res.data.result.code === 200) {
-        console.log(res);
         this.tableData = res.data.result.item;
       }
     },
     // 天数请求
-    changeTime(Value) {
-      this.timeData = Object.assign(calculateDate(Value));
+    changeTime(value) {
+      this.timeData = Object.assign(calculateDate(value));
       if (this.hotValue === "热门择样") {
         this.getGetSalesHotSample();
       } else {
@@ -627,8 +750,9 @@ export default {
       }
     },
     // 热门泽洋和热门搜索切换
-    changeHot(Value) {
-      if (Value === "热门择样") {
+    changeHot(value) {
+      console.log(value);
+      if (value === "热门择样") {
         this.getGetSalesHotSample();
       } else {
         this.getGetSalesHotSearch();
@@ -641,7 +765,12 @@ export default {
   mounted() {
     this.getOrgCompany();
     this.getGetSalesOrderDataStatistics();
-    this.getGetSalesHotSearch();
+    this.getGetSalesHotSample();
+  },
+  computed: {
+    swiper() {
+      return this.$refs.mySwiper.$swiper;
+    }
   }
 };
 </script>
@@ -734,7 +863,7 @@ export default {
         display: flex;
         flex-wrap: wrap;
         .item {
-          width: 185px;
+          width: 180px;
           text-align: center;
           cursor: pointer;
           margin-bottom: 20px;
@@ -831,13 +960,16 @@ export default {
     display: flex;
     // flex-wrap: wrap;
     justify-content: space-between;
+    box-sizing: border-box;
     .left {
-      width: 987px;
-      height: 440px;
+      width: 980px;
+      min-width: 980px;
+      height: 430px;
       background-color: #fff;
       border-radius: 4px;
       box-sizing: border-box;
       padding: 0 20px;
+      box-sizing: border-box;
       .title {
         height: 50px;
         display: flex;
@@ -858,12 +990,65 @@ export default {
         justify-content: space-between;
         .item {
           width: 302px;
+          cursor: pointer;
           .imgBox {
             width: 302px;
             height: 133px;
             overflow: hidden;
+            position: relative;
             .el-image {
               transition: all 1s;
+            }
+            .hoverBox {
+              color: #fff;
+              opacity: 0;
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0, 0, 0, 0.5);
+              transition: all 1s;
+              .box {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: space-evenly;
+                .boxLeft,
+                .boxRight {
+                  // width: 50%;
+                  .changshangIcon {
+                    display: block;
+                    width: 14px;
+                    height: 14px;
+                    margin-right: 10px;
+                    background: url("~@/assets/images/changshangIcon.png")
+                      no-repeat center;
+                    background-size: contain;
+                  }
+                  .chanpinIcon {
+                    display: block;
+                    width: 14px;
+                    height: 14px;
+                    margin-right: 10px;
+                    background: url("~@/assets/images/chanpinIcon.png")
+                      no-repeat center;
+                    background-size: contain;
+                  }
+                  .changshang {
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    margin-top: 10px;
+                    &.changshangCount {
+                      margin-top: 40px;
+                    }
+                  }
+                }
+              }
+            }
+            &:hover .hoverBox {
+              opacity: 1;
             }
           }
           &:hover {
@@ -883,33 +1068,94 @@ export default {
         }
       }
       @{deep} .minHall {
+        height: 198px;
         display: flex;
-        justify-content: space-between;
-        height: 208px;
-        .swiper-container-horizontal .slider-wrapper,
-        .swiper-container-vertical .slider-wrapper {
-          align-items: flex-start !important;
-        }
-        .slider-item {
-          width: 221px;
-          height: 158px;
-          margin-right: 20px;
-          cursor: pointer;
-          &:last-of-type {
-            margin-right: 0;
+        .el-carousel {
+          height: 198px;
+          width: 100%;
+          box-sizing: border-box;
+          .el-carousel__container {
+            height: 198px;
+          }
+          .el-carousel__indicators {
+            position: absolute;
+            left: 50%;
+            bottom: 10px;
+            margin-left: -18px;
+            .el-carousel__indicator {
+              .el-carousel__button {
+                width: 10px !important;
+                height: 10px !important;
+                border-radius: 50%;
+              }
+            }
           }
         }
         .minHallItem {
           width: 221px;
           height: 158px;
+          cursor: pointer;
+          margin-right: 20px;
           .imgBox {
             width: 221px;
             height: 108px;
-            // overflow: hidden;
+            overflow: hidden;
             .el-image {
               width: 221px;
               height: 108px;
               transition: all 1s;
+            }
+            position: relative;
+            .hoverBox {
+              color: #fff;
+              opacity: 0;
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0, 0, 0, 0.5);
+              transition: all 1s;
+              .box {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: space-evenly;
+                .boxLeft,
+                .boxRight {
+                  // width: 50%;
+                  .changshangIcon {
+                    display: block;
+                    width: 14px;
+                    height: 14px;
+                    margin-right: 10px;
+                    background: url("~@/assets/images/changshangIcon.png")
+                      no-repeat center;
+                    background-size: contain;
+                  }
+                  .chanpinIcon {
+                    display: block;
+                    width: 14px;
+                    height: 14px;
+                    margin-right: 10px;
+                    background: url("~@/assets/images/chanpinIcon.png")
+                      no-repeat center;
+                    background-size: contain;
+                  }
+                  .changshang {
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    margin-top: 10px;
+                    &.changshangCount {
+                      margin-top: 30px;
+                    }
+                  }
+                }
+              }
+            }
+            &:hover .hoverBox {
+              opacity: 1;
             }
           }
           &:hover {
@@ -933,7 +1179,7 @@ export default {
     }
     .right {
       flex: 1;
-      height: 440px;
+      height: 430px;
       background-color: #fff;
       border-radius: 4px;
       padding: 0 20px;
@@ -983,8 +1229,9 @@ export default {
       }
       .contentBox {
         margin-top: 15px;
-        height: 375px;
+        height: 365px;
         background-color: #ccc;
+        box-sizing: border-box;
         .tableIndex {
           display: flex;
           align-items: center;
@@ -1045,6 +1292,11 @@ export default {
               white-space: nowrap; /*不换行*/
               text-overflow: ellipsis; /*超出部分文字以...显示*/
             }
+          }
+          .el-image {
+            width: 70px;
+            height: 54px;
+            min-width: 70px;
           }
         }
       }

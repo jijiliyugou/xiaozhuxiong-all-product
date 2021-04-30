@@ -295,6 +295,7 @@ export default {
           this.clienFormData.size = obj.size;
           this.clienFormData.decimalPlaces = obj.decimalPlaces;
           this.clienFormData.rejectionMethod = obj.rejectionMethod;
+          this.clienFormData.profitCalcMethod = obj.profitCalcMethod;
         }
       }
     }

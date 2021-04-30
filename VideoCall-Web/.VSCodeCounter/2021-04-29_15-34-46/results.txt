@@ -1,0 +1,139 @@
+Date : 2021-04-29 15:34:46
+Directory : d:\LittleBearPC\VideoCall-Web
+Total : 71 files,  21903 codes, 1176 comments, 398 blanks, all 23477 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JSON       |          2 |     12,393 |          0 |          2 |     12,395 |
+| Vue        |         32 |      6,729 |        222 |        127 |      7,078 |
+| JavaScript |         32 |      2,449 |        940 |        161 |      3,550 |
+| Less       |          1 |        139 |          0 |          0 |        139 |
+| CSS        |          1 |        108 |          0 |         34 |        142 |
+| XML        |          1 |         50 |          3 |         67 |        120 |
+| Markdown   |          1 |         19 |          0 |          6 |         25 |
+| HTML       |          1 |         16 |         11 |          1 |         28 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                           | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                              |         71 |     21,903 |      1,176 |        398 |     23,477 |
+| public                                                                         |          1 |         16 |         11 |          1 |         28 |
+| src                                                                            |         63 |      9,384 |      1,115 |        385 |     10,884 |
+| src\assets                                                                     |          2 |        125 |         34 |          8 |        167 |
+| src\assets\js                                                                  |          2 |        125 |         34 |          8 |        167 |
+| src\assets\js\common                                                           |          1 |          0 |          0 |          1 |          1 |
+| src\assets\js\signalROptions                                                   |          1 |        125 |         34 |          7 |        166 |
+| src\components                                                                 |         22 |      4,661 |        169 |        116 |      4,946 |
+| src\components\LoginForm                                                       |          1 |        117 |          0 |          2 |        119 |
+| src\components\footer                                                          |          3 |        730 |         12 |          9 |        751 |
+| src\components\head                                                            |          1 |        176 |          1 |          2 |        179 |
+| src\components\order                                                           |          4 |      1,440 |         14 |         14 |      1,468 |
+| src\components\public                                                          |         13 |      2,198 |        142 |         89 |      2,429 |
+| src\components\public\carousel                                                 |          4 |        717 |         36 |         61 |        814 |
+| src\components\public\loading                                                  |          2 |         90 |         11 |          6 |        107 |
+| src\components\public\sIdentify                                                |          1 |        153 |          8 |          5 |        166 |
+| src\css                                                                        |          2 |        158 |          3 |        101 |        262 |
+| src\css\iconfont                                                               |          2 |        158 |          3 |        101 |        262 |
+| src\lang                                                                       |          3 |        334 |         32 |          6 |        372 |
+| src\less                                                                       |          1 |        139 |          0 |          0 |        139 |
+| src\mixins                                                                     |          1 |        297 |         10 |          2 |        309 |
+| src\plugins                                                                    |         12 |        424 |        658 |         54 |      1,136 |
+| src\plugins\agoraAjax                                                          |          2 |         92 |        308 |          7 |        407 |
+| src\plugins\ajax                                                               |          3 |        119 |        325 |         18 |        462 |
+| src\plugins\errHandle                                                          |          1 |          7 |         14 |          2 |         23 |
+| src\plugins\loading                                                            |          6 |        206 |         11 |         27 |        244 |
+| src\plugins\loading\handleLoad                                                 |          2 |         76 |          3 |          7 |         86 |
+| src\plugins\loading\pageLoad                                                   |          4 |        130 |          8 |         20 |        158 |
+| src\router                                                                     |          1 |         74 |         19 |          6 |         99 |
+| src\service                                                                    |          3 |        282 |         60 |          6 |        348 |
+| src\store                                                                      |          1 |         21 |         10 |          3 |         34 |
+| src\utils                                                                      |          4 |        593 |         29 |         31 |        653 |
+| src\views                                                                      |          9 |      2,211 |         81 |         45 |      2,337 |
+| src\views\home                                                                 |          1 |         10 |          0 |          1 |         11 |
+| src\views\meeting                                                              |          3 |        630 |          2 |         20 |        652 |
+| src\views\order                                                                |          1 |        115 |          3 |          0 |        118 |
+| src\views\user                                                                 |          1 |        361 |          2 |          4 |        367 |
+| src\views\video                                                                |          1 |        213 |          3 |          2 |        218 |
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                       | language   | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| d:\LittleBearPC\VideoCall-Web\.eslintrc.js                                     | JavaScript |         14 |          0 |          1 |         15 |
+| d:\LittleBearPC\VideoCall-Web\README.md                                        | Markdown   |         19 |          0 |          6 |         25 |
+| d:\LittleBearPC\VideoCall-Web\agora.config.js                                  | JavaScript |          3 |         10 |          0 |         13 |
+| d:\LittleBearPC\VideoCall-Web\babel.config.js                                  | JavaScript |          3 |          0 |          1 |          4 |
+| d:\LittleBearPC\VideoCall-Web\package-lock.json                                | JSON       |     12,346 |          0 |          1 |     12,347 |
+| d:\LittleBearPC\VideoCall-Web\package.json                                     | JSON       |         47 |          0 |          1 |         48 |
+| d:\LittleBearPC\VideoCall-Web\public\index.html                                | HTML       |         16 |         11 |          1 |         28 |
+| d:\LittleBearPC\VideoCall-Web\src\App.vue                                      | Vue        |         28 |          0 |          1 |         29 |
+| d:\LittleBearPC\VideoCall-Web\src\assets\js\common\common.js                   | JavaScript |          0 |          0 |          1 |          1 |
+| d:\LittleBearPC\VideoCall-Web\src\assets\js\signalROptions\signalROptions.js   | JavaScript |        125 |         34 |          7 |        166 |
+| d:\LittleBearPC\VideoCall-Web\src\components\LoginForm\LoginForm.vue           | Vue        |        117 |          0 |          2 |        119 |
+| d:\LittleBearPC\VideoCall-Web\src\components\footer\footer.vue                 | Vue        |        321 |          9 |          1 |        331 |
+| d:\LittleBearPC\VideoCall-Web\src\components\footer\loginFooter.vue            | Vue        |         54 |          0 |          0 |         54 |
+| d:\LittleBearPC\VideoCall-Web\src\components\footer\setting.vue                | Vue        |        355 |          3 |          8 |        366 |
+| d:\LittleBearPC\VideoCall-Web\src\components\head\head.vue                     | Vue        |        176 |          1 |          2 |        179 |
+| d:\LittleBearPC\VideoCall-Web\src\components\order\addSampling.vue             | Vue        |        106 |          1 |          0 |        107 |
+| d:\LittleBearPC\VideoCall-Web\src\components\order\modalProductDetail.vue      | Vue        |        253 |          0 |          8 |        261 |
+| d:\LittleBearPC\VideoCall-Web\src\components\order\product.vue                 | Vue        |        561 |          5 |          4 |        570 |
+| d:\LittleBearPC\VideoCall-Web\src\components\order\productList.vue             | Vue        |        520 |          8 |          2 |        530 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\AgoraVideoCall.vue         | Vue        |        503 |         69 |         10 |        582 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\carousel\assist.js         | JavaScript |        271 |         17 |         43 |        331 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\carousel\carousel.vue      | Vue        |        367 |         17 |         10 |        394 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\carousel\dom.js            | JavaScript |         32 |          2 |          3 |         37 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\carousel\icon.vue          | Vue        |         47 |          0 |          5 |         52 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\chart.vue                  | Vue        |        296 |         12 |          2 |        310 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\endingMettingModal.vue     | Vue        |        187 |          6 |          1 |        194 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\errorHandler.vue           | Vue        |         51 |          0 |          3 |         54 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\escModal.vue               | Vue        |         93 |          0 |          0 |         93 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\loading\loading.js         | JavaScript |         20 |         11 |          4 |         35 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\loading\loading.vue        | Vue        |         70 |          0 |          2 |         72 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\reconnectionModal.vue      | Vue        |        108 |          0 |          1 |        109 |
+| d:\LittleBearPC\VideoCall-Web\src\components\public\sIdentify\sIdentify.vue    | Vue        |        153 |          8 |          5 |        166 |
+| d:\LittleBearPC\VideoCall-Web\src\css\iconfont\iconfont.css                    | CSS        |        108 |          0 |         34 |        142 |
+| d:\LittleBearPC\VideoCall-Web\src\css\iconfont\iconfont.svg                    | XML        |         50 |          3 |         67 |        120 |
+| d:\LittleBearPC\VideoCall-Web\src\lang\en.js                                   | JavaScript |        155 |         10 |          2 |        167 |
+| d:\LittleBearPC\VideoCall-Web\src\lang\index.js                                | JavaScript |         24 |         12 |          3 |         39 |
+| d:\LittleBearPC\VideoCall-Web\src\lang\zh.js                                   | JavaScript |        155 |         10 |          1 |        166 |
+| d:\LittleBearPC\VideoCall-Web\src\less\common.less                             | Less       |        139 |          0 |          0 |        139 |
+| d:\LittleBearPC\VideoCall-Web\src\main.js                                      | JavaScript |         37 |         10 |          6 |         53 |
+| d:\LittleBearPC\VideoCall-Web\src\mixins\video.js                              | JavaScript |        297 |         10 |          2 |        309 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\agoraAjax\ajax.js                    | JavaScript |         81 |        300 |          5 |        386 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\agoraAjax\index.js                   | JavaScript |         11 |          8 |          2 |         21 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\ajax\ajax.js                         | JavaScript |         89 |        270 |          5 |        364 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\ajax\conf.js                         | JavaScript |         18 |         47 |         11 |         76 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\ajax\index.js                        | JavaScript |         12 |          8 |          2 |         22 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\errHandle\index.js                   | JavaScript |          7 |         14 |          2 |         23 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\loading\handleLoad\handleLoading.js  | JavaScript |         18 |          3 |          4 |         25 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\loading\handleLoad\handleLoading.vue | Vue        |         58 |          0 |          3 |         61 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\loading\pageLoad\Loading.vue         | Vue        |         57 |          1 |          8 |         66 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\loading\pageLoad\Loading2.vue        | Vue        |         37 |          1 |          4 |         42 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\loading\pageLoad\loading.js          | JavaScript |         18 |          3 |          4 |         25 |
+| d:\LittleBearPC\VideoCall-Web\src\plugins\loading\pageLoad\loading2.js         | JavaScript |         18 |          3 |          4 |         25 |
+| d:\LittleBearPC\VideoCall-Web\src\router\index.js                              | JavaScript |         74 |         19 |          6 |         99 |
+| d:\LittleBearPC\VideoCall-Web\src\service\agoraService.js                      | JavaScript |         21 |         14 |          1 |         36 |
+| d:\LittleBearPC\VideoCall-Web\src\service\meetingService.js                    | JavaScript |         67 |         24 |          0 |         91 |
+| d:\LittleBearPC\VideoCall-Web\src\service\tokenService.js                      | JavaScript |        194 |         22 |          5 |        221 |
+| d:\LittleBearPC\VideoCall-Web\src\store\index.js                               | JavaScript |         21 |         10 |          3 |         34 |
+| d:\LittleBearPC\VideoCall-Web\src\utils\BrowserCheck.js                        | JavaScript |         15 |          1 |          4 |         20 |
+| d:\LittleBearPC\VideoCall-Web\src\utils\Settings.js                            | JavaScript |          9 |         11 |          4 |         24 |
+| d:\LittleBearPC\VideoCall-Web\src\utils\util.js                                | JavaScript |        478 |          9 |         22 |        509 |
+| d:\LittleBearPC\VideoCall-Web\src\utils\vaildata.js                            | JavaScript |         91 |          8 |          1 |        100 |
+| d:\LittleBearPC\VideoCall-Web\src\views\Home.vue                               | Vue        |        193 |          6 |          5 |        204 |
+| d:\LittleBearPC\VideoCall-Web\src\views\Login.vue                              | Vue        |        689 |         65 |         13 |        767 |
+| d:\LittleBearPC\VideoCall-Web\src\views\home\index.vue                         | Vue        |         10 |          0 |          1 |         11 |
+| d:\LittleBearPC\VideoCall-Web\src\views\meeting\addMeeting.vue                 | Vue        |        304 |          1 |         10 |        315 |
+| d:\LittleBearPC\VideoCall-Web\src\views\meeting\createMeeting.vue              | Vue        |        316 |          1 |          9 |        326 |
+| d:\LittleBearPC\VideoCall-Web\src\views\meeting\index.vue                      | Vue        |         10 |          0 |          1 |         11 |
+| d:\LittleBearPC\VideoCall-Web\src\views\order\order.vue                        | Vue        |        115 |          3 |          0 |        118 |
+| d:\LittleBearPC\VideoCall-Web\src\views\user\userList.vue                      | Vue        |        361 |          2 |          4 |        367 |
+| d:\LittleBearPC\VideoCall-Web\src\views\video\video.vue                        | Vue        |        213 |          3 |          2 |        218 |
+| d:\LittleBearPC\VideoCall-Web\vue.config.js                                    | JavaScript |         71 |         40 |          2 |        113 |
+| Total                                                                          |            |     21,903 |      1,176 |        398 |     23,477 |
++--------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

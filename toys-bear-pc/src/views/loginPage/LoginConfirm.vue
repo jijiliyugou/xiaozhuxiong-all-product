@@ -7,37 +7,44 @@
       <div class="middleBox">
         <div class="myTitle">选择登陆角色</div>
         <div class="userBox">
-          <li
-            class="userItem"
-            @click.prevent="toMeInfo(item)"
-            v-for="(item, i) in userList"
-            :key="i"
-          >
-            <el-image
-              class="img"
-              style="width: 60px; height: 60px;"
-              :src="item.companyLogo"
-              fit="cover"
+          <template v-for="(item, i) in userList">
+            <li
+              :class="{ userItem: true, active: item.checked }"
+              @click.prevent="toMeInfo(item)"
+              :key="i"
             >
-              <div
-                slot="error"
-                class="image-slot"
-                style="width:100%;height:100%;display:flex;align-items:center;text-align:center;"
+              <el-image
+                class="img"
+                style="width: 60px; height: 60px;"
+                :src="item.companyLogo"
+                fit="cover"
               >
-                <img :src="require('@/assets/images/imgError.png')" alt="" />
-              </div>
-              <div
-                slot="placeholder"
-                class="image-slot"
-                style="width:100%;height:100%;display:flex;align-items:center;white-space: nowrap;text-align:center;"
+                <div
+                  slot="error"
+                  class="image-slot"
+                  style="width:100%;height:100%;display:flex;align-items:center;text-align:center;"
+                >
+                  <img :src="require('@/assets/images/imgError.png')" alt="" />
+                </div>
+                <div
+                  slot="placeholder"
+                  class="image-slot"
+                  style="width:100%;height:100%;display:flex;align-items:center;white-space: nowrap;text-align:center;"
+                >
+                  <img :src="require('@/assets/images/imgError.png')" alt="" />
+                </div>
+              </el-image>
+              <p style="box-sizing:border-box;padding-right:10px;">
+                {{ item.companyName }}
+              </p>
+              <el-radio
+                v-if="$route.query.id === 'checkted'"
+                v-model="item.checked"
+                :label="true"
+                ><span style="display:none;">1</span></el-radio
               >
-                <img :src="require('@/assets/images/imgError.png')" alt="" />
-              </div>
-            </el-image>
-            <p style="box-sizing:border-box;padding-right:10px;">
-              {{ item.companyName }}
-            </p>
-          </li>
+            </li>
+          </template>
           <div class="testItem"></div>
           <div class="testItem"></div>
           <div class="testItem"></div>
@@ -73,7 +80,18 @@ export default {
       });
       console.log(res);
       if (res.data.result.code === 200) {
+        for (let i = 0; i < res.data.result.item.length; i++) {
+          if (
+            res.data.result.item[i].companyNumber ==
+            this.userInfo.commparnyList[0].companyNumber
+          ) {
+            res.data.result.item[i].checked = true;
+          } else {
+            res.data.result.item[i].checked = false;
+          }
+        }
         this.userList = res.data.result.item;
+        console.log(this.userList);
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -100,6 +118,10 @@ export default {
       });
     },
     async toMeInfo(item) {
+      for (let i = 0; i < this.userList.length; i++) {
+        this.userList[i].checked = false;
+      }
+      item.checked = true;
       const res = await this.$http.post("/api/UserAffiliateCompany", {
         UserId: this.userInfo.userInfo.id,
         CompanyNumber: item.companyNumber
@@ -244,6 +266,15 @@ export default {
           align-items: center;
           cursor: pointer;
           margin-bottom: 30px;
+          position: relative;
+          .el-radio {
+            position: absolute;
+            bottom: 10px;
+            right: 0;
+          }
+          &.active {
+            border: 2px solid #3368a9;
+          }
           &:nth-last-of-type(1) {
             margin-bottom: 0;
           }

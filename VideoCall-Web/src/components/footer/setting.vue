@@ -4,71 +4,69 @@
  * @Author: gaojiahao
  * @Date: 2020-11-03 16:35:57
  * @LastEditors: sueRimn
- * @LastEditTime: 2021-04-23 17:10:23
+ * @LastEditTime: 2021-04-29 17:52:54
 -->
 <template>
-    <Modal v-model="show" title="设置" @on-ok="ok" @on-cancel="cancel" width="430" draggable class="setting">
+    <Modal v-model="show" :title="$t('settings.settings')" @on-ok="ok" @on-cancel="cancel" width="430" draggable class="setting">
         <div class="setting_panel">
             <Tabs :value="modal" :animated="false">
-                <TabPane label="房间设置" name="name1" v-if="flag">
+                <TabPane :label="$t('settings.roomSettingTitle')" name="name1" v-if="flag">
                     <div class="setting_room_wrap">
                         <div class="item">
                             <div class="icon">
                                 <Icon type="ios-albums" />            
                             </div>
                             <div class="title">
-                                房间ID
+                                {{$t("settings.meetingsId")}}
                             </div>
                             <div class="text">
                                 <Input v-model="formValidate['id']" :style="{width:'113px'}" :maxlength="7" disabled></Input>
                             </div>
-                            <div class="action">
+                            <!-- <div class="action">
                                 <Icon type="md-sync" />刷新
-                            </div>
+                            </div> -->
                         </div>
                         <div class="item">
                             <div class="icon">
                                 <Icon type="ios-calendar-outline" />       
                             </div>
                             <div class="title">
-                                结束时间
+                                {{$t("settings.endTime")}}
                             </div>
                             <div class="text">
-                                <DatePicker type="datetime" v-model="formValidate['endTime']" @on-change="formValidate['endTime']=$event" format="yyyy-MM-dd HH:mm" style="width: 226px;" :transfer='true'></DatePicker> 
+                                <DatePicker type="datetime" v-model="formValidate['endTime']" @on-change="formValidate['endTime']=$event" format="yyyy-MM-dd HH:mm" style="width: 226px;" :transfer='true' :options="options"></DatePicker> 
                             </div>    
                         </div>
                         <div class="item">
                             <div class="icon">
-                                <Icon type="md-bicycle" />       
+                                <Icon type="md-person" /> 
                             </div>
                             <div class="title">
-                                主持人
+                                {{$t("settings.host")}}
                             </div>
                             <div class="text">
-                                我
+                                {{$t("settings.me")}}
                             </div>
                         </div>
                         <Divider />
                         <div class="settings_wrap">
-                            <div>设置新进入房间的会议人状态</div>
-                            <CheckboxGroup v-model="formValidate.settings" class="settings">
-                                <Checkbox label="isM">容许参会者进入房间时打开摄像头</Checkbox>
-                                <Checkbox label="isC">容许参会者进入房间时打开麦克风</Checkbox>
-                            </CheckboxGroup>
+                            <div>{{$t("settings.settingsStatus")}}</div>
+                            <Checkbox v-model="formValidate.settings.isMic">{{$t("settings.isMic")}}</Checkbox>
+                            <Checkbox v-model="formValidate.settings.isCar">{{$t("settings.isCar")}}</Checkbox>
                         </div>
                         <div style="width:100%;"> 
-                            <Button type="primary" @click="save" style="float: right;">确认</Button>
+                            <Button type="primary" @click="save" style="float: right;">{{$t("settings.button")}}</Button>
                         </div>
                     </div>
                 </TabPane>
-                <TabPane label="个人设置" name="name2">
+                <TabPane :label="$t('settings.personalSettingTitle')" name="name2">
                     <div class="setting_room_wrap">
                         <div class="item">
                             <div class="icon">
-                                <Icon type="ios-calendar-outline" />       
+                                <Icon type="ios-videocam" />
                             </div>
                             <div class="title">
-                                摄像头
+                                {{$t("settings.camera")}}
                             </div>
                             <div class="text">
                                 <Select v-model="videoDevice" :style="{width:'200px',float: 'left'}" clearable @on-select="onChangeVideoDevice" :transfer='true'>
@@ -78,10 +76,10 @@
                         </div>
                         <div class="item">
                             <div class="icon">
-                                <Icon type="ios-calendar-outline" />       
+                                <Icon type="ios-mic" />
                             </div>
                             <div class="title">
-                                麦克风
+                                {{$t("settings.audio")}}
                             </div>
                             <div class="text">
                                 <Select v-model="audioDevice" :style="{width:'200px',float: 'left'}" clearable  @on-select="onChangeAudioDevice" :transfer='true'>
@@ -91,15 +89,26 @@
                         </div>
                         <div class="item">
                             <div class="icon">
-                                <Icon type="ios-calendar-outline" />       
+                                <Icon type="ios-cog-outline" />    
                             </div>
                             <div class="title">
-                                视频清晰度
+                                {{$t("settings.resolutionRatio")}}
                             </div>
                             <div class="text">
                                 <Select v-model="videoEncoder" :style="{width:'200px',float: 'left'}" clearable  @on-select="onChangeVideoEncoder" :transfer='true'>
                                     <Option v-for="(item,index) in videoEncoderList" :value="item.value" :key="index">{{ item.name }}</Option>
                                 </Select>
+                            </div>    
+                        </div>
+                        <div class="item">
+                            <div class="icon">
+                                <Icon type="ios-volume-up" />    
+                            </div>
+                            <div class="title">
+                                {{$t("settings.volume")}}
+                            </div>
+                            <div class="text">
+                                <div style="width: 200px;"><Slider v-model="volume" @on-input="onInput"></Slider></div>
                             </div>    
                         </div>
                     </div>
@@ -115,7 +124,8 @@
 <script>
 import * as Cookies from "js-cookie";
 import {
-  Update
+  Update,
+  QueryMeetingRoom
 } from "@service/meetingService";
 
 export default {
@@ -144,13 +154,16 @@ export default {
             formValidate:{
                 id:100007,
                 endTime:'',
-                settings:['isM','isC']
+                settings:{
+                    isMic:true,
+                    isCar:true
+                }
             },
             videoDevice:'',
             audioDevice:'',
             flag:false,
             modal:'name1',
-            videoEncoder:'720p_6',
+            videoEncoder:'1080p_2',
             videoEncoderList:[
                 {
                     name:'480p',
@@ -163,14 +176,28 @@ export default {
                 {
                     name:'1080p',
                     value:'1080p_5'
+                },
+                {
+                    name:'1080p_30',
+                    value:'1080p_2'
                 }
-            ]
+            ],
+            options: {
+                disabledDate (date) {
+                    var endTime = Cookies.get('endTime');
+                    return date && date.valueOf() < Date.now(endTime) - 86400000;
+                }
+            },
+            volume:100,
         }
     },
     watch:{
         showModal: {
             handler(val) {
                 this.show = val;
+                if(val) {
+                    this.QueryMeetingRoom();
+                }
             }
         },
         videoDevices:{
@@ -185,6 +212,9 @@ export default {
             },
             deep:true
         }
+    },
+    computed:{
+
     },
     methods: {
         ok(){
@@ -202,11 +232,32 @@ export default {
         onChangeVideoEncoder(val){
             this.$emit('change-video-encoder',val.value);           
         },
+        QueryMeetingRoom(){
+            if(this.flag){
+                return new Promise((resolve, reject) => {
+                    QueryMeetingRoom({roomNumber:this.formValidate.id}).then(res => {
+                        if (res.success) {
+                            this.formValidate.endTime = res.data.endTime;
+                            this.formValidate.settings.isMic = res.data.isAllowOpenMicrophone;
+                            this.formValidate.settings.isCar = res.data.isAllowOpenCameras;
+                        } else {
+                            this.$Message.error({
+                                background: true,
+                                content: res.result.msg
+                            });
+                        }
+                    });
+                });
+            }
+        },
         save(){
             var params = {
                 roomNumber:this.formValidate.id,
-                endTime:this.formValidate.endTime
+                endTime:this.formValidate.endTime,
+                isAllowOpenCameras:this.formValidate.settings.isCar,
+                isAllowOpenMicrophone:this.formValidate.settings.isMic,
             };
+            var me = this;
             return new Promise((resolve, reject) => {
                 this.$FromLoading.show();
                 Update(params).then(res => {
@@ -216,6 +267,9 @@ export default {
                             content: res.message
                         });
                         Cookies.set('endTime',res.data.endTime);
+                        window.sessionStorage.setItem("isMic",this.formValidate.settings.isMic);
+                        window.sessionStorage.setItem("isCar",this.formValidate.settings.isCar); 
+                        me.$parent.$parent.$parent.$parent.$refs.video.againCount() //保存结束时间后，重新计算计时器
                         this.$emit('show-modal-detail', false);
                         this.$FromLoading.hide(); 
                     }
@@ -225,9 +279,13 @@ export default {
                     background: true,
                     content: err.message
                 });
-                this.$FromLoading.hide(); 
+                this.$FromLoading.hide();
             });   
-        }
+        },
+        //调整通话音量
+        onInput(value){
+            this.$emit('set-volum',value);
+        },
     },
     mounted() {
 
@@ -264,7 +322,7 @@ export default {
 }
 .setting .setting_panel{
     display: flex;
-    height: 387px;
+    // height: 387px;
     .setting_room_wrap {
         padding: 15px;
         .item {

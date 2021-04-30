@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-03-31 17:09:19
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\views\Home.vue
- * @LastEditTime: 2021-04-23 14:54:18
+ * @LastEditTime: 2021-04-29 14:35:06
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -16,7 +16,7 @@
         </Header>
         <Layout>
             <Sider hide-trigger breakpoint="md" class="container-sider" v-model="isCollapsed" collapsible :collapsed-width="0" ref="side1" hide-trigger :width="220">
-              <UserList @collapsed-sider="collapsedSider" :userlist="userlist"></UserList>
+              <UserList @collapsed-sider="collapsedSider" :userlists="userlist"></UserList>
               <div class="nextPage" v-if="isCollapsed" @click="collapsedSider">
                 <Icon type="ios-arrow-forward" />
               </div>
@@ -30,7 +30,7 @@
         </Layout>
         <Footer>
           <Footers @leave="leave" @endMeeting="endMeeting" @set-volum="setVolum" @get-devices="getDevices" :videoDevices="videoDevices" :audioDevices="audioDevices" @change-devices="changeDevices" 
-             @change-video-encoder="changeVideoEncoder"
+             @change-video-encoder="changeVideoEncoder" ref='footer'
            ></Footers>
         </Footer>
     </Layout>
@@ -39,13 +39,14 @@
 
 <script>
 import * as Cookies from "js-cookie";
-import Heads from "@components/head/index";
+import Heads from "@components/head/head";
 import UserList from "@views/user/userList";
-import Video from "@views/video/index";
-import Order from "@views/order/index";
-import Footers from "@components/footer/index";
+import Video from "@views/video/video";
+import Order from "@views/order/order";
+import Footers from "@components/footer/footer";
 import {
-  QueryMeetingRoomMembers
+  QueryMeetingRoomMembers,
+  QueryMeetingRoom
 } from "@service/meetingService";
 
 export default {
@@ -63,7 +64,9 @@ export default {
       videoDevices:null,
       audioDevices:null,
       userlist:[],
-      roomNumber:''
+      roomNumber:'',
+      meetingRoomInfo:{},
+      isAdmin:false
     };
   },
   methods: {
@@ -108,6 +111,21 @@ export default {
           }
         });
       });  
+    },
+    QueryMeetingRoom(){
+
+      return new Promise((resolve, reject) => {
+        QueryMeetingRoom({roomNumber:this.roomNumber}).then(res => {
+          if (res.success) {
+            Cookies.set('endTime',res.data.endTime);
+          } else {
+            this.$Message.error({
+              background: true,
+              content: res.result.msg
+            });
+          }
+        });
+      });  
     }
   },
   mounted() {
@@ -119,6 +137,10 @@ export default {
     this.config = JSON.parse(window.sessionStorage.getItem("SPHY_LOGIN_TOKEN"));
     this.roomNumber = Cookies.get("channel");
     this.getQueryMeetingRoomMembers();
+    this.isAdmin = Cookies.get("isAdmin")=='true' ? true : false;
+    if(this.isAdmin){
+      this.QueryMeetingRoom();
+    }
   }
 };
 </script>

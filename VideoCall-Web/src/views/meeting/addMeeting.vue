@@ -9,6 +9,18 @@ d<!--
 <template>
   <div class="createMeeting" ref="createMeeting">
     <div class="wrapper">
+      <div class="wrapper_dropdown">
+        <Dropdown trigger="click" style="margin-left: 20px" @on-click="onClickDropdown">
+          <a href="javascript:void(0)">
+            language:{{language}}
+            <Icon type="ios-arrow-down"></Icon>
+          </a>
+          <DropdownMenu slot="list">
+            <DropdownItem name="zh">中文</DropdownItem>
+            <DropdownItem name="en">English</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </div>
       <div class="login_wrapper">
         <div class="head">
           <div class="title">
@@ -21,7 +33,7 @@ d<!--
               <Col span="8">
               </Col>
               <Col span="8">
-                <div class="item active">进入会议</div>
+                <div class="item active">{{$t("addMeeting.title")}}</div>
               </Col>
               <Col span="8">
               </Col>
@@ -31,21 +43,21 @@ d<!--
             <!-- <FormItem label="会议ID" prop="id">
               <Input v-model="formValidate['id']" :style="{width:'300px',marginLeft: '-50px'}" :maxlength="11" disabled></Input>
             </FormItem> -->
-            <FormItem label="公司名称" prop="company">
-              <Input v-model="formValidate['company']" :style="{width:'300px',marginLeft: '-47px'}" placeholder="请输入公司名称"></Input>
+            <FormItem :label="$t('addMeeting.company')" prop="company">
+              <Input v-model="formValidate['company']" :style="{width:'300px',marginLeft: '-47px'}" :placeholder="$t('addMeeting.companyText')"></Input>
             </FormItem>
-            <FormItem label="昵称" prop="nickName">
-              <Input v-model="formValidate['nickName']" :style="{width:'300px',marginLeft: '-47px'}" placeholder="请输入您的昵称"></Input>
+            <FormItem :label="$t('addMeeting.nickName')" prop="nickName">
+              <Input v-model="formValidate['nickName']" :style="{width:'300px',marginLeft: '-47px'}" :placeholder="$t('addMeeting.nickNameText')"></Input>
             </FormItem>
-            <FormItem label="摄像头" prop="videoId">
+            <FormItem :label="$t('addMeeting.videoId')" prop="videoId">
               <Select v-model="formValidate['videoId']" :style="{width:'300px',marginLeft: '-47px'}" clearable @on-select="onChangeVideoDevice">
                 <Option v-for="(item,index) in videoDevices" :value="item.deviceId" :key="index">{{ item.label }}</Option>
              </Select>
             </FormItem>
-            <FormItem prop="settings">
-              <CheckboxGroup v-model="formValidate.settings" :style="{marginLeft: '-150px'}">
-                <Checkbox label="isM">打开麦克风</Checkbox>
-                <Checkbox label="isC">打开摄像头</Checkbox>
+            <FormItem prop="settings" :style="{float: 'left'}">
+              <CheckboxGroup v-model="formValidate.settings">
+                <Checkbox label="isM">{{$t("addMeeting.audio")}}</Checkbox>
+                <Checkbox label="isC">{{$t("addMeeting.camera")}}</Checkbox>
               </CheckboxGroup>    
             </FormItem>
             <FormItem>
@@ -66,6 +78,7 @@ import LoginFooter from "@components/footer/loginFooter";
 import {
   JoinMeetingRoom
 } from "@service/meetingService";
+import tokenService from "@service/tokenService";
 
 export default {
   name: "addMeeting",
@@ -85,13 +98,34 @@ export default {
       baseMode: "avc",
       transcode: "interop",
       attendeeMode: "video",
-      videoProfile: "720p_6",  //省流量测试
+      videoProfile: "1080p_2",  //省流量测试
       ruleValidate:{
-
+        company: [
+          { required: true, message: this.$t('addMeeting.companyText'), trigger: 'blur' }
+        ],
+        nickName: [
+          { required: true, message: this.$t('addMeeting.nickNameText'), trigger: 'blur' }
+        ],
       },
       videoDevices:[],
       roomNumber:'',
-      mac:''
+      mac:'',
+      language:'简体中文',
+      locale: [],
+      changeLang: [
+        {
+          value: "zh",
+          label: "简体中文"
+        },
+        {
+          value: "en",
+          label: "English"
+        },
+        {
+          value: "tc",
+          label: "繁體中文"
+        }
+      ],
     };
   },
   methods: {
@@ -116,6 +150,8 @@ export default {
                 Cookies.set("uid", res.data.meetingRoomMemberId);
                 Cookies.set("videoId", this.formValidate.videoId);
                 Cookies.set("companyName", res.data.companyName);
+                window.sessionStorage.setItem("isMic",res.data.isAllowOpenMicrophone);
+                window.sessionStorage.setItem("isCar",res.data.isAllowOpenCameras);
                 this.$router.push('/');  
               } else {
                 this.$Message.error({
@@ -149,6 +185,7 @@ export default {
         token : this.generateUUID(),
       };
       window.sessionStorage.setItem('SPHY_LOGIN_TOKEN', JSON.stringify(globalToken));
+      tokenService.setAgoraToken();
     },
     generateUUID() {
       var d = new Date().getTime();
@@ -159,6 +196,24 @@ export default {
       });
       return uuid;
     },
+    onClickDropdown(val){
+      this.changeLangFn(val);
+    },
+    //切换多语言
+    changeLangFn(val) {
+      let chan = this.changeLang;
+      for (let i in chan) {
+        if (chan[i].value === val) {
+          this.locale = this.$i18n.locale = chan[i].value;
+          this.language = chan[i].label;
+          localStorage.setItem("language", chan[i].value);
+        }
+      }
+    },
+  },
+  mounted() {
+    this.locale = this.$i18n.locale;
+    this.changeLangFn(this.locale);
   },
   created(){
     this.initRMT();

@@ -192,22 +192,22 @@ export default {
     },
     // 找同款
     sameEvent() {
-      this.$common.handlerMsgState({
-        msg: "敬请期待",
-        type: "warning"
-      });
-      return false;
-      // const value = JSON.parse(JSON.stringify(this.item));
-      // value.type = "same";
-      // const fd = {
-      //   name: "same" + this.item.productNumber,
-      //   linkUrl: "/bsIndex/bsProductSearchIndex",
-      //   component: "bsSimilarProduct",
-      //   refresh: true,
-      //   label: "同款产品" + this.item.fa_no,
-      //   value: value
-      // };
-      // this.$store.commit("myAddTab", fd);
+      // this.$common.handlerMsgState({
+      //   msg: "敬请期待",
+      //   type: "warning"
+      // });
+      // return false;
+      const value = JSON.parse(JSON.stringify(this.item));
+      value.type = "same";
+      const fd = {
+        name: "same" + this.item.productNumber,
+        linkUrl: "/bsIndex/bsProductSearchIndex",
+        component: "bsSimilarProduct",
+        refresh: true,
+        label: "同款产品" + this.item.fa_no,
+        value: value
+      };
+      this.$store.commit("myAddTab", fd);
     },
     // 显示明细
     showDetails(flag) {
@@ -249,10 +249,20 @@ export default {
         this.$store.commit("myAddTab", fd);
       } else {
         // 去展厅
-        this.$common.handlerMsgState({
-          msg: "展厅首页敬请期待",
-          type: "warning"
-        });
+        // this.$common.handlerMsgState({
+        //   msg: "展厅首页敬请期待",
+        //   type: "warning"
+        // });
+        // return false;
+        const fd = {
+          name: item.exhibitionNumber || item.companyNumber,
+          linkUrl: "/bsIndex/bsProductSearchIndex",
+          component: "bsExhibitionHallHome",
+          refresh: true,
+          label: item.exhibitionName,
+          value: item
+        };
+        this.$store.commit("myAddTab", fd);
       }
     },
     // 收藏
@@ -273,7 +283,7 @@ export default {
         productNumber: item.productNumber
       });
       if (res.data.result.code === 200) {
-        eventBus.$emit("resetProducts", item);
+        eventBus.$emit("resetProductCollection");
       } else {
         this.$common.handlerMsgState({
           msg: "收藏失败",
@@ -306,15 +316,30 @@ export default {
           type: "warning"
         });
       }
-      eventBus.$emit("resetMyShoppingCart");
-      eventBus.$emit("resetProducts", this.item);
+      eventBus.$emit("resetMyCart", this.item);
       this.$nextTick(() => {
         this.$forceUpdate();
       });
     },
-    // 删除浏览记录
-    handlerDeleteBrowsing(item) {
-      console.log(item);
+    // 删除单个浏览记录
+    async handlerDeleteBrowsing(item) {
+      const fd = {
+        id: item.id,
+        type: 0
+      };
+      const res = await this.$http.post("/api/DeleteProductRecord", fd);
+      if (res.data.result.code === 200) {
+        eventBus.$emit("refreshHtml");
+        this.$common.handlerMsgState({
+          msg: "删除成功",
+          type: "success"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: "删除失败",
+          type: "danger"
+        });
+      }
     }
   },
   created() {},
@@ -475,6 +500,7 @@ export default {
       .left {
         flex: 1;
         .item {
+          width: 175px;
           padding: 4px 0;
           overflow: hidden; /*超出部分隐藏*/
           white-space: nowrap; /*不换行*/

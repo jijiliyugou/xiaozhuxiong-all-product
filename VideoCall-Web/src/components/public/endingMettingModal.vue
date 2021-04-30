@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-08 14:46:21
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\public\endingMettingModal.vue
- * @LastEditTime: 2021-04-22 17:53:29
+ * @LastEditTime: 2021-04-28 18:58:46
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -12,7 +12,7 @@
     <div class="timeModal" v-if="show">
         <div class="title">
             <Icon type="ios-alert" class="icon" />
-            <div>会议即将结束！</div>
+            <div>{{$t("modal.endMeeting")}}</div>
         </div>
         <div class="time">
             <div class="timer item">
@@ -30,8 +30,8 @@
             </div>
         </div>
         <div class="action">
-            <Button type="primary" shape="circle" style="width:88px;margin:0 14px 0 28px;">重新设置</Button>
-            <Button type="warning" shape="circle" style="width:88px;margin:0 28px 0 14px;background:#E6E6E6;border-color:#E6E6E6;color:#666666">取消</Button>
+            <Button type="primary" shape="circle" style="width:88px;margin:0 14px 0 28px;" @click="showSettings">{{$t("modal.endReset")}}</Button>
+            <Button type="warning" shape="circle" style="width:88px;margin:0 28px 0 14px;background:#E6E6E6;border-color:#E6E6E6;color:#666666" @click="cancel">{{$t("modal.endCancel")}}</Button>
         </div>
     </div>
 </template>
@@ -48,21 +48,23 @@ export default {
     watch:{
         isShow:{
             handler(val){
-                debugger
                 this.show = val;
-            }
+            },
+            // deep:true,
+            // immediate:true
         }
     },
     data() {
         return {
-            currentTime:5,
+            currentTime:300,
             timeObj: null, // 时间对象,下方会用到
             myHours: '00', // 我定义来接收计算出来的 小时 的
             myMinutes: '00', // 我定义来接收计算出来的 分钟 的
             mySeconds: '00',// 我定义来接收计算出来的 秒钟 的
             count:null,
             show:false,
-            endTime:null
+            endTime:null,
+            isAdmin:false,
         };
     },
     methods:{
@@ -80,6 +82,11 @@ export default {
             if(this.timeObj.seconds=='0'&&this.timeObj.minutes=='0'&this.timeObj.hours=='0'){
                 clearInterval(this.count);   
                 this.show = false;
+                if(this.isAdmin) {
+                    this.$parent.$parent.$parent.$parent.$parent.$refs.video.$refs.video.endMeeting();  //到点结束会议
+                } else {
+                    this.$parent.$parent.$parent.$parent.$parent.$refs.video.$refs.video.leave();    //普通用户离开
+                }
             }
             // 计算出时分秒
             this.myHours = this.timeObj.hours<10?'0'+this.timeObj.hours:this.timeObj.hours;
@@ -87,6 +94,19 @@ export default {
             this.mySeconds = this.timeObj.seconds<10?'0'+this.timeObj.seconds:this.timeObj.seconds;
             this.currentTime--;
         },
+        showSettings(){
+            this.$emit('show-setting');
+            this.show = false;
+        },
+        cancel(){
+            this.show = false;
+        },
+        againCount(){
+            clearInterval(this.count);
+            this.currentTime = 300;
+            this.show = false;
+            this.isAdmin =  Cookies.get("isAdmin")=='true' ? true : false;
+        }
     },
     created() {
         //this.testTimer();

@@ -4,7 +4,7 @@
  * @Author: gaojiahao
  * @Date: 2020-10-19 15:30:49
  * @LastEditors: sueRimn
- * @LastEditTime: 2020-11-03 19:23:18
+ * @LastEditTime: 2021-04-26 10:40:11
  */
 import conf from "./conf";
 import ajax from "./ajax";
@@ -16,5 +16,6 @@ export default {
   upload: ajax.upload,
   request: ajax.request,
   postJSON: ajax.postJSON,
+  agoraAjax: ajax.agoraAjax,
   conf
 };

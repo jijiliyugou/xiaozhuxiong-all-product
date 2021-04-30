@@ -6,9 +6,7 @@
         <div class="top">
           <div class="clientsImg">
             <el-image
-              style=" width: 120px;
-            height: 120px;
-            border-radius: 50%;;"
+              style="width: 120px; height: 120px; border-radius: 50%"
               fit="contain"
               :src="companyInfo.companyLogo"
               lazy
@@ -27,8 +25,8 @@
               <p v-if="companyInfo.contactsMan">
                 联系人：{{ companyInfo.contactsMan }}
               </p>
-              <p v-if="companyInfo.telePhoneNumber">
-                电话：{{ companyInfo.telePhoneNumber }}
+              <p v-if="companyInfo.telephoneNumber">
+                电话：{{ companyInfo.telephoneNumber }}
               </p>
               <p v-if="companyInfo.phoneNumber">
                 手机：{{ companyInfo.phoneNumber }}
@@ -57,139 +55,161 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="tableBox">
-      <div class="screenBox">
-        <div class="left" v-if="isDiyu === 0">
-          <div class="screenItem" @click="sortTypeEvent(null)">
-            <span :class="{ screenLabel: true, active: sortOrder === null }"
-              >综合</span
-            >
-          </div>
-          <div class="screenItem" @click="sortTypeEvent(1)">
-            <span :class="{ screenLabel: true, active: sortOrder === 1 }"
-              >单价</span
-            >
-            <i v-show="isPrice === null" class="jiantou xiajiantouIcon"></i>
-            <i v-show="isPrice === 1" class="jiantou xiaActiveIcon"></i>
-            <i v-show="isPrice === 2" class="jiantou shangActiveIcon"></i>
-          </div>
-          <div class="screenItem" @click="sortTypeEvent(2)">
-            <span :class="{ screenLabel: true, active: sortOrder === 2 }">
-              时间
-            </span>
-            <i v-show="isTime === null" class="jiantou xiajiantouIcon"></i>
-            <i v-show="isTime === 1" class="jiantou xiaActiveIcon"></i>
-            <i v-show="isTime === 2" class="jiantou shangActiveIcon"></i>
-          </div>
-          <div class="item">
-            <span class="label">关键词搜索:</span>
-            <el-input
-              type="text"
-              size="medium"
-              v-model="KeyWord"
-              placeholder="请输入关键词"
-              clearable
-              @keyup.native.enter="search"
-            ></el-input>
-          </div>
+      <div class="tableBox">
+        <div class="screenBox">
+          <div class="left" v-if="isDiyu === 0">
+            <div class="screenItem" @click="sortTypeEvent(null)">
+              <span :class="{ screenLabel: true, active: sortOrder === null }"
+                >综合</span
+              >
+            </div>
+            <div class="screenItem" @click="sortTypeEvent(1)">
+              <span :class="{ screenLabel: true, active: sortOrder === 1 }"
+                >单价</span
+              >
+              <i v-show="isPrice === null" class="jiantou xiajiantouIcon"></i>
+              <i v-show="isPrice === 1" class="jiantou xiaActiveIcon"></i>
+              <i v-show="isPrice === 2" class="jiantou shangActiveIcon"></i>
+            </div>
+            <div class="screenItem" @click="sortTypeEvent(2)">
+              <span :class="{ screenLabel: true, active: sortOrder === 2 }">
+                时间
+              </span>
+              <i v-show="isTime === null" class="jiantou xiajiantouIcon"></i>
+              <i v-show="isTime === 1" class="jiantou xiaActiveIcon"></i>
+              <i v-show="isTime === 2" class="jiantou shangActiveIcon"></i>
+            </div>
+            <div class="screenItem" @click="sortTypeEvent(4)">
+              <span :class="{ screenLabel: true, active: sortOrder === 4 }">
+                货号
+              </span>
+              <i v-show="isFa_no === null" class="jiantou xiajiantouIcon"></i>
+              <i v-show="isFa_no === 1" class="jiantou xiaActiveIcon"></i>
+              <i v-show="isFa_no === 2" class="jiantou shangActiveIcon"></i>
+            </div>
+            <div class="item">
+              <span class="label">关键词搜索:</span>
+              <el-input
+                type="text"
+                size="medium"
+                v-model="KeyWord"
+                placeholder="请输入关键词"
+                clearable
+                @keyup.native.enter="search"
+              ></el-input>
+            </div>
 
-          <div class="item">
-            <el-button
-              @click="search"
-              type="primary"
-              icon="el-icon-search"
-              size="medium"
-            >
-              搜索
-            </el-button>
+            <div class="item">
+              <el-button
+                @click="search"
+                type="primary"
+                icon="el-icon-search"
+                size="medium"
+              >
+                搜索
+              </el-button>
+            </div>
           </div>
-        </div>
-        <div class="left" v-if="isDiyu === 1">
-          <div class="screenItem" @click="sortTypeEvent(null)">
-            <span :class="{ screenLabel: true, active: sortOrder === null }"
-              >综合</span
-            >
+          <div class="left" v-if="isDiyu === 1">
+            <div class="screenItem" @click="sortTypeEvent(null)">
+              <span :class="{ screenLabel: true, active: sortOrder === null }"
+                >综合</span
+              >
+            </div>
+            <div class="screenItem" @click="sortTypeEvent(1)">
+              <span :class="{ screenLabel: true, active: sortOrder === 1 }"
+                >单价</span
+              >
+              <i v-show="isPrice === null" class="jiantou xiajiantouIcon"></i>
+              <i v-show="isPrice === 1" class="jiantou xiaActiveIcon"></i>
+              <i v-show="isPrice === 2" class="jiantou shangActiveIcon"></i>
+            </div>
+            <div class="screenItem" @click="sortTypeEvent(2)">
+              <span :class="{ screenLabel: true, active: sortOrder === 2 }">
+                时间
+              </span>
+              <i v-show="isTime === null" class="jiantou xiajiantouIcon"></i>
+              <i v-show="isTime === 1" class="jiantou xiaActiveIcon"></i>
+              <i v-show="isTime === 2" class="jiantou shangActiveIcon"></i>
+            </div>
+            <div class="screenItem" @click="sortTypeEvent(4)">
+              <span :class="{ screenLabel: true, active: sortOrder === 4 }">
+                货号
+              </span>
+              <i v-show="isFa_no === null" class="jiantou xiajiantouIcon"></i>
+              <i v-show="isFa_no === 1" class="jiantou xiaActiveIcon"></i>
+              <i v-show="isFa_no === 2" class="jiantou shangActiveIcon"></i>
+            </div>
+            <div class="item">
+              <span class="label">关键词搜索:</span>
+              <el-input
+                type="text"
+                size="medium"
+                v-model="searchForm.keyword"
+                placeholder="请输入关键词"
+                @keyup.native.enter="searchEcommend"
+              ></el-input>
+            </div>
+            <div class="item">
+              <el-button
+                @click="searchEcommend"
+                type="primary"
+                size="medium"
+                icon="el-icon-search"
+              >
+                搜索
+              </el-button>
+            </div>
           </div>
-          <div class="screenItem" @click="sortTypeEvent(1)">
-            <span :class="{ screenLabel: true, active: sortOrder === 1 }"
-              >单价</span
-            >
-            <i v-show="isPrice === null" class="jiantou xiajiantouIcon"></i>
-            <i v-show="isPrice === 1" class="jiantou xiaActiveIcon"></i>
-            <i v-show="isPrice === 2" class="jiantou shangActiveIcon"></i>
-          </div>
-          <div class="screenItem" @click="sortTypeEvent(2)">
-            <span :class="{ screenLabel: true, active: sortOrder === 2 }">
-              时间
-            </span>
-            <i v-show="isTime === null" class="jiantou xiajiantouIcon"></i>
-            <i v-show="isTime === 1" class="jiantou xiaActiveIcon"></i>
-            <i v-show="isTime === 2" class="jiantou shangActiveIcon"></i>
-          </div>
-          <div class="item">
-            <span class="label">关键词搜索:</span>
-            <el-input
-              type="text"
-              size="medium"
-              v-model="searchForm.keyword"
-              placeholder="请输入关键词"
-              @keyup.native.enter="searchEcommend"
-            ></el-input>
-          </div>
-          <div class="item">
-            <el-button
-              @click="searchEcommend"
-              type="primary"
-              size="medium"
-              icon="el-icon-search"
-            >
-              搜索
-            </el-button>
-          </div>
-        </div>
-        <div class="right">
-          <div
-            :class="{ grid: true, active: isGrid === 'bsGridComponent' }"
-            @click="handerIsGrid('bsGridComponent')"
-          ></div>
-          <div
-            :class="{ column: true, active: isGrid === 'bsColumnComponent' }"
-            @click="handerIsGrid('bsColumnComponent')"
-          ></div>
-          <div class="line"></div>
-          <!-- <div class="totalCount">
+          <div class="right">
+            <div
+              :class="{ grid: true, active: isGrid === 'bsGridComponent' }"
+              @click="handerIsGrid('bsGridComponent')"
+            ></div>
+            <div
+              :class="{
+                column: true,
+                active: isGrid === 'bsColumnComponent'
+              }"
+              @click="handerIsGrid('bsColumnComponent')"
+            ></div>
+            <div class="line"></div>
+            <!-- <div class="totalCount">
             <span class="totalCountText">{{ totalCount }}</span>
             <span>条数据</span>
           </div> -->
-          <div class="myMinPagination">
-            <div @click="firstEvent" class="first el-icon-arrow-left"></div>
-            <div class="count">
-              <span class="pageIndex">{{ currentPage }}</span>
-              <span>/</span>
-              <span>{{ Math.ceil(totalCount / pageSize) }}</span>
+            <div class="myMinPagination">
+              <div @click="firstEvent" class="first el-icon-arrow-left"></div>
+              <div class="count">
+                <span class="pageIndex">{{ currentPage }}</span>
+                <span>/</span>
+                <span>{{ Math.ceil(totalCount / pageSize) }}</span>
+              </div>
+              <div @click="nextEvent" class="next el-icon-arrow-right"></div>
             </div>
-            <div @click="nextEvent" class="next el-icon-arrow-right"></div>
           </div>
         </div>
+        <div class="productListBox">
+          <!-- 产品列表 -->
+          <component :is="isGrid" :productList="productList"></component>
+          <!-- 分页 -->
+          <center class="myPagination">
+            <el-pagination
+              layout="total, sizes, prev, pager, next, jumper"
+              :page-sizes="[12, 24, 36, 48]"
+              background
+              :total="totalCount"
+              :page-size="pageSize"
+              :current-page.sync="currentPage"
+              @current-change="handleCurrentChange"
+              @size-change="handleSizeChange"
+            ></el-pagination>
+          </center>
+        </div>
       </div>
-      <div class="productListBox">
-        <!-- 产品列表 -->
-        <component :is="isGrid" :productList="productList"></component>
-        <!-- 分页 -->
-        <center style="padding:20px 0;">
-          <el-pagination
-            layout="total, sizes, prev, pager, next, jumper"
-            :page-sizes="[12, 24, 36, 48]"
-            background
-            :total="totalCount"
-            :page-size="pageSize"
-            :current-page.sync="currentPage"
-            @current-change="handleCurrentChange"
-            @size-change="handleSizeChange"
-          ></el-pagination>
-        </center>
-      </div>
+    </div>
+    <div class="footer" v-if="totalCount >= 7">
+      <img src="@/assets/images/footerBg.png" alt="" />
     </div>
   </div>
 </template>
@@ -212,6 +232,7 @@ export default {
   data() {
     return {
       companyInfo: {},
+      isFa_no: null,
       isDiyu: 0,
       isPrice: null,
       isTime: null,
@@ -239,6 +260,14 @@ export default {
 
   created() {},
   mounted() {
+    // 取消收藏
+    eventBus.$on("resetProducts", item => {
+      for (let i = 0; i < this.productList.length; i++) {
+        if (this.productList[i].productNumber == item.productNumber) {
+          this.productList[i].isFavorite = item.isFavorite;
+        }
+      }
+    });
     eventBus.$emit("showCart", true);
     this.getProductListPageAll();
     this.getCompanyByID();
@@ -278,6 +307,8 @@ export default {
         PageIndex: this.currentPage,
         PageSize: this.pageSize,
         KeyWord: this.KeyWord,
+        sortOrder: this.sortOrder,
+        sortType: this.sortType,
         typeId: 1,
         companyNumber: this.item.companyNumber
       };
@@ -303,7 +334,8 @@ export default {
         maxPrice: this.searchForm.maxPrice,
         startTime: this.searchForm.time.length ? this.searchForm.time[0] : null,
         endTime: this.searchForm.time.length ? this.searchForm.time[1] : null,
-        sortOrder: this.sortOrder
+        sortOrder: this.sortOrder,
+        sortType: this.sortType
       };
       for (const key in fd) {
         if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
@@ -406,6 +438,7 @@ export default {
           this.sortType = this.isPrice =
             this.isPrice === null ? 1 : this.isPrice === 1 ? 2 : null;
           this.sortType = null;
+          this.isFa_no = null;
           this.isTime = null;
           this.isRedu = null;
           this.sortType = this.isPrice;
@@ -414,6 +447,7 @@ export default {
         case 2:
           this.isTime = this.isTime === null ? 1 : this.isTime === 1 ? 2 : null;
           this.sortType = null;
+          this.isFa_no = null;
           this.isPrice = null;
           this.isRedu = null;
           this.sortType = this.isTime;
@@ -423,8 +457,18 @@ export default {
           this.isRedu = this.isRedu === null ? 1 : this.isRedu === 1 ? 2 : null;
           this.sortType = null;
           this.isPrice = null;
+          this.isFa_no = null;
           this.isTime = null;
           this.sortType = this.isRedu;
+          this.sortType === null && (this.sortOrder = null);
+          break;
+        case 4:
+          this.isFa_no =
+            this.isFa_no === null ? 1 : this.isFa_no === 1 ? 2 : null;
+          this.sortType = null;
+          this.isPrice = null;
+          this.isTime = null;
+          this.sortType = this.isFa_no;
           this.sortType === null && (this.sortOrder = null);
           break;
         default:
@@ -447,7 +491,6 @@ export default {
 <style scoped lang="less">
 .bsMyClientsDetail {
   min-height: 100%;
-  background-color: #fff;
   .hander {
     .handerBg {
       height: 160px;
@@ -681,6 +724,17 @@ export default {
   .productListBox {
     width: 100%;
     box-sizing: border-box;
+    .myPagination {
+      padding: 30px 0;
+    }
   }
+}
+.footer {
+  margin-top: 20px;
+  background-color: #f1f3f6;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -9,6 +9,7 @@
           :auto-upload="false"
           :on-change="changeUpload"
           :on-preview="handlePictureCardPreview"
+          :on-remove="handleRemove"
           :http-request="successUpload"
           :file-list="editImages"
           accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
@@ -27,11 +28,11 @@
         <el-form-item label="昵称" label-width="100px" prop="linkman">
           <el-input v-model="addEmployeeForm.linkman"></el-input>
         </el-form-item>
-        <el-form-item label="密码" v-if="isEdit" label-width="100px">
-          <el-input v-model="addEmployeeForm.newPassword"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" v-else label-width="100px" prop="password">
-          <el-input v-model="addEmployeeForm.password"></el-input>
+        <el-form-item label="密码" label-width="100px">
+          <el-input
+            v-model="addEmployeeForm.password"
+            onkeyup="this.value=this.value.replace(/[\u4E00-\u9FA5]/g,'')"
+          ></el-input>
         </el-form-item>
       </div>
       <div class="flexLayout">
@@ -60,11 +61,17 @@
           type="date"
           placeholder="选择日期"
           v-model="addEmployeeForm.birthday"
-          style="width: 100%;"
+          style="width: 100%"
+          value-format="yyyy-MM-dd"
         ></el-date-picker>
       </el-form-item>
       <el-form-item label="备注" label-width="100px">
-        <el-input type="textarea" v-model="addEmployeeForm.remark"></el-input>
+        <el-input
+          type="textarea"
+          v-model="addEmployeeForm.remark"
+          maxlength="50"
+          show-word-limit
+        ></el-input>
       </el-form-item>
     </el-form>
     <center>
@@ -117,7 +124,8 @@ export default {
         phoneNumber: [
           { required: true, message: "请输入员工账号", trigger: "blur" },
           {
-            pattern: /^1[2,3,4,5,6,7,8,9][0-9]{9}$/,
+            // pattern: /^1[2,3,4,5,6,7,8,9][0-9]{9}$/,
+            pattern: /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[0-8]|8\d|9\d)\d{8}$/,
             message: "手机格式不正确",
             trigger: "blur"
           }
@@ -129,6 +137,8 @@ export default {
         password: [
           { required: true, message: "请输入员工密码", trigger: "blur" },
           { min: 6, max: 20, message: "最少输入6到20个字符", trigger: "blur" }
+          //   let reg= /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{4,20}$/
+          //   密码必须是由4-20位字母+数字组合'
         ],
         sex: [{ required: true, message: "请选择员工性别", trigger: "change" }],
         isMain: [
@@ -144,11 +154,11 @@ export default {
     // 选择头像
     changeUpload(file, fileList) {
       this.file = file.raw;
+      this.editImages = fileList;
       if (fileList.length > 1) fileList.shift();
     },
     // 预览头像
     handlePictureCardPreview(file) {
-      console.log(file);
       this.$PreviewPic({
         zIndex: 9999, // 组件的zIndex值 默认为2000
         index: 0, // 展示第几张图片 默认为0
@@ -162,6 +172,11 @@ export default {
           console.log(i);
         }
       });
+    },
+    // 删除图片事件
+    handleRemove(file, fileList) {
+      this.addEmployeeForm.userImage = "";
+      this.editImages = fileList;
     },
     // 上传头像
     async successUpload() {
@@ -184,59 +199,27 @@ export default {
     },
     // 提交添加员工
     async submit() {
-      const imgRes = await this.successUpload();
-      if (imgRes.data.result.code === 200) {
-        this.addEmployeeForm.userImage =
-          imgRes.data.result.object[0] && imgRes.data.result.object[0].filePath
-            ? imgRes.data.result.object[0].filePath
-            : this.addEmployeeForm.userImage;
-      } else {
-        this.$messsage.error("头像上传失败");
-        return false;
-      }
-      this.$refs.addEmployeeRef.validate(async valid => {
-        if (valid) {
-          this.addEmployeeForm.companyId = this.companyId;
-          this.addEmployeeForm.password = this.addEmployeeForm.newPassword
-            ? this.$md5("LitterBear" + this.addEmployeeForm.newPassword)
-            : this.addEmployeeForm.password;
-          this.$emit("submit", this.addEmployeeForm);
+      if (this.editImages.length != 0) {
+        const imgRes = await this.successUpload();
+        if (imgRes.data.result.code === 200) {
+          this.addEmployeeForm.userImage =
+            imgRes.data.result.object[0] &&
+            imgRes.data.result.object[0].filePath
+              ? imgRes.data.result.object[0].filePath
+              : this.addEmployeeForm.userImage;
+        } else {
+          this.$messsage.error("头像上传失败");
+          return false;
         }
-      });
-      //     if (valid) {
-      //       this.addEmployeeForm.password = this.addEmployeeForm.newPassword
-      //         ? this.$md5("LitterBear" + this.addEmployeeForm.newPassword)
-      //         : this.addEmployeeForm.password;
-      //       const res = await this.$http.post(
-      //         "/api/UpdateOrgPersonnel",
-      //         this.addEmployeeForm
-      //       );
-      //       if (res.data.result.code === 200) {
-      //         this.addEmployeeDialog = false;
-      //         const msg = this.isEdit ? "编辑成功" : "新增成功";
-      //       } else {
-      //         this.addEmployeeForm.password = "";
-      //       }
-      //     }
-      //   });
-      // } else {
-      //   this.$refs.addEmployeeRef.validate(async valid => {
-      //     if (valid) {
-      //       this.addEmployeeForm.password = this.$md5(
-      //         "LitterBear" + this.addEmployeeForm.password
-      //       );
-      //       const res = await this.$http.post(
-      //         "/api/CreateOrgPersonnel",
-      //         this.addEmployeeForm
-      //       );
-      //       if (res.data.result.code === 200) {
-      //         this.addEmployeeDialog = false;
-      //       } else {
-      //         this.addEmployeeForm.password = "";
-      //       }
-      //     }
-      //   });
-      // }
+        this.$refs.addEmployeeRef.validate(async valid => {
+          if (valid) {
+            this.addEmployeeForm.companyId = this.companyId;
+            this.$emit("submit", this.addEmployeeForm);
+          }
+        });
+      } else {
+        this.$refs.addEmployeeRef.validateField("userImage");
+      }
     }
   },
   created() {},

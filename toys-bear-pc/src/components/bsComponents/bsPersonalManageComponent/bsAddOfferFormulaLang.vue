@@ -9,26 +9,33 @@
     >
       <el-form-item label="主题：" prop="title">
         <el-input
-          placeholder="请输入内容"
+          placeholder="请输入主题"
           v-model="formData.title"
           clearable
+          maxlength="20"
+          size="medium"
+          show-word-limit
         ></el-input>
       </el-form-item>
-      <el-form-item label="排序：" prop="sort">
-        <el-input
-          placeholder="请输入内容"
-          v-model.number="formData.sort"
-          clearable
-        ></el-input>
-      </el-form-item>
+
       <el-form-item label="内容：" prop="content">
         <el-input
           type="textarea"
           :rows="2"
-          placeholder="请输入内容"
+          placeholder="请输入内容..."
           v-model="formData.content"
+          maxlength="100"
+          size="medium"
+          show-word-limit
         >
         </el-input>
+      </el-form-item>
+      <el-form-item label="排序：" prop="sort">
+        <el-input
+          placeholder=""
+          v-model.number="formData.sort"
+          clearable
+        ></el-input>
       </el-form-item>
       <center>
         <template>
@@ -61,7 +68,7 @@ export default {
       defaultFormRules: {
         title: [{ required: true, message: "请输入主题", trigger: "blur" }],
         sort: [
-          { required: true, message: "请输入排序", trigger: "blur" },
+          //   { required: true, message: "请输入排序", trigger: "blur" },
           { type: "number", message: "必须为数字值" }
         ],
         content: [{ required: true, message: "请输入内容", trigger: "blur" }]

@@ -126,8 +126,8 @@
                   <template v-else-if="item.imgList.length > 0">
                     <div class="imgComtent">
                       <img
-                        @click="openImgView(item.imgList.split(','))"
-                        v-for="val in item.imgList.split(',')"
+                        @click="openImgView(item.imgList.split(','), i)"
+                        v-for="(val, i) in item.imgList.split(',')"
                         :lazy-src="val"
                         :key="val"
                         :class="{
@@ -411,10 +411,11 @@ export default {
       rAF(frameFunc);
     },
     // 预览
-    openImgView(list) {
+    openImgView(list, index) {
+      console.log(list);
       this.$PreviewPic({
         zIndex: 9999, // 组件的zIndex值 默认为2000
-        index: 0, // 展示第几张图片 默认为0
+        index: index, // 展示第几张图片 默认为0
         list: list, // 需要展示图片list
         onClose: i => {
           // 关闭时的回调
@@ -791,7 +792,6 @@ export default {
           type: "danger"
         });
       }
-      this.noticeType = null;
     }
   },
   created() {},

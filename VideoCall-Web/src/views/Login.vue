@@ -179,7 +179,7 @@ export default {
         baseMode: "avc",
         transcode: "interop",
         attendeeMode: "video",
-        videoProfile: "720p_6",
+        videoProfile: "1080p_2",
         sendBottonStatus:true,
         timer:null,
         count: '',

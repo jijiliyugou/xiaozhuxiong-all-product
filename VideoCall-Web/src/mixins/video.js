@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-02 15:18:13
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\mixins\video.js
- * @LastEditTime: 2021-04-23 15:18:49
+ * @LastEditTime: 2021-04-30 15:20:11
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -26,7 +26,7 @@ export default {
                 } else {
                     items[i].style.width = "100%";
                     items[i].style.height = "100%";
-                    items[i].style.gridArea = `4 / ${1 + (count*12)} / 11 / ${13 +(13*count)}`;
+                    items[i].style.gridArea = `3 / ${1 + (count*12)} / 11 / ${13 +(13*count)}`;
                     items[i].style.zIndex = 0;
                     items[i].style.border = "1px solid #FFFFFF";
                     items[i].onclick = function (e) { $.setMainVideo(e.currentTarget.id) };
@@ -34,7 +34,6 @@ export default {
                 }
                 }
             } else if(type==3){
-                debugger
                 for(var i=0;i<items.length;i++){
                 if(i==0){
                     items[i].style.display = "none";  

@@ -29,14 +29,10 @@
         </div>
       </div>
     </div>
-    <div class="clientList">
-      <div class="titleLeft">
-        <p>客户列表</p>
-        <p>( {{ totalCount }} )</p>
-      </div>
-    </div>
+
+    <!-- 厂商列表 -->
     <div class="tableBox">
-      <!-- 客户列表 -->
+      <div class="title">厂商列表 ({{ totalCount }})</div>
       <el-table
         :data="tableData"
         stripe
@@ -100,7 +96,7 @@
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
-          :page-sizes="[12, 24, 36, 48]"
+          :page-sizes="[10, 20, 30, 40]"
           background
           :total="totalCount"
           :page-size="pageSize"
@@ -272,24 +268,6 @@ export default {
           width: 58px;
           min-width: 58px;
         }
-      }
-    }
-  }
-  .clientList {
-    min-height: 100%;
-    background-color: #fff;
-    padding: 0 20px;
-    .titleLeft {
-      height: 55px;
-      font-size: 15px;
-      font-weight: 700;
-      padding-left: 15px;
-      box-sizing: border-box;
-      position: relative;
-      display: flex;
-      align-items: center;
-      p:nth-child(2) {
-        font-weight: 500;
       }
     }
   }

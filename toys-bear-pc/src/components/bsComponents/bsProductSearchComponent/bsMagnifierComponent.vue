@@ -92,10 +92,7 @@
                   class="video-js vjs-default-skin minVideo"
                   poster=""
                 >
-                  <source
-                    src="http://img.toysbear.com/Ad/Video//2020-12-31/16094169983727201208.MP4"
-                    type="video/mp4"
-                  />
+                  <source :src="videoAddress" type="video/mp4" />
                 </video>
               </div>
             </li>

@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-06 11:58:11
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\order\addSampling.vue
- * @LastEditTime: 2021-04-23 12:22:32
+ * @LastEditTime: 2021-04-30 11:15:09
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -13,16 +13,16 @@
         <div class="head">
             <div class="title">
                 <i class="iconfont icondanju"></i>
-                择样单号
+                {{$t("addSampling.orderTitle")}}
             </div>
         </div>   
         <div class="content">
             <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="0">
                 <FormItem prop="number">
-                    <Input v-model="formValidate.number" placeholder="请输入择样单号"></Input>
+                    <Input v-model.trim="formValidate.number" :placeholder="$t('addSampling.orderText')"></Input>
                 </FormItem>
                 <FormItem prop="code">
-                    <Input v-model="formValidate.code" placeholder="请输入验证码"></Input>
+                    <Input v-model.trim="formValidate.code" :placeholder="$t('addSampling.codeText')"></Input>
                 </FormItem>
                 <FormItem>
                     <div style="width:100%;"> 
@@ -44,10 +44,10 @@ export default {
             },
             ruleValidate:{
                 number: [
-                    { required: true, message: '请输入择样单号', trigger: 'blur' }
+                    { required: true, message: this.$t('addSampling.orderText'), trigger: 'blur' }
                 ],
                 code: [
-                    { required: true, message: '请输入验证码', trigger: 'blur' }
+                    { required: true, message: this.$t('addSampling.codeText'), trigger: 'blur' }
                 ],
             },
         }

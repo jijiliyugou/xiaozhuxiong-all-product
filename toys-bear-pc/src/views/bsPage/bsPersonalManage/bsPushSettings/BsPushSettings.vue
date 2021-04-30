@@ -9,7 +9,7 @@
           size="medium"
           @click="openAddLanguage"
         >
-          新增常用语
+          新增消息模板
         </el-button>
       </div>
     </div>
@@ -98,7 +98,7 @@ export default {
       currentRow: {},
       isEdit: false,
       editRow: {},
-      dialogTitle: "新增常用语",
+      dialogTitle: "新增消息模板",
       addLangDialog: false,
       totalCount: 0,
       pageSize: 10,

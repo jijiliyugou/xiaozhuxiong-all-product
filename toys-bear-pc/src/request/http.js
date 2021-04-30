@@ -169,10 +169,11 @@ myAxios.install = function(Vue) {
       config.headers.Utoken =
         $Store.state.userInfo && $Store.state.userInfo.accessToken;
       config.headers["content-type"] = "application/json";
-      // loaddingOptions[config.url] = true;
-      // setTimeout(() => {
-      //   if (loaddingOptions[config.url])
+      /**
+       * 不需要loadding的请求
+       */
       if (
+        !config.url.includes("GetHallStatisticsCount") &&
         !config.url.includes("SelectProductOfferFormulaList") &&
         !config.url.includes("CreateProductCollection") &&
         !config.url.includes("ExportSampleOfferToExcel") &&

@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-06 11:37:17
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\order\product.vue
- * @LastEditTime: 2021-04-22 17:48:00
+ * @LastEditTime: 2021-04-30 15:09:17
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -15,12 +15,12 @@
             <div class="head">
                 <div class="title" :class="[flag=='order' ? 'active':'']" @click="changTabType('order')">
                     <div class="active_text">
-                        择样单号
+                        {{$t("product.order.orderNoTitle")}}
                     </div>
                 </div>
                 <div class="title" :class="[flag=='product' ? 'active':'']" @click="changTabType('product')">
                     <div class="active_text">
-                        当前产品
+                        {{$t("product.order.productTitle")}}
                     </div>
                 </div>
                 <div class="title right">
@@ -32,21 +32,41 @@
         <div class="select_order" v-if="flag=='order'">
             <Table :columns="orderColumns" :data="orderList" height="330" class="select_order_list"></Table>
             <div class="select_order_info">
-                <Row>
+                <Row v-if="lang=='zh'">
                     <Col span="8">
-                        总款数：{{totalKuanshu}}
+                        {{$t("product.order.totalRecords")}}：{{totalKuanshu}}
                     </Col>
                     <Col span="8">
-                        总箱数：{{totalBoxCount}}
+                        {{$t("product.order.totalCTNS")}}：{{totalBoxCount}}
                     </Col>
                     <Col span="8">
-                        总个数：{{totalCount}}
+                        {{$t("product.order.totalQuantity")}}：{{totalCount}}
                     </Col>
                     <Col span="24">
-                        总体积/总材积：{{totalBulkFeet}}/{{totalBulkStere}}
+                        {{$t("product.order.totalVolume")}}：{{totalBulkFeet}}/{{totalBulkStere}}
                     </Col>
                     <Col span="19">
-                        总金额：<span class="red">￥{{totalAmount}}</span>
+                        {{$t("product.order.totalPrice")}}：<span class="red">￥{{totalAmount}}</span>
+                    </Col>
+                    <Col span="5">
+                        <div class="order_list" @click="changeProductList"></div>    
+                    </Col>
+                </Row>
+                <Row v-else>
+                    <Col span="12">
+                        {{$t("product.order.totalRecords")}}：{{totalKuanshu}}
+                    </Col>
+                    <Col span="12">
+                        {{$t("product.order.totalCTNS")}}：{{totalBoxCount}}
+                    </Col>
+                    <Col span="24">
+                        {{$t("product.order.totalQuantity")}}：{{totalCount}}
+                    </Col>
+                    <Col span="24">
+                        {{$t("product.order.totalVolume")}}：{{totalBulkFeet}}/{{totalBulkStere}}
+                    </Col>
+                    <Col span="19">
+                        {{$t("product.order.totalPrice")}}：<span class="red">￥{{totalAmount}}</span>
                     </Col>
                     <Col span="5">
                         <div class="order_list" @click="changeProductList"></div>    
@@ -56,16 +76,16 @@
         </div>
         <!-- 当前产品 -->
         <div class="now_product" v-else>
-            <Row class="ipput_wrap" v-if="isAdmin">
-                <Col span="6"><div class="text">公司编号</div></Col>
-                <Col span="12"><Input v-model="companyNumber" class="iipput_wrap_box" :style="{width:'137px'}" clearable @on-change="getProductInfo" @on-enter="getProductInfo" @keyup.enter.native="getProductInfo" /></Col>
-                <Col span="6"><Button type="primary" :style="{width:'60px',marginLeft: '11px'}" @click="getProductInfo">确定</Button></Col>
+            <Row class="ipput_wrap">
+                <Col span="6" v-if="isAdmin"><div :class="[lang=='zh'?'text':'en_text']">{{$t("product.order.companyNumber")}}</div></Col>
+                <Col span="12" v-if="isAdmin"><Input v-model.trim="companyNumber" class="iipput_wrap_box" :style="{width:'130px'}" clearable @on-enter="getProductInfo" @keyup.enter.native="getProductInfo" /></Col>
+                <Col span="6" v-if="isAdmin"><Button type="primary" @click="getProductInfo">{{$t("product.order.button")}}</Button></Col>
             </Row>
             <Row class="product_wrap" v-if="this.productInfo.id">
                 <Col span="8">
                     <Poptip trigger='hover' content="content" placement="right" :transfer="true">
-                        <img :src="productInfo.productImages.length&&productInfo.productImages[0]||test" style="width:87px;height:65px;margin-left:19px"/>
-                        <img slot="content" :src="productInfo.productImages.length&&productInfo.productImages[0]||test" style="width:300px;height:300px" />
+                        <img :src="productInfo.productImages.length&&productInfo.productImages[0]" style="width:87px;height:65px;margin-left:19px" />
+                        <img slot="content" :src="productInfo.productImages.length&&productInfo.productImages[0]" style="width:100%;height:100%" />
                     </Poptip>
                 </Col>
                 <Col span="16">
@@ -76,58 +96,58 @@
             <Row class="now_item_box" v-if="this.productInfo.id">
                 <Col span="24">
                     <div class="now_item">
-                        <div class="title">公司编号：</div>
+                        <div class="title">{{$t("product.info.companyNumber")}}：</div>
                         <div class="text">{{this.productInfo.companyNumber}}</div>
                     </div>
                     <div class="now_item">
-                        <div class="title">货号：</div>
+                        <div class="title">{{$t("product.info.factoryNo")}}：</div>
                         <div class="text">{{this.productInfo.factoryNo}}</div>
                     </div>
                     <div class="now_item">
-                        <div class="title">包装：</div>
+                        <div class="title">{{$t("product.info.chinesePack")}}：</div>
                         <div class="text">{{this.productInfo.chinesePack}}</div>
                     </div>
                     <div class="now_item">
-                        <div class="title">产品规格：</div>
+                        <div class="title">{{$t("product.info.productSize")}}：</div>
                         <div class="text">{{this.productInfo.productLength}}*{{this.productInfo.productWidth}}*{{this.productInfo.productHeight}}</div>（CM）
                     </div>
                     <div class="now_item">
-                        <div class="title">外箱规格：</div>
+                        <div class="title">{{$t("product.info.packageSize")}}：</div>
                         <div class="text">{{this.productInfo.outerBoxLength}}*{{this.productInfo.outerBoxWidth}}*{{this.productInfo.outerBoxHeight}}</div>（CM）
                     </div>
                     <div class="now_item">
-                        <div class="title">包装规格：</div>
-                        <div class="text"></div>（CM）
+                        <div class="title">{{$t("product.info.cartonSize")}}：</div>
+                        <div class="text">{{this.productInfo.innerBoxLength}}*{{this.productInfo.innerBoxWidth}}*{{this.productInfo.innerBoxHeight}}</div>（CM）
                     </div>
                     <div class="now_item">
-                        <div class="title">装箱量：</div>
-                        <div class="text">{{this.productInfo.outerBoxLoadCapa}}</div>（PCS）
+                        <div class="title">{{$t("product.info.innerBox")}}：</div>
+                        <div class="text">{{this.productInfo.innerBoxCount}}/{{this.productInfo.outerBoxLoadCapa}}</div>（PCS）
                     </div>
                     <div class="now_item">
-                        <div class="title">体积/材积：</div>
-                        <div class="text"></div>（CBM）
+                        <div class="title">{{$t("product.info.CBM")}}：</div>
+                        <div class="text">{{this.productInfo.outerBoxBulkStere}}/{{this.productInfo.outerBoxBulkFeet}}</div>（CBM）
                     </div>
                     <div class="now_item">
-                        <div class="title">毛重/净重：</div>
-                        <div class="text"></div>（KG）
+                        <div class="title">{{$t("product.info.GW")}}：</div>
+                        <div class="text">{{this.productInfo.outerBoxGrossWeight}}/{{this.productInfo.outerBoxNetWeight}}</div>（KG）
                     </div>
                 </Col>
             </Row>
             <div class="action" v-if="this.productInfo.id&&isAdmin">
-                <Button type="primary" shape="circle" style="width:88px;margin:0 9px 0 58.5px;" @click="sureFlag = true">加入择样</Button>
-                <Modal v-model="sureFlag" title="温馨提示" @on-ok="addSelection" @on-cancel="cancelSelection">
-                    <Icon type="ios-alert-outline" style="color:#ff9900;font-size:18px"/><span>确认加入择样？</span>
+                <Button type="primary" shape="circle" style="width:88px;margin:0 9px 0 58.5px;" @click="sureFlag = true">{{$t("product.other.add")}}</Button>
+                <Modal v-model="sureFlag" :title="$t('product.other.reminder')" @on-ok="addSelection" @on-cancel="cancelSelection">
+                    <Icon type="ios-alert-outline" style="color:#ff9900;font-size:18px"/><span>{{$t("product.other.sureAdd")}}</span>
                 </Modal>
-                <Button type="warning" shape="circle" style="width:88px;margin:0 58.5px 0 9px;"  @click="delFlag = true">删除</Button>
-                <Modal v-model="delFlag" title="温馨提示" @on-ok="delSelection" @on-cancel="cancelDel">
-                    <Icon type="ios-alert-outline" style="color:#ed4014;font-size:18px"/><span>确认删除择样？</span>
+                <Button type="warning" shape="circle" style="width:88px;margin:0 58.5px 0 9px;"  @click="delFlag = true">{{$t("product.other.delete")}}</Button>
+                <Modal v-model="delFlag" :title="$t('product.other.reminder')" @on-ok="delSelection" @on-cancel="cancelDel">
+                    <Icon type="ios-alert-outline" style="color:#ed4014;font-size:18px"/><span>{{$t("product.other.sureDelete")}}</span>
                 </Modal>
             </div>
             <Row class="product_wrap" v-if="!this.productInfo.id">
                 <Col span="8">
                 </Col>
                 <Col span="8" style="text-align: center">
-                    暂无数据
+                    {{$t("product.order.noData")}}
                 </Col>
                 <Col span="8">
                 </Col>
@@ -168,7 +188,7 @@ export default {
         return {
             orderColumns: [
                 {
-                    title: '品名',
+                    title: this.$t("product.order.productNameList"),
                     key: 'productName',
                     render: (h, params) => {
                         return h('div', [
@@ -197,12 +217,12 @@ export default {
                     width: 107
                 },
                 {
-                    title: '货号',
+                    title: this.$t("product.order.prodcutNumberList"),
                     key: 'factoryNo',
                     width: 90
                 },
                 {
-                    title: '报价',
+                    title: this.$t("product.order.productPriceList"),
                     key: 'address',
                     render: (h, params) => {
                         return h('div', [
@@ -237,7 +257,8 @@ export default {
             roomNumber:null,
             isAdmin:false,
             sureFlag:false,
-            delFlag:false
+            delFlag:false,
+            lang:'zh'
         }
     },
     watch:{
@@ -417,6 +438,7 @@ export default {
         this.roomNumber=Cookies.get('channel');
         this.isAdmin=Cookies.get("isAdmin")=='true' ? true : false;
         this.getQuerySampleOrderDetails();
+        this.lang = window.localStorage.getItem('language');
     }
 }
 </script>
@@ -462,7 +484,7 @@ export default {
         .select_order{
             height: 422px;
             .select_order_info {
-                margin: 16px 0 16px 16px;
+                margin: 8px 0 8px 16px;
                 width: 295px;
                 height: 66px;
                 .order_list {
@@ -489,6 +511,9 @@ export default {
                 padding: 19px 17px;
                 .text {
                     line-height: 32px;
+                }
+                .en_text{
+                    font-size: 12px;
                 }
             }
             .product_wrap{

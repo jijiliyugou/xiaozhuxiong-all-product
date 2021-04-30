@@ -50,7 +50,7 @@
           </div>
           <span class="content userName">{{ userInfo.userInfo.linkman }}</span>
         </div>
-        <div class="moreBox" @click="checkUsers">
+        <div class="moreBox" @click.stop="checkUsers">
           <i class="moreIcon"></i>
           <el-collapse-transition>
             <div class="isCheckUserInfo" v-show="isCheckUser">
@@ -138,10 +138,29 @@ export default {
     // 打开切换角色
     checkUsers() {
       this.isCheckUser = !this.isCheckUser;
+    },
+    // 注册全局点击事件
+    globalEvent() {
+      //如果提供了事件对象，则这是一个非IE浏览器
+      // if (e && e.stopPropagation)
+      //   //因此它支持W3C的stopPropagation()方法
+      //   e.stopPropagation();
+      // else {
+      //   //否则，我们需要使用IE的方式来取消事件冒泡
+      //   window.event.cancelBubble = true;
+      // }
+      // if (e.preventDefault) {
+      //   e.preventDefault();
+      // } else {
+      //   window.event.returnValue == false;
+      // }
+      this.isCheckUser = false;
     }
   },
   created() {},
-  mounted() {},
+  mounted() {
+    document.onclick = this.globalEvent;
+  },
   computed: {
     ...mapState(["userInfo"])
   }

@@ -70,6 +70,8 @@ export default {
   mounted() {
     this.$store.commit("handlerShowGlobalMsg", false);
     this.$store.commit("handlerIsJindu", false);
+    this.$store.commit("handlerimgSearch", false);
+    this.$store.commit("handlerHallSearchCate", null);
     eventBus.$on("showCart", flag => {
       this.isShowCartBox = flag;
     });

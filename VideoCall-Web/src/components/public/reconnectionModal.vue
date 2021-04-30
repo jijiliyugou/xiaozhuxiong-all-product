@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-08 14:53:35
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\public\reconnectionModal.vue
- * @LastEditTime: 2021-04-21 20:13:49
+ * @LastEditTime: 2021-04-23 17:42:02
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -39,7 +39,6 @@ export default {
     watch:{
         isShowReconnection:{
             handler(val){
-                debugger
                 this.show = val;
             },
         }

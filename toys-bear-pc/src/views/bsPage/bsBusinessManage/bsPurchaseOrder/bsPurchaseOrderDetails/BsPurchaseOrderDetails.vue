@@ -43,7 +43,7 @@
     <div class="tableBox">
       <div class="tableTitle">
         <div class="titleText">
-          <span class="title">采购商品</span>
+          <span class="title">采购产品</span>
           ({{ totalCount }})
         </div>
         <el-button size="medium" @click="openSelectTemplate" type="warning">
@@ -232,8 +232,7 @@
         title="订单模板"
         v-if="exportTemplateDialog"
         :visible.sync="exportTemplateDialog"
-        top="60px"
-        width="80%"
+        width="1200px"
       >
         <bsExportOrder
           :options="{
@@ -249,7 +248,7 @@
 </template>
 
 <script>
-import bsExportOrder from "@/components/commonComponent/exportOrderComponent";
+import bsExportOrder from "@/components/commonComponent/exportOrderComponent/caigoudingdan.vue";
 export default {
   components: { bsExportOrder },
   props: {

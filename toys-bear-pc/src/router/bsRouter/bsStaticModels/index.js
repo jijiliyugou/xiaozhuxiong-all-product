@@ -24,7 +24,7 @@ const BsSampleQuotationDetails = () =>
   import(
     "@/components/bsComponents/bsSampleComponent/bsSampleQuotationDetails.vue"
   );
-// 找样报价-选择报价商品
+// 找样报价-选择报价产品
 const BsSampleOfferCommodity = () =>
   import(
     "@/components/bsComponents/bsSampleComponent/bsSampleOfferCommodity.vue"

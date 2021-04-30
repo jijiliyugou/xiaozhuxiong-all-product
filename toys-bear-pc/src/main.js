@@ -18,7 +18,9 @@ import "video.js/dist/video-js.css";
 import common from "@/utils/common";
 import VueCookies from "vue-cookies";
 import CollapseTransition from "element-ui/lib/transitions/collapse-transition";
-
+// import VueAwesomeSwiper from "vue-awesome-swiper";
+// Vue.use(VueAwesomeSwiper);
+// import "swiper/dist/css/swiper.css";
 /**
  * 全局组件集合
  */

@@ -299,9 +299,25 @@
             </el-select>
           </el-form-item>
           <el-form-item label="利润率：" prop="profit">
-            <el-input v-model="clienFormData.profit" placeholder="请输入利润率">
+            <!-- <el-input v-model="clienFormData.profit" placeholder="请输入利润率">
               <span slot="suffix">%</span>
-            </el-input>
+            </el-input> -->
+            <div style="display: flex; justify-content:space-between;">
+              <el-input
+                maxlength="30"
+                style="flex:1;"
+                v-model="clienFormData.profit"
+              >
+                <span slot="suffix">%</span>
+              </el-input>
+              <el-radio-group
+                style="flex:1;display:flex; align-items:center;margin-left: 20px;"
+                v-model="clienFormData.profitCalcMethod"
+              >
+                <el-radio :label="2">除法</el-radio>
+                <el-radio :label="1">乘法</el-radio>
+              </el-radio-group>
+            </div>
           </el-form-item>
         </div>
         <div class="formItemBox">
@@ -337,7 +353,14 @@
             ></el-input>
           </el-form-item>
           <el-form-item label="每车尺码：" prop="size">
-            <el-select v-model="clienFormData.size" placeholder="请选择尺码">
+            <el-select
+              v-model.number="clienFormData.size"
+              @change="selectBlur"
+              filterable
+              allow-create
+              default-first-option
+              placeholder="请输入/选择尺码"
+            >
               <el-option
                 v-for="(item, i) in options.size"
                 :key="i"
@@ -378,6 +401,12 @@
             </el-select>
           </el-form-item>
         </div>
+        <div class="chengchuTishi" v-show="clienFormData.profitCalcMethod == 2">
+          {{ chufa }}
+        </div>
+        <div class="chengchuTishi" v-show="clienFormData.profitCalcMethod == 1">
+          {{ chengfa }}
+        </div>
         <div class="lessThanPrice">
           <div class="left">
             <el-form-item label="价格小于：">
@@ -388,6 +417,7 @@
               >
               </el-input>
             </el-form-item>
+            <div class="tishi">当价格小于指定值，则调整小数位数</div>
           </div>
           <div class="right">
             <!-- xiaoshuweishu -->
@@ -510,6 +540,8 @@ export default {
   },
   data() {
     return {
+      chufa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)/(1-报价利润%)/汇率",
+      chengfa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)*(1+报价利润%)/汇率",
       dateTime: null,
       handSitesList: [],
       websiteInfoId: null,
@@ -544,10 +576,11 @@ export default {
       defaultShareDomain: [],
       clienFormData: {
         miniPrice: 0,
-        miniPriceDecimalPlaces: 1,
+        miniPriceDecimalPlaces: 0,
         url: null,
         isExportExcel: false,
         profit: 0,
+        profitCalcMethod: 2,
         expireTime: null,
         customerInfoId: null,
         offerMethod: "汕头",
@@ -650,6 +683,12 @@ export default {
         });
       }
     },
+    // 下拉框输入事件
+    selectBlur(val) {
+      if (isNaN(Number(val))) {
+        this.clienFormData.size = null;
+      }
+    },
     // 获取列表
     async getDataList() {
       const fd = {
@@ -739,7 +778,8 @@ export default {
     openAddClien() {
       this.clienFormData = {
         miniPrice: 0,
-        miniPriceDecimalPlaces: 1,
+        miniPriceDecimalPlaces: 0,
+        profitCalcMethod: 2,
         url: null,
         isExportExcel: false,
         profit: 0,
@@ -782,25 +822,25 @@ export default {
     },
     // 打开编辑分享
     openEdit(row) {
-      this.clienFormData = {
-        miniPrice: 0,
-        miniPriceDecimalPlaces: 1,
-        url: null,
-        isExportExcel: false,
-        profit: 0,
-        expireTime: null,
-        customerInfoId: null,
-        offerMethod: "汕头",
-        currencyType: "¥",
-        currencyTypeName: "RMB",
-        totalCost: "0",
-        exchange: 0,
-        size: "24",
-        decimalPlaces: 3,
-        rejectionMethod: "四舍五入",
-        websiteInfoId: null,
-        isCustomerInfo: true
-      };
+      //   this.clienFormData = {
+      //     miniPrice: 0,
+      //     miniPriceDecimalPlaces: 1,
+      //     url: null,
+      //     isExportExcel: false,
+      //     profit: 0,
+      //     expireTime: null,
+      //     customerInfoId: null,
+      //     offerMethod: "汕头",
+      //     currencyType: "¥",
+      //     currencyTypeName: "RMB",
+      //     totalCost: "0",
+      //     exchange: 0,
+      //     size: "24",
+      //     decimalPlaces: 3,
+      //     rejectionMethod: "四舍五入",
+      //     websiteInfoId: null,
+      //     isCustomerInfo: true
+      //   };
       this.defaultFormula = null;
       this.dialogTitle = "编辑站点";
       for (const key in row) {
@@ -1073,12 +1113,32 @@ export default {
   .formItemBox {
     display: flex;
     justify-content: space-between;
+    .el-form-item {
+      flex: 1;
+    }
+  }
+  .chengchuTishi {
+    color: #ff4848;
+    box-sizing: border-box;
+    padding-left: 120px;
+    margin-bottom: 20px;
   }
   .lessThanPrice {
     display: flex;
     justify-content: space-between;
-    padding-top: 20px;
+    padding: 20px 0;
     border-top: 1px solid #dcdfe6;
+    .left,
+    .right {
+      flex: 1;
+      position: relative;
+      .tishi {
+        position: absolute;
+        bottom: -5px;
+        left: 120px;
+        color: #ff4848;
+      }
+    }
   }
 }
 .isData {

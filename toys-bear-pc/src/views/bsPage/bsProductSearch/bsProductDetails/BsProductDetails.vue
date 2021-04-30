@@ -131,28 +131,25 @@
             <i class="infoIcon"></i>
             <span>在线咨询</span>
           </p>
-          <!-- <el-tooltip
-            class="item"
-            effect="dark"
-            :content="
-              productDetail.supplierPhone || productDetail.exhibitionPhone
-            "
-            placement="top"
+          <p
+            class="item myHover"
+            v-if="productDetail.exhibitionTelephoneNumber"
           >
-            <p class="item myHover">
-              <i class="phoneIcon"></i>
-              <span>联系电话</span>
-            </p>
-          </el-tooltip> -->
-          <p class="item myHover">
             <i class="phoneIcon"></i>
+            <span>{{ productDetail.exhibitionTelephoneNumber }}</span>
+          </p>
+          <p
+            class="item myHover"
+            v-if="productDetail.supplierPhone || productDetail.exhibitionPhone"
+          >
+            <i class="sjIcon"></i>
             <span>{{
               productDetail.supplierPhone || productDetail.exhibitionPhone
             }}</span>
           </p>
-          <p class="item myHover" v-if="productDetail.qq">
+          <p class="item myHover" v-if="productDetail.supplierQQ">
             <i class="qqIcon"></i>
-            <span>{{ productDetail.qq }}</span>
+            <span>{{ productDetail.supplierQQ }}</span>
           </p>
           <p class="item myHover" @click="toFactory(productDetail)">
             <i class="shopIcon"></i>
@@ -184,7 +181,7 @@
           v-for="imgItem in productDetail.imgUrlList"
           :key="imgItem"
         >
-          <img style="margin: 0 auto;" :src="imgItem" alt="" />
+          <img style="margin: 0 auto" :src="imgItem" alt="" />
         </div>
       </div>
     </div>
@@ -244,51 +241,60 @@ export default {
       this.$router.push("/bsIndex/bsVendorQuery");
     },
     // 加购
-    handlerShopping(item) {
-      if (this.shoppingList.length >= 500) {
+    handlerShopping() {
+      if (this.shoppingList.length >= 500 && !this.item.isShopping) {
         this.$common.handlerMsgState({
           msg: "购物车已满500条",
           type: "warning"
         });
         return;
       }
-      item.isShopping = !item.isShopping;
-      if (item.isShopping) {
-        item.shoppingCount = 1;
-        this.$store.commit("pushShopping", item);
+      this.item.isShopping = !this.item.isShopping;
+      if (this.item.isShopping) {
+        this.item.shoppingCount = 1;
+        this.$store.commit("pushShopping", this.item);
         this.$common.handlerMsgState({
           msg: "加购成功",
           type: "success"
         });
       } else {
-        item.shoppingCount = 0;
-        this.$store.commit("popShopping", item);
+        this.item.shoppingCount = 0;
+        this.$store.commit("popShopping", this.item);
         this.$common.handlerMsgState({
           msg: "取消加购成功",
           type: "warning"
         });
       }
-      eventBus.$emit("resetMyCart", this.shoppingList);
+      // 删除购物车样式
+      eventBus.$emit("resetMyCart", this.item);
+      this.$nextTick(() => {
+        this.$forceUpdate();
+      });
     },
     // 收藏
     async addCollect(item) {
+      if (item.isFavorite) {
+        this.$common.handlerMsgState({
+          msg: "取消收藏",
+          type: "warning"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: "收藏成功",
+          type: "success"
+        });
+      }
+      item.isFavorite = !item.isFavorite;
       const res = await this.$http.post("/api/CreateProductCollection", {
         productNumber: item.productNumber
       });
       if (res.data.result.code === 200) {
-        if (item.isFavorite) {
-          this.$common.handlerMsgState({
-            msg: "取消收藏",
-            type: "warning"
-          });
-        } else {
-          this.$common.handlerMsgState({
-            msg: "收藏成功",
-            type: "success"
-          });
-        }
-        item.isFavorite = !item.isFavorite;
-        eventBus.$emit("resetProducts", item);
+        eventBus.$emit("resetProductCollection");
+      } else {
+        this.$common.handlerMsgState({
+          msg: "收藏失败",
+          type: "danger"
+        });
       }
     },
     // 获取产品详情
@@ -300,6 +306,7 @@ export default {
         this.productDetail = res.data.result.item;
         this.productDetail.isShopping = this.item.isShopping;
         console.log(this.productDetail, "产品详情");
+        eventBus.$emit("refreshHtml");
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -312,9 +319,6 @@ export default {
   mounted() {
     eventBus.$emit("showCart", true);
     this.getProductDetails();
-    eventBus.$on("resetMyCollection", () => {
-      this.getProductDetails();
-    });
   },
   computed: {
     ...mapGetters({
@@ -322,7 +326,8 @@ export default {
     })
   },
   beforeDestroy() {
-    eventBus.$off("resetMyCollection");
+    eventBus.$off("resetProductCollection");
+    eventBus.$off("resetMyCart");
   }
 };
 </script>
@@ -530,6 +535,14 @@ export default {
             margin-right: 15px;
             background: url("~@/assets/images/onlinePhoneIcon.png") no-repeat
               center;
+            background-size: contain;
+          }
+          .sjIcon {
+            min-width: 28px;
+            width: 28px;
+            height: 28px;
+            margin-right: 15px;
+            background: url("~@/assets/images/sjIcon.png") no-repeat center;
             background-size: contain;
           }
           .qqIcon {

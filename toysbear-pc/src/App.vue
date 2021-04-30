@@ -20,7 +20,7 @@
       </div>
     </el-backtop>
     <!-- 漂浮物 -->
-    <div
+    <!-- <div
       class="cartBox"
       v-if="
         !$route.path.includes('/login') &&
@@ -41,7 +41,7 @@
           </el-badge>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>

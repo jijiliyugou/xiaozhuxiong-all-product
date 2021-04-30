@@ -2,34 +2,40 @@
   <div class="box">
     <div class="searchInput">
       <span class="label">产品搜索:</span>
-      <el-input
-        v-focus
-        size="medium"
-        ref="focusKeyword"
-        @keyup.native.enter="searchProducts"
-        style="width: 340px; margin: 0 15px"
-        placeholder="输入关键词+空格可模糊搜索"
-        v-model="searchForm.keyword"
-        clearable
-      >
-        <template slot="prefix">
-          <el-upload
-            :auto-upload="false"
-            ref="uploadRef"
-            accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
-            class="upload-demo"
-            action="/api/WebsiteShare/SearchProductsByPicture"
-            :show-file-list="false"
-            :on-change="openUpload"
-          >
-            <i class="iconXj"></i>
-            <!-- <i
+      <div class="inputBox">
+        <el-tag effect="plain" @close="closeTag" closable v-if="searchHallCate">
+          {{ searchHallCate.companyInfo.companyName }}
+        </el-tag>
+        <el-input
+          v-focus
+          size="medium"
+          ref="focusKeyword"
+          @keyup.native.enter="searchProducts"
+          style="width: 340px; margin: 0 15px"
+          placeholder="输入关键词+空格可模糊搜索"
+          v-model="myKeyword"
+          clearable
+        >
+          <template slot="prefix">
+            <el-upload
+              :auto-upload="false"
+              ref="uploadRef"
+              accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
+              class="upload-demo"
+              action="/api/WebsiteShare/SearchProductsByPicture"
+              :show-file-list="false"
+              :on-change="openUpload"
+            >
+              <i class="iconXj"></i>
+              <!-- <i
               style="font-size: 20px;"
               class="el-input__icon el-icon-camera-solid"
             ></i> -->
-          </el-upload>
-        </template>
-      </el-input>
+            </el-upload>
+          </template>
+        </el-input>
+      </div>
+
       <el-button
         size="medium"
         @click="searchProducts"
@@ -41,7 +47,7 @@
       <el-checkbox-group
         v-model="synthesis"
         @change="handleSynthesis"
-        style="margin: 0 30px;"
+        style="margin: 0 30px"
       >
         <el-checkbox label="精准查询" name="type"></el-checkbox>
       </el-checkbox-group>
@@ -62,33 +68,36 @@
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default {
+  props: ["keyword"],
   data() {
     return {
       synthesis: false,
       advanced: true,
-      searchForm: {
-        keyword: ""
-      }
+      myKeyword: ""
     };
   },
+  watch: {
+    myKeyword(val) {
+      this.$emit("input", val);
+    },
+    keyword(val) {
+      this.myKeyword = val;
+    }
+  },
   methods: {
+    // 关闭关联搜索
+    closeTag() {
+      this.$emit("closeTag");
+    },
     // 选择图片-图搜
     openUpload(file) {
-      // const fd = {
-      //   name: "/bsIndex/bsProductSearchIndex",
-      //   linkUrl: "/bsIndex/bsProductSearchIndex",
-      //   component: "bsProductSearchIndex",
-      //   refresh: true,
-      //   label: "产品查询"
-      // };
-      // this.$store.commit("myAddTab", fd);
       eventBus.$emit("openUpload", file);
     },
     // 文本搜索产品
     searchProducts() {
-      eventBus.$emit("searchProducts", this.searchForm);
+      eventBus.$emit("searchProducts");
       // const fd = {
       //   name: "/bsIndex/bsProductSearchIndex",
       //   linkUrl: "/bsIndex/bsProductSearchIndex",
@@ -122,21 +131,25 @@ export default {
   },
   created() {},
   mounted() {
-    eventBus.$on("imgSearch", () => {
+    eventBus.$on("imgSearchChange", () => {
       this.$refs.uploadRef.$children[0].$refs.input.click();
+      this.$store.commit("handlerimgSearch", false);
     });
   },
   computed: {
     ...mapGetters({
       shoppingList: "myShoppingList"
-    })
+    }),
+    ...mapState(["searchHallCate"])
   },
   beforeDestroy() {
-    eventBus.$off("imgSearch");
+    eventBus.$off("imgSearchChange");
+    eventBus.$off("txtSearch");
   }
 };
 </script>
 <style scoped lang="less">
+@deep: ~">>>";
 .box {
   width: 100%;
   display: flex;
@@ -147,6 +160,16 @@ export default {
     flex: 1;
     display: flex;
     align-items: center;
+    .inputBox {
+      margin-left: 5px;
+      .el-tag {
+        margin-left: 10px;
+        height: 36px;
+        line-height: 36px;
+        vertical-align: top;
+        box-sizing: border-box;
+      }
+    }
     .advancedBox {
       width: 90px;
       height: 36px;
@@ -155,11 +178,12 @@ export default {
       align-items: center;
       line-height: 36px;
       cursor: pointer;
+      color: #3368a9;
       i {
         margin-left: 5px;
         width: 10px;
         height: 10px;
-        color: #666666;
+        color: #3368a9;
         display: inline-block;
       }
     }

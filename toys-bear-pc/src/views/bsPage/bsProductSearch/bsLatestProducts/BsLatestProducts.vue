@@ -1,82 +1,91 @@
 <template>
-  <div class="bsMyCollection">
-    <div class="title">
-      <div class="titleLeft">
-        <span>最新产品 ({{ totalCount }})</span>
-      </div>
-      <div class="right">
-        <el-button type="warning" size="medium" @click="toShoppingCart">
-          <i class="whiteCart"></i>
-          <span>购物车</span>
-          <span>({{ shoppingList.length }})</span>
-        </el-button>
-      </div>
-    </div>
-    <div class="searchBox">
-      <div class="left">
-        <div class="item" style="min-width:350px">
-          <span class="label">关键字：</span>
-          <el-input
-            v-focus
-            type="text"
-            size="medium"
-            v-model="keyword"
-            clearable
-            placeholder="输入关键词+空格可模糊搜索"
-            @keyup.native.enter="search"
-          ></el-input>
+  <div>
+    <div class="BsLatestProducts">
+      <div class="title">
+        <div class="titleLeft">
+          <span>最新产品 ({{ totalCount }})</span>
         </div>
-        <div class="item">
-          <span class="label">时间段：</span>
-          <el-date-picker
-            size="medium"
-            value-format="yyyy-MM-ddTHH:mm:ss"
-            v-model="dateTime"
-            type="datetimerange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          >
-          </el-date-picker>
-        </div>
-        <div class="item">
-          <el-button
-            @click="search"
-            type="primary"
-            icon="el-icon-search"
-            size="medium"
-          >
-            搜索
+        <div class="right">
+          <el-button type="warning" size="medium" @click="toShoppingCart">
+            <i class="whiteCart"></i>
+            <span>购物车</span>
+            <span>({{ shoppingList.length }})</span>
           </el-button>
         </div>
       </div>
-      <div class="right">
-        <div
-          :class="{ grid: true, active: isGrid === 'bsGridComponent' }"
-          @click="handerIsGrid('bsGridComponent')"
-        ></div>
-        <div
-          :class="{ column: true, active: isGrid === 'bsColumnComponent' }"
-          @click="handerIsGrid('bsColumnComponent')"
-        ></div>
+      <div class="searchBox">
+        <div class="left">
+          <div class="item" style="min-width:350px">
+            <span class="label">关键字：</span>
+            <el-input
+              v-focus
+              type="text"
+              size="medium"
+              v-model="keyword"
+              clearable
+              placeholder="输入关键词+空格可模糊搜索"
+              @keyup.native.enter="search"
+            ></el-input>
+          </div>
+          <div class="item">
+            <span class="label">时间段：</span>
+            <el-date-picker
+              size="medium"
+              value-format="yyyy-MM-ddTHH:mm:ss"
+              v-model="dateTime"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+            >
+            </el-date-picker>
+          </div>
+          <div class="item">
+            <el-button
+              @click="search"
+              type="primary"
+              icon="el-icon-search"
+              size="medium"
+            >
+              搜索
+            </el-button>
+          </div>
+        </div>
+        <div class="right">
+          <div class="searchTime">
+            查询用时：<span>{{ searchHttpTime }}</span
+            >秒
+          </div>
+          <div
+            :class="{ grid: true, active: isGrid === 'bsGridComponent' }"
+            @click="handerIsGrid('bsGridComponent')"
+          ></div>
+          <div
+            :class="{ column: true, active: isGrid === 'bsColumnComponent' }"
+            @click="handerIsGrid('bsColumnComponent')"
+          ></div>
+        </div>
+      </div>
+      <div class="tableBox">
+        <!-- 产品列表 -->
+        <component :is="isGrid" :productList="productList"></component>
+        <!-- 分页 -->
+        <center style="padding:30px 0;">
+          <el-pagination
+            layout="total, sizes, prev, pager, next, jumper"
+            :page-sizes="[12, 24, 36, 48]"
+            background
+            :total="totalCount"
+            :page-size="pageSize"
+            :current-page.sync="currentPage"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+          ></el-pagination>
+        </center>
       </div>
     </div>
-    <div class="tableBox">
-      <!-- 产品列表 -->
-      <component :is="isGrid" :productList="tableData"></component>
-      <!-- 分页 -->
-      <center style="padding:20px 0;">
-        <el-pagination
-          layout="total, sizes, prev, pager, next, jumper"
-          :page-sizes="[12, 24, 36, 48]"
-          background
-          :total="totalCount"
-          :page-size="pageSize"
-          :current-page.sync="currentPage"
-          @current-change="handleCurrentChange"
-          @size-change="handleSizeChange"
-        ></el-pagination>
-      </center>
+    <div class="footer" v-if="totalCount >= 7">
+      <img src="@/assets/images/footerBg.png" alt="" />
     </div>
   </div>
 </template>
@@ -97,15 +106,49 @@ export default {
       isGrid: "bsGridComponent",
       keyword: null,
       dateTime: null,
-      tableData: [],
+      productList: [],
       totalCount: 0,
       pageSize: 12,
-      currentPage: 1
+      currentPage: 1,
+      searchHttpTime: null
     };
+  },
+  computed: {
+    ...mapGetters({
+      shoppingList: "myShoppingList"
+    })
+  },
+  watch: {
+    shoppingList: {
+      deep: true,
+      handler(list) {
+        if (list) {
+          if (list.length) {
+            for (let i = 0; i < this.productList.length; i++) {
+              for (let j = 0; j < list.length; j++) {
+                if (
+                  this.productList[i].productNumber == list[j].productNumber
+                ) {
+                  this.productList[i].isShopping = true;
+                  break;
+                } else {
+                  this.productList[i].isShopping = false;
+                }
+              }
+            }
+          } else {
+            this.productList.forEach(val => {
+              val.isShopping = false;
+            });
+          }
+        }
+      }
+    }
   },
   methods: {
     // 获取列表
     async getProductsList() {
+      let startDate = Date.now();
       const fd = {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
@@ -135,7 +178,9 @@ export default {
           }
         }
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        this.productList = res.data.result.item.items;
+        let endDate = Date.now();
+        this.searchHttpTime = (endDate - startDate) / 1000;
       }
     },
     // 去购物车
@@ -175,51 +220,41 @@ export default {
       this.getProductsList();
     }
   },
-  created() {
-    this.getProductsList();
-  },
+  created() {},
   mounted() {
-    // 取消收藏
-    eventBus.$on("resetProducts", item => {
-      for (let i = 0; i < this.tableData.length; i++) {
-        if (this.tableData[i].productNumber == item.productNumber) {
-          this.tableData[i].isFavorite = item.isFavorite;
-        }
-      }
+    this.getProductsList();
+    // 取消收藏/刷新页面
+    eventBus.$on("resetProductCollection", () => {
+      this.getProductsList();
     });
     // 删除购物车
     eventBus.$on("resetMyCart", list => {
       if (list.length) {
-        for (let i = 0; i < this.tableData.length; i++) {
+        for (let i = 0; i < this.productList.length; i++) {
           for (let j = 0; j < list.length; j++) {
-            if (this.tableData[i].productNumber == list[j].productNumber) {
-              this.tableData[i].isShopping = true;
+            if (this.productList[i].productNumber == list[j].productNumber) {
+              this.productList[i].isShopping = true;
               break;
             } else {
-              this.tableData[i].isShopping = false;
+              this.productList[i].isShopping = false;
             }
           }
         }
       } else {
-        this.tableData.forEach(val => {
+        this.productList.forEach(val => {
           val.isShopping = false;
         });
       }
     });
   },
   beforeDestroy() {
-    eventBus.$off("resetProducts");
-  },
-  computed: {
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    })
+    eventBus.$off("resetProductCollection");
   }
 };
 </script>
 <style scoped lang="less">
 @deep: ~">>>";
-.bsMyCollection {
+.BsLatestProducts {
   min-height: 100%;
   background-color: #fff;
   padding: 0 20px;
@@ -280,8 +315,14 @@ export default {
     }
     .right {
       display: flex;
-      width: 60px;
-      min-width: 60px;
+      width: 250px;
+      min-width: 250px;
+      .searchTime {
+        margin-right: 40px;
+        span {
+          color: #3368a9;
+        }
+      }
       .grid,
       .column {
         width: 17px;
@@ -344,5 +385,13 @@ export default {
       }
     }
   }
+}
+.footer {
+  margin-top: 20px;
+  background-color: #f1f3f6;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

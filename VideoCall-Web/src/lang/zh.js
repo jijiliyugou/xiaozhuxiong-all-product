@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-03-31 20:28:17
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\lang\zh.js
- * @LastEditTime: 2021-04-15 16:45:33
+ * @LastEditTime: 2021-04-28 19:23:35
  * @LastEditors: sueRimn
  * @Descripttion:
  * @version: 1.0.0
@@ -26,6 +26,140 @@ export default {
     scan:'请使用小竹熊App扫一扫登录'
   },
   createMeeting:{
+    title:'创建会议',
+    meetingId:'会议ID',
+    companyId:'选择展厅',
+    companyIdText: '请选择展厅',
+    nickName:'昵称',
+    nickNameText:'请输入您的昵称',
+    startTime:'开始时间',
+    startTimeText:'选择开始时间',
+    endTime:'结束时间',
+    endTimeText:'选择结束时间',
+    mettingNumber:'入会人数',
+    mettingNumberText:'请输入1-8',
+    people:'人',
+    camera:'打开麦克风',
+    audio:'打开摄像头',
     button:'确定'
   },
+  addMeeting:{
+    title:'进入会议',
+    company:'公司名称',
+    companyText:'请输入公司名称',
+    nickName:'昵称',
+    nickNameText:'请输入您的昵称',
+    videoId:'摄像头',
+    camera:'打开摄像头',
+    audio:'打开麦克风',
+    button:'confirm'
+  },
+  userList:{
+    host:'主持人',
+    players:'与会人',
+    delete:'移除',
+    cancelDelete:'取消移除'
+  },
+  footer:{
+    isMic:'音频',
+    isCar:'视频',
+  },
+  settings:{
+    settings:'设置',
+    roomSettingTitle:'房间设置',
+    personalSettingTitle:'个人设置',
+    meetingsId:'会议ID',
+    endTime:'结束时间',
+    host:'主持人',
+    me:'我',
+    settingsStatus:'设置新进入房间的会议人状态',
+    isMic:'容许参会者进入房间时打开麦克风',
+    isCar:'容许参会者进入房间时打开摄像头',
+    button:'确认',
+    camera:'摄像头',
+    audio:'麦克风',
+    resolutionRatio:'分辨率',
+    volume:'音量'
+  },
+  addSampling:{
+    orderTitle:'择样单号',
+    orderText:'请输入择样单号',
+    codeText:'请输入验证码',
+    button:'确认'
+  },
+  product:{
+    order:{
+      orderNoTitle:'择样单号',
+      productTitle:'当前产品',
+      productNameList:'品名',
+      prodcutNumberList:'货号',
+      productPriceList:'报价',
+      totalRecords:'总款数',
+      totalCTNS:'总箱数',
+      totalQuantity:'总个数',
+      totalVolume:'总体积/总材积',
+      totalWeight:'总毛总/总净重',
+      totalPrice:'总金额',
+      companyNumber:'公司编号',
+      button:'确认',
+      noData:'暂无数据',
+      submit:'提交',
+      orderTitle:'悦翔展厅：择样单',
+      nowCode:'本次代号'
+    },
+    info:{
+      price:'单价',
+      companyNumber:'公司编号',
+      factoryNo:'货号',
+      chinesePack:'包装',
+      productSize:'产品规格',
+      packageSize:'外箱规格',
+      cartonSize:'包装规格',
+      innerBox:'内箱/装箱量',
+      CBM:'体积/材积',
+      GW:'毛重/净重',
+    },
+    detail:{
+      productInfo:'产品信息',
+      totalCBM:'总体积',
+      totalCucf:'总材积',
+    },
+    other:{
+      add:'加入择样',
+      delete:'删除',
+      reminder:'温馨提示',
+      sureAdd:'确认加入择样？',
+      sureDelete:'确认删除择样？'
+    }
+  },
+  chart:{
+    chartTitle:'聊天',
+    saySomething:'说点什么',
+    send:'发送'
+  },
+  other:{
+    technicalSupport:'技术支持',
+    copyShareUrl:'复制分享链接成功！', 
+    noCompanyInformation:'未获取到公司信息',
+    roomNumberNotObtained:'未获取到房间号',
+    noCamera:'您的设备未检测到摄像头'
+  },
+  modal:{
+    leaveRoom:'确定退出会议室？',
+    leaveSure:'确定关闭',
+    leaveCancel:'取消',
+    endMeeting:'会议即将结束！',
+    endReset:'重新设置',
+    endCancel:'取消'
+  },
+  video:{
+    tipCamera:'温馨提示：未检测到摄像头',
+    user:'用户',
+    join:'加入了会议室!',
+    leave:'离开了会议室!',
+    definition:'温馨提示：切换清晰度成功',
+    deviceIn:'温馨提示：设备已插入',
+    deviceChange:'温馨提示：设备已切换',
+    deviceOut:'温馨提示：设备已拔出',
+  }
 };

@@ -173,6 +173,7 @@
                 v-show="scope.row.offerNumber.indexOf('S') < 0"
                 size="mini"
                 type="info"
+                @click="toPushDetails(scope.$index, scope.row)"
                 >推送</el-button
               >
               <el-button
@@ -210,11 +211,11 @@
     <!-- 导出订单模板dialog -->
     <transition name="el-zoom-in-center">
       <el-dialog
-        title="订单模板"
+        class="exportOrder"
+        title="导出列表"
         v-if="exportTemplateDialog"
         :visible.sync="exportTemplateDialog"
-        top="60px"
-        width="80%"
+        width="1200px"
       >
         <bsExportOrder :options="orderRow" />
       </el-dialog>
@@ -223,7 +224,7 @@
 </template>
 
 <script>
-import bsExportOrder from "@/components/commonComponent/exportOrderComponent";
+import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gongsizhaoyangbaojia.vue";
 import eventBus from "@/assets/js/common/eventBus.js";
 export default {
   name: "bsSampleQuotation",
@@ -347,6 +348,23 @@ export default {
       };
       this.$store.commit("myAddTab", fd);
     },
+    // 推送跳转
+    // toPushDetails(index, row) {
+    //   const fd = {
+    //     name: row.offerNumber + "报价推送",
+    //     linkUrl: "/bsIndex/bsSampleQuotation",
+    //     component: "bsPushIndex",
+    //     refresh: true,
+    //     noPush: true,
+    //     label: "报价推送" + row.offerNumber,
+    //     value: row
+    //   };
+    //   console.log(fd);
+    //   this.$store.commit("myAddTab", fd);
+    // },
+    toPushDetails() {
+      return false;
+    },
     //编辑报价跳转
     async handleEdit(index, row) {
       const fd = {
@@ -452,6 +470,11 @@ export default {
         width: 80px;
         height: 60px;
       }
+    }
+  }
+  @{deep} .exportOrder {
+    .el-dialog__body {
+      padding: 0;
     }
   }
 }

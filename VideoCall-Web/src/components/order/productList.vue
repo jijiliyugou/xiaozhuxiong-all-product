@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-06 11:15:36
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\order\productList.vue
- * @LastEditTime: 2021-04-22 16:26:24
+ * @LastEditTime: 2021-04-30 15:14:50
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -11,13 +11,13 @@
 <template>
     <div class="productList_wrap">
     <!-- 择样购物车 -->
-        <Drawer title="择样订单详情" :closable="true" v-model="isShow" @on-close="changeProductList" width='1255' class="productList">
+        <Drawer title="择样订单详情" :closable="true" v-model="isShow" @on-close="changeProductList" width='1272' class="productList">
             <div slot="close" style="cursor: pointer;color: black;display: inline-block;width: 100%;height: 24px;line-height: 24px;font-size: 24px;color: #999999;margin-top: 4px;
                 margin-right: 8px;">
                 <Icon type="md-arrow-round-forward" />
             </div>
             <div class="title">
-                <div class="item">悦翔展厅：择样单</div><div class="item" style="margin-left:47px">本次代号： {{sampleSelection.number}}</div>
+                <div class="item">{{companyName}}：{{$t("product.order.orderTitle")}}</div><div class="item" style="margin-left:47px">{{$t("product.order.nowCode")}}： {{sampleSelection.number}}</div>
             </div>
             <Table :columns="columns2" :data="data2" height="700" :loading="loading" class="from">
                 <template slot-scope="{ row, index }" slot="action">
@@ -33,32 +33,32 @@
             </Table>
             <div class="total">
                 <div class="item">
-                    <Button type="primary" shape="circle" style="width:88px;margin: 6px 6px 0 0;" @click="save" v-if="flag">提交</Button>
+                    <div class="label">{{$t("product.order.totalRecords")}}：</div>
+                    <div class="text">{{totalKuanshu}}</div>
                 </div>
                 <div class="item">
-                    <div class="label">总价：</div>
-                    <div class="text active">$ {{totalAmount}}</div>
+                    <div class="label">{{$t("product.order.totalCTNS")}}：</div>
+                    <div class="text">{{totalBoxCount}}</div>
                 </div>
                 <div class="item">
-                    <div class="label">总毛重/总净重：</div>
-                    <div class="text">{{totalGrossWeight}}/{{totalNetWeight}}(KG)</div>
+                    <div class="label">{{$t("product.order.totalQuantity")}}：</div>
+                    <div class="text">{{totalCount}}</div>
                 </div>
                 <div class="item">
-                    <div class="label">总体积/总材积：</div>
+                    <div class="label">{{$t("product.order.totalVolume")}}：</div>
                     <div class="text">{{totalBulkFeet}} cbm</div>
                     <div class="text">{{totalBulkStere}} cuft</div>
                 </div>
                 <div class="item">
-                    <div class="label">总个数：</div>
-                    <div class="text">{{totalCount}}</div>
+                    <div class="label">{{$t("product.order.totalWeight")}}：</div>
+                    <div class="text">{{totalGrossWeight}}/{{totalNetWeight}}(KG)</div>
                 </div>
                 <div class="item">
-                    <div class="label">总箱数：</div>
-                    <div class="text">{{totalBoxCount}}</div>
+                    <div class="label">{{$t("product.order.totalPrice")}}：</div>
+                    <div class="text active">$ {{totalAmount}}</div>
                 </div>
                 <div class="item">
-                    <div class="label">总款数：</div>
-                    <div class="text">{{totalKuanshu}}</div>
+                    <Button type="primary" shape="circle" style="width:88px;margin: 6px 6px 0 0;" @click="save" v-if="flag">{{$t("product.order.submit")}}</Button>
                 </div>
             </div>
         </Drawer>
@@ -201,9 +201,10 @@ export default {
                     width: 210
                 },
                 {
-                    title: '产品信息',
+                    title: this.$t("product.detail.productInfo"),
                     key: 'info2',
                     render: (h, params) => {
+                        var me = this;
                         return h('div', [
                             h('div', {
                                 style: {
@@ -211,28 +212,28 @@ export default {
                                     fontSize: '12px',
                                     color: '#333333'
                                 },
-                            },'公司编号：' + params.row.companyNumber),
+                            },me.$t("product.info.companyNumber")+'：' + params.row.companyNumber),
                             h('div', {
                                 style: {
                                     marginTop: '4px',
                                     fontSize: '12px',
                                     color: '#333333'
                                 },  
-                            },'包装方式：' + params.row.chinesePack),
+                            },me.$t("product.info.chinesePack")+'：' + params.row.chinesePack),
                             h('div', { 
                                 style: {
                                     marginTop: '4px',
                                     fontSize: '12px',
                                     color: '#333333'
                                 },  
-                            },'产品规格：' + params.row.productLength +'x'+params.row.productWidth+'x'+params.row.productHeight+'(cm)'),
+                            },me.$t("product.info.productSize")+'：' + params.row.productLength +'x'+params.row.productWidth+'x'+params.row.productHeight+'(cm)'),
                             h('div', {  
                                 style: {
                                     marginTop: '4px',
                                     fontSize: '12px',
                                     color: '#333333'
                                 }, 
-                            },'包装规格：' + params.row.innerBoxLength +'x'+params.row.innerBoxWidth+'x'+params.row.innerBoxHeight+'(cm)'),
+                            },me.$t("product.info.cartonSize")+'：' + params.row.innerBoxLength +'x'+params.row.innerBoxWidth+'x'+params.row.innerBoxHeight+'(cm)'),
                         ])
                     },
                     width: 210
@@ -241,6 +242,7 @@ export default {
                     title: ' ',
                     key: 'info3',
                     render: (h, params) => {
+                        var me = this;
                         return h('div', [
                             h('div', {
                                 style: {
@@ -248,28 +250,28 @@ export default {
                                     fontSize: '12px',
                                     color: '#333333'
                                 },
-                            },'外箱规格：' + params.row.outerBoxLength +'x'+params.row.outerBoxWidth+'x'+params.row.outerBoxHeight+'(cm)'),
+                            },me.$t("product.info.packageSize")+'：' + params.row.outerBoxLength +'x'+params.row.outerBoxWidth+'x'+params.row.outerBoxHeight+'(cm)'),
                             h('div', {
                                 style: {
                                     marginTop: '4px',
                                     fontSize: '12px',
                                     color: '#333333'
                                 },  
-                            },'内箱/装箱量：' + params.row.innerBoxCount+'(cbm)/'+params.row.outerBoxLoadCapa+'(cuft)'),
+                            },this.$t("product.info.innerBox")+'：' + params.row.innerBoxCount+'(cbm)/'+params.row.outerBoxLoadCapa+'(cuft)'),
                             h('div', { 
                                 style: {
                                     marginTop: '4px',
                                     fontSize: '12px',
                                     color: '#333333'
                                 },  
-                            },'体积/材积：' + params.row.outerBoxBulkFeet + '/' + params.row.outerBoxBulkStere),
+                            },this.$t("product.info.CBM")+'：' + params.row.outerBoxBulkFeet + '/' + params.row.outerBoxBulkStere),
                             h('div', {  
                                 style: {
                                     marginTop: '4px',
                                     fontSize: '12px',
                                     color: '#333333'
                                 }, 
-                            },'毛重/净重：' + params.row.outerBoxGrossWeight+'/'+params.row.outerBoxNetWeight+'(kg)'),
+                            },this.$t("product.info.GW")+'：' + params.row.outerBoxGrossWeight+'/'+params.row.outerBoxNetWeight+'(kg)'),
                         ])
                     },
                     width: 210
@@ -277,8 +279,8 @@ export default {
                 {
                     renderHeader:(h,params)=>{
                         return h('div',[
-                            h('div','总箱数'),
-                            h('div','总数量'),
+                            h('div',this.$t("product.order.totalCTNS")),
+                            h('div',this.$t("product.order.totalQuantity")),
                         ])
                     },
                     key: 'tempAmount',
@@ -342,8 +344,8 @@ export default {
                 {
                     renderHeader:(h,params)=>{
                         return h('div',[
-                            h('div','总体积'),
-                            h('div','总材积'),
+                            h('div',this.$t("product.detail.totalCBM")),
+                            h('div',this.$t("product.detail.totalCucf")),
                         ])
                     },
                     key: 'Total',
@@ -367,7 +369,7 @@ export default {
                     width: 142
                 },
                 {
-                    title: '总金额',
+                    title: this.$t("product.order.totalPrice"),
                     key: 'totalAmount',
                     align: 'center',
                     render: (h, params) => {
@@ -409,7 +411,8 @@ export default {
             totalNetWeight:0,
             roomNumber:null,
             loading:true,
-            flag:false
+            flag:false,
+            companyName:''
         }
     },
     methods: {
@@ -521,6 +524,7 @@ export default {
     created(){
         this.roomNumber=Cookies.get('channel');
         this.flag =  Cookies.get("isAdmin")=='true' ? true : false;
+        this.companyName = Cookies.get("companyName") || "未获取到公司信息";
     }
 }
 </script>

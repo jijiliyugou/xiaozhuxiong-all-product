@@ -1,17 +1,21 @@
 <template>
-  <div class="productSearch">
-    <template v-if="!imageSearchValue">
-      <div class="advancedSearchBox">
-        <bsProductSearch
-          ref="searchRef"
-          @handleSynthesis="handleSynthesis"
-          @screeningShow="screeningShow"
-        />
-        <!-- 高级筛选 -->
-        <div class="advancedScreening" v-show="screeningFlag == true">
-          <div class="title">高级筛选:</div>
-          <div class="queryCondition">
-            <!-- <div>
+  <div>
+    <div class="productSearch">
+      <template v-if="!imageSearchValue">
+        <div class="advancedSearchBox">
+          <bsProductSearch
+            ref="searchRef"
+            :keyword="searchForm.keyword"
+            v-model="searchForm.keyword"
+            @closeTag="closeTag"
+            @handleSynthesis="handleSynthesis"
+            @screeningShow="screeningShow"
+          />
+          <!-- 高级筛选 -->
+          <div class="advancedScreening" v-show="screeningFlag == true">
+            <div class="title">高级筛选:</div>
+            <div class="queryCondition">
+              <!-- <div>
               <span class="text">综合：</span>
               <el-checkbox
                 v-model="synthesis"
@@ -21,158 +25,560 @@
                 综合查询
               </el-checkbox>
             </div> -->
-            <div class="item">
-              <span class="text">搜索类型：</span>
-              <el-checkbox
-                @change="handleCheckedScreensChange"
-                v-model="searchForm.fa_no"
-              >
-                货号
-              </el-checkbox>
-              <el-checkbox
-                @change="handleCheckedScreensChange"
-                v-model="searchForm.name"
-              >
-                名称
-              </el-checkbox>
-              <el-checkbox
-                @change="handleCheckedScreensChange"
-                v-model="searchForm.number"
-              >
-                编号
-              </el-checkbox>
+              <div class="item">
+                <span class="text">搜索类型：</span>
+                <el-checkbox
+                  @change="handleCheckedScreensChange"
+                  v-model="searchForm.fa_no"
+                >
+                  货号
+                </el-checkbox>
+                <el-checkbox
+                  @change="handleCheckedScreensChange"
+                  v-model="searchForm.name"
+                >
+                  名称
+                </el-checkbox>
+                <el-checkbox
+                  @change="handleCheckedScreensChange"
+                  v-model="searchForm.number"
+                >
+                  编号
+                </el-checkbox>
+              </div>
+              <div class="item">
+                <span class="text">是否精准：</span>
+                <el-radio-group v-model="isAccurate" @change="handleIsAccurate">
+                  <el-radio label="模糊"></el-radio>
+                  <el-radio label="精准"></el-radio>
+                </el-radio-group>
+              </div>
             </div>
-            <div class="item">
-              <span class="text">是否精准：</span>
-              <el-radio-group v-model="isAccurate" @change="handleIsAccurate">
-                <el-radio label="模糊"></el-radio>
-                <el-radio label="精准"></el-radio>
-              </el-radio-group>
+            <div class="parameter">
+              <el-form :model="advancedFormdata">
+                <div class="left">
+                  <el-form-item label="产品规格：">
+                    <el-input
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      size="medium"
+                      placeholder="长"
+                      style="width: 55px"
+                      v-model="advancedFormdata.pr_le"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="宽"
+                      style="width: 55px"
+                      v-model="advancedFormdata.pr_wi"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="高"
+                      style="width: 55px"
+                      v-model="advancedFormdata.pr_hi"
+                    ></el-input>
+                    &nbsp;<span>CM</span>
+                  </el-form-item>
+                  <el-form-item label="外箱规格：">
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="长"
+                      style="width: 55px"
+                      v-model="advancedFormdata.ou_le"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="宽"
+                      style="width: 55px"
+                      v-model="advancedFormdata.ou_wi"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="高"
+                      style="width: 55px"
+                      v-model="advancedFormdata.ou_hi"
+                    ></el-input>
+                    &nbsp;<span>CM</span>
+                  </el-form-item>
+                  <el-form-item label="包装规格：" style="margin: 0">
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="长"
+                      style="width: 55px"
+                      v-model="advancedFormdata.in_le"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="宽"
+                      style="width: 55px"
+                      v-model="advancedFormdata.in_wi"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="高"
+                      style="width: 55px"
+                      v-model="advancedFormdata.in_hi"
+                    ></el-input>
+                    &nbsp;<span>CM</span>
+                  </el-form-item>
+                </div>
+                <div class="left">
+                  <el-form-item label="包装方式：">
+                    <el-select
+                      filterable
+                      size="medium"
+                      style="width: 200px; heigth: 35px"
+                      clearable
+                      v-model="advancedFormdata.ch_pa"
+                      placeholder="请选择"
+                    >
+                      <el-option
+                        v-for="item in chpaList"
+                        :key="item.pa_nu"
+                        :label="item.ch_pa"
+                        :value="item.ch_pa"
+                      >
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="是否有图：">
+                    <el-radio-group v-model="advancedFormdata.isUpInsetImg">
+                      <el-radio label="是"></el-radio>
+                      <el-radio label="否"></el-radio>
+                    </el-radio-group>
+                  </el-form-item>
+                  <el-form-item style="margin: 0" label="">
+                    <el-button
+                      type="primary"
+                      size="mini"
+                      style="color: #fff"
+                      @click="confirmAdvanced"
+                    >
+                      确 定
+                    </el-button>
+                  </el-form-item>
+                </div>
+              </el-form>
             </div>
           </div>
-          <div class="parameter">
-            <el-form :model="advancedFormdata">
-              <div class="left">
-                <el-form-item label="产品规格：">
-                  <el-input
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    size="medium"
-                    placeholder="长"
-                    style="width: 55px"
-                    v-model="advancedFormdata.pr_le"
-                  ></el-input
-                  ><span>-</span>
-                  <el-input
-                    size="medium"
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    placeholder="宽"
-                    style="width: 55px"
-                    v-model="advancedFormdata.pr_wi"
-                  ></el-input
-                  ><span>-</span>
-                  <el-input
-                    size="medium"
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    placeholder="高"
-                    style="width: 55px"
-                    v-model="advancedFormdata.pr_hi"
-                  ></el-input>
-                  &nbsp;<span>CM</span>
-                </el-form-item>
-                <el-form-item label="外箱规格：">
-                  <el-input
-                    size="medium"
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    placeholder="长"
-                    style="width: 55px"
-                    v-model="advancedFormdata.ou_le"
-                  ></el-input
-                  ><span>-</span>
-                  <el-input
-                    size="medium"
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    placeholder="宽"
-                    style="width: 55px"
-                    v-model="advancedFormdata.ou_wi"
-                  ></el-input
-                  ><span>-</span>
-                  <el-input
-                    size="medium"
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    placeholder="高"
-                    style="width: 55px"
-                    v-model="advancedFormdata.ou_hi"
-                  ></el-input>
-                  &nbsp;<span>CM</span>
-                </el-form-item>
-                <el-form-item label="包装规格：">
-                  <el-input
-                    size="medium"
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    placeholder="长"
-                    style="width: 55px"
-                    v-model="advancedFormdata.in_le"
-                  ></el-input
-                  ><span>-</span>
-                  <el-input
-                    size="medium"
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    placeholder="宽"
-                    style="width: 55px"
-                    v-model="advancedFormdata.in_wi"
-                  ></el-input
-                  ><span>-</span>
-                  <el-input
-                    size="medium"
-                    onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    placeholder="高"
-                    style="width: 55px"
-                    v-model="advancedFormdata.in_hi"
-                  ></el-input>
-                  &nbsp;<span>CM</span>
-                </el-form-item>
+          <!-- 展厅分类 -->
+          <div class="hallCate" v-if="searchHallCate">
+            <div class="productClass">
+              <span class="myLabel">产品分类:</span>
+              <div :class="{ tags: true, showOneCate: isOneDownCate }">
+                <div
+                  @click="hallTagEvent(null)"
+                  :class="{
+                    itemTag: true,
+                    isActive: searchForm.categoryNumber === null
+                  }"
+                >
+                  全部
+                </div>
+                <div
+                  @click="hallTagEvent(item)"
+                  :class="{
+                    itemTag: true,
+                    isActive: searchForm.categoryNumber === item.categoryNumber
+                  }"
+                  v-for="item in searchHallCate.cateList"
+                  :key="item.categoryNumber"
+                >
+                  {{ item.categoryName }}
+                </div>
               </div>
-              <div class="left">
-                <el-form-item label="包装方式：">
-                  <el-select
-                    filterable
-                    size="medium"
-                    style="width: 200px; heigth: 35px"
-                    clearable
-                    v-model="advancedFormdata.ch_pa"
-                    placeholder="请选择"
-                  >
-                    <el-option
-                      v-for="item in chpaList"
-                      :key="item.pa_nu"
-                      :label="item.ch_pa"
-                      :value="item.ch_pa"
-                    >
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="是否图片：">
-                  <el-radio-group v-model="advancedFormdata.isUpInsetImg">
-                    <el-radio label="是"></el-radio>
-                    <el-radio label="否"></el-radio>
-                  </el-radio-group>
-                </el-form-item>
-                <el-form-item style="margin: 0; " label="">
-                  <el-button
-                    type="primary"
-                    size="medium"
-                    style="color: #fff;"
-                    @click="confirmAdvanced"
-                  >
-                    确 定
-                  </el-button>
-                </el-form-item>
+              <div class="topLine">
+                <div class="develop" @click="handlerOneCateLabel">
+                  <span class="zhankai">{{
+                    isOneDownCate ? "展开" : "隐藏"
+                  }}</span>
+                  <i v-show="isOneDownCate" class="el-icon-arrow-down"></i>
+                  <i v-show="!isOneDownCate" class="el-icon-arrow-up"></i>
+                </div>
               </div>
-            </el-form>
+            </div>
+          </div>
+          <!-- 所有分类 -->
+          <div class="allCate" v-else>
+            <!--一级分类 -->
+            <div class="productClass">
+              <span class="myLabel">产品分类:</span>
+              <div :class="{ tags: true, showOneCate: isOneDownCate }">
+                <div
+                  @click="oneTagEvent(null)"
+                  :class="{ itemTag: true, isActive: oneCurrentTag === null }"
+                >
+                  全部
+                </div>
+                <div
+                  @click="oneTagEvent(item)"
+                  :class="{
+                    itemTag: true,
+                    isActive: oneCurrentTag && oneCurrentTag.id === item.id
+                  }"
+                  v-for="item in categoryList"
+                  :key="item.id"
+                >
+                  {{ item.name }}
+                </div>
+              </div>
+              <div class="topLine">
+                <div class="develop" @click="handlerOneCateLabel">
+                  <span class="zhankai">{{
+                    isOneDownCate ? "展开" : "隐藏"
+                  }}</span>
+                  <i v-show="isOneDownCate" class="el-icon-arrow-down"></i>
+                  <i v-show="!isOneDownCate" class="el-icon-arrow-up"></i>
+                </div>
+              </div>
+            </div>
+            <!-- 二级分类 -->
+            <div class="twoLevelClass" v-if="oneCurrentTag">
+              <span class="myLabel">二级分类:</span>
+              <div :class="{ tags: true, showTwoCate: isTwoDownCate }">
+                <div
+                  @click="twoTagEvent(null)"
+                  :class="{ itemTag: true, isActive: currentTwoTag === null }"
+                >
+                  全部
+                </div>
+                <div
+                  @click="twoTagEvent(item.id)"
+                  :class="{
+                    itemTag: true,
+                    isActive: currentTwoTag === item.id
+                  }"
+                  v-for="item in oneCurrentTag.children"
+                  :key="item.id"
+                >
+                  {{ item.name }}
+                </div>
+              </div>
+              <div class="topLine">
+                <div class="develop" @click="handlerTwoCateLabel">
+                  <span class="zhankai">{{
+                    isTwoDownCate ? "展开" : "隐藏"
+                  }}</span>
+                  <i v-show="isTwoDownCate" class="el-icon-arrow-down"></i>
+                  <i v-show="!isTwoDownCate" class="el-icon-arrow-up"></i>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <!-- 标准筛选 -->
-        <!-- <div class="standardScreening" v-show="screeningFlag == false">
+        <div class="productsWrap">
+          <div class="screenBox">
+            <div class="left">
+              <div class="screenItem" @click="sortTypeEvent(null)">
+                <span :class="{ screenLabel: true, active: sortOrder === null }"
+                  >综合</span
+                >
+              </div>
+              <div class="screenItem" @click="sortTypeEvent(3)">
+                <span :class="{ screenLabel: true, active: sortOrder === 3 }"
+                  >热度</span
+                >
+                <i v-show="isRedu === null" class="jiantou xiajiantouIcon"></i>
+                <i v-show="isRedu === 1" class="jiantou xiaActiveIcon"></i>
+                <i v-show="isRedu === 2" class="jiantou shangActiveIcon"></i>
+              </div>
+              <div class="screenItem" @click="sortTypeEvent(1)">
+                <span :class="{ screenLabel: true, active: sortOrder === 1 }"
+                  >单价</span
+                >
+                <i v-show="isPrice === null" class="jiantou xiajiantouIcon"></i>
+                <i v-show="isPrice === 1" class="jiantou xiaActiveIcon"></i>
+                <i v-show="isPrice === 2" class="jiantou shangActiveIcon"></i>
+              </div>
+              <div class="screenItem" @click="sortTypeEvent(2)">
+                <span :class="{ screenLabel: true, active: sortOrder === 2 }">
+                  时间
+                </span>
+                <i v-show="isTime === null" class="jiantou xiajiantouIcon"></i>
+                <i v-show="isTime === 1" class="jiantou xiaActiveIcon"></i>
+                <i v-show="isTime === 2" class="jiantou shangActiveIcon"></i>
+              </div>
+              <div class="screenItem dateTime">
+                <span class="screenLabel">上架时间</span>
+                <el-date-picker
+                  size="mini"
+                  value-format="yyyy-MM-ddTHH:mm:ss"
+                  v-model="searchForm.time"
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                >
+                </el-date-picker>
+              </div>
+              <div class="screenItem priceUnit">
+                <span class="screenLabel">价格区间</span>
+                <div class="intervalPrice">
+                  <el-input
+                    size="mini"
+                    v-model="searchForm.minPrice"
+                    placeholder="最低"
+                  ></el-input>
+                  <span class="line">-</span>
+                  <el-input
+                    size="mini"
+                    v-model="searchForm.maxPrice"
+                    placeholder="最高"
+                  ></el-input>
+                </div>
+              </div>
+              <el-button
+                @click="getProductList(false)"
+                type="primary"
+                style="margin-left: 10px"
+                size="mini"
+              >
+                确定
+              </el-button>
+            </div>
+            <div class="right">
+              <div class="searchTime">
+                查询用时：<span>{{ searchHttpTime }}</span
+                >秒
+              </div>
+              <div
+                :class="{ grid: true, active: isGrid === 'bsGridComponent' }"
+                @click="handerIsGrid('bsGridComponent')"
+              ></div>
+              <div
+                :class="{
+                  column: true,
+                  active: isGrid === 'bsColumnComponent'
+                }"
+                @click="handerIsGrid('bsColumnComponent')"
+              ></div>
+              <div class="line"></div>
+              <div class="totalCount">
+                <span class="totalCountText">{{ totalCount }}</span>
+                <span>条数据</span>
+              </div>
+              <div class="myMinPagination">
+                <div @click="firstEvent" class="first el-icon-arrow-left"></div>
+                <div class="count">
+                  <span class="pageIndex">{{ currentPage }}</span>
+                  <span>/</span>
+                  <span>{{ Math.ceil(totalCount / pageSize) }}</span>
+                </div>
+                <div @click="nextEvent" class="next el-icon-arrow-right"></div>
+              </div>
+            </div>
+          </div>
+          <div class="productListBox">
+            <!-- 产品列表 -->
+            <component :is="isGrid" :productList="productList"></component>
+            <!-- 分页 -->
+            <center class="myPagination">
+              <el-pagination
+                background
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="currentPage"
+                :page-sizes="[12, 24, 36, 48]"
+                :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="totalCount"
+              >
+              </el-pagination>
+            </center>
+          </div>
+        </div>
+      </template>
+      <!-- 图搜结果 -->
+      <template v-if="imageSearchValue">
+        <div class="advancedSearchBox">
+          <bsProductSearch
+            ref="searchRef"
+            :keyword="searchForm.keyword"
+            v-model="searchForm.keyword"
+            @closeTag="closeTag"
+            @handleSynthesis="handleSynthesis"
+            @screeningShow="screeningShow"
+          />
+          <!-- 高级筛选 -->
+          <div class="advancedScreening" v-show="screeningFlag == true">
+            <div class="title">高级筛选:</div>
+            <div class="queryCondition">
+              <!-- <div>
+              <span class="text">综合：</span>
+              <el-checkbox
+                v-model="synthesis"
+                @change="handleSynthesis"
+                style="margin-right: 30px;"
+              >
+                综合查询
+              </el-checkbox>
+            </div> -->
+              <div class="item">
+                <span class="text">搜索类型：</span>
+                <el-checkbox
+                  @change="handleCheckedScreensChange"
+                  v-model="searchForm.fa_no"
+                >
+                  货号
+                </el-checkbox>
+                <el-checkbox
+                  @change="handleCheckedScreensChange"
+                  v-model="searchForm.name"
+                >
+                  名称
+                </el-checkbox>
+                <el-checkbox
+                  @change="handleCheckedScreensChange"
+                  v-model="searchForm.number"
+                >
+                  编号
+                </el-checkbox>
+              </div>
+              <div class="item">
+                <span class="text">是否精准：</span>
+                <el-radio-group v-model="isAccurate" @change="handleIsAccurate">
+                  <el-radio label="模糊"></el-radio>
+                  <el-radio label="精准"></el-radio>
+                </el-radio-group>
+              </div>
+            </div>
+            <div class="parameter">
+              <el-form :model="advancedFormdata">
+                <div class="left">
+                  <el-form-item label="产品规格：">
+                    <el-input
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      size="medium"
+                      placeholder="长"
+                      style="width: 55px"
+                      v-model="advancedFormdata.pr_le"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="宽"
+                      style="width: 55px"
+                      v-model="advancedFormdata.pr_wi"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="高"
+                      style="width: 55px"
+                      v-model="advancedFormdata.pr_hi"
+                    ></el-input>
+                    &nbsp;<span>CM</span>
+                  </el-form-item>
+                  <el-form-item label="外箱规格：">
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="长"
+                      style="width: 55px"
+                      v-model="advancedFormdata.ou_le"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="宽"
+                      style="width: 55px"
+                      v-model="advancedFormdata.ou_wi"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="高"
+                      style="width: 55px"
+                      v-model="advancedFormdata.ou_hi"
+                    ></el-input>
+                    &nbsp;<span>CM</span>
+                  </el-form-item>
+                  <el-form-item label="包装规格：" style="margin: 0">
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="长"
+                      style="width: 55px"
+                      v-model="advancedFormdata.in_le"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="宽"
+                      style="width: 55px"
+                      v-model="advancedFormdata.in_wi"
+                    ></el-input
+                    ><span class="hx">-</span>
+                    <el-input
+                      size="medium"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      placeholder="高"
+                      style="width: 55px"
+                      v-model="advancedFormdata.in_hi"
+                    ></el-input>
+                    &nbsp;<span>CM</span>
+                  </el-form-item>
+                </div>
+                <div class="left">
+                  <el-form-item label="包装方式：">
+                    <el-select
+                      filterable
+                      size="medium"
+                      style="width: 200px; heigth: 35px"
+                      clearable
+                      v-model="advancedFormdata.ch_pa"
+                      placeholder="请选择"
+                    >
+                      <el-option
+                        v-for="item in chpaList"
+                        :key="item.pa_nu"
+                        :label="item.ch_pa"
+                        :value="item.ch_pa"
+                      >
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="是否有图：">
+                    <el-radio-group v-model="advancedFormdata.isUpInsetImg">
+                      <el-radio label="是"></el-radio>
+                      <el-radio label="否"></el-radio>
+                    </el-radio-group>
+                  </el-form-item>
+                  <el-form-item style="margin: 0" label="">
+                    <el-button
+                      type="primary"
+                      size="mini"
+                      style="color: #fff"
+                      @click="confirmAdvanced"
+                    >
+                      确 定
+                    </el-button>
+                  </el-form-item>
+                </div>
+              </el-form>
+            </div>
+          </div>
+          <!-- 标准筛选 -->
+          <!-- <div class="standardScreening" v-show="screeningFlag == false">
           <span class="myLabel">标准筛选:</span>
           <el-checkbox
             v-model="synthesis"
@@ -206,287 +612,143 @@
             包装
           </el-checkbox>
         </div> -->
-        <div class="productClass">
-          <span class="myLabel">产品分类:</span>
-          <div :class="{ tags: true, showOneCate: isOneDownCate }">
-            <div
-              @click="oneTagEvent(null)"
-              :class="{ itemTag: true, isActive: oneCurrentTag === null }"
-            >
-              全部
-            </div>
-            <div
-              @click="oneTagEvent(item)"
-              :class="{
-                itemTag: true,
-                isActive: oneCurrentTag && oneCurrentTag.id === item.id
-              }"
-              v-for="item in categoryList"
-              :key="item.id"
-            >
-              {{ item.name }}
-            </div>
-          </div>
-          <div class="topLine">
-            <div class="develop" @click="handlerOneCateLabel">
-              <span class="zhankai">{{ isOneDownCate ? "展开" : "隐藏" }}</span>
-              <i v-show="isOneDownCate" class="el-icon-arrow-down"></i>
-              <i v-show="!isOneDownCate" class="el-icon-arrow-up"></i>
-            </div>
-          </div>
-        </div>
-        <div class="twoLevelClass" v-if="oneCurrentTag">
-          <span class="myLabel">二级分类:</span>
-          <div :class="{ tags: true, showTwoCate: isTwoDownCate }">
-            <div
-              @click="twoTagEvent(null)"
-              :class="{ itemTag: true, isActive: currentTwoTag === null }"
-            >
-              全部
-            </div>
-            <div
-              @click="twoTagEvent(item.id)"
-              :class="{ itemTag: true, isActive: currentTwoTag === item.id }"
-              v-for="item in oneCurrentTag.children"
-              :key="item.id"
-            >
-              {{ item.name }}
-            </div>
-          </div>
-          <div class="topLine">
-            <div class="develop" @click="handlerTwoCateLabel">
-              <span class="zhankai">{{ isTwoDownCate ? "展开" : "隐藏" }}</span>
-              <i v-show="isTwoDownCate" class="el-icon-arrow-down"></i>
-              <i v-show="!isTwoDownCate" class="el-icon-arrow-up"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="productsWrap">
-        <div class="screenBox">
-          <div class="left">
-            <div class="screenItem" @click="sortTypeEvent(null)">
-              <span :class="{ screenLabel: true, active: sortOrder === null }"
-                >综合</span
+          <div class="productClass">
+            <span class="myLabel">产品分类:</span>
+            <div :class="{ tags: true, showOneCate: isOneDownCate }">
+              <div
+                @click="oneTagEvent(null)"
+                :class="{ itemTag: true, isActive: oneCurrentTag === null }"
               >
-            </div>
-            <div class="screenItem" @click="sortTypeEvent(3)">
-              <span :class="{ screenLabel: true, active: sortOrder === 3 }"
-                >热度</span
+                全部
+              </div>
+              <div
+                @click="oneTagEvent(item)"
+                :class="{
+                  itemTag: true,
+                  isActive: oneCurrentTag && oneCurrentTag.id === item.id
+                }"
+                v-for="item in categoryList"
+                :key="item.id"
               >
-              <i v-show="isRedu === null" class="jiantou xiajiantouIcon"></i>
-              <i v-show="isRedu === 1" class="jiantou xiaActiveIcon"></i>
-              <i v-show="isRedu === 2" class="jiantou shangActiveIcon"></i>
-            </div>
-            <div class="screenItem" @click="sortTypeEvent(1)">
-              <span :class="{ screenLabel: true, active: sortOrder === 1 }"
-                >单价</span
-              >
-              <i v-show="isPrice === null" class="jiantou xiajiantouIcon"></i>
-              <i v-show="isPrice === 1" class="jiantou xiaActiveIcon"></i>
-              <i v-show="isPrice === 2" class="jiantou shangActiveIcon"></i>
-            </div>
-            <div class="screenItem" @click="sortTypeEvent(2)">
-              <span :class="{ screenLabel: true, active: sortOrder === 2 }">
-                时间
-              </span>
-              <i v-show="isTime === null" class="jiantou xiajiantouIcon"></i>
-              <i v-show="isTime === 1" class="jiantou xiaActiveIcon"></i>
-              <i v-show="isTime === 2" class="jiantou shangActiveIcon"></i>
-            </div>
-            <div class="screenItem dateTime">
-              <span class="screenLabel">上架时间</span>
-              <el-date-picker
-                size="mini"
-                value-format="yyyy-MM-ddTHH:mm:ss"
-                v-model="searchForm.time"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-              >
-              </el-date-picker>
-            </div>
-            <div class="screenItem priceUnit">
-              <span class="screenLabel">价格区间</span>
-              <div class="intervalPrice">
-                <el-input
-                  size="mini"
-                  v-model="searchForm.minPrice"
-                  placeholder="最低"
-                ></el-input>
-                <span class="line">-</span>
-                <el-input
-                  size="mini"
-                  v-model="searchForm.maxPrice"
-                  placeholder="最高"
-                ></el-input>
+                {{ item.name }}
               </div>
             </div>
-            <el-button
-              @click="getProductList(false)"
-              type="primary"
-              style="margin-left: 10px"
-              size="mini"
-            >
-              确定
-            </el-button>
-          </div>
-          <div class="right">
-            <div
-              :class="{ grid: true, active: isGrid === 'bsGridComponent' }"
-              @click="handerIsGrid('bsGridComponent')"
-            ></div>
-            <div
-              :class="{ column: true, active: isGrid === 'bsColumnComponent' }"
-              @click="handerIsGrid('bsColumnComponent')"
-            ></div>
-            <div class="line"></div>
-            <div class="totalCount">
-              <span class="totalCountText">{{ totalCount }}</span>
-              <span>条数据</span>
-            </div>
-            <div class="myMinPagination">
-              <div @click="firstEvent" class="first el-icon-arrow-left"></div>
-              <div class="count">
-                <span class="pageIndex">{{ currentPage }}</span>
-                <span>/</span>
-                <span>{{ Math.ceil(totalCount / pageSize) }}</span>
+            <div class="topLine">
+              <div class="develop" @click="handlerOneCateLabel">
+                <span class="zhankai">{{
+                  isOneDownCate ? "展开" : "隐藏"
+                }}</span>
+                <i v-show="isOneDownCate" class="el-icon-arrow-down"></i>
+                <i v-show="!isOneDownCate" class="el-icon-arrow-up"></i>
               </div>
-              <div @click="nextEvent" class="next el-icon-arrow-right"></div>
+            </div>
+          </div>
+          <div class="twoLevelClass" v-if="oneCurrentTag">
+            <span class="myLabel">二级分类:</span>
+            <div :class="{ tags: true, showTwoCate: isTwoDownCate }">
+              <div
+                @click="twoTagEvent(null)"
+                :class="{ itemTag: true, isActive: currentTwoTag === null }"
+              >
+                全部
+              </div>
+              <div
+                @click="twoTagEvent(item.id)"
+                :class="{ itemTag: true, isActive: currentTwoTag === item.id }"
+                v-for="item in oneCurrentTag.children"
+                :key="item.id"
+              >
+                {{ item.name }}
+              </div>
+            </div>
+            <div class="topLine">
+              <div class="develop" @click="handlerTwoCateLabel">
+                <span class="zhankai">{{
+                  isTwoDownCate ? "展开" : "隐藏"
+                }}</span>
+                <i v-show="isTwoDownCate" class="el-icon-arrow-down"></i>
+                <i v-show="!isTwoDownCate" class="el-icon-arrow-up"></i>
+              </div>
             </div>
           </div>
         </div>
-        <div class="productListBox">
-          <!-- 产品列表 -->
-          <component :is="isGrid" :productList="productList"></component>
-          <!-- 分页 -->
-          <center class="myPagination">
-            <el-pagination
-              background
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :current-page="currentPage"
-              :page-sizes="[12, 24, 36, 48]"
-              :page-size="pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="totalCount"
-            >
-            </el-pagination>
-          </center>
-        </div>
-      </div>
-    </template>
-    <!-- 图搜结果 -->
-    <template v-if="imageSearchValue">
-      <div class="picSearchBox">
-        <div class="searchInput">
-          <span class="label">产品搜索:</span>
-          <el-input
-            size="medium"
-            @keyup.native.enter="textSearchProducts"
-            style="width: 340px; margin: 0 15px"
-            placeholder="请输入关键词"
-            v-model="searchForm.keyword"
-            clearable
-          >
-            <template slot="prefix">
-              <el-upload
-                :auto-upload="false"
-                ref="uploadRef"
-                accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
-                class="upload-demo"
-                action="/api/WebsiteShare/SearchProductsByPicture"
-                :show-file-list="false"
-                :on-change="uploadPic"
-              >
-                <i
-                  style="font-size: 20px"
-                  class="el-input__icon el-icon-camera-solid"
-                ></i>
-              </el-upload>
-            </template>
-          </el-input>
-          <el-button
-            size="medium"
-            @click="textSearchProducts"
-            type="primary"
-            icon="el-icon-search"
-            >搜 索</el-button
-          >
-        </div>
-        <div class="resultTitle">搜索图片</div>
-        <div class="resultBox">
-          <div class="left">
-            <p class="totalCountBox">
-              <span class="title">搜索产品</span>
-              <span class="total">
-                <span class="title">总记录：</span>
-                <span class="text"> {{ totalCount }} </span>条
-              </span>
-            </p>
-          </div>
-          <div class="middle">
-            <!-- {{ searchImgPreview }} -->
-            <div class="preview" v-if="searchImgPreview">
-              <div class="imgBox">
-                <div class="miniImg">
+        <div class="picSearchBox">
+          <div class="resultTitle">搜索图片</div>
+          <div class="resultBox">
+            <div class="left">
+              <p class="totalCountBox">
+                <span class="title">搜索产品</span>
+                <span class="total">
+                  <span class="title">总记录：</span>
+                  <span class="text"> {{ totalCount }} </span>条
+                </span>
+              </p>
+            </div>
+            <div class="middle">
+              <!-- {{ searchImgPreview }} -->
+              <div class="preview" v-if="searchImgPreview">
+                <div class="imgBox">
+                  <div class="miniImg">
+                    <el-image
+                      @click.native.stop.prevent="
+                        openCubeImg(searchImgPreview.img)
+                      "
+                      :src="searchImgPreview.img"
+                      fit="contain"
+                    ></el-image>
+                  </div>
                   <el-image
+                    :src="searchImgPreview.baseImg"
                     @click.native.stop.prevent="
-                      openCubeImg(searchImgPreview.img)
+                      openCubeImg(searchImgPreview.baseImg)
                     "
-                    :src="searchImgPreview.img"
                     fit="contain"
                   ></el-image>
                 </div>
-                <el-image
-                  :src="searchImgPreview.baseImg"
-                  @click.native.stop.prevent="
-                    openCubeImg(searchImgPreview.baseImg)
-                  "
-                  fit="contain"
-                ></el-image>
               </div>
             </div>
+            <div class="right"></div>
           </div>
-          <div class="right"></div>
-        </div>
-        <div class="picProductListBox">
-          <!-- 产品列表 -->
-          <component :is="isGrid" :productList="productList"></component>
-        </div>
-      </div>
-    </template>
-    <!-- vueCropper 剪裁图片实现-->
-    <el-dialog title="图片剪裁" :visible.sync="isShowCropper" destroy-on-close>
-      <div class="cropperWrap">
-        <div class="cropper-content">
-          <div class="cropper" style="text-align: center">
-            <vueCropper
-              ref="cropper"
-              :img="option.img"
-              :outputSize="option.outputSize"
-              :outputType="option.outputType"
-              :autoCropWidth="option.autoCropWidth"
-              :autoCropHeight="option.autoCropHeight"
-              :canScale="option.canScale"
-              :info="option.info"
-              :full="option.full"
-              :canMove="option.canMove"
-              :canMoveBox="option.canMoveBox"
-              :original="option.original"
-              :autoCrop="option.autoCrop"
-              :fixed="option.fixed"
-              :fixedNumber="option.fixedNumber"
-              :centerBox="option.centerBox"
-              :infoTrue="option.infoTrue"
-              :fixedBox="option.fixedBox"
-              :mode="option.mode"
-            ></vueCropper>
+          <div class="picProductListBox">
+            <!-- 产品列表 -->
+            <component :is="isGrid" :productList="productList"></component>
           </div>
         </div>
-        <center slot="footer" class="dialog-footer">
-          <!-- <el-button type="info" @click="cropperCancel">取 消</el-button>
+      </template>
+      <!-- vueCropper 剪裁图片实现-->
+      <el-dialog
+        title="图片剪裁"
+        :visible.sync="isShowCropper"
+        destroy-on-close
+      >
+        <div class="cropperWrap">
+          <div class="cropper-content">
+            <div class="cropper" style="text-align: center">
+              <vueCropper
+                ref="cropper"
+                :img="option.img"
+                :outputSize="option.outputSize"
+                :outputType="option.outputType"
+                :autoCropWidth="option.autoCropWidth"
+                :autoCropHeight="option.autoCropHeight"
+                :canScale="option.canScale"
+                :info="option.info"
+                :full="option.full"
+                :canMove="option.canMove"
+                :canMoveBox="option.canMoveBox"
+                :original="option.original"
+                :autoCrop="option.autoCrop"
+                :fixed="option.fixed"
+                :fixedNumber="option.fixedNumber"
+                :centerBox="option.centerBox"
+                :infoTrue="option.infoTrue"
+                :fixedBox="option.fixedBox"
+                :mode="option.mode"
+              ></vueCropper>
+            </div>
+          </div>
+          <center slot="footer" class="dialog-footer">
+            <!-- <el-button type="info" @click="cropperCancel">取 消</el-button>
         <el-button
           type="primary"
           class="el-icon-refresh-left"
@@ -499,16 +761,20 @@
           @click="$refs.cropper.rotateRight()"
           >右 旋 转</el-button
         > -->
-          <el-button
-            class="submitBtn"
-            type="primary"
-            @click="onCubeImg"
-            :loading="loading"
-            >确认</el-button
-          >
-        </center>
-      </div>
-    </el-dialog>
+            <el-button
+              class="submitBtn"
+              type="primary"
+              @click="onCubeImg"
+              :loading="loading"
+              >确认</el-button
+            >
+          </center>
+        </div>
+      </el-dialog>
+    </div>
+    <div class="footer" v-if="totalCount >= 7">
+      <img src="@/assets/images/footerBg.png" alt="" />
+    </div>
   </div>
 </template>
 
@@ -533,7 +799,9 @@ export default {
       baseImg: null,
       fileinfo: null,
       isShowCropper: false,
-      advancedFormdata: {}, //高级搜索条件
+      advancedFormdata: {
+        isUpInsetImg: "是"
+      }, //高级搜索条件
       screeningFlag: false,
       isAccurate: "模糊",
       chpaList: [],
@@ -572,19 +840,21 @@ export default {
       pageSize: 12,
       totalCount: 0,
       searchForm: {
+        companyNumber: null,
         keyword: "",
         minPrice: "",
         maxPrice: "",
         categoryNumber: null,
         time: [],
         fa_no: true,
-        number: 0,
+        number: false,
         name: true,
-        packName: 0
+        packName: false
       },
       currentTwoTag: null,
       isOneDownCate: true,
-      isTwoDownCate: true
+      isTwoDownCate: true,
+      searchHttpTime: null
     };
   },
   methods: {
@@ -637,6 +907,16 @@ export default {
             this.$store.state.userInfo.commparnyList[0] &&
             this.$store.state.userInfo.commparnyList[0].companyNumber;
           const fd = new FormData();
+          if (
+            this.searchHallCate &&
+            this.searchHallCate.companyInfo &&
+            this.searchHallCate.companyInfo.companyNumber
+          ) {
+            fd.append(
+              "hallNumber",
+              this.searchHallCate.companyInfo.companyNumber
+            );
+          }
           fd.append("companynumber", companynumber);
           fd.append("file", file);
           const res = await this.$http.post("/api/File/SearchPicture", fd);
@@ -707,9 +987,10 @@ export default {
     // 获取产品列表请求
     async getProductList(flag) {
       this.$store.commit("searchValues", null);
-
+      let startDate = Date.now();
       const fd = {
         name: this.searchForm.keyword,
+        hallNumber: this.searchForm.companyNumber,
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         categoryNumber: this.searchForm.categoryNumber,
@@ -727,7 +1008,7 @@ export default {
         sortType: this.sortType,
         // 高级搜索条件
         fa_no: this.advancedFormdata.fa_no,
-        isUpInsetImg: this.advancedFormdata.isUpInsetImg == "是" ? true : false,
+        isUpInsetImg: this.advancedFormdata.isUpInsetImg == "否" ? false : true,
         ch_pa: this.advancedFormdata.ch_pa,
         pr_le: this.advancedFormdata.pr_le,
         pr_wi: this.advancedFormdata.pr_wi,
@@ -778,6 +1059,8 @@ export default {
         }
         this.productList = item.items;
         this.totalCount = item.totalCount;
+        let endDate = Date.now();
+        this.searchHttpTime = (endDate - startDate) / 1000;
       } else {
         this.totalCount = 0;
         this.$common.handlerMsgState({
@@ -785,8 +1068,9 @@ export default {
           type: "danger"
         });
       }
-      if (flag) this.getProductCategoryList();
-      this.GetProductChpaList();
+      if (flag) {
+        this.getProductCategoryList();
+      }
     },
     // 切換頁容量
     handleSizeChange(pageSize) {
@@ -834,16 +1118,26 @@ export default {
       this.synthesis = !this.synthesis;
       if (!this.synthesis) {
         this.isAccurate = "模糊";
-        this.searchForm.fa_no = 0;
-        this.searchForm.number = 0;
-        this.searchForm.name = 0;
+        this.searchForm.number = false;
+        this.searchForm.fa_no = true;
+        this.searchForm.name = true;
         this.searchForm.packName = 0;
       } else {
         this.isAccurate = "精准";
+        this.searchForm.fa_no = true;
+        this.searchForm.name = true;
       }
     },
     // 选择筛选
     handleCheckedScreensChange(flag) {
+      if (
+        this.searchForm.fa_no === false &&
+        this.searchForm.number === false &&
+        this.searchForm.name === false
+      ) {
+        this.isAccurate = "模糊";
+        this.$refs.searchRef.synthesis = false;
+      }
       if (flag) {
         this.synthesis = false;
       }
@@ -852,10 +1146,14 @@ export default {
     handleIsAccurate(flag) {
       this.isAccurate = flag;
       if (flag === "模糊") {
+        this.searchForm.fa_no = true;
+        this.searchForm.name = true;
         this.synthesis = false;
         this.$refs.searchRef.synthesis = false;
       } else {
         this.synthesis = true;
+        this.searchForm.fa_no = true;
+        this.searchForm.name = true;
         this.$refs.searchRef.synthesis = true;
       }
     },
@@ -865,7 +1163,7 @@ export default {
     },
     // 确认高级搜索
     confirmAdvanced() {
-      this.searchForm.keyword = this.$refs.searchRef.searchForm.keyword;
+      // this.searchForm.keyword = this.$refs.searchRef.searchForm.keyword;
       this.getProductList(false);
     },
     // 切换产品列表样式
@@ -897,17 +1195,24 @@ export default {
       this.currentPage++;
       this.getProductList(false);
     },
+    // 展厅分类点击事件
+    hallTagEvent(item) {
+      this.searchForm.categoryNumber = item ? item.categoryNumber : item;
+      this.getProductList(false);
+    },
     // 一级分类点击事件
     oneTagEvent(item) {
       this.currentTwoTag = null;
       this.oneCurrentTag = item;
       this.cateChildren = item ? item.children : [];
       this.searchForm.categoryNumber = item ? item.id : item;
+      this.getProductList(false);
     },
     // 二级分类点击事件
     twoTagEvent(id) {
       this.currentTwoTag = id;
       this.searchForm.categoryNumber = id || this.oneCurrentTag.id;
+      this.getProductList(false);
     },
     // 展开一级分类
     handlerOneCateLabel() {
@@ -918,17 +1223,26 @@ export default {
       this.isTwoDownCate = !this.isTwoDownCate;
     },
     clearRootEvent() {
+      eventBus.$off("resetProductCollection");
       eventBus.$off("searchProducts");
       eventBus.$off("openUpload");
+      eventBus.$off("resetMyCart");
+    },
+    // 关闭关联搜索
+    closeTag() {
+      this.$store.commit("handlerHallSearchCate", null);
+      this.searchForm.categoryNumber = null;
+      this.searchForm.companyNumber = null;
+      this.$common.handlerMsgState({
+        msg: "关闭关联搜索",
+        type: "warning"
+      });
     }
   },
-  created() {
-    this.getProductList(true);
-  },
+  created() {},
   mounted() {
     // 点击搜索-文字搜索
-    eventBus.$on("searchProducts", form => {
-      this.searchForm.keyword = form.keyword;
+    eventBus.$on("searchProducts", () => {
       this.currentPage = 1;
       this.getProductList(false);
     });
@@ -936,27 +1250,21 @@ export default {
     eventBus.$on("openUpload", file => {
       this.uploadPic(file);
     });
-    eventBus.$on("resetMyCollection", () => {
-      this.getCollectList();
+    // 取消收藏/刷新页面
+    eventBus.$on("resetProductCollection", () => {
+      this.getProductList();
     });
     // 取消收藏
-    eventBus.$on("resetProducts", item => {
-      for (let i = 0; i < this.productList.length; i++) {
-        if (this.productList[i].productNumber == item.productNumber) {
-          this.productList[i].isFavorite = item.isFavorite;
-        }
-      }
-    });
-    eventBus.$on("resetProductCollection", item => {
-      for (let i = 0; i < this.productList.length; i++) {
-        if (this.productList[i].productNumber == item.productNumber) {
-          this.productList[i].isFavorite = item.isFavorite;
-        }
-      }
-    });
+    // eventBus.$on("resetProductCollection", (item) => {
+    //   for (let i = 0; i < this.productList.length; i++) {
+    //     if (this.productList[i].productNumber == item.productNumber) {
+    //       this.productList[i].isFavorite = item.isFavorite;
+    //     }
+    //   }
+    // });
     // 增加滚动事件
-    eventBus.$emit("startScroll");
-    // 删除购物车
+    // eventBus.$emit("startScroll");
+    // 删除购物车样式
     eventBus.$on("resetMyCart", list => {
       if (list.length) {
         for (let i = 0; i < this.productList.length; i++) {
@@ -975,9 +1283,34 @@ export default {
         });
       }
     });
-    this.$nextTick(() => {
-      if (this.$route.query.id === "imgSearch") {
-        eventBus.$emit("imgSearch");
+    this.$nextTick(async () => {
+      if (this.searchTxt != "") {
+        // 首页文字搜索跳转
+        this.searchForm.keyword = this.searchTxt;
+        this.currentPage = 1;
+        await this.getProductList(true);
+        await this.GetProductChpaList();
+        this.$store.commit("handlerSearchTxt", "");
+      } else if (this.searchHallCate) {
+        // 展厅主页带分类搜索
+        this.currentPage = 1;
+        this.searchForm.keyword = this.searchHallCate.keyword;
+        this.searchForm.categoryNumber =
+          this.searchHallCate.cate && this.searchHallCate.cate.categoryNumber;
+        this.searchForm.companyNumber =
+          this.searchHallCate.companyInfo &&
+          this.searchHallCate.companyInfo.companyNumber;
+        this.isOneDownCate = false;
+        this.getProductList(false);
+      } else if (this.imgSearch) {
+        eventBus.$emit("imgSearchChange");
+        this.GetProductChpaList();
+        this.getProductCategoryList();
+      } else {
+        // 默认搜索
+        this.currentPage = 1;
+        await this.getProductList(true);
+        await this.GetProductChpaList();
       }
     });
   },
@@ -987,26 +1320,49 @@ export default {
     }),
     ...mapState(["searchImgPreview"]),
     ...mapState(["imageSearchValue"]),
-    ...mapState(["myColles"])
+    ...mapState(["myColles", "searchTxt", "searchHallCate", "imgSearch"])
   },
   watch: {
-    shoppingList(list) {
-      if (list) {
-        if (list.length) {
-          for (let i = 0; i < this.productList.length; i++) {
-            for (let j = 0; j < list.length; j++) {
-              if (this.productList[i].productNumber == list[j].productNumber) {
-                this.productList[i].isShopping = true;
-                break;
-              } else {
-                this.productList[i].isShopping = false;
+    searchHallCate: {
+      deep: true,
+      handler(val) {
+        if (val) {
+          this.currentPage = 1;
+          this.isOneDownCate = false;
+          // 展厅主页带分类搜索
+          this.searchForm.keyword = this.searchHallCate.keyword;
+          this.searchForm.categoryNumber =
+            this.searchHallCate.cate && this.searchHallCate.cate.categoryNumber;
+          this.searchForm.companyNumber =
+            this.searchHallCate.companyInfo &&
+            this.searchHallCate.companyInfo.companyNumber;
+          this.getProductList(true);
+        }
+      }
+    },
+
+    shoppingList: {
+      deep: true,
+      handler(list) {
+        if (list) {
+          if (list.length) {
+            for (let i = 0; i < this.productList.length; i++) {
+              for (let j = 0; j < list.length; j++) {
+                if (
+                  this.productList[i].productNumber == list[j].productNumber
+                ) {
+                  this.productList[i].isShopping = true;
+                  break;
+                } else {
+                  this.productList[i].isShopping = false;
+                }
               }
             }
+          } else {
+            this.productList.forEach(val => {
+              val.isShopping = false;
+            });
           }
-        } else {
-          this.productList.forEach(val => {
-            val.isShopping = false;
-          });
         }
       }
     },
@@ -1018,7 +1374,7 @@ export default {
   },
   beforeDestroy() {
     this.clearRootEvent();
-    eventBus.$off("resetProducts");
+    this.$store.commit("handlerHallSearchCate", null);
   }
 };
 </script>
@@ -1051,7 +1407,8 @@ export default {
     }
     @{deep} .advancedScreening {
       display: flex;
-      height: 147px;
+      height: 114px;
+
       .el-checkbox {
         .el-checkbox__input {
           border-radius: 50%;
@@ -1061,22 +1418,22 @@ export default {
         }
       }
       .title {
+        height: 114px;
         display: flex;
         align-items: center;
       }
       .queryCondition {
-        width: 468px;
-        height: 147px;
-        opacity: 1;
+        width: 383px;
+        height: 114px;
         border: 1px solid #dcdfe6;
         border-radius: 5px;
-        padding: 20px 0;
+        padding: 20px 10px;
         margin: 0 20px;
         box-sizing: border-box;
         .item {
           display: flex;
           align-items: center;
-          padding: 15px 0;
+          padding: 10px 0;
           .text {
             width: 80px;
             text-align: right;
@@ -1084,27 +1441,38 @@ export default {
         }
       }
       .parameter {
-        width: 660px;
+        height: 114px;
+        width: 700px;
         form {
           display: flex;
+
           .el-form-item {
-            height: 36px;
+            height: 30px;
             display: flex;
             align-items: center;
             color: #999999;
             text-align: center;
+            margin-bottom: 12px;
+            line-height: 30px;
+            .el-form-item__label {
+              height: 30px;
+              line-height: 30px;
+            }
             .el-form-item__content {
-              line-height: 36px;
+              line-height: 30px;
+              .el-input--medium .el-input__inner {
+                height: 30px;
+                line-height: 30px;
+              }
             }
           }
-          span {
+          .hx {
             text-align: center;
+            padding: 0 6px;
           }
           .left {
             flex: 1;
-          }
-          .right {
-            flex: 1;
+            padding: 0 15px;
           }
         }
       }
@@ -1229,11 +1597,17 @@ export default {
         }
       }
       .right {
-        width: 340px;
+        width: 500px;
         height: 100%;
         display: flex;
         align-items: center;
         justify-content: flex-end;
+        .searchTime {
+          margin-right: 40px;
+          span {
+            color: #3368a9;
+          }
+        }
         .grid,
         .column {
           width: 17px;
@@ -1386,5 +1760,13 @@ export default {
       }
     }
   }
+}
+.footer {
+  margin-top: 20px;
+  background-color: #f1f3f6;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

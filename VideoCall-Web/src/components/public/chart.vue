@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-04-06 11:26:36
  * @FilePath: \projectd:\LittleBearPC\VideoCall-Web\src\components\public\chart.vue
- * @LastEditTime: 2021-04-20 17:01:48
+ * @LastEditTime: 2021-04-30 15:29:43
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -13,7 +13,7 @@
         <div class="head">
             <div class="title">
                 <i class="iconfont iconliaotian"></i>
-                聊天
+                {{$t("chart.chartTitle")}}
             </div>
         </div>   
         <div class="content_box" id="content_box">
@@ -59,8 +59,8 @@
             </List>
         </div>
         <div class="input_wrap">
-            <Input v-model="chartValue" placeholder="说点什么"  :border="false" class="input_box" clearable @on-enter="send" />
-            <span class="blue" @click="send">发送</span>
+            <Input v-model="chartValue" :placeholder="$t('chart.saySomething')" :border="false" class="input_box" clearable @on-enter="send" />
+            <span class="blue" @click="send">{{$t("chart.send")}}</span>
         </div>
     </div>
 </template>
@@ -87,7 +87,8 @@ export default {
             chartValue:'',
             appId:null,
             client:null,
-            channel:null
+            channel:null,
+            lang:'zh'
         }
     },
     methods: {
@@ -108,7 +109,7 @@ export default {
                 this.channel.sendMessage({ text: this.chartValue }).then(() => {
                     this.chartHistory.push({
                         id:this.uid,
-                        name:'我',
+                        name:this.lang=='zh'?'我':'me',
                         content: this.chartValue,
                         date: util.getNowTime(),
                         isMy: true
@@ -197,14 +198,14 @@ export default {
     },
     created(){
         this.init();    
-        
+        this.lang = window.localStorage.getItem('language');
     }
 }
 </script>
 <style lang="less" scoped>
     .chart {
         height: 341px;
-        border-bottom: 1px solid #e0e0e0;
+        // border-bottom: 1px solid #e0e0e0;
         .head{
             width: 311px;
             height: 45px;
