@@ -1655,7 +1655,7 @@ export default {
     async getEmployeeList(id) {
       const fd = {
         orgCompanyID: id,
-        keyeyword: this.staffKeyword,
+        keyword: this.staffKeyword,
         skipCount: this.employeeMan.currentPage,
         maxResultCount: this.employeeMan.pageSize
       };
