@@ -122,7 +122,7 @@ export default {
       oddNumbers: "单号",
       exportOrder: "导出订单",
       orderTime: "订单时间",
-      totalQuantity: "总量",
+      totalQuantity: "总款数",
       totalPrice: "总价",
       companyName: "公司名称",
       email: "邮箱",

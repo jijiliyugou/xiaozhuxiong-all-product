@@ -15,6 +15,24 @@
             @keyup.native.enter="search"
           ></el-input>
         </div>
+        <div class="item" v-if="userInfo.userInfo.isMain">
+          <span class="label">业务员：</span>
+          <el-select
+            v-model="staffId"
+            filterable
+            size="medium"
+            clearable
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in staffList"
+              :key="item.id"
+              :label="item.linkman"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </div>
         <div class="item">
           <span class="label">时间段：</span>
           <el-date-picker
@@ -67,6 +85,11 @@
             {{ scope.row.url }}
           </template>
         </el-table-column>
+        <el-table-column
+          label="业务员"
+          prop="createdBy"
+          width="300"
+        ></el-table-column>
         <el-table-column label="新增时间" prop="createdOn" width="300">
           <template slot-scope="scope">
             <span> {{ scope.row.createdOn.replace(/T.*/, "") }}</span>
@@ -128,7 +151,7 @@
 </template>
 
 <script>
-// import { mapState } from "vuex";
+import { mapState } from "vuex";
 import bsAddSiteDomain from "./bsAddSiteDomain/bsAddSiteDomain";
 export default {
   name: "bsSiteSettings",
@@ -137,6 +160,8 @@ export default {
   },
   data() {
     return {
+      staffList: [],
+      staffId: null,
       currentRow: {},
       isEdit: false,
       showAddDomain: false,
@@ -153,6 +178,21 @@ export default {
   methods: {
     // 查询
     search() {
+      this.getSites();
+    },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
       this.getSites();
     },
     // 删除站点信息
@@ -205,6 +245,7 @@ export default {
     // 获取站点列表
     async getSites() {
       const fd = {
+        staffId: this.staffId,
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyword: this.searchForm.keyword,
@@ -245,7 +286,10 @@ export default {
     }
   },
   mounted() {
-    this.getSites();
+    this.getStaffList();
+  },
+  computed: {
+    ...mapState(["currentComparnyId", "userInfo"])
   }
 };
 </script>

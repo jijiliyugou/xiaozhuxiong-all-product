@@ -15,6 +15,24 @@
             @keyup.native.enter="search"
           ></el-input>
         </div>
+        <div class="item" v-if="userInfo.userInfo.isMain">
+          <span class="label">业务员：</span>
+          <el-select
+            v-model="staffId"
+            filterable
+            size="medium"
+            clearable
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in staffList"
+              :key="item.id"
+              :label="item.linkman"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </div>
         <div class="item">
           <span class="label">时间段：</span>
           <el-date-picker
@@ -94,6 +112,13 @@
         >
         </el-table-column>
         <el-table-column
+          label="业务员"
+          prop="staffName"
+          align="center"
+          show-overflow-tooltip
+        >
+        </el-table-column>
+        <el-table-column
           prop="price"
           label="创建时间"
           align="center"
@@ -108,7 +133,7 @@
           label="操作"
           header-align="center"
           align="center"
-          width="150"
+          show-overflow-tooltip
         >
           <template slot-scope="scope">
             <el-button type="primary" @click="openEdit(scope.row)" size="mini"
@@ -148,7 +173,7 @@
       :title="dialogTitle"
       :visible.sync="showDialog"
       v-if="showDialog"
-      width="50%"
+      width="800px"
     >
       <bsAddOfferFormula
         :editRow="editRow"
@@ -162,6 +187,7 @@
 
 <script>
 import bsAddOfferFormula from "@/components/bsComponents/bsPersonalManageComponent/bsAddOfferFormula";
+import { mapState } from "vuex";
 export default {
   name: "bsQuotationSettings",
   components: {
@@ -169,6 +195,8 @@ export default {
   },
   data() {
     return {
+      staffList: [],
+      staffId: null,
       dialogTitle: "新增报价公式",
       isEdit: false,
       editRow: {},
@@ -185,6 +213,21 @@ export default {
     // 搜索
     search() {
       this.currentPage = 1;
+      this.getOfferFormula();
+    },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
       this.getOfferFormula();
     },
     // 提交新增
@@ -265,6 +308,7 @@ export default {
         startTime: this.dateTime && this.dateTime[0],
         endTime: this.dateTime && this.dateTime[1],
         keyword: this.keyword,
+        staffId: this.staffId,
         skipCount: this.currentPage,
         maxResultCount: this.pageSize
       };
@@ -302,7 +346,10 @@ export default {
   },
   created() {},
   mounted() {
-    this.getOfferFormula();
+    this.getStaffList();
+  },
+  computed: {
+    ...mapState(["userInfo", "currentComparnyId"])
   }
 };
 </script>

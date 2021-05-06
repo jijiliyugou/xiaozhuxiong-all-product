@@ -317,7 +317,7 @@
       title="举报"
       :visible.sync="dialogjubao"
       destroy-on-close
-      width="30%"
+      width="800px"
     >
       <ul class="selectJubaoInfo">
         <li
@@ -342,7 +342,7 @@
       title="发布公告"
       :visible.sync="sendNoticeDialog"
       v-if="sendNoticeDialog"
-      width="40%"
+      width="1200px"
     >
       <bsSendNotice @close="closeSendNotice" />
     </el-dialog>
@@ -429,6 +429,7 @@ export default {
     },
     // 查看我的公告
     searchMyNotice() {
+      this.findList = [];
       this.noticeType = null;
       this.publisher = this.userInfo.userInfo.id;
       this.issuedCompanyID = this.currentComparnyId;
@@ -509,6 +510,7 @@ export default {
     },
     // 根据类型搜索公告
     searchNotice(type) {
+      this.findList = [];
       this.currentPage = 1;
       this.noticeType = type;
       this.publisher = null;
@@ -676,14 +678,23 @@ export default {
           this.currentIten = item;
         }
       }
-
+      for (let i = 0; i < this.findList.length; i++) {
+        this.$set(this.findList[i], "isPinglun", false);
+      }
       this.currentIten = item;
       this.huifuUser = child;
     },
     // 打开评论
     openPinglun(item) {
-      if (!item.isPinglun) this.$set(item, "isPinglun", true);
-      else item.isPinglun = false;
+      for (let i = 0; i < this.findList.length; i++) {
+        this.$set(this.findList[i], "isPinglun", false);
+        this.$set(this.findList[i], "isHuiPinglun", false);
+      }
+      if (!item.isPinglun) {
+        this.$set(item, "isPinglun", true);
+      } else item.isPinglun = false;
+      this.$set(item, "isHuiPinglun", false);
+      console.log(this.findList);
     },
     // 提交评论
     async subPinglun(item) {

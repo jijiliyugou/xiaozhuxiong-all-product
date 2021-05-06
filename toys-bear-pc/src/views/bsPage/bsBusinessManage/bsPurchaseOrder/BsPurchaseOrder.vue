@@ -15,16 +15,23 @@
             @keyup.native.enter="search"
           ></el-input>
         </div>
-        <div class="item">
-          <span class="label">操作人员：</span>
-          <el-input
-            type="text"
+        <div class="item" v-if="userInfo.userInfo.isMain">
+          <span class="label">业务员：</span>
+          <el-select
+            v-model="searchForm.staffId"
+            filterable
             size="medium"
-            v-model="searchForm.orgPersonnelName"
             clearable
-            placeholder="请输入"
-            @keyup.native.enter="search"
-          ></el-input>
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in staffList"
+              :key="item.id"
+              :label="item.linkman"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
         </div>
         <div class="item" style="max-width: 300px">
           <span class="label">时间段：</span>
@@ -77,7 +84,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="操作人员"
+          label="业务员"
           prop="orgPersonnelName"
           align="center"
         ></el-table-column>
@@ -180,6 +187,7 @@
 
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/caigoudingdan.vue";
+import { mapState } from "vuex";
 export default {
   name: "bsPurchaseOrder",
   components: {
@@ -187,11 +195,12 @@ export default {
   },
   data() {
     return {
+      staffList: [],
       orderRow: {},
       exportTemplateDialog: false,
       searchForm: {
         keyword: null,
-        orgPersonnelName: null,
+        staffId: null,
         dateTime: null
       },
       tableData: [],
@@ -212,6 +221,21 @@ export default {
         value: row
       };
       this.$store.commit("myAddTab", fd);
+    },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.getTableDataList();
     },
     // 导入菜单
     importOrder() {
@@ -262,7 +286,7 @@ export default {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyword: this.searchForm.keyword,
-        orgPersonnelName: this.searchForm.orgPersonnelName,
+        staffId: this.searchForm.staffId,
         messageExt: 7,
         messageModel: 7,
         startTime: this.searchForm.dateTime && this.searchForm.dateTime[0],
@@ -301,8 +325,11 @@ export default {
     }
   },
   created() {},
+  computed: {
+    ...mapState(["currentComparnyId", "userInfo"])
+  },
   mounted() {
-    this.getTableDataList();
+    this.getStaffList();
   }
 };
 </script>

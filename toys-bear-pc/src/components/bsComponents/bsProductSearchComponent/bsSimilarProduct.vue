@@ -36,16 +36,15 @@
         <div class="contactBox">
           <div class="sourceBox" @click="toFactory(item)">
             <i class="sourceIcon"></i>
-            <!-- <template v-if="item.isIntegral">
+            <el-tooltip
+              effect="dark"
+              :content="item.supplierName"
+              placement="top"
+            >
               <span class="text">
                 {{ item.supplierName }}
               </span>
-            </template>
-            <template v-else> -->
-            <span class="text">
-              {{ item.supplierName }}
-            </span>
-            <!-- </template> -->
+            </el-tooltip>
           </div>
           <div class="infoBox">
             <p class="infoItem" @click="toNews(item)">
@@ -54,15 +53,33 @@
             </p>
             <p class="infoItem" v-if="item.supplierTelePhoneNumber">
               <i class="telePhoneIcon"></i>
-              <span>{{ item.supplierTelePhoneNumber }}</span>
+              <el-tooltip
+                effect="dark"
+                :content="item.supplierTelePhoneNumber"
+                placement="top"
+              >
+                <span>{{ item.supplierTelePhoneNumber }}</span>
+              </el-tooltip>
             </p>
             <p class="infoItem" v-if="item.supplierPhone">
               <i class="phoneIcon"></i>
-              <span>{{ item.supplierPhone }}</span>
+              <el-tooltip
+                effect="dark"
+                :content="item.supplierPhone"
+                placement="top"
+              >
+                <span>{{ item.supplierPhone }}</span>
+              </el-tooltip>
             </p>
             <p class="infoItem" v-if="item.supplierQQ">
               <i class="qqIcon"></i>
-              <span>{{ item.supplierQQ }}</span>
+              <el-tooltip
+                effect="dark"
+                :content="item.supplierQQ"
+                placement="top"
+              >
+                <span>{{ item.supplierQQ }}</span>
+              </el-tooltip>
             </p>
             <p class="infoItem" @click="toFactory(item)">
               <i class="shopIcon"></i>
@@ -77,7 +94,7 @@
           <p class="infoTitle">资料来源</p>
           <p>{{ item.exhibitionName }}</p>
           <p>
-            展厅编号: <span>{{ item.exhibitionNumber }}</span>
+            展厅编号: <span>{{ item.number }}</span>
           </p>
           <p>
             摊位号: <span>{{ item.booth_nu_pro }}</span>
@@ -92,7 +109,9 @@
             {{ item.type == "same" ? "同款产品" : "相似产品" }}
             <span class="productCount">({{ totalCount }})</span>
           </div>
-          <el-button>购物车({{ shoppingList.length }})</el-button>
+          <el-button @click="toMyShoppingCart"
+            >购物车({{ shoppingList.length }})</el-button
+          >
         </div>
       </div>
       <!-- 筛选 -->
@@ -256,6 +275,22 @@ export default {
     };
   },
   methods: {
+    // 去购物车
+    toMyShoppingCart() {
+      const fd = {
+        name: "/bsIndex/bsShoppingCart",
+        linkUrl: "/bsIndex/bsShoppingCart",
+        component: "bsShoppingCart",
+        refresh: true,
+        label: "购物车"
+      };
+      this.$router.push("/bsIndex/bsShoppingCart");
+      this.$store.commit("myAddTab", fd);
+    },
+    // 切换产品列表样式
+    handerIsGrid(type) {
+      this.isGrid = type;
+    },
     // 图搜
     async imageSearch() {
       const fd = new FormData();
@@ -264,8 +299,8 @@ export default {
       const res = await this.$http.post("/api/File/SearchPicture", fd);
       if (res.data.result.code === 200) {
         console.log(res);
-        // this.productList = res.data.result.object;
-        // this.totalCount = res.data.result.object.length;
+        this.productList = res.data.result.object;
+        this.totalCount = res.data.result.object.length;
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.message,
@@ -370,12 +405,12 @@ export default {
         maxPrice: this.searchForm.maxPrice,
         startTime: this.searchForm.time ? this.searchForm.time[0] : null,
         endTime: this.searchForm.time ? this.searchForm.time[1] : null,
-        // precisionSearch: JSON.stringify({
-        //   fa_no: this.searchForm.fa_no ? 1 : 0,
-        //   number: this.searchForm.number ? 1 : 0,
-        //   name: this.searchForm.name ? 1 : 0,
-        //   packName: this.searchForm.packName ? 1 : 0
-        // }),
+        precisionSearch: JSON.stringify({
+          fa_no: 1,
+          number: 0,
+          name: 0,
+          packName: 0
+        }),
         sortOrder: this.sortOrder,
         sortType: this.sortType
       };
@@ -447,7 +482,6 @@ export default {
     this.searchForm.maxPrice = this.item.price * 1.05;
     this.searchForm.minPrice = this.item.price * 0.95;
     // 小0.95  大1.05
-    console.log(this.item);
     switch (this.item.type) {
       case "similarity":
         this.imageSearch();
@@ -456,6 +490,44 @@ export default {
         this.getProductList();
         break;
     }
+    // 取消收藏/刷新页面
+    eventBus.$on("resetProductCollection", item => {
+      // this.getProductList();
+      for (let i = 0; i < this.productList.length; i++) {
+        if (this.productList[i].productNumber == item.productNumber) {
+          this.productList[i].isFavorite = item.isFavorite;
+        }
+      }
+    });
+    // 加购删除购物车
+    eventBus.$on("resetMyCart", item => {
+      if (Object.prototype.toString.call(item) === "[object Array]") {
+        // 数组
+        if (item.length) {
+          for (let i = 0; i < this.productList.length; i++) {
+            for (let j = 0; j < item.length; j++) {
+              if (this.productList[i].productNumber == item[j].productNumber) {
+                this.productList[i].isShopping = true;
+                break;
+              } else {
+                this.productList[i].isShopping = false;
+              }
+            }
+          }
+        } else {
+          this.productList.forEach(val => {
+            val.isShopping = false;
+          });
+        }
+      } else if (Object.prototype.toString.call(item) === "[object Object]") {
+        // 对象;
+        for (let i = 0; i < this.productList.length; i++) {
+          if (item.productNumber == this.productList[i].productNumber) {
+            this.productList[i].isShopping = item.isShopping;
+          }
+        }
+      }
+    });
   },
   computed: {
     ...mapGetters({
@@ -503,6 +575,7 @@ export default {
         display: flex;
         .sourceBox {
           // height: 48px;
+          max-width: 150px;
           box-sizing: border-box;
           // margin-top: 10px;
           display: flex;
@@ -528,6 +601,10 @@ export default {
           display: flex;
           .infoItem {
             margin-right: 27px;
+            max-width: 150px;
+            overflow: hidden; /*超出部分隐藏*/
+            white-space: nowrap; /*不换行*/
+            text-overflow: ellipsis; /*超出部分文字以...显示*/
             display: flex;
             align-items: center;
             color: #666;

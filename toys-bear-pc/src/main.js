@@ -10,7 +10,6 @@ import "@/styles/base.less";
 import element from "@/element/index";
 import "@/assets/css/theme/index.css";
 import { getMenuFuc } from "@/router/index";
-import ExTableColumn from "ex-table-column";
 import PreviewPic from "vue-preview-pictures"; // 预览
 import waterfall from "vue-waterfall2";
 import Video from "video.js";
@@ -26,7 +25,6 @@ import CollapseTransition from "element-ui/lib/transitions/collapse-transition";
  */
 import MessageComponent from "@/components/commonComponent/messageComponent/main.js";
 
-Vue.component(ExTableColumn.name, ExTableColumn);
 Vue.prototype.$PreviewPic = PreviewPic;
 Vue.prototype.$video = Video;
 Vue.config.productionTip = false;

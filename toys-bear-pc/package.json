@@ -13,7 +13,6 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.1",
-    "ex-table-column": "^1.1.2",
     "jquery": "^3.6.0",
     "less-loader": "^5.0.0",
     "video.js": "^7.11.4",

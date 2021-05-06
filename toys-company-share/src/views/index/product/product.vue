@@ -202,6 +202,11 @@ export default {
     async getSearchCompanyShareProductPage() {
       this.$store.commit("imageSearch", null);
       this.$store.commit("handlerSearchImgPreview", null);
+      const dateFd = {
+        startTime: this.datetime && this.datetime[0],
+        endTime: this.datetime && this.datetime[1]
+      };
+      this.$store.commit("handlerSearchDate", dateFd);
       const fd = {
         ...this.searchForm,
         sortOrder: this.sortOrder,
@@ -259,37 +264,20 @@ export default {
     document.title = this.productLang.title;
     this.clientWidth = document.body.clientWidth;
   },
-  beforeRouteLeave(to, from, next) {
-    // if (to.name === "shoppingCart" && from.name === "product") {
-    //   from.meta.keepAlive = true;
-    // } else {
-    //   from.meta.keepAlive = false;
-    //   to.meta.keepAlive = false;
-    // }
-    next();
-  },
   beforeRouteEnter(to, from, next) {
-    // for (let i = 0; i < data.items.length; i++) {
-    //   for (let j = 0; j < this.shoppingList.length; j++) {
-    //     if (data.items[i].id === this.shoppingList[j].id)
-    //       data.items[i].isShopping = true;
-    //   }
-    // }
     next(_that => {
+      for (let i = 0; i < _that.productList.length; i++) {
+        _that.productList[i].isShopping = false;
+      }
       if (_that.shoppingList.length) {
         for (let i = 0; i < _that.productList.length; i++) {
           for (let j = 0; j < _that.shoppingList.length; j++) {
-            if (_that.productList[i].id == _that.shoppingList[j].id) {
+            if (_that.productList[i].id === _that.shoppingList[j].id)
               _that.productList[i].isShopping = true;
-            }
           }
         }
-      } else {
-        for (let i = 0; i < _that.productList.length; i++) {
-          _that.productList[i].isShopping = false;
-        }
       }
-      _that.$root.eventHub.$emit("resetProductsItem");
+      _that.$root.eventHub.$emit("resetProductsItem", _that.productList);
       // _that.getSearchCompanyShareProductPage();
     });
   },

@@ -10,6 +10,14 @@
       <router-view v-if="$route.meta.keepAlive"></router-view>
     </keep-alive>
     <router-view v-if="!$route.meta.keepAlive"></router-view>
+    <!-- 返回按钮 -->
+    <div
+      class="goBack"
+      @click="goToBack"
+      v-if="$route.path !== '/login' && $route.path !== '/index/home'"
+    >
+      <i class="iconfont icon-fanhui"></i>
+    </div>
     <!-- 漂浮物 -->
     <div class="cartBox" v-if="$route.path !== '/login'">
       <div class="cart" @click="toMyShoppingCart">
@@ -36,6 +44,13 @@ export default {
     // 回到顶部
     toTop() {
       $("#app").animate({ scrollTop: 0 }, 100);
+    },
+    // 返回上一步
+    goToBack() {
+      this.$router.go(-1);
+      if (this.$route.path.includes("productDetails")) {
+        this.$root.eventHub.$emit("resetRelatedProducts");
+      }
     },
     // 去购物车
     toMyShoppingCart() {
@@ -81,11 +96,25 @@ export default {
   width: 100%;
   height: 100%;
 }
+.goBack {
+  position: fixed;
+  background: #ffffff;
+  border: 1px solid #e9e9e9;
+  border-radius: 3px;
+  width: 50px;
+  height: 50px;
+  right: 265px;
+  top: 200px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .cartBox {
   position: fixed;
   width: 50px;
   height: 120px;
-  right: 200px;
+  right: 265px;
   bottom: 10px;
   display: flex;
   flex-direction: column;
@@ -147,7 +176,18 @@ export default {
 }
 @media screen and (max-width: 1700px) {
   .cartBox {
-    right: 30px;
+    right: 120px;
+  }
+  .goBack {
+    right: 120px;
+  }
+}
+@media screen and (max-width: 1280px) {
+  .cartBox {
+    right: 0px;
+  }
+  .goBack {
+    right: 0px;
   }
 }
 </style>

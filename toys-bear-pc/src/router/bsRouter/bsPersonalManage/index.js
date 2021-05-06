@@ -16,6 +16,10 @@ const BsPushSettings = () =>
 const BsPushIndex = () =>
   import("@/components/commonComponent/pushDetailsComponent/bsPushIndex.vue");
 
+// 好友方式
+const BsContactWay = () =>
+  import("@/views/bsPage/bsPersonalManage/bsContactWay/BsContactWay.vue");
+
 export default [
   {
     path: "/bsIndex/bsAccountManage",
@@ -45,6 +49,14 @@ export default [
     path: "/bsIndex/bsPushIndex",
     name: "bsPushIndex",
     component: BsPushIndex,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsContactWay",
+    name: "bsContactWay",
+    component: BsContactWay,
     meta: {
       keepAlive: true
     }

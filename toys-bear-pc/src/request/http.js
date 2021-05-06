@@ -75,7 +75,7 @@ const createLogRecord = async function(obj) {
     });
     return false;
   }
-  const res = await axios.post("api/CreateLogRecord", obj);
+  const res = await axios.post("/api/CreateLogRecord", obj);
   if (res.data.result.code !== 200) {
     const msg =
       "api/CreateLogRecord报错code=" +

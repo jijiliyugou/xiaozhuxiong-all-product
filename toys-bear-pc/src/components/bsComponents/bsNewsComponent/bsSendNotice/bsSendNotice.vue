@@ -160,7 +160,7 @@
       :visible.sync="selectPush"
       destroy-on-close
       append-to-body
-      width="30%"
+      width="800px"
       top="50px"
     >
       <el-radio-group class="myRadios" v-model="radio" @change="changeRadios">

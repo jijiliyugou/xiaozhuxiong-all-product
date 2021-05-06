@@ -2,7 +2,10 @@
   <div class="contentBox">
     <home-top-component />
     <!-- <keep-alive> -->
-    <productDetailComponent class="productDetailBox" />
+    <productDetailComponent
+      v-if="showProductDetails"
+      class="productDetailBox"
+    />
     <!-- </keep-alive> -->
     <myFoot class="myFoot" />
   </div>
@@ -20,14 +23,21 @@ export default {
   },
   data() {
     return {
-      product: {}
+      showProductDetails: true
     };
   },
   methods: {},
   created() {
     document.title = this.productDetailLang.title;
   },
-  mounted() {},
+  mounted() {
+    this.$root.eventHub.$on("resetRelatedProducts", () => {
+      this.showProductDetails = false;
+      this.$nextTick(() => {
+        this.showProductDetails = true;
+      });
+    });
+  },
   watch: {
     "$store.state.globalLang"(val) {
       if (val) document.title = this.productDetailLang.title;
@@ -37,6 +47,9 @@ export default {
     productDetailLang() {
       return this.$t("lang.productDetail");
     }
+  },
+  beforeDestroy() {
+    this.$root.eventHub.$off("resetRelatedProducts");
   }
 };
 </script>

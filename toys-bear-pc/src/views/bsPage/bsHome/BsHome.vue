@@ -19,7 +19,9 @@
               fit="contain"
             >
             </el-image>
+            <!-- <el-badge :value="5" class="homeBadge"> -->
             <span class="text">{{ item.title }}</span>
+            <!-- </el-badge> -->
           </li>
           <li class="block"></li>
           <li class="block"></li>
@@ -834,7 +836,11 @@ export default {
           display: flex;
           align-items: center;
           cursor: pointer;
-
+          @{deep} .homeBadge {
+            .el-badge__content {
+              right: 6px;
+            }
+          }
           .text {
             margin-left: 20px;
           }
@@ -1008,7 +1014,6 @@ export default {
               width: 100%;
               height: 100%;
               background-color: rgba(0, 0, 0, 0.5);
-              transition: all 1s;
               .box {
                 width: 100%;
                 height: 100%;
@@ -1049,6 +1054,7 @@ export default {
             }
             &:hover .hoverBox {
               opacity: 1;
+              transition: all 1s;
             }
           }
           &:hover {
@@ -1115,7 +1121,6 @@ export default {
               width: 100%;
               height: 100%;
               background-color: rgba(0, 0, 0, 0.5);
-              transition: all 1s;
               .box {
                 width: 100%;
                 height: 100%;
@@ -1156,6 +1161,7 @@ export default {
             }
             &:hover .hoverBox {
               opacity: 1;
+              transition: all 1s;
             }
           }
           &:hover {

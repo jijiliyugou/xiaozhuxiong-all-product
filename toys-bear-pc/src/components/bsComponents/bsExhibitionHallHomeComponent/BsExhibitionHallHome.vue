@@ -22,22 +22,26 @@
           </div>
         </el-image>
         <div class="context">
-          <div class="companyName">{{ companyInfo.companyName }}</div>
+          <div class="companyName" v-if="companyInfo.companyName">
+            {{ companyInfo.companyName }}
+          </div>
           <div class="infos">
-            <p class="infoItem">
+            <p class="infoItem" v-if="companyInfo.contactsMan">
               联系人：<span>{{ companyInfo.contactsMan }}</span>
             </p>
-            <p class="infoItem">
-              电话：<span>{{ companyInfo.telephoneNumber }}</span>
+            <p class="infoItem" v-if="companyInfo.telephoneNumber">
+              <i class="phoneIcon"></i>
+              <span>{{ companyInfo.telephoneNumber }}</span>
             </p>
-            <p class="infoItem">
-              手机：<span>{{ companyInfo.phoneNumber }}</span>
+            <p class="infoItem" v-if="companyInfo.phoneNumber">
+              <i class="sjIcon"></i>
+              <span>{{ companyInfo.phoneNumber }}</span>
             </p>
             <p class="infoItem newIconBox" @click="toNews">
               <i class="newIcon"></i><span>在线咨询</span>
             </p>
           </div>
-          <div class="address">
+          <div class="address" v-if="companyInfo.address">
             地址：<span>{{ companyInfo.address }}</span>
           </div>
         </div>
@@ -421,6 +425,23 @@ export default {
                 no-repeat;
               background-size: contain;
               margin-right: 10px;
+            }
+            .phoneIcon {
+              min-width: 28px;
+              width: 28px;
+              height: 28px;
+              margin-right: 15px;
+              background: url("~@/assets/images/onlinePhoneIcon.png") no-repeat
+                center;
+              background-size: contain;
+            }
+            .sjIcon {
+              min-width: 28px;
+              width: 28px;
+              height: 28px;
+              margin-right: 15px;
+              background: url("~@/assets/images/sjIcon.png") no-repeat center;
+              background-size: contain;
             }
           }
         }

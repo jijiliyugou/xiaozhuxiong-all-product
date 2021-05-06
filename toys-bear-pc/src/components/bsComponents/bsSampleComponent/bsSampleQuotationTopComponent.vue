@@ -9,7 +9,7 @@
           客户名称：<span>{{ itemList.customerName }} </span>
         </p>
         <p>
-          操作员：<span style="color: #2d7fe4">{{ itemList.linkman }} </span>
+          业务员：<span style="color: #2d7fe4">{{ itemList.linkman }} </span>
         </p>
         <p>
           状态：<span

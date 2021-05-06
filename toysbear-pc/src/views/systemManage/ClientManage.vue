@@ -152,6 +152,7 @@
             <!-- <el-table-column prop="e_mail" label="邮箱"></el-table-column> -->
             <el-table-column
               prop="phoneNumber"
+              width="100"
               label="联系电话"
               sortable
             ></el-table-column>
@@ -229,7 +230,7 @@
             <el-table-column
               label="操作"
               align="center"
-              width="420"
+              width="480"
               fixed="right"
             >
               <template slot-scope="scope">
@@ -263,6 +264,13 @@
                   plain
                   @click="openEmployeeMan(scope.row)"
                   >员工管理</el-button
+                >
+                <el-button
+                  size="mini"
+                  type="danger"
+                  plain
+                  @click="deleteOrgCompany(scope.row)"
+                  >删除</el-button
                 >
               </template>
             </el-table-column>
@@ -899,13 +907,20 @@
             <el-button type="danger" @click="resetForm">取消</el-button>
           </center>
         </el-dialog>
-        <div class="addBtn">
-          <el-button
-            type="primary"
-            style="float: right"
-            @click="openAddemployee"
-            >新增</el-button
-          >
+        <div class="addStaffBtn">
+          <div class="left">
+            <el-input
+              clearable
+              style="width: 250px;margin: 0 20px;"
+              @keyup.enter.native="searchStaffList"
+              v-model="staffKeyword"
+              placeholder="输入关键字"
+            ></el-input>
+            <el-button type="primary" @click="searchStaffList">搜 索</el-button>
+          </div>
+          <div class="right">
+            <el-button type="primary" @click="openAddemployee">新 增</el-button>
+          </div>
         </div>
         <el-table
           :data="employeeList"
@@ -1172,6 +1187,7 @@ export default {
   components: { bsTop, bsFooter, BMapComponent },
   data() {
     return {
+      staffKeyword: null,
       hide1Upload: false,
       hide2Upload: false,
       distribution: null,
@@ -1632,14 +1648,23 @@ export default {
         this.hide2Upload = false;
       }
     },
+    searchStaffList() {
+      this.getEmployeeList(this.employeeMan.id);
+    },
     // 获取员工列表
     async getEmployeeList(id) {
+      const fd = {
+        orgCompanyID: id,
+        keyeyword: this.staffKeyword,
+        skipCount: this.employeeMan.currentPage,
+        maxResultCount: this.employeeMan.pageSize
+      };
+      for (const key in fd) {
+        if (fd[key] === undefined || fd[key] === null || fd[key] === "")
+          delete fd[key];
+      }
       try {
-        const res = await this.$http.post("/api/CompanyUserPage", {
-          orgCompanyID: id,
-          skipCount: this.employeeMan.currentPage,
-          maxResultCount: this.employeeMan.pageSize
-        });
+        const res = await this.$http.post("/api/CompanyUserPage", fd);
         if (res.data.result.code === 200) {
           this.employeeList = res.data.result.item.items || [];
           this.employeeMan.totalCount = res.data.result.item.totalCount;
@@ -1650,6 +1675,30 @@ export default {
         console.log(error);
       }
     },
+    // 删除客户 | 删除公司
+    deleteOrgCompany(row) {
+      this.$confirm("确定要删除此公司吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = await this.$http.post("/api/DeleteOrgCompany", row);
+          console.log(res);
+          if (res.data.result.code === 200) {
+            this.$message.success("删除成功");
+          } else {
+            this.$message.error(res.data.result.msg);
+          }
+          this.getClientList();
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消删除"
+          });
+        });
+    },
     // 打开员工管理
     openEmployeeMan(row) {
       this.employeeList = [];
@@ -1658,6 +1707,7 @@ export default {
       this.employeeMan.phoneNumber = row.phoneNumber;
       this.employeeMan.id = row.id;
       this.getEmployeeList(row.id);
+      this.staffKeyword = null;
       this.employeeMan.dialog = true;
     },
     // 审核
@@ -2278,6 +2328,14 @@ export default {
     input {
       height: 30px;
     }
+  }
+}
+.addStaffBtn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .left {
+    flex: 1;
   }
 }
 </style>

@@ -159,7 +159,7 @@
     </el-table>
     <!-- 新增员工 | 编辑员工 -->
     <el-dialog
-      width="50%"
+      width="800px"
       :title="yuangongTitle"
       v-if="addEmployDialog"
       :visible.sync="addEmployDialog"
@@ -175,7 +175,7 @@
     </el-dialog>
     <!-- 绑定员工 -->
     <el-dialog
-      width="70%"
+      width="1200px"
       title="绑定员工"
       v-if="bindEmployDialog"
       :visible.sync="bindEmployDialog"
@@ -191,7 +191,7 @@
     <!-- 编辑公司 -->
     <el-dialog
       top="60"
-      width="70%"
+      width="1200px"
       title="编辑公司"
       v-if="editCompanyDialog"
       :visible.sync="editCompanyDialog"
@@ -209,7 +209,7 @@
       :visible.sync="bindCompanyDialog"
       v-if="bindCompanyDialog"
       destroy-on-close
-      width="70%"
+      width="1200px"
     >
       <bsBindCompany
         :companyNumber="myInfo.companyNumber"
@@ -501,15 +501,17 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    &::before {
-      width: 4px;
-      height: 14px;
-      background-color: #3368a9;
-      position: absolute;
-      left: 0;
-      top: 50%;
-      content: "";
-      transform: translate(0, -50%);
+    .left {
+      &::before {
+        width: 4px;
+        height: 14px;
+        background-color: #3368a9;
+        position: absolute;
+        left: 0;
+        top: 50%;
+        content: "";
+        transform: translate(0, -50%);
+      }
     }
   }
   @{deep} .el-table {

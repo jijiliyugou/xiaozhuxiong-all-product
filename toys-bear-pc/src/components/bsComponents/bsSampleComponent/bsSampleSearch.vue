@@ -202,7 +202,7 @@
       :close-on-click-modal="false"
       :visible.sync="addMyClientDialog"
       destroy-on-close
-      width="50%"
+      width="800px"
       :header-cell-style="{ backgroundColor: '#f9fafc' }"
     >
       <el-form
@@ -468,7 +468,6 @@ export default {
     // 获取客户列表
     async getClientList() {
       const fd = {
-        keyword: this.clientKeyword,
         skipCount: this.clientCurrentPage,
         maxResultCount: this.clientPageSize
       };

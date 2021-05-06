@@ -155,7 +155,7 @@
                   value-format="yyyy-MM-ddTHH:mm:ss"
                   :picker-options="pickerOptions"
                   type="daterange"
-                  range-separator="—"
+                  range-separator="-"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   align="right"
@@ -163,6 +163,26 @@
               </el-form-item>
             </div>
             <div class="itemBox">
+              <el-form-item label="业务员：" v-if="userInfo.userInfo.isMain">
+                <el-select
+                  style="width: 215px;"
+                  v-model="searchFD.staffId"
+                  filterable
+                  size="medium"
+                  clearable
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="item in staffList"
+                    :key="item.id"
+                    :label="item.linkman"
+                    :value="item.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+            <div class="itemBox btn">
               <el-button
                 type="primary"
                 class="searchBtn"
@@ -235,26 +255,33 @@
               </template>
             </el-table-column>
             <el-table-column
+              prop="orgPersonnelName"
+              label="业务员"
+              align="center"
+            >
+            </el-table-column>
+            <el-table-column
               prop="number"
               width="200"
               label="订单备注"
+              show-overflow-tooltip
               align="center"
             >
               <template slot-scope="scope">
-                <el-tooltip
+                <!-- <el-tooltip
                   class="item"
                   effect="dark"
                   :content="scope.row.remark"
                   placement="top"
                 >
-                  <div class="remarkClass">
-                    {{
-                      scope.row.remark && scope.row.orderType != "Sample"
-                        ? scope.row.remark
-                        : ""
-                    }}
-                  </div>
-                </el-tooltip>
+                  <div class="remarkClass"> -->
+                {{
+                  scope.row.remark && scope.row.orderType != "Sample"
+                    ? scope.row.remark
+                    : ""
+                }}
+                <!-- </div>
+                </el-tooltip> -->
               </template>
             </el-table-column>
             <el-table-column
@@ -311,106 +338,13 @@
       placeholder="隐藏域"
       type="hidden"
     ></el-input>
-    <!-- 旧版模板 -->
-    <!-- <div class="erweimaApp" @mouseenter="hoverLogo" @mouseleave="hoverIsLogo">
-      <img class="jiaerweima" :src="jiaerweima" alt="" />
-      <div class="saomaDiv" v-show="isActive">
-        <div class="saoma"></div>
-      </div>
-    </div>
-    <div class="titleBox">
-      <div class="logo">
-        <img src="~@/assets/images/logo.png" alt="" />
-      </div>
-      <h1 class="title">同步择样订单</h1>
-      <div class="titleEn">
-        <span class="titleEnSpan">Synchronize orders</span>
-      </div>
-    </div>
-    <div class="synchronizeOrders">
-      <el-table
-        :header-cell-style="{ backgroundColor: '#8bc4ff', color: '#fff' }"
-        :data="tableList"
-        id="myTable"
-        border
-        ref="singleTable"
-        size="medium"
-        height="570"
-        tooltip-effect="dark"
-        highlight-current-row
-        @current-change="handleSelectionChange"
-      >
-        <el-table-column label="选择" width="50" align="center">
-          <template slot-scope="scope">
-            <el-checkbox v-model="scope.row.checked"></el-checkbox>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="hall_na"
-          label="择样来源"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="the_nu"
-          label="本次代号"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="number"
-          label="择样编号"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="happenDate"
-          label="择样时间"
-          align="center"
-          sortable
-        >
-          <template slot-scope="scope">
-            {{
-              scope.row.happenDate &&
-                scope.row.happenDate.replace(/t[\s\S]+/gi, "")
-            }}
-          </template>
-        </el-table-column>
-      </el-table>
-      <center style="margin-top:20px;">
-        <div class="myPagination">
-          <div class="total">
-            共
-            <span style="color:#165af7;font-weight:bold;">{{ totalCount }}</span>
-            条
-          </div>
-          <div class="pages" v-show="tableList && tableList.length > 1">
-            <div class="shouye" @click="toOnePage">首页</div>
-            <el-pagination
-              layout="total, sizes, prev, pager, next, jumper"
-              background
-              prev-text="上一页"
-              next-text="下一页"
-              :total="totalCount"
-              :page-size="pageSize"
-              :current-page.sync="currentPage"
-              :page-sizes="[6, 9, 15, 30]"
-              @current-change="currentChange"
-              @size-change="handleSizeChange"
-            ></el-pagination>
-          </div>
-        </div>
-      </center>
-      <el-input
-        id="SampleOrder"
-        v-model="currentValue"
-        placeholder="隐藏域"
-        type="hidden"
-      ></el-input>
-    </div> -->
   </div>
 </template>
 
 <script>
 import erweimaComponent from "./erweimaComponent";
 import erpSampleDetails from "./erpSampleDetails";
+import { mapState } from "vuex";
 export default {
   components: {
     erweimaComponent,
@@ -418,10 +352,12 @@ export default {
   },
   data() {
     return {
+      staffList: [],
       sortOrder: null,
       sortType: null,
       dateTile: null,
       searchFD: {
+        staffId: null,
         keyword: null,
         orderFrom: "全部",
         orderType: "全部",
@@ -481,7 +417,8 @@ export default {
   computed: {
     currentValue() {
       return JSON.stringify(this.currentSelectItem);
-    }
+    },
+    ...mapState(["currentComparnyId", "userInfo"])
   },
   methods: {
     // 返回事件
@@ -574,6 +511,21 @@ export default {
       this.currentPage = 1;
       this.getOrderList();
     },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.getOrderList();
+    },
     // 获取列表
     async getOrderList() {
       const fd = {
@@ -618,7 +570,7 @@ export default {
     }
   },
   mounted() {
-    this.getOrderList();
+    this.getStaffList();
   },
   async beforeDestroy() {
     //  this.$store.dispatch("getToken");

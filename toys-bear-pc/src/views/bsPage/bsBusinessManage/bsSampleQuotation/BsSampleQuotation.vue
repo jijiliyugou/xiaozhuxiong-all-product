@@ -26,16 +26,23 @@
             @keyup.native.enter="search"
           ></el-input>
         </div>
-        <div class="item">
-          <span class="label">操作人员：</span>
-          <el-input
-            type="text"
+        <div class="item" v-if="userInfo.userInfo.isMain">
+          <span class="label">业务员：</span>
+          <el-select
+            v-model="searchForm.staffId"
+            filterable
             size="medium"
             clearable
-            v-model="searchForm.Linkman"
-            placeholder="请输入关键词"
-            @keyup.native.enter="search"
-          ></el-input>
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in staffList"
+              :key="item.id"
+              :label="item.linkman"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
         </div>
         <div class="item" style="max-width: 300px">
           <span class="label">时间段：</span>
@@ -68,9 +75,9 @@
           ref="collecTable"
           :header-cell-style="{ backgroundColor: '#f9fafc' }"
         >
-          <el-table-column label="序号" type="index" align="center" width="70">
+          <el-table-column label="序号" type="index" align="center" width="50">
           </el-table-column>
-          <el-table-column label="报价单号" min-width="150">
+          <el-table-column label="报价单号" min-width="100">
             <template slot-scope="scope">
               <span
                 @click="goDetails(scope.row)"
@@ -83,34 +90,28 @@
           <el-table-column
             prop="customerName"
             label="客户名称"
-            width="100"
             align="center"
           ></el-table-column>
           <el-table-column
             prop="createdOn"
-            width="150"
             label="报价时间"
+            min-width="100"
             align="center"
           >
             <template slot-scope="scope">
               {{ scope.row.createdOn.replace(/T/, " ") }}
             </template>
           </el-table-column>
-          <el-table-column width="200" align="center" label="操作人员">
+          <el-table-column align="center" label="业务员">
             <template slot-scope="scope">
               <span>
                 {{ scope.row.linkman }}
               </span>
             </template>
           </el-table-column>
-          <el-table-column
-            label="报价总数"
-            prop="total"
-            width="100"
-            align="center"
-          >
+          <el-table-column label="报价总数" prop="total" align="center">
           </el-table-column>
-          <el-table-column label="总金额" align="center" width="100">
+          <el-table-column label="总金额" align="center">
             <template slot-scope="scope">
               <span style="color: #eb1515">
                 {{ scope.row.cu_de }}
@@ -127,24 +128,14 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="汇率" align="center" width="100">
+          <el-table-column label="汇率" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.exchange }}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="profit"
-            label="利润"
-            align="center"
-            width="100"
-          >
+          <el-table-column prop="profit" label="利润" align="center">
           </el-table-column>
-          <el-table-column
-            prop="status"
-            label="状态"
-            align="center"
-            width="100"
-          >
+          <el-table-column prop="status" label="状态" align="center">
             <template slot-scope="scope">
               {{
                 scope.row.status === 0
@@ -226,6 +217,7 @@
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gongsizhaoyangbaojia.vue";
 import eventBus from "@/assets/js/common/eventBus.js";
+import { mapState } from "vuex";
 export default {
   name: "bsSampleQuotation",
   components: {
@@ -233,6 +225,7 @@ export default {
   },
   data() {
     return {
+      staffList: [],
       orderRow: {},
       exportTemplateDialog: false,
       rowUpdata: {},
@@ -240,7 +233,7 @@ export default {
         orderNumber: null,
         OfferNumber: null,
         CustomerName: null,
-        Linkman: null,
+        staffId: null,
         clientName: null,
         contacts: null,
         dateTime: null
@@ -273,7 +266,7 @@ export default {
       const fd = {
         OfferNumber: this.searchForm.OfferNumber,
         CustomerName: this.searchForm.CustomerName,
-        Linkman: this.searchForm.Linkman,
+        staffId: this.searchForm.staffId,
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         startTime: this.searchForm.dateTime && this.searchForm.dateTime[0],
@@ -319,6 +312,21 @@ export default {
             type: "warning"
           });
         });
+    },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.getCompanySamplelistPage();
     },
     // 切換頁容量
     handleSizeChange(pageSize) {
@@ -367,6 +375,7 @@ export default {
     },
     //编辑报价跳转
     async handleEdit(index, row) {
+      console.log(row, "row");
       const fd = {
         name: "编辑" + row.offerNumber,
         linkUrl: "/bsIndex/bsSampleQuotation",
@@ -386,10 +395,13 @@ export default {
   },
   created() {},
   mounted() {
-    this.getCompanySamplelistPage();
+    this.getStaffList();
     eventBus.$on("resetSamplelist", () => {
       this.getCompanySamplelistPage();
     });
+  },
+  computed: {
+    ...mapState(["currentComparnyId", "userInfo"])
   },
   beforeDestroy() {
     eventBus.$off("resetSamplelist");
@@ -440,6 +452,9 @@ export default {
   @{deep} .tableBox {
     .el-table {
       font-size: 13px;
+      .cell {
+        padding: 0 2px;
+      }
       .imgBox {
         text-align: left;
         display: flex;

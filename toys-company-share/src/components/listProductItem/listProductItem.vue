@@ -118,14 +118,21 @@ export default {
     },
     // 查看详情
     toDetails(item) {
-      window.sessionStorage.setItem(
-        "currentProductDetails",
-        JSON.stringify(item)
-      );
-      let { href } = this.$router.resolve({
-        path: "/productDetails"
-      });
-      window.open(href, "_blank");
+      if (this.$route.path.includes("productDetails")) {
+        this.$router.push({
+          path: "/productDetails",
+          query: {
+            id: item.productNumber
+          }
+        });
+      } else {
+        this.$router.push({
+          path: "/productDetails",
+          query: {
+            id: item.productNumber
+          }
+        });
+      }
     }
   },
   mounted() {
@@ -134,7 +141,7 @@ export default {
     });
   },
   beforeDestroy() {
-    this.$root.eventHub.$off("resetProductsItem");
+    // this.$root.eventHub.$off("resetProductsItem");
   },
   created() {},
   computed: {

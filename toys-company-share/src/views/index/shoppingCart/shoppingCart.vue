@@ -694,14 +694,12 @@ export default {
     },
     // 打开产品详情
     openProductDetail(item) {
-      window.sessionStorage.setItem(
-        "currentProductDetails",
-        JSON.stringify(item)
-      );
-      let { href } = this.$router.resolve({
-        path: "/productDetails"
+      this.$router.push({
+        path: "/productDetails",
+        query: {
+          id: item.productNumber
+        }
       });
-      window.open(href, "_blank");
     },
     // 提交订单
     async submitOrder() {
@@ -813,7 +811,6 @@ export default {
           this.$message.error(this.publicLang.deleteSuccessful);
         }
       });
-      console.log(123);
       this.$root.eventHub.$emit("resetProductsForeach", this.dataList);
     },
     // 计算总价

@@ -3,7 +3,7 @@
     <el-dialog
       title="推送"
       :visible.sync="pushDialog"
-      width="40%"
+      width="800px"
       :before-close="closeDialog"
     >
       <div class="pushBox">
@@ -48,7 +48,7 @@
       :title="dialogTitle"
       :visible.sync="addLangDialog"
       v-if="addLangDialog"
-      width="50%"
+      width="1200px"
     >
       <bsAddOfferFormulaLang
         :editRow="editRow"

@@ -80,9 +80,17 @@
             <span>{{ item.fa_no }}</span>
           </p>
         </div>
-        <div class="right" @click.stop="handlerShopping">
+        <div v-if="typeId != 1" class="right" @click.stop="handlerShopping">
           <i v-if="item.isShopping" class="shoppingCartActive"></i>
           <i v-else class="shoppingCart"></i>
+        </div>
+        <div
+          v-if="typeId === 1"
+          class="right"
+          @click.stop="handlerUpadate(item)"
+        >
+          <i v-if="item.isShoppingUpdate" class="updateIcon"></i>
+          <i v-else class="UpadateCart"></i>
         </div>
       </div>
       <div class="sourceBox" @click="toFactory(item)">
@@ -158,7 +166,7 @@
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default {
   props: {
     item: {
@@ -167,7 +175,8 @@ export default {
   },
   data() {
     return {
-      isShowDetails: null
+      isShowDetails: null,
+      canClick: true
     };
   },
   methods: {
@@ -218,7 +227,7 @@ export default {
     async toProductDetails() {
       const fd = {
         name: this.item.productNumber,
-        linkUrl: "/bsIndex/bsProductSearchIndex",
+        linkUrl: this.$route.path,
         component: "bsProductDetails",
         refresh: true,
         label: this.item.fa_no || "产品详情",
@@ -256,17 +265,18 @@ export default {
         // return false;
         const fd = {
           name: item.exhibitionNumber || item.companyNumber,
-          linkUrl: "/bsIndex/bsProductSearchIndex",
+          linkUrl: "/bsIndex/bsHome",
           component: "bsExhibitionHallHome",
           refresh: true,
           label: item.exhibitionName,
           value: item
         };
+        this.$router.push("/bsIndex/bsHome");
         this.$store.commit("myAddTab", fd);
       }
     },
-    // 收藏
-    async addCollect(item) {
+    // 收藏事件
+    async collectEvent(item) {
       if (item.isFavorite) {
         this.$common.handlerMsgState({
           msg: "取消收藏",
@@ -283,23 +293,35 @@ export default {
         productNumber: item.productNumber
       });
       if (res.data.result.code === 200) {
-        eventBus.$emit("resetProductCollection");
+        eventBus.$emit("resetProductCollection", item);
+        eventBus.$emit("resetProductDetailsCollection", item);
+        // 收藏菜单事件
+        eventBus.$emit("resetMyCollectionMenu");
       } else {
+        item.isFavorite = !item.isFavorite;
         this.$common.handlerMsgState({
           msg: "收藏失败",
           type: "danger"
         });
       }
+      this.$nextTick(() => {
+        this.canClick = true;
+      });
     },
-    // 加购
-    handlerShopping() {
-      if (this.shoppingList.length >= 500 && !this.item.isShopping) {
+    // 收藏
+    async addCollect(item) {
+      if (this.canClick) {
+        this.canClick = false;
+        this.collectEvent(item);
+      } else {
         this.$common.handlerMsgState({
-          msg: "购物车已满500条",
-          type: "warning"
+          msg: "操作过于频繁",
+          type: "danger"
         });
-        return;
       }
+    },
+    // 加购事件
+    callbackShopping() {
       this.item.isShopping = !this.item.isShopping;
       if (this.item.isShopping) {
         this.item.shoppingCount = 1;
@@ -320,6 +342,50 @@ export default {
       this.$nextTick(() => {
         this.$forceUpdate();
       });
+    },
+    // 加购
+    handlerShopping() {
+      if (this.shoppingList.length >= 500 && !this.item.isShopping) {
+        this.$common.handlerMsgState({
+          msg: "购物车已满500条",
+          type: "warning"
+        });
+        return;
+      }
+      if (this.canClick) {
+        this.canClick = false;
+        this.callbackShopping();
+        setTimeout(() => {
+          this.canClick = true;
+        }, 1000);
+      } else {
+        this.$common.handlerMsgState({
+          msg: "操作过于频繁",
+          type: "danger"
+        });
+      }
+    },
+    // 添加报价
+    handlerUpadate(item) {
+      item.isShoppingUpdate = !item.isShoppingUpdate;
+      if (item.isShoppingUpdate) {
+        this.$set(item, "boxNumber", 1); //默认传一箱过去，不然总金额计算错误
+        // item.boxNumber = 1;
+        this.$store.commit("pushOfferProductList", item);
+        // this.$emit("pushOfferProductList", item);
+        this.$common.handlerMsgState({
+          msg: "添加报价产品成功",
+          type: "success"
+        });
+      } else {
+        this.$store.commit("popOfferProductList", item);
+        // this.$emit("popOfferProductList", item);
+        this.$common.handlerMsgState({
+          msg: "删除报价产品成功",
+          type: "warning"
+        });
+      }
+      this.$forceUpdate();
     },
     // 删除单个浏览记录
     async handlerDeleteBrowsing(item) {
@@ -346,9 +412,16 @@ export default {
   computed: {
     ...mapGetters({
       shoppingList: "myShoppingList"
-    })
+    }),
+    ...mapState(["typeId"])
   },
-  mounted() {}
+  mounted() {
+    eventBus.$on("upDateProductView", () => {
+      this.$nextTick(() => {
+        this.$forceUpdate();
+      });
+    });
+  }
 };
 </script>
 <style scoped lang="less">
@@ -540,6 +613,36 @@ export default {
           background: url("~@/assets/images/shoppingCartActiveIcon.png")
             no-repeat center;
           background-size: contain;
+        }
+        .UpadateCart {
+          width: 36px;
+          height: 36px;
+          transition: all 0.3s;
+          background: url("~@/assets/images/UpadateCart.png") no-repeat center;
+          background-size: contain;
+        }
+        .updateIcon {
+          width: 36px;
+          height: 36px;
+          transition: all 0.3s;
+          background: url("~@/assets/images/updateIcon.png") no-repeat center;
+          background-size: contain;
+        }
+        &:hover {
+          .UpadateCart {
+            -webkit-transform: scale(1.2) rotate(360deg);
+            -moz-transform: scale(1.2) rotate(360deg);
+            -ms-transform: scale(1.2) rotate(360deg);
+            transform: scale(1.2) rotate(360deg);
+            margin-bottom: 5px;
+          }
+          .updateIcon {
+            -webkit-transform: scale(1.2) rotate(360deg);
+            -moz-transform: scale(1.2) rotate(360deg);
+            -ms-transform: scale(1.2) rotate(360deg);
+            transform: scale(1.2) rotate(360deg);
+            margin-bottom: 5px;
+          }
         }
         &:hover {
           .shoppingCart {

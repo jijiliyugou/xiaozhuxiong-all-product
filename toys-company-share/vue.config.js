@@ -3,6 +3,8 @@ const path = require("path");
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
+const CompressionWebpackPlugin = require("compression-webpack-plugin");
+const productionGzipExtensions = ["js", "css", "html", "svg", "less"];
 const proEnv = require("./config/pro.env"); // 生产环境
 const testEnv = require("./config/test.env"); // 测试环境
 const devEnv = require("./config/dev.env"); // 本地环境
@@ -50,18 +52,34 @@ const config = {
         return assetFilename.endsWith(".js");
       }
     },
-    plugins: [
-      new webpack.ProvidePlugin({
-        $: "jquery",
-        jQuery: "jquery",
-        "window.jQuery": "jquery"
-      })
-    ],
     externals: {
       BMap: "BMap"
     }
   }
 };
+const plugins = [
+  new webpack.ProvidePlugin({
+    $: "jquery",
+    jQuery: "jquery",
+    "window.jQuery": "jquery"
+  })
+];
+const pluginsProduction = [
+  new webpack.ProvidePlugin({
+    $: "jquery",
+    jQuery: "jquery",
+    "window.jQuery": "jquery"
+  }),
+  new CompressionWebpackPlugin({
+    // 配置压缩包
+    filename: "[path].gz[query]", // 目标资源名称。
+    algorithm: "gzip", // 可以是 function(buf, callback) 或者字符串。对于字符串来说依照 zlib 的算法(或者 zopfli 的算法)。默认值是 "gzip"。
+    test: new RegExp("\\.(" + productionGzipExtensions.join("|") + ")$"), // 所有匹配该正则的资源都会被处理。默认值是全部资源。
+    // threshold: 10240,  // 只有大小大于该值的资源会被处理。单位是 bytes。默认值是 0
+    minRatio: 0.8, // 只有压缩率小于这个值的资源才会被处理。默认值是 0.8。
+    deleteOriginalAssets: false // 删除原文件
+  })
+];
 if (env !== "production") {
   config.devServer = {
     open: true, // 开启自动打开浏览器
@@ -81,5 +99,8 @@ if (env !== "production") {
       }
     }
   };
+  config.configureWebpack.plugins = plugins;
+} else {
+  config.configureWebpack.plugins = pluginsProduction;
 }
 module.exports = config;

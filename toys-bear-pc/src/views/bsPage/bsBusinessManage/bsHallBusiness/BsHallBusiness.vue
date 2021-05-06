@@ -58,16 +58,23 @@
           </el-option>
         </el-select>
       </div>
-      <div class="item">
-        <span class="label">操作人员：</span>
-        <el-input
-          type="text"
+      <div class="item" v-if="userInfo.userInfo.isMain">
+        <span class="label">业务员：</span>
+        <el-select
+          v-model="searchForm.staffId"
+          filterable
           size="medium"
           clearable
-          v-model="searchForm.orgPersonnelName"
-          placeholder="请输入关键词"
-          @keyup.native.enter="search"
-        ></el-input>
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in staffList"
+            :key="item.id"
+            :label="item.linkman"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
       </div>
       <div class="item date">
         <span class="label">时间段：</span>
@@ -135,11 +142,13 @@
         </el-table-column>
         <el-table-column prop="hall_na" label="展厅名称" align="center">
         </el-table-column>
+        <el-table-column prop="orgPersonnelName" label="业务员" align="center">
+        </el-table-column>
         <el-table-column
           prop="pushContent"
           label="备注"
           align="center"
-          min-width="200"
+          show-overflow-tooltip
         >
         </el-table-column>
         <el-table-column prop="state" label="状态" align="center" width="100">
@@ -206,6 +215,7 @@
 
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/zhantingyewu.vue";
+import { mapState } from "vuex";
 export default {
   name: "bsHallBusiness",
   components: {
@@ -213,6 +223,7 @@ export default {
   },
   data() {
     return {
+      staffList: [],
       exportTemplateDialog: false,
       orderRow: {},
       typesList: [
@@ -254,7 +265,7 @@ export default {
       searchForm: {
         keyword: null,
         fromCompanyName: null,
-        orgPersonnelName: null,
+        staffId: null,
         messageExt: null,
         readStatus: "-1",
         dateTime: null
@@ -266,6 +277,21 @@ export default {
     };
   },
   methods: {
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.getTableDataList();
+    },
     // 导出
     exportOrder(row) {
       this.orderRow = row;
@@ -293,7 +319,7 @@ export default {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyWord: this.searchForm.keyword,
-        orgPersonnelName: this.searchForm.orgPersonnelName,
+        staffId: this.searchForm.staffId,
         fromCompanyName: this.searchForm.fromCompanyName,
         messageExt: this.searchForm.messageExt,
         startTime: this.searchForm.dateTime && this.searchForm.dateTime[0],
@@ -336,7 +362,7 @@ export default {
     }
   },
   created() {
-    this.getTableDataList();
+    this.getStaffList();
   },
   filters: {
     switchMessageExt(val) {
@@ -361,7 +387,10 @@ export default {
       return msg;
     }
   },
-  mounted() {}
+  mounted() {},
+  computed: {
+    ...mapState(["currentComparnyId", "userInfo"])
+  }
 };
 </script>
 <style scoped lang="less">

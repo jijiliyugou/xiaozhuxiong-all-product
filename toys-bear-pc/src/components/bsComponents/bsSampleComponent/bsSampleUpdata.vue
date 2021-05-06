@@ -31,27 +31,35 @@
           ref="collecTable"
           :header-cell-style="{ backgroundColor: '#f9fafc' }"
         >
-          <el-table-column label="序号" type="index" align="center" width="70">
+          <el-table-column label="序号" type="index" align="center" width="50">
           </el-table-column>
-          <el-table-column prop="img" label="产品" width="300">
+          <el-table-column prop="img" label="产品" width="250">
             <template slot-scope="scope">
               <div class="imgBox">
                 <el-image
                   @click.native="goDetails(scope.row)"
                   fit="contain"
-                  style="width:80px;height:60px;"
+                  style="width: 60px; height: 60px"
                   :src="scope.row.imgUrlList && scope.row.imgUrlList[0]"
                 >
-                  <div slot="placeholder" class="errorImg">
+                  <div
+                    slot="placeholder"
+                    style="width: 60px; height: 60px"
+                    class="errorImg"
+                  >
                     <img
-                      style="width:60px;height:60px;"
+                      style="width: 60px; height: 60px"
                       src="~@/assets/images/imgError.png"
                       alt
                     />
                   </div>
-                  <div slot="error" class="errorImg">
+                  <div
+                    slot="error"
+                    style="width: 60px; height: 60px"
+                    class="errorImg"
+                  >
                     <img
-                      style="width:60px;height:60px;"
+                      style="width: 60px; height: 60px"
                       src="~@/assets/images/imgError.png"
                       alt
                     />
@@ -81,20 +89,28 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="资料来源" align="center">
+          <el-table-column
+            label="资料来源"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               {{ scope.row.companyName }}
             </template>
           </el-table-column>
           <el-table-column
             prop="fa_no"
+            show-overflow-tooltip
             label="出厂货号"
-            width="100"
             align="center"
           ></el-table-column>
-          <el-table-column prop="ch_pa" label="包装" align="center" width="100">
+          <el-table-column prop="ch_pa" label="包装" align="center">
           </el-table-column>
-          <el-table-column label="产品规格" align="center">
+          <el-table-column
+            label="产品规格"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -104,7 +120,11 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="包装规格" align="center">
+          <el-table-column
+            label="包装规格"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
@@ -113,7 +133,11 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="外箱规格" align="center">
+          <el-table-column
+            label="外箱规格"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -122,24 +146,32 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="体积/材积" align="center">
+          <el-table-column
+            label="体积/材积"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="毛重/净重" align="center" width="100">
+          <el-table-column
+            label="毛重/净重"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
             </template>
           </el-table-column>
-          <el-table-column label="装箱量" align="center" width="100">
+          <el-table-column label="装箱量" align="center" show-overflow-tooltip>
             <template slot-scope="scope">
               <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
             </template>
           </el-table-column>
-          <el-table-column label="箱数" align="center" width="100">
+          <el-table-column label="箱数" align="center" show-overflow-tooltip>
             <template slot-scope="scope">
               <input
                 class="inputNumber"
@@ -154,8 +186,9 @@
           <el-table-column
             prop="ch_pa"
             label="总数量"
+            width="50"
             align="center"
-            width="100"
+            show-overflow-tooltip
           >
             <template slot-scope="scope">
               <span>
@@ -163,29 +196,23 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="price" label="厂价" align="center" width="100">
+          <el-table-column prop="price" label="厂价" align="center">
             <template slot-scope="scope">
-              <span style="color:#f56c6c"> ￥{{ scope.row.price }} </span>
+              <span style="color: #f56c6c"> ￥{{ scope.row.price }} </span>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="offerAmount"
-            label="报出价"
-            align="center"
-            width="100"
-          >
+          <el-table-column prop="offerAmount" label="报出价" align="center">
             <template slot-scope="scope">
-              <span style="color:#f56c6c">
+              <span style="color: #f56c6c">
                 {{ scope.row.cu_de + scope.row.offerAmount }}
               </span>
             </template>
           </el-table-column>
-
-          <ex-table-column :autoFit="true" width="100" label="报出总价">
+          <el-table-column label="报出总价">
             <template slot-scope="scope">
               <p class="item price">
-                <span style="color:#f56c6c">{{ scope.row.cu_de }}</span>
-                <span style="color:#f56c6c">
+                <span style="color: #f56c6c">{{ scope.row.cu_de }}</span>
+                <span style="color: #f56c6c">
                   {{
                     priceCount(
                       scope.row.offerAmount,
@@ -196,13 +223,8 @@
                 </span>
               </p>
             </template>
-          </ex-table-column>
-          <el-table-column
-            label="操作"
-            header-align="center"
-            align="center"
-            width="100"
-          >
+          </el-table-column>
+          <el-table-column label="操作" header-align="center" align="center">
             <template slot-scope="scope">
               <el-button
                 size="mini"
@@ -213,45 +235,45 @@
             </template>
           </el-table-column>
         </el-table>
-      </div>
-    </div>
-    <!-- 统计 -->
-    <div class="tableBtoBox">
-      <div class="tableBto">
-        <div class="right">
-          <p class="item">
-            <span class="itemTitle">总款数：</span>
-            <span>{{ offerProductList.length }}</span>
-          </p>
-          <p class="item">
-            <span class="itemTitle">总箱数：</span>
-            <span>{{ myTotalQuantity(offerProductList) }}</span>
-          </p>
-          <p class="item">
-            <span class="itemTitle">总体积/总材积：</span>
-            <span
-              >{{ myTotalVolume(offerProductList).outerBoxStere }}/{{
-                myTotalVolume(offerProductList).outerBoxFeet
-              }}</span
-            >
-          </p>
-          <p class="item">
-            <span class="itemTitle">总毛重/总净重：</span>
-            <span>{{ totalMaozhong() }}/{{ totalJingzhong() }}(KG)</span>
-          </p>
-          <p class="item">
-            <span class="itemTitle">总金额：</span>
-            <span class="price"
-              >{{ item.cu_de + myTotalPrice(offerProductList) }}
-            </span>
-          </p>
-          <el-button
-            type="primary"
-            @click="openSub(false)"
-            style="margin-left: 10px;"
-            size="small"
-            >确定提交</el-button
-          >
+        <!-- 统计 -->
+        <div class="tableBtoBox">
+          <div class="tableBto">
+            <div class="right">
+              <p class="item">
+                <span class="itemTitle">总款数：</span>
+                <span>{{ offerProductList.length }}</span>
+              </p>
+              <p class="item">
+                <span class="itemTitle">总箱数：</span>
+                <span>{{ myTotalQuantity(offerProductList) }}</span>
+              </p>
+              <p class="item">
+                <span class="itemTitle">总体积/总材积：</span>
+                <span
+                  >{{ myTotalVolume(offerProductList).outerBoxStere }}/{{
+                    myTotalVolume(offerProductList).outerBoxFeet
+                  }}</span
+                >
+              </p>
+              <p class="item">
+                <span class="itemTitle">总毛重/总净重：</span>
+                <span>{{ totalMaozhong() }}/{{ totalJingzhong() }}(KG)</span>
+              </p>
+              <p class="item">
+                <span class="itemTitle">总金额：</span>
+                <span class="price"
+                  >{{ clienFormData.cu_de + myTotalPrice(offerProductList) }}
+                </span>
+              </p>
+              <el-button
+                type="primary"
+                @click="openSub(false)"
+                style="margin-left: 10px"
+                size="small"
+                >确定提交</el-button
+              >
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -272,7 +294,7 @@
     <el-dialog
       title="修改报价信息"
       :visible.sync="subDialogVisible"
-      width="40%"
+      width="800px"
     >
       <div class="contactInfoBox">
         <div class="userInfoBox">
@@ -286,11 +308,8 @@
             <el-form-item label="报价客户：" prop="customerId">
               <div class="formItemBox">
                 <el-select
-                  @change="changeCustomer"
                   v-model="clienFormData.customerId"
-                  :filter-method="filterMethod"
                   filterable
-                  clearable
                   placeholder="请 输入/选择 客户"
                 >
                   <el-option
@@ -366,6 +385,7 @@
                 <el-form-item label="汇率：" prop="exchange">
                   <el-input
                     maxlength="30"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
                     v-model="clienFormData.exchange"
                   ></el-input>
                 </el-form-item>
@@ -390,16 +410,22 @@
                   <!-- <el-input maxlength="30" v-model="clienFormData.profit">
                     <span slot="suffix">%</span>
                   </el-input> -->
-                  <div style="display: flex; justify-content:space-between;">
+                  <div style="display: flex; justify-content: space-between">
                     <el-input
                       maxlength="30"
-                      style="flex:1;"
+                      onkeyup="value=value.replace(/[^\d.]/g,'')"
+                      style="flex: 1"
                       v-model="clienFormData.profit"
                     >
                       <span slot="suffix">%</span>
                     </el-input>
                     <el-radio-group
-                      style="flex:1;display:flex; align-items:center;margin-left: 20px;"
+                      style="
+                        flex: 1;
+                        display: flex;
+                        align-items: center;
+                        margin-left: 20px;
+                      "
                       v-model="clienFormData.profitCalcMethod"
                     >
                       <el-radio :label="2">除法</el-radio>
@@ -410,6 +436,7 @@
                 <el-form-item label="总费用：" prop="totalCost">
                   <el-input
                     v-model="clienFormData.totalCost"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
                     clearable
                     placeholder="请输入总费用"
                   >
@@ -468,6 +495,7 @@
                 <el-form-item label="价格小于：" prop="miniPrice">
                   <el-input
                     v-model="clienFormData.miniPrice"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
                     clearable
                     placeholder="请输入"
                   >
@@ -495,7 +523,7 @@
               </div>
             </div>
           </el-form>
-          <center style="margin-top: 40px;">
+          <center style="margin-top: 40px">
             <el-button
               size="medium"
               @click="submitOrder"
@@ -522,7 +550,7 @@
         :visible.sync="addMyClientDialog"
         destroy-on-close
         append-to-body
-        width="50%"
+        width="1200px"
       >
         <el-form
           ref="addMyClientRef"
@@ -908,6 +936,7 @@ export default {
         label: row.fa_no || "产品详情",
         value: row
       };
+      this.$router.push("/bsIndex/bsProductSearchIndex");
       this.$store.commit("myAddTab", fd);
     },
     // 获取列表
@@ -945,6 +974,7 @@ export default {
         this.clienFormData
       );
       if (res.data.result.code === 200) {
+        eventBus.$emit("resetSamplelist");
         this.$common.handlerMsgState({
           msg: "提交成功",
           type: "success"
@@ -1342,43 +1372,12 @@ export default {
       justify-content: space-between;
     }
   }
-  .tableBtoBox {
-    position: fixed;
-    right: 27px;
-    bottom: 0px;
-    width: 1652px;
-    z-index: 30;
-    .tableBto {
-      display: flex;
-      align-items: center;
-      height: 80px;
-      padding: 0 30px;
-      box-sizing: border-box;
-      background-color: #fff;
-      .right {
-        flex: 1;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        .item {
-          margin-right: 15px;
-          display: flex;
-          align-items: center;
-          // .itemTitle {
-          // }
-          .price {
-            color: #eb1515;
-            font-weight: 700;
-            font-size: 18px;
-          }
-        }
-      }
-    }
-  }
-
   @{deep} .tableBox {
     .el-table {
       font-size: 13px;
+      .cell {
+        padding: 0 2px;
+      }
       .inputNumber {
         width: 50px;
         outline: none;
@@ -1398,7 +1397,7 @@ export default {
         font-size: 14px;
         cursor: pointer;
         .productName {
-          width: 190px;
+          width: 160px;
           height: 60px;
           margin-left: 15px;
           .name,
@@ -1443,6 +1442,42 @@ export default {
         }
       }
     }
+    .tableBtoBox {
+      position: absolute;
+      width: 100%;
+      margin-right: 20px;
+      z-index: 1;
+      left: 0;
+      bottom: 0;
+      box-sizing: border-box;
+      padding-right: 20px;
+      .tableBto {
+        display: flex;
+        align-items: center;
+        height: 80px;
+        padding: 0 30px;
+        box-sizing: border-box;
+        background-color: #fff;
+        .right {
+          flex: 1;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          .item {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            // .itemTitle {
+            // }
+            .price {
+              color: #eb1515;
+              font-weight: 700;
+              font-size: 18px;
+            }
+          }
+        }
+      }
+    }
   }
 }
 .contactInfoBox {
@@ -1479,6 +1514,18 @@ export default {
     .el-select {
       flex: 1;
     }
+  }
+}
+@media screen and (max-width: 1768px) {
+  .tableBtoBox {
+    padding-right: 10px !important;
+    bottom: 10px !important;
+  }
+}
+@media screen and (min-width: 1919px) {
+  .tableBtoBox {
+    padding-right: 0px !important;
+    bottom: 0px !important;
   }
 }
 </style>

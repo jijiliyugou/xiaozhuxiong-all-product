@@ -58,9 +58,9 @@
             <span>{{ item.fa_no }}</span>
           </p>
         </div>
-        <div class="right" @click.stop="handlerShopping(item)">
-          <i v-if="item.isShopping" class="shoppingCartActive"></i>
-          <i v-else class="shoppingCart"></i>
+        <div class="right" @click.stop="handlerUpadate(item)">
+          <i v-if="item.isShoppingUpdate" class="updateIcon"></i>
+          <i v-else class="UpadateCart"></i>
         </div>
       </div>
       <p class="item">
@@ -125,7 +125,7 @@ export default {
   },
   data() {
     return {
-      isShopping: false
+      isShoppingUpdate: false
     };
   },
   methods: {
@@ -184,20 +184,20 @@ export default {
       }
     },
     // 添加报价
-    handlerShopping(item) {
-      item.isShopping = !item.isShopping;
-      if (item.isShopping) {
+    handlerUpadate(item) {
+      item.isShoppingUpdate = !item.isShoppingUpdate;
+      if (item.isShoppingUpdate) {
         this.$set(item, "boxNumber", 1); //默认传一箱过去，不然总金额计算错误
         // item.boxNumber = 1;
-        // this.$store.commit("pushOfferProductList", item);
-        this.$emit("pushOfferProductList", item);
+        this.$store.commit("pushOfferProductList", item);
+        // this.$emit("pushOfferProductList", item);
         this.$common.handlerMsgState({
           msg: "添加报价产品成功",
           type: "success"
         });
       } else {
-        // this.$store.commit("popOfferProductList", item);
-        this.$emit("popOfferProductList", item);
+        this.$store.commit("popOfferProductList", item);
+        // this.$emit("popOfferProductList", item);
         this.$common.handlerMsgState({
           msg: "删除报价产品成功",
           type: "warning"
@@ -317,31 +317,29 @@ export default {
         justify-content: center;
         box-sizing: border-box;
         cursor: pointer;
-        .shoppingCart {
+        .UpadateCart {
           width: 36px;
           height: 36px;
           transition: all 0.3s;
-          background: url("~@/assets/images/shopping1CartIcon.png") no-repeat
-            center;
+          background: url("~@/assets/images/UpadateCart.png") no-repeat center;
           background-size: contain;
         }
-        .shoppingCartActive {
+        .updateIcon {
           width: 36px;
           height: 36px;
           transition: all 0.3s;
-          background: url("~@/assets/images/shopping1CartActiveIcon.png")
-            no-repeat center;
+          background: url("~@/assets/images/updateIcon.png") no-repeat center;
           background-size: contain;
         }
         &:hover {
-          .shoppingCart {
+          .UpadateCart {
             -webkit-transform: scale(1.2) rotate(360deg);
             -moz-transform: scale(1.2) rotate(360deg);
             -ms-transform: scale(1.2) rotate(360deg);
             transform: scale(1.2) rotate(360deg);
             margin-bottom: 5px;
           }
-          .shoppingCartActive {
+          .updateIcon {
             -webkit-transform: scale(1.2) rotate(360deg);
             -moz-transform: scale(1.2) rotate(360deg);
             -ms-transform: scale(1.2) rotate(360deg);

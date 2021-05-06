@@ -26,18 +26,22 @@
                 联系人：{{ companyInfo.contactsMan }}
               </p>
               <p v-if="companyInfo.telephoneNumber">
-                电话：{{ companyInfo.telephoneNumber }}
+                <i class="phoneIcon"></i>{{ companyInfo.telephoneNumber }}
               </p>
               <p v-if="companyInfo.phoneNumber">
-                手机：{{ companyInfo.phoneNumber }}
+                <i class="sjIcon"></i>{{ companyInfo.phoneNumber }}
               </p>
-              <p v-if="companyInfo.qq">QQ：{{ companyInfo.qq }}</p>
-              <p v-if="companyInfo.address">地址：{{ companyInfo.address }}</p>
+              <p v-if="companyInfo.qq">
+                <i class="qqIcon"></i>{{ companyInfo.qq }}
+              </p>
               <p class="onlineConsultation" @click="toNews">
                 <img src="~@/assets/images/consult.png" alt />
                 在线咨询
               </p>
             </div>
+            <p v-if="companyInfo.address" style="color: #666;">
+              地址：{{ companyInfo.address }}
+            </p>
           </div>
         </div>
         <div class="headTop">
@@ -218,6 +222,7 @@
 import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
 import eventBus from "@/assets/js/common/eventBus.js";
+import { mapGetters } from "vuex";
 export default {
   name: "bsMyClientsDetail",
   components: {
@@ -257,20 +262,62 @@ export default {
       typesList: []
     };
   },
-
+  watch: {
+    shoppingList: {
+      deep: true,
+      handler() {
+        eventBus.$emit("upDateProductView");
+      }
+    }
+  },
   created() {},
   mounted() {
-    // 取消收藏
-    eventBus.$on("resetProducts", item => {
+    // 取消收藏/刷新页面
+    eventBus.$on("resetProductCollection", item => {
+      // this.getProductList();
       for (let i = 0; i < this.productList.length; i++) {
         if (this.productList[i].productNumber == item.productNumber) {
           this.productList[i].isFavorite = item.isFavorite;
         }
       }
     });
+    // 加购删除购物车
+    eventBus.$on("resetMyCart", item => {
+      if (Object.prototype.toString.call(item) === "[object Array]") {
+        // 数组
+        if (item.length) {
+          for (let i = 0; i < this.productList.length; i++) {
+            for (let j = 0; j < item.length; j++) {
+              if (this.productList[i].productNumber == item[j].productNumber) {
+                this.productList[i].isShopping = true;
+                break;
+              } else {
+                this.productList[i].isShopping = false;
+              }
+            }
+          }
+        } else {
+          this.productList.forEach(val => {
+            val.isShopping = false;
+          });
+        }
+      } else if (Object.prototype.toString.call(item) === "[object Object]") {
+        // 对象;
+        for (let i = 0; i < this.productList.length; i++) {
+          if (item.productNumber == this.productList[i].productNumber) {
+            this.productList[i].isShopping = item.isShopping;
+          }
+        }
+      }
+    });
     eventBus.$emit("showCart", true);
     this.getProductListPageAll();
     this.getCompanyByID();
+  },
+  computed: {
+    ...mapGetters({
+      shoppingList: "myShoppingList"
+    })
   },
   methods: {
     // 去聊天
@@ -498,7 +545,7 @@ export default {
     }
     .handerTitle {
       padding-left: 57px;
-      height: 140px;
+      height: 180px;
       background: #ffffff;
       .top {
         height: 90px;
@@ -544,6 +591,7 @@ export default {
             text-align: left;
             color: #666666;
             line-height: 34px;
+            margin: 10px 0;
             p {
               display: flex;
               align-content: center;
@@ -552,6 +600,31 @@ export default {
                 margin-right: 10px;
                 width: 28px;
                 height: 28px;
+              }
+              .phoneIcon {
+                min-width: 28px;
+                width: 28px;
+                height: 28px;
+                margin-right: 15px;
+                background: url("~@/assets/images/onlinePhoneIcon.png")
+                  no-repeat center;
+                background-size: contain;
+              }
+              .qqIcon {
+                min-width: 28px;
+                width: 28px;
+                height: 28px;
+                margin-right: 15px;
+                background: url("~@/assets/images/QQ.png") no-repeat center;
+                background-size: contain;
+              }
+              .sjIcon {
+                min-width: 28px;
+                width: 28px;
+                height: 28px;
+                margin-right: 15px;
+                background: url("~@/assets/images/sjIcon.png") no-repeat center;
+                background-size: contain;
               }
             }
             .onlineConsultation {
@@ -567,6 +640,7 @@ export default {
         background-color: #fff;
         padding-left: 20px;
         display: flex;
+        margin-top: 40px;
         border-radius: 4px;
         .tabs {
           width: 100px;

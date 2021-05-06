@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 export default {
   props: {
     item: {
@@ -56,6 +56,10 @@ export default {
   methods: {
     // 加购
     handlerShopping(item) {
+      if (!item.isShopping && this.shoppingList.length >= 500) {
+        this.$message.error("购物车已满500条");
+        return false;
+      }
       item.isShopping = !item.isShopping;
       if (item.isShopping) {
         item.shoppingCount = 1;
@@ -72,14 +76,22 @@ export default {
     },
     // 查看详情
     toDetails(item) {
-      window.sessionStorage.setItem(
-        "currentProductDetails",
-        JSON.stringify(item)
-      );
-      let { href } = this.$router.resolve({
-        path: "/productDetails"
-      });
-      window.open(href, "_blank");
+      if (this.$route.path.includes("productDetails")) {
+        this.$router.push({
+          path: "/productDetails",
+          query: {
+            id: item.productNumber
+          }
+        });
+        this.$root.eventHub.$emit("resetRelatedProducts");
+      } else {
+        this.$router.push({
+          path: "/productDetails",
+          query: {
+            id: item.productNumber
+          }
+        });
+      }
     }
   },
   created() {},
@@ -89,11 +101,14 @@ export default {
     });
   },
   beforeDestroy() {
-    this.$root.eventHub.$off("resetProductsItem");
+    // this.$root.eventHub.$off("resetProductsItem");
   },
   computed: {
     ...mapState(["globalLang"]),
     ...mapState(["userInfo"]),
+    ...mapGetters({
+      shoppingList: "myShoppingList"
+    }),
     publicLang() {
       return this.$t("lang.publicLang");
     }

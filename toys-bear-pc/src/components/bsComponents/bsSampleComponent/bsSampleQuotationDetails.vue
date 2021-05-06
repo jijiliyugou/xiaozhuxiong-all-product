@@ -15,6 +15,7 @@
       <div class="tableBox">
         <el-table
           :data="tableData"
+          size="mini"
           style="width: 100%"
           ref="collecTable"
           :header-cell-style="{ background: '#f1f3f6' }"
@@ -30,14 +31,22 @@
                   style="width: 80px; height: 60px"
                   :src="scope.row.imgUrlList && scope.row.imgUrlList[0]"
                 >
-                  <div slot="placeholder" class="errorImg">
+                  <div
+                    slot="placeholder"
+                    style="width:60px;height:60px;"
+                    class="errorImg"
+                  >
                     <img
                       style="width: 55px; height: 60px"
                       src="~@/assets/images/imgError.png"
                       alt
                     />
                   </div>
-                  <div slot="error" class="errorImg">
+                  <div
+                    slot="error"
+                    style="width:60px;height:60px;"
+                    class="errorImg"
+                  >
                     <img
                       style="width: 55px; height: 60px"
                       src="~@/assets/images/imgError.png"
@@ -69,7 +78,11 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="资料来源" align="center">
+          <el-table-column
+            label="资料来源"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               {{ scope.row.supplierName }}
             </template>
@@ -77,12 +90,15 @@
           <el-table-column
             prop="fa_no"
             label="出厂货号"
-            width="100"
             align="center"
           ></el-table-column>
-          <el-table-column prop="ch_pa" label="包装" align="center" width="100">
+          <el-table-column prop="ch_pa" label="包装" align="center">
           </el-table-column>
-          <el-table-column label="产品规格" align="center">
+          <el-table-column
+            label="产品规格"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -92,7 +108,11 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="包装规格" align="center">
+          <el-table-column
+            label="包装规格"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
@@ -101,7 +121,11 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="外箱规格" align="center">
+          <el-table-column
+            label="外箱规格"
+            align="center"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -110,29 +134,29 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="体积/材积" align="center">
+          <el-table-column
+            label="体积/材积"
+            align="center"
+            min-width="100"
+            show-overflow-tooltip
+          >
             <template slot-scope="scope">
               <span>
                 {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="毛重/净重" align="center" width="100">
+          <el-table-column label="毛重/净重" align="center">
             <template slot-scope="scope">
               <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
             </template>
           </el-table-column>
-          <el-table-column label="装箱量" align="center" width="100">
+          <el-table-column label="装箱量" align="center">
             <template slot-scope="scope">
               <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="boxNumber"
-            label="箱数"
-            align="center"
-            width="80"
-          >
+          <el-table-column prop="boxNumber" label="箱数" align="center">
             <template slot-scope="scope">
               <span>
                 {{ handleOffer(scope.row.boxNumber) }}
@@ -151,12 +175,7 @@
               />
             </template>
           </el-table-column> -->
-          <el-table-column
-            prop="ch_pa"
-            label="总数量"
-            align="center"
-            width="100"
-          >
+          <el-table-column prop="ch_pa" label="总数量" align="center">
             <template slot-scope="scope">
               <span>
                 {{
@@ -167,18 +186,13 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="price" label="厂价" align="center" width="100">
+          <el-table-column prop="price" label="厂价" align="center">
             <template slot-scope="scope">
               <span style="color: #f56c6c"> ￥{{ scope.row.price }} </span>
             </template>
           </el-table-column>
 
-          <el-table-column
-            prop="offerAmount"
-            label="报出价"
-            align="center"
-            width="100"
-          >
+          <el-table-column prop="offerAmount" label="报出价" align="center">
             <template slot-scope="scope">
               <span style="color: #f56c6c">
                 {{ scope.row.cu_de + handleOffer(scope.row.offerAmount) }}
@@ -190,7 +204,6 @@
             prop="OfferTotalAmount"
             label="报出总价"
             align="center"
-            width="100"
           >
             <template slot-scope="scope">
               <span style="color: #f56c6c">{{ scope.row.cu_de }}</span>
@@ -208,42 +221,42 @@
             </template>
           </el-table-column>
         </el-table>
-      </div>
-    </div>
-    <!-- 统计 -->
-    <div class="tableBtoBox">
-      <div class="tableBto">
-        <div class="right">
-          <p class="item">
-            <span class="itemTitle">总款数：</span>
-            <span>{{ tableData.length }}</span>
-          </p>
-          <p class="item">
-            <span class="itemTitle">总箱数：</span>
-            <span>{{ myTotalQuantity(tableData) }}</span>
-          </p>
-          <p class="item">
-            <span class="itemTitle">总体积/总材积：</span>
-            <span
-              >{{ handleOffer(myTotalVolume(tableData).outerBoxStere) }}/{{
-                handleOffer(myTotalVolume(tableData).outerBoxFeet)
-              }}</span
-            >
-          </p>
-          <p class="item">
-            <span class="itemTitle">总毛重/总净重：</span>
-            <span
-              >{{ handleOffer(totalMaozhong()) }}/{{
-                handleOffer(totalJingzhong())
-              }}(KG)</span
-            >
-          </p>
-          <p class="item">
-            <span class="itemTitle">总金额：</span>
-            <span class="price"
-              >{{ item.cu_de + handleOffer(myTotalPrice(tableData)) }}
-            </span>
-          </p>
+        <!-- 统计 -->
+        <div class="tableBtoBox">
+          <div class="tableBto">
+            <div class="right">
+              <p class="item">
+                <span class="itemTitle">总款数：</span>
+                <span>{{ tableData.length }}</span>
+              </p>
+              <p class="item">
+                <span class="itemTitle">总箱数：</span>
+                <span>{{ myTotalQuantity(tableData) }}</span>
+              </p>
+              <p class="item">
+                <span class="itemTitle">总体积/总材积：</span>
+                <span
+                  >{{ handleOffer(myTotalVolume(tableData).outerBoxStere) }}/{{
+                    handleOffer(myTotalVolume(tableData).outerBoxFeet)
+                  }}</span
+                >
+              </p>
+              <p class="item">
+                <span class="itemTitle">总毛重/总净重：</span>
+                <span
+                  >{{ handleOffer(totalMaozhong()) }}/{{
+                    handleOffer(totalJingzhong())
+                  }}(KG)</span
+                >
+              </p>
+              <p class="item">
+                <span class="itemTitle">总金额：</span>
+                <span class="price"
+                  >{{ item.cu_de + handleOffer(myTotalPrice(tableData)) }}
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -360,6 +373,7 @@ export default {
         label: row.fa_no || "产品详情",
         value: row
       };
+      this.$router.push("/bsIndex/bsProductSearchIndex");
       this.$store.commit("myAddTab", fd);
     },
     // 获取列表
@@ -685,6 +699,7 @@ export default {
   @{deep} .tableBox {
     .el-table {
       font-size: 13px;
+      padding-bottom: 60px;
       .inputNumber {
         width: 50px;
         outline: none;
@@ -752,36 +767,39 @@ export default {
         }
       }
     }
-  }
-  .tableBtoBox {
-    width: 1652px;
-    position: fixed;
-    right: 27px;
-    bottom: 0px;
-    z-index: 30;
-    .tableBto {
+    .tableBtoBox {
+      position: absolute;
       width: 100%;
-      display: flex;
-      align-items: center;
-      background-color: #fff;
-      height: 80px;
-      padding: 0 30px;
+      margin-right: 20px;
+      z-index: 1;
+      left: 0;
+      bottom: 0;
       box-sizing: border-box;
-      .right {
-        flex: 1;
+      padding-right: 20px;
+      .tableBto {
+        width: 100%;
         display: flex;
-        justify-content: flex-end;
         align-items: center;
-        .item {
-          margin-right: 15px;
+        background-color: #fff;
+        height: 80px;
+        padding: 0 30px;
+        box-sizing: border-box;
+        .right {
+          flex: 1;
           display: flex;
+          justify-content: flex-end;
           align-items: center;
-          // .itemTitle {
-          // }
-          .price {
-            color: #eb1515;
-            font-weight: 700;
-            font-size: 18px;
+          .item {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            // .itemTitle {
+            // }
+            .price {
+              color: #eb1515;
+              font-weight: 700;
+              font-size: 18px;
+            }
           }
         }
       }
@@ -789,7 +807,7 @@ export default {
   }
 }
 // 表格样式
-.el-table {
+@{deep} .el-table {
   /*
 	 *改变浏览器默认的滚动条样式
 	 */
@@ -817,10 +835,25 @@ export default {
       color: #666;
     }
   }
+  .cell {
+    padding: 0 2px;
+  }
 }
 @{deep} .exportOrder {
   .el-dialog__body {
     padding: 0;
+  }
+}
+@media screen and (max-width: 1768px) {
+  .tableBtoBox {
+    padding-right: 10px !important;
+    bottom: 10px !important;
+  }
+}
+@media screen and (min-width: 1919px) {
+  .tableBtoBox {
+    padding-right: 0px !important;
+    bottom: 0px !important;
   }
 }
 </style>

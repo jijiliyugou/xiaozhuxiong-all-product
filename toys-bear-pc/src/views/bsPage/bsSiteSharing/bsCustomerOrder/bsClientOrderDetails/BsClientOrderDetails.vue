@@ -64,7 +64,7 @@
           'font-weight': '400'
         }"
       >
-        <el-table-column label="序号" type="index" align="center" width="70">
+        <el-table-column label="序号" type="index" align="center" width="50">
         </el-table-column>
         <el-table-column label="产品" width="300">
           <template slot-scope="scope">
@@ -106,29 +106,25 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column width="100" label="资料来源">
+        <el-table-column label="资料来源" show-overflow-tooltip>
           <template slot-scope="scope">
-            <div
-              style="
-                width: 100px;
-                overflow: hidden;
-                max-width: 100px;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-              "
-            >
-              {{ scope.row.exhibitionName }}
-            </div>
+            {{ scope.row.exhibitionName }}
           </template>
         </el-table-column>
         <el-table-column
           prop="fa_no"
           label="出厂货号"
+          show-overflow-tooltip
           align="center"
         ></el-table-column>
-        <el-table-column prop="ch_pa" label="包装" align="center">
+        <el-table-column
+          prop="ch_pa"
+          label="包装"
+          align="center"
+          show-overflow-tooltip
+        >
         </el-table-column>
-        <el-table-column label="产品规格" min-width="100" align="center">
+        <el-table-column label="产品规格" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>
               {{ scope.row.pr_le }}x{{ scope.row.pr_wi }}x{{
@@ -137,7 +133,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="包装规格" min-width="100" align="center">
+        <el-table-column label="包装规格" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>
               {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
@@ -146,7 +142,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="外箱规格" min-width="100" align="center">
+        <el-table-column label="外箱规格" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
             <span>
               {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -155,43 +151,59 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="体积/材积" min-width="150" align="center">
+        <el-table-column label="体积/材积" show-overflow-tooltip align="center">
           <template slot-scope="scope">
             <span>
               {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="毛重/净重" align="center">
+        <el-table-column label="毛重/净重" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
             <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
           </template>
         </el-table-column>
-        <el-table-column label="装箱量" align="center">
+        <el-table-column label="装箱量" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
             <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
           </template>
         </el-table-column>
         <el-table-column
           prop="productCount"
+          show-overflow-tooltip
           width="50"
           align="center"
           label="箱数"
         >
         </el-table-column>
-        <el-table-column width="80" align="center" label="总数量">
+        <el-table-column
+          width="80"
+          align="center"
+          show-overflow-tooltip
+          label="总数量"
+        >
           <template slot-scope="scope">
             {{ scope.row.productCount * scope.row.ou_lo }}
           </template>
         </el-table-column>
-        <el-table-column prop="costPrice" align="center" label="参考单价">
+        <el-table-column
+          prop="costPrice"
+          align="center"
+          show-overflow-tooltip
+          label="参考单价"
+        >
           <template slot-scope="scope">
             <span style="color: #3368a9">
-              {{ options.currencyType + scope.row.costPrice }}
+              {{ "￥" + scope.row.costPrice }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="productPrice" align="center" label="报出价">
+        <el-table-column
+          prop="productPrice"
+          show-overflow-tooltip
+          align="center"
+          label="报出价"
+        >
           <template slot-scope="scope">
             <span style="color: #f56c6c">
               {{ options.currencyType + scope.row.productPrice }}
@@ -202,7 +214,7 @@
           prop="OfferTotalAmount"
           label="报出总价"
           align="center"
-          width="100"
+          show-overflow-tooltip
         >
           <template slot-scope="scope">
             <span style="color: #f56c6c">{{ scope.row.cu_de }}</span>
@@ -243,7 +255,7 @@
         <p class="item">
           <span class="itemTitle">总出厂价/总金额：</span>
           <span style="color: #3368a9">
-            {{ options.currencyType }}
+            ￥
           </span>
           <span style="color: #3368a9">{{ options.totalCostPrice }}</span>
           <span style="margin: 5px"></span>
@@ -397,7 +409,7 @@ export default {
         label: row.fa_no || "产品详情",
         value: row
       };
-      console.log(row);
+      this.$router.push("/bsIndex/bsProductSearchIndex");
       this.$store.commit("myAddTab", fd);
     },
     // 切换当前页
@@ -580,6 +592,9 @@ export default {
       }
     }
     @{deep} .el-table {
+      .cell {
+        padding: 0 2px;
+      }
       .el-table__header-wrapper .el-checkbox {
         display: none;
       }

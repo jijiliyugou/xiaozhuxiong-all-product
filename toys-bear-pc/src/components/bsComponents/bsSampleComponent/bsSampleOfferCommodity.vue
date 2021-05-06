@@ -24,19 +24,22 @@
       <div class="right">
         <el-button @click="handleAffirm" type="primary" round>
           确定已选择({{ offerProductList.length }})
-          <i style="font-size:15px" class="el-icon-right el-icon--right"></i>
+          <i style="font-size: 15px" class="el-icon-right el-icon--right"></i>
         </el-button>
       </div>
     </div>
     <div class="productListBox">
       <!-- 产品列表 -->
-      <!-- <bsProductSearchIndex v-if="typeId === 1"></bsProductSearchIndex> -->
+      <bsProductSearchIndex
+        v-if="typeId === 1"
+        :typeId="typeId"
+      ></bsProductSearchIndex>
 
-      <!-- <div class="bsGridComponent" v-if="typeId != 1"> -->
-      <div class="bsGridComponent">
+      <!--@pushOfferProductList="pushOfferProductList"
+          @popOfferProductList="popOfferProductList" -->
+      <div class="bsGridComponent" v-if="typeId != 1">
+        <!-- <div class="bsGridComponent"> -->
         <bsSampleOfferProductList
-          @pushOfferProductList="pushOfferProductList"
-          @popOfferProductList="popOfferProductList"
           v-for="item in productList"
           :key="item.productNumber"
           :item="item"
@@ -48,8 +51,8 @@
       </div>
 
       <!-- 分页 -->
-      <!-- <center style="padding:20px 0;" v-if="typeId != 1"> -->
-      <center style="padding:20px 0;">
+      <center style="padding: 20px 0" v-if="typeId != 1">
+        <!-- <center style="padding:20px 0;"> -->
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
           :page-sizes="[12, 24, 36, 48]"
@@ -65,26 +68,30 @@
   </div>
 </template>
 <script>
-// import { mapState } from "vuex";
+import { mapState } from "vuex";
 import bsSampleOfferProductList from "@/components/bsComponents/bsSampleComponent/bsSampleOfferProductList";
-// import bsProductSearchIndex from "@/views/bsPage/bsProductSearch/bsProductSearchIndex/BsProductSearchIndex.vue";
+import bsProductSearchIndex from "@/views/bsPage/bsProductSearch/bsProductSearchIndex/BsProductSearchIndex.vue";
 
 import eventBus from "@/assets/js/common/eventBus.js";
 export default {
   name: "bsSampleOfferCommodity",
   components: {
-    bsSampleOfferProductList
+    bsSampleOfferProductList,
+    bsProductSearchIndex
   },
   props: {
     item: {
       type: Object
     }
   },
+  computed: {
+    ...mapState(["offerProductList"])
+  },
   data() {
     return {
       num: null,
       typeId: 0,
-      offerProductList: [],
+      //   offerProductList: [],
       productList: [],
       isGrid: "bsGridComponent",
       totalCount: 0,
@@ -107,7 +114,11 @@ export default {
       };
       const res = await this.$http.post("/api/ProductOfferDetailPage", fd);
       if (res.data.result.code === 200) {
-        this.offerProductList = res.data.result.item.items;
+        this.$store.commit(
+          "updataOfferProductList",
+          res.data.result.item.items
+        );
+        // this.offerProductList = res.data.result.item.items;
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -150,7 +161,7 @@ export default {
                 item.items[i].productNumber ===
                 this.offerProductList[j].productNumber
               ) {
-                item.items[i].isShopping = true;
+                item.items[i].isShoppingUpdate = true;
               }
             }
           }
@@ -207,6 +218,7 @@ export default {
     //切换
     checkTabstypeId(num) {
       this.typeId = num;
+      this.$store.commit("resetCheckTabstypeId", num);
       this.getProductList();
     },
     // 切換頁容量

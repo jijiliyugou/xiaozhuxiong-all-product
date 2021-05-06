@@ -80,7 +80,7 @@
     <el-dialog
       title="推送记录"
       :visible.sync="pushRecordDialog"
-      width="45%"
+      width="800px"
       :before-close="closePushRecordDialog"
     >
       <bsPushRecordComponent></bsPushRecordComponent>

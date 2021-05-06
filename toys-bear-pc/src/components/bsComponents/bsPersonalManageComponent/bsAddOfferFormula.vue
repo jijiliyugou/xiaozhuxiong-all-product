@@ -67,6 +67,7 @@
           <el-form-item label="汇率：" prop="exchange">
             <el-input
               v-model="addDefaultForm.exchange"
+              onkeyup="value=value.replace(/[^\d.]/g,'')"
               :maxlength="String(addDefaultForm.exchange).includes('.') ? 7 : 6"
             ></el-input>
           </el-form-item>
@@ -100,6 +101,7 @@
               <el-input
                 maxlength="30"
                 style="flex:1;"
+                onkeyup="value=value.replace(/[^\d.]/g,'')"
                 v-model="addDefaultForm.profit"
               >
                 <span slot="suffix">%</span>
@@ -164,6 +166,7 @@
           <el-form-item label="价格小于：" prop="miniPrice">
             <el-input
               style="width:100%;"
+              onkeyup="value=value.replace(/[^\d.]/g,'')"
               v-model="addDefaultForm.miniPrice"
               clearable
               placeholder="请输入"

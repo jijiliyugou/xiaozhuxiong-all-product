@@ -108,7 +108,6 @@ export default {
   },
   data() {
     return {
-      productDetails: null,
       productData: null
     };
   },
@@ -127,27 +126,28 @@ export default {
         this.$store.commit("popShopping", item);
         this.$message.warning(this.publicLang.cancelSuccessfully);
       }
+      // this.$root.eventHub.$emit("resetProducts");
     },
     // 获取产品详情接口
     async getProductDetails() {
       const res = await this.$http.get(
         "/api/WebsiteShare/SearchCompanyShareProductDetailPage?productNumber=" +
-          this.productDetails.productNumber
+          this.$route.query.id
       );
       const { code, data, message } = res.data.result;
       if (code == 200) {
+        for (let i = 0; i < this.shoppingList.length; i++) {
+          if (this.shoppingList[i].productNumber == data.productNumber) {
+            data.isShopping = true;
+          }
+        }
         this.productData = data;
-        console.log(data);
       } else {
         this.$message.error(message);
       }
     }
   },
-  created() {
-    this.productDetails = JSON.parse(
-      window.sessionStorage.getItem("currentProductDetails")
-    );
-  },
+  created() {},
   mounted() {
     this.getProductDetails();
   },

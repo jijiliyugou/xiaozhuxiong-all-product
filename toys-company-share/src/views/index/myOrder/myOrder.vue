@@ -43,7 +43,7 @@
                   <div class="keys">{{ myOrderLang.email }}：</div>
                 </div>
                 <div class="right">
-                  <div class="values">{{ item.totalCount }}</div>
+                  <div class="values">{{ item.totalKuanshu }}</div>
                   <div class="values">{{ item.email }}</div>
                 </div>
               </div>

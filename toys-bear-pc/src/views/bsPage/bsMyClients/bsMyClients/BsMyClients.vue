@@ -17,6 +17,24 @@
             @keyup.native.enter="search"
           ></el-input>
         </div>
+        <div class="item" v-if="userInfo.userInfo.isMain">
+          <span class="label">业务员：</span>
+          <el-select
+            v-model="staffId"
+            filterable
+            size="medium"
+            clearable
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in staffList"
+              :key="item.id"
+              :label="item.linkman"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </div>
         <div class="item">
           <span class="label">时间段：</span>
           <el-date-picker
@@ -73,6 +91,13 @@
         </el-table-column>
         <el-table-column align="center" prop="email" label="邮箱" width="180">
         </el-table-column>
+        <el-table-column
+          align="center"
+          prop="staffName"
+          label="业务员"
+          show-overflow-tooltip
+        >
+        </el-table-column>
         <el-table-column align="center" prop="createdOn" label="创建时间">
         </el-table-column>
         <el-table-column align="center" prop="remark" label="备注">
@@ -112,7 +137,7 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="dialogVisible"
-      width="30%"
+      width="800px"
       :before-close="closeDialog"
     >
       <el-form
@@ -165,10 +190,13 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "bsMyClients",
   data() {
     return {
+      staffList: [],
+      staffId: null,
       dialogTitle: "新增客户",
       dialogVisible: false,
       editRow: {},
@@ -196,6 +224,7 @@ export default {
       const fd = {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
+        staffId: this.staffId,
         keyword: this.keyword,
         startTime: this.dateTime && this.dateTime[0],
         endTime: this.dateTime && this.dateTime[1]
@@ -210,6 +239,21 @@ export default {
         this.totalCount = res.data.result.item.totalCount;
         this.tableData = res.data.result.item.items;
       }
+    },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.getClientsListPage();
     },
     // 搜索
     search() {
@@ -333,7 +377,10 @@ export default {
   },
   created() {},
   mounted() {
-    this.getClientsListPage();
+    this.getStaffList();
+  },
+  computed: {
+    ...mapState(["currentComparnyId", "userInfo"])
   }
 };
 </script>
@@ -372,7 +419,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    &::before {
+    .left::before {
       width: 4px;
       height: 14px;
       background-color: #3368a9;

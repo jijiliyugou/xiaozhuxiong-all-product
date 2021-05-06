@@ -417,16 +417,6 @@
           <div class="advancedScreening" v-show="screeningFlag == true">
             <div class="title">高级筛选:</div>
             <div class="queryCondition">
-              <!-- <div>
-              <span class="text">综合：</span>
-              <el-checkbox
-                v-model="synthesis"
-                @change="handleSynthesis"
-                style="margin-right: 30px;"
-              >
-                综合查询
-              </el-checkbox>
-            </div> -->
               <div class="item">
                 <span class="text">搜索类型：</span>
                 <el-checkbox
@@ -577,41 +567,6 @@
               </el-form>
             </div>
           </div>
-          <!-- 标准筛选 -->
-          <!-- <div class="standardScreening" v-show="screeningFlag == false">
-          <span class="myLabel">标准筛选:</span>
-          <el-checkbox
-            v-model="synthesis"
-            @change="handleSynthesis"
-            style="margin-right: 30px;"
-          >
-            综合
-          </el-checkbox>
-          <el-checkbox
-            @change="handleCheckedScreensChange"
-            v-model="searchForm.fa_no"
-          >
-            货号
-          </el-checkbox>
-          <el-checkbox
-            @change="handleCheckedScreensChange"
-            v-model="searchForm.name"
-          >
-            名称
-          </el-checkbox>
-          <el-checkbox
-            @change="handleCheckedScreensChange"
-            v-model="searchForm.number"
-          >
-            编号
-          </el-checkbox>
-          <el-checkbox
-            @change="handleCheckedScreensChange"
-            v-model="searchForm.packName"
-          >
-            包装
-          </el-checkbox>
-        </div> -->
           <div class="productClass">
             <span class="myLabel">产品分类:</span>
             <div :class="{ tags: true, showOneCate: isOneDownCate }">
@@ -676,13 +631,13 @@
           <div class="resultTitle">搜索图片</div>
           <div class="resultBox">
             <div class="left">
-              <p class="totalCountBox">
+              <!-- <p class="totalCountBox">
                 <span class="title">搜索产品</span>
                 <span class="total">
                   <span class="title">总记录：</span>
                   <span class="text"> {{ totalCount }} </span>条
                 </span>
-              </p>
+              </p> -->
             </div>
             <div class="middle">
               <!-- {{ searchImgPreview }} -->
@@ -709,9 +664,115 @@
             </div>
             <div class="right"></div>
           </div>
+          <div class="screenBox">
+            <div class="left">
+              <div class="screenItem" @click="picSortTypeEvent(null)">
+                <span :class="{ screenLabel: true, active: sortOrder === null }"
+                  >综合</span
+                >
+              </div>
+              <div class="screenItem" @click="picSortTypeEvent(3)">
+                <span :class="{ screenLabel: true, active: sortOrder === 3 }"
+                  >热度</span
+                >
+                <i v-show="isRedu === null" class="jiantou xiajiantouIcon"></i>
+                <i v-show="isRedu === 1" class="jiantou xiaActiveIcon"></i>
+                <i v-show="isRedu === 2" class="jiantou shangActiveIcon"></i>
+              </div>
+              <div class="screenItem" @click="picSortTypeEvent(1)">
+                <span :class="{ screenLabel: true, active: sortOrder === 1 }"
+                  >单价</span
+                >
+                <i v-show="isPrice === null" class="jiantou xiajiantouIcon"></i>
+                <i v-show="isPrice === 1" class="jiantou xiaActiveIcon"></i>
+                <i v-show="isPrice === 2" class="jiantou shangActiveIcon"></i>
+              </div>
+              <div class="screenItem" @click="picSortTypeEvent(2)">
+                <span :class="{ screenLabel: true, active: sortOrder === 2 }">
+                  时间
+                </span>
+                <i v-show="isTime === null" class="jiantou xiajiantouIcon"></i>
+                <i v-show="isTime === 1" class="jiantou xiaActiveIcon"></i>
+                <i v-show="isTime === 2" class="jiantou shangActiveIcon"></i>
+              </div>
+              <div class="screenItem dateTime">
+                <span class="screenLabel">上架时间</span>
+                <el-date-picker
+                  size="mini"
+                  value-format="yyyy-MM-ddTHH:mm:ss"
+                  v-model="searchForm.time"
+                  type="daterange"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                >
+                </el-date-picker>
+              </div>
+              <div class="screenItem priceUnit">
+                <span class="screenLabel">价格区间</span>
+                <div class="intervalPrice">
+                  <el-input
+                    size="mini"
+                    v-model="searchForm.minPrice"
+                    placeholder="最低"
+                  ></el-input>
+                  <span class="line">-</span>
+                  <el-input
+                    size="mini"
+                    v-model="searchForm.maxPrice"
+                    placeholder="最高"
+                  ></el-input>
+                </div>
+              </div>
+              <el-button
+                @click="picGetProducts"
+                type="primary"
+                style="margin-left: 10px"
+                size="mini"
+              >
+                确定
+              </el-button>
+            </div>
+            <div class="right">
+              <div class="searchTime">
+                查询用时：<span>{{ searchHttpTime }}</span
+                >秒
+              </div>
+              <div
+                :class="{ grid: true, active: isGrid === 'bsGridComponent' }"
+                @click="handerIsGrid('bsGridComponent')"
+              ></div>
+              <div
+                :class="{
+                  column: true,
+                  active: isGrid === 'bsColumnComponent'
+                }"
+                @click="handerIsGrid('bsColumnComponent')"
+              ></div>
+              <div class="line"></div>
+              <div class="totalCount" style="margin-right: 20px;">
+                <span>共</span>
+                <span class="totalCountText">{{ totalCount }}</span>
+                <span>条数据</span>
+              </div>
+              <!-- <div class="myMinPagination">
+                <div @click="firstEvent" class="first el-icon-arrow-left"></div>
+                <div class="count">
+                  <span class="pageIndex">{{ currentPage }}</span>
+                  <span>/</span>
+                  <span>{{ Math.ceil(totalCount / pageSize) }}</span>
+                </div>
+                <div @click="nextEvent" class="next el-icon-arrow-right"></div>
+              </div> -->
+            </div>
+          </div>
           <div class="picProductListBox">
             <!-- 产品列表 -->
-            <component :is="isGrid" :productList="productList"></component>
+            <component
+              :is="isGrid"
+              :productList="productList"
+              :typeId="typeId"
+            ></component>
           </div>
         </div>
       </template>
@@ -893,6 +954,7 @@ export default {
     onCubeImg() {
       this.isGrid = "bsColumnComponent";
       this.loading = true;
+      let startDate = Date.now();
       // 获取cropper的截图的base64 数据
       this.$refs.cropper.getCropBlob(async file => {
         const urlPreView = window.URL.createObjectURL(file);
@@ -921,12 +983,14 @@ export default {
           fd.append("file", file);
           const res = await this.$http.post("/api/File/SearchPicture", fd);
           if (res.data.result.code === 200) {
+            let endDate = Date.now();
+            this.searchHttpTime = (endDate - startDate) / 1000;
             this.$store.commit("searchValues", res.data.result.object);
             this.productList = res.data.result.object;
             this.totalCount = res.data.result.object.length;
             this.cropperCancel();
           } else {
-            this.$store.commit("searchValues", []);
+            // this.$store.commit("searchValues", []);
             this.cropperCancel();
             this.$common.handlerMsgState({
               msg: res.data.result.message,
@@ -938,12 +1002,97 @@ export default {
         }
       });
     },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
     // 取消裁剪
     cropperCancel() {
       this.$refs.cropper.clearCrop();
       this.isShowCropper = false;
       this.option.img = "";
       this.loading = false;
+    },
+    async picGetProducts() {
+      let startDate = Date.now();
+      const fd = {
+        hallNumber: this.searchForm.companyNumber,
+        minPrice: this.searchForm.minPrice,
+        maxPrice: this.searchForm.maxPrice,
+        startTime: this.searchForm.time.length ? this.searchForm.time[0] : null,
+        endTime: this.searchForm.time.length ? this.searchForm.time[1] : null,
+        sortOrder: this.sortOrder,
+        sortType: this.sortType
+      };
+      fd.productNumberList = this.imageSearchValue.map(val => ({
+        productNumber: val.productNumber,
+        orderBy: val.orderBy
+      }));
+      for (const key in fd) {
+        if (fd[key] === null || fd[key] === undefined || fd[key] === "")
+          delete fd[key];
+      }
+      const res = await this.$http.post("/api/SearchPictureSortScreen", fd);
+      if (res.data.result.code === 200) {
+        this.productList = res.data.result.item;
+        this.totalCount = this.productList.length;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      let endDate = Date.now();
+      this.searchHttpTime = (endDate - startDate) / 1000;
+    },
+    // 图搜过滤类型
+    picSortTypeEvent(type) {
+      this.sortOrder = type;
+      switch (type) {
+        case 1:
+          this.sortType = this.isPrice =
+            this.isPrice === null ? 1 : this.isPrice === 1 ? 2 : null;
+          this.sortType = null;
+          this.isTime = null;
+          this.isRedu = null;
+          this.sortType = this.isPrice;
+          this.sortType === null && (this.sortOrder = null);
+          break;
+        case 2:
+          this.isTime = this.isTime === null ? 1 : this.isTime === 1 ? 2 : null;
+          this.sortType = null;
+          this.isPrice = null;
+          this.isRedu = null;
+          this.sortType = this.isTime;
+          this.sortType === null && (this.sortOrder = null);
+          break;
+        case 3:
+          this.isRedu = this.isRedu === null ? 1 : this.isRedu === 1 ? 2 : null;
+          this.sortType = null;
+          this.isPrice = null;
+          this.isTime = null;
+          this.sortType = this.isRedu;
+          this.sortType === null && (this.sortOrder = null);
+          break;
+        default:
+          this.isPrice = null;
+          this.isTime = null;
+          this.isRedu = null;
+          this.sortType = null;
+          this.sortOrder = null;
+          break;
+      }
+      this.picGetProducts();
     },
     // 过滤类型
     sortTypeEvent(type) {
@@ -1046,17 +1195,34 @@ export default {
       const res = await this.$http.post("/api/SearchBearProductPage", fd);
       const { code, item, msg } = res.data.result;
       if (code === 200) {
-        if (this.shoppingList) {
-          for (let i = 0; i < item.items.length; i++) {
-            for (let j = 0; j < this.shoppingList.length; j++) {
-              if (
-                item.items[i].productNumber ===
-                this.shoppingList[j].productNumber
-              )
-                item.items[i].isShopping = true;
+        console.log(this.shoppingList);
+        if (this.typeId === 1) {
+          if (this.offerProductList) {
+            for (let i = 0; i < item.items.length; i++) {
+              for (let j = 0; j < this.offerProductList.length; j++) {
+                if (
+                  item.items[i].productNumber ===
+                  this.offerProductList[j].productNumber
+                ) {
+                  item.items[i].isShoppingUpdate = true;
+                }
+              }
+            }
+          }
+        } else {
+          if (this.shoppingList) {
+            for (let i = 0; i < item.items.length; i++) {
+              for (let j = 0; j < this.shoppingList.length; j++) {
+                if (
+                  item.items[i].productNumber ===
+                  this.shoppingList[j].productNumber
+                )
+                  item.items[i].isShopping = true;
+              }
             }
           }
         }
+
         this.productList = item.items;
         this.totalCount = item.totalCount;
         let endDate = Date.now();
@@ -1223,10 +1389,8 @@ export default {
       this.isTwoDownCate = !this.isTwoDownCate;
     },
     clearRootEvent() {
-      eventBus.$off("resetProductCollection");
       eventBus.$off("searchProducts");
       eventBus.$off("openUpload");
-      eventBus.$off("resetMyCart");
     },
     // 关闭关联搜索
     closeTag() {
@@ -1251,36 +1415,41 @@ export default {
       this.uploadPic(file);
     });
     // 取消收藏/刷新页面
-    eventBus.$on("resetProductCollection", () => {
-      this.getProductList();
+    eventBus.$on("resetProductCollection", item => {
+      // this.getProductList();
+      for (let i = 0; i < this.productList.length; i++) {
+        if (this.productList[i].productNumber == item.productNumber) {
+          this.productList[i].isFavorite = item.isFavorite;
+        }
+      }
     });
-    // 取消收藏
-    // eventBus.$on("resetProductCollection", (item) => {
-    //   for (let i = 0; i < this.productList.length; i++) {
-    //     if (this.productList[i].productNumber == item.productNumber) {
-    //       this.productList[i].isFavorite = item.isFavorite;
-    //     }
-    //   }
-    // });
-    // 增加滚动事件
-    // eventBus.$emit("startScroll");
-    // 删除购物车样式
-    eventBus.$on("resetMyCart", list => {
-      if (list.length) {
-        for (let i = 0; i < this.productList.length; i++) {
-          for (let j = 0; j < list.length; j++) {
-            if (this.productList[i].productNumber == list[j].productNumber) {
-              this.productList[i].isShopping = true;
-              break;
-            } else {
-              this.productList[i].isShopping = false;
+    // 加购删除购物车
+    eventBus.$on("resetMyCart", item => {
+      if (Object.prototype.toString.call(item) === "[object Array]") {
+        // 数组
+        if (item.length) {
+          for (let i = 0; i < this.productList.length; i++) {
+            for (let j = 0; j < item.length; j++) {
+              if (this.productList[i].productNumber == item[j].productNumber) {
+                this.productList[i].isShopping = true;
+                break;
+              } else {
+                this.productList[i].isShopping = false;
+              }
             }
           }
+        } else {
+          this.productList.forEach(val => {
+            val.isShopping = false;
+          });
         }
-      } else {
-        this.productList.forEach(val => {
-          val.isShopping = false;
-        });
+      } else if (Object.prototype.toString.call(item) === "[object Object]") {
+        // 对象;
+        for (let i = 0; i < this.productList.length; i++) {
+          if (item.productNumber == this.productList[i].productNumber) {
+            this.productList[i].isShopping = item.isShopping;
+          }
+        }
       }
     });
     this.$nextTick(async () => {
@@ -1318,9 +1487,17 @@ export default {
     ...mapGetters({
       shoppingList: "myShoppingList"
     }),
-    ...mapState(["searchImgPreview"]),
-    ...mapState(["imageSearchValue"]),
-    ...mapState(["myColles", "searchTxt", "searchHallCate", "imgSearch"])
+    ...mapState([
+      "myColles",
+      "searchTxt",
+      "searchHallCate",
+      "imgSearch",
+      "typeId",
+      "imageSearchValue",
+      "offerProductList",
+      "searchImgPreview",
+      "currentComparnyId"
+    ])
   },
   watch: {
     searchHallCate: {
@@ -1340,30 +1517,29 @@ export default {
         }
       }
     },
-
     shoppingList: {
       deep: true,
-      handler(list) {
-        if (list) {
-          if (list.length) {
-            for (let i = 0; i < this.productList.length; i++) {
-              for (let j = 0; j < list.length; j++) {
-                if (
-                  this.productList[i].productNumber == list[j].productNumber
-                ) {
-                  this.productList[i].isShopping = true;
-                  break;
-                } else {
-                  this.productList[i].isShopping = false;
-                }
-              }
-            }
-          } else {
-            this.productList.forEach(val => {
-              val.isShopping = false;
-            });
-          }
-        }
+      handler() {
+        // if (list) {
+        //   if (list.length) {
+        //     for (let i = 0; i < this.productList.length; i++) {
+        //       for (let j = 0; j < list.length; j++) {
+        //         if (
+        //           this.productList[i].productNumber == list[j].productNumber
+        //         ) {
+        //           this.productList[i].isShopping = true;
+        //           break;
+        //         } else {
+        //           this.productList[i].isShopping = false;
+        //         }
+        //       }
+        //     }
+        //   } else {
+        //     this.productList.forEach(val => {
+        //       val.isShopping = false;
+        //     });
+        //   }
+        eventBus.$emit("upDateProductView");
       }
     },
     "searchForm.time"(newVal) {
@@ -1677,6 +1853,138 @@ export default {
   .picSearchBox {
     background-color: #fff;
     padding: 20px;
+    .screenBox {
+      width: 100%;
+      height: 50px;
+      background-color: #f9fafc;
+      display: flex;
+      align-items: center;
+      .left {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        .screenItem {
+          margin-left: 20px;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          padding: 5px;
+          &.priceUnit,
+          &.dateTime {
+            cursor: default;
+            @{deep} .el-date-editor {
+              width: 210px;
+              box-sizing: border-box;
+              padding-left: 16px;
+              .el-icon-date {
+                display: none;
+              }
+            }
+          }
+          .screenLabel {
+            margin-right: 10px;
+            &.active {
+              color: #3368a9;
+              font-weight: bold;
+            }
+          }
+          .jiantou {
+            width: 9px;
+            height: 16px;
+            opacity: 1;
+          }
+          .xiajiantouIcon {
+            background: url("~@/assets/images/xiajiantou.png") no-repeat center;
+            background-size: contain;
+          }
+          .xiaActiveIcon {
+            background: url("~@/assets/images/xiaActive.png") no-repeat center;
+            background-size: contain;
+          }
+          .shangActiveIcon {
+            background: url("~@/assets/images/shangActive.png") no-repeat center;
+            background-size: contain;
+          }
+          .el-date-editor {
+            width: 210px;
+          }
+          .intervalPrice {
+            width: 130px;
+            display: flex;
+            align-items: center;
+            .line {
+              margin: 0 5px;
+            }
+          }
+        }
+      }
+      .right {
+        width: 500px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        .searchTime {
+          margin-right: 40px;
+          span {
+            color: #3368a9;
+          }
+        }
+        .grid,
+        .column {
+          width: 17px;
+          height: 17px;
+          margin-right: 25px;
+          cursor: pointer;
+        }
+        .grid {
+          background: url("~@/assets/images/gridIcon.png") no-repeat center;
+          background-size: contain;
+          &.active {
+            background: url("~@/assets/images/gridActiveIcon.png") no-repeat
+              center;
+            background-size: contain;
+          }
+        }
+        .column {
+          background: url("~@/assets/images/columnIcon.png") no-repeat center;
+          background-size: contain;
+          &.active {
+            background: url("~@/assets/images/columnActiveIcon.png") no-repeat
+              center;
+            background-size: contain;
+          }
+        }
+        .line {
+          width: 1px;
+          height: 100%;
+          opacity: 1;
+          background: #e9e9e9;
+        }
+        .totalCount {
+          margin-left: 15px;
+          .totalCountText {
+            color: #eb1515;
+          }
+        }
+        .myMinPagination {
+          width: 110px;
+          display: flex;
+          align-items: center;
+          justify-content: space-evenly;
+          margin-left: 20px;
+          .first,
+          .next {
+            cursor: pointer;
+          }
+          .count {
+            .pageIndex {
+              color: #ff760e;
+            }
+          }
+        }
+      }
+    }
     .searchInput {
       flex: 1;
       display: flex;

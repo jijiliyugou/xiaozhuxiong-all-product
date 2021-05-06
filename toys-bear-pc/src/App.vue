@@ -21,9 +21,9 @@
         <div class="cart" @click="toMyShoppingCart">
           <div class="cartIconBox">
             <el-badge
+              class="appBadge"
               :hidden="!shoppingList || shoppingList.length < 1"
               :value="shoppingList && shoppingList.length"
-              class="item"
             >
               <i class="cartIcon"></i>
             </el-badge>
@@ -195,7 +195,7 @@ export default {
         width: 50px;
         height: 50px;
         position: relative;
-        .el-badge {
+        .appBadge {
           width: 20px;
           height: 20px;
           position: absolute;

@@ -219,19 +219,20 @@
             prop="remark"
             align="center"
             width="200"
+            show-overflow-tooltip
             label="备注"
           >
             <template slot-scope="scope">
-              <el-tooltip
+              <!-- <el-tooltip
                 class="item"
                 effect="dark"
                 :content="scope.row.remark"
                 placement="top"
               >
-                <div class="remarkClass">
-                  {{ scope.row.remark }}
-                </div>
-              </el-tooltip>
+                <div class="remarkClass"> -->
+              {{ scope.row.remark }}
+              <!-- </div>
+              </el-tooltip> -->
             </template>
           </el-table-column>
           <el-table-column prop="ma_na" align="center" label="厂家名称">

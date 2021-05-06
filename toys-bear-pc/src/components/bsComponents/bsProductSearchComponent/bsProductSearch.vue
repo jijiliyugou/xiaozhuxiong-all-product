@@ -58,7 +58,12 @@
         ></i>
       </div>
     </div>
-    <el-button type="warning" size="medium" @click="toShoppingCart">
+    <el-button
+      v-if="typeId != 1"
+      type="warning"
+      size="medium"
+      @click="toShoppingCart"
+    >
       <i class="whiteCart"></i>
       <span>购物车</span>
       <span>({{ shoppingList && shoppingList.length }})</span>
@@ -140,7 +145,7 @@ export default {
     ...mapGetters({
       shoppingList: "myShoppingList"
     }),
-    ...mapState(["searchHallCate"])
+    ...mapState(["searchHallCate", "typeId"])
   },
   beforeDestroy() {
     eventBus.$off("imgSearchChange");

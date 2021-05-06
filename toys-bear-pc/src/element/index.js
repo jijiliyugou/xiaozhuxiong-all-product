@@ -35,11 +35,14 @@ import {
   CarouselItem,
   Tag,
   Tooltip,
-  Badge
+  Link,
+  Badge,
+  InfiniteScroll
 } from "element-ui";
 const element = {
   install: function(Vue) {
     Vue.use(Button);
+    Vue.use(InfiniteScroll);
     Vue.use(Switch);
     Vue.use(Select);
     Vue.use(Option);
@@ -69,6 +72,7 @@ const element = {
     Vue.use(Tooltip);
     Vue.use(Col);
     Vue.use(Tag);
+    Vue.use(Link);
     Vue.use(Card);
     Vue.use(Carousel);
     Vue.use(CarouselItem);

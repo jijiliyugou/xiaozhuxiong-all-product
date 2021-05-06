@@ -13,6 +13,51 @@
         </el-button>
       </div>
     </div>
+    <!-- 搜索 -->
+    <div class="searchBox">
+      <div class="left">
+        <div class="item">
+          <span class="label">关键字：</span>
+          <el-input
+            v-focus
+            type="text"
+            size="medium"
+            clearable
+            v-model="keyword"
+            placeholder="请输入关键词"
+            @keyup.native.enter="search"
+          ></el-input>
+        </div>
+        <div class="item" v-if="userInfo.userInfo.isMain">
+          <span class="label">业务员：</span>
+          <el-select
+            v-model="staffId"
+            filterable
+            size="medium"
+            clearable
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in staffList"
+              :key="item.id"
+              :label="item.linkman"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
+        </div>
+        <div class="item">
+          <el-button
+            @click="search"
+            type="primary"
+            icon="el-icon-search"
+            size="medium"
+          >
+            搜索
+          </el-button>
+        </div>
+      </div>
+    </div>
     <!-- 表格 -->
     <div class="tableBox">
       <el-table
@@ -23,9 +68,9 @@
       >
         <el-table-column label="序号" type="index" align="center" width="70">
         </el-table-column>
-        <el-table-column prop="sort" label="排序" width="100"></el-table-column>
         <el-table-column prop="title" label="主题"></el-table-column>
         <el-table-column prop="content" label="内容"></el-table-column>
+        <el-table-column prop="staffName" label="业务员"></el-table-column>
         <el-table-column
           label="操作"
           header-align="center"
@@ -74,7 +119,7 @@
       :title="dialogTitle"
       :visible.sync="addLangDialog"
       v-if="addLangDialog"
-      width="50%"
+      width="800px"
     >
       <bsAddOfferFormulaLang
         :editRow="editRow"
@@ -88,6 +133,7 @@
 
 <script>
 import bsAddOfferFormulaLang from "@/components/bsComponents/bsPersonalManageComponent/bsAddOfferFormulaLang";
+import { mapState } from "vuex";
 export default {
   name: "bsPushSettings",
   components: {
@@ -95,6 +141,9 @@ export default {
   },
   data() {
     return {
+      keyword: null,
+      staffId: null,
+      staffList: [],
       currentRow: {},
       isEdit: false,
       editRow: {},
@@ -102,7 +151,7 @@ export default {
       addLangDialog: false,
       totalCount: 0,
       pageSize: 10,
-      currentPage: 10,
+      currentPage: 1,
       tableData: []
     };
   },
@@ -111,6 +160,7 @@ export default {
       const fd = {
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
+        staffId: this.staffId,
         keyword: this.keyword,
         startTime: this.dateTime && this.dateTime[0],
         endTime: this.dateTime && this.dateTime[1]
@@ -120,11 +170,26 @@ export default {
           delete fd[key];
         }
       }
-      const res = await this.$http.post("/api/PushSettings/ListByPage", { fd });
+      const res = await this.$http.post("/api/PushSettings/ListByPage", fd);
       if (res.data.result.code === 200) {
         this.tableData = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
       }
+    },
+    // 获取公司下的员工列表
+    async getStaffList() {
+      const res = await this.$http.post("/api/CompanyUserList", {
+        orgCompanyID: this.currentComparnyId
+      });
+      if (res.data.result.code === 200) {
+        this.staffList = res.data.result.item.personnels;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.getPushSettingsPage();
     },
     // 搜索
     search() {
@@ -204,17 +269,20 @@ export default {
         this.currentPage != 1
       )
         return false;
-      this.getCollectList();
+      this.getPushSettingsPage();
     },
     // 修改当前页
     handleCurrentChange(page) {
       this.currentPage = page;
-      this.getCollectList();
+      this.getPushSettingsPage();
     }
   },
   created() {},
   mounted() {
-    this.getPushSettingsPage();
+    this.getStaffList();
+  },
+  computed: {
+    ...mapState(["userInfo", "currentComparnyId"])
   }
 };
 </script>
@@ -235,7 +303,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    &::before {
+    .left::before {
       width: 4px;
       height: 14px;
       background-color: #3368a9;
@@ -254,6 +322,26 @@ export default {
         background: url("~@/assets/images/whiteCart.png") no-repeat center;
         background-size: contain;
         margin-right: 10px;
+      }
+    }
+  }
+  .searchBox {
+    height: 76px;
+    display: flex;
+    align-items: center;
+    .left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      .item {
+        display: flex;
+        align-items: center;
+        max-width: 290px;
+        margin-right: 20px;
+        .label {
+          width: 58px;
+          min-width: 58px;
+        }
       }
     }
   }
