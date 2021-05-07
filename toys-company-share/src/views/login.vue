@@ -5,7 +5,7 @@
       <div class="loginBox">
         <div class="title">
           <el-image :src="userLogo.companyLogo"></el-image>
-          <span class="titleText">{{ userLogo.companyName }}</span>
+          <span class="titleText">{{ currentLang.companyName }}</span>
         </div>
         <div class="minTitle">
           <el-image
@@ -53,6 +53,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   data() {
     return {
@@ -69,17 +70,7 @@ export default {
         verifyCode: [
           { required: true, message: "请输入邀请码", trigger: "blur" }
         ]
-      },
-      options: [
-        {
-          value: "zh-CN",
-          label: "中文"
-        },
-        {
-          value: "en",
-          label: "英文"
-        }
-      ]
+      }
     };
   },
   methods: {
@@ -105,7 +96,6 @@ export default {
     },
     // 获取公司logo和名字
     async getCompanyLogo() {
-      //  + location.href
       // 设置默认图片和文字
       this.userLogo = {
         companyLogo: require("@/assets/images/logo.png"),
@@ -115,7 +105,31 @@ export default {
         "/api/WebsiteShare/GetCompanyInfoOnLogin?url=" + location.href
       );
       const { code, data } = res.data.result;
-      if (code === 200) this.userLogo = data;
+      if (code === 200) {
+        this.userLogo = data;
+        this.$store.commit("initLangs", data.contactInfoList || []);
+        // 如果存在
+        if (data.contactInfoList) {
+          let currentLang = data.contactInfoList.find(
+            val => val.language == this.globalLang
+          );
+          // 如果上次的语言存在  用上次的
+          if (currentLang) {
+            this.$store.commit("handleCurrentLang", currentLang);
+          } else {
+            currentLang = data.contactInfoList.find(
+              val => val.language == "en"
+            );
+            // 有英文用英文
+            if (currentLang) {
+              this.$store.commit("handleCurrentLang", currentLang);
+            } else {
+              // 没有英文用第一个
+              this.$store.commit("handleCurrentLang", data.contactInfoList[0]);
+            }
+          }
+        }
+      }
     }
   },
   created() {
@@ -131,6 +145,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["globalLang", "currentLang", "langs"]),
     loginLang() {
       return this.$t("lang.login");
     }

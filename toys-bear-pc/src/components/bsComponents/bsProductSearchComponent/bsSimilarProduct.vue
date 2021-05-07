@@ -51,14 +51,14 @@
               <i class="infoIcon"></i>
               <span>在线咨询</span>
             </p>
-            <p class="infoItem" v-if="item.supplierTelePhoneNumber">
+            <p class="infoItem" v-if="item.supplierTelephoneNumber">
               <i class="telePhoneIcon"></i>
               <el-tooltip
                 effect="dark"
-                :content="item.supplierTelePhoneNumber"
+                :content="item.supplierTelephoneNumber"
                 placement="top"
               >
-                <span>{{ item.supplierTelePhoneNumber }}</span>
+                <span>{{ item.supplierTelephoneNumber }}</span>
               </el-tooltip>
             </p>
             <p class="infoItem" v-if="item.supplierPhone">

@@ -110,7 +110,7 @@
                     @click="getCode"
                     >获取验证码</span
                   >
-                  <span v-show="!show" @click="getCode" class="myCount"
+                  <span v-show="!show" class="myCount"
                     >{{ count }}s重新获取</span
                   >
                 </div>
@@ -132,111 +132,6 @@
         </div>
       </div>
     </div>
-    <!-- 旧版界面 -->
-    <!-- <div class="erweimaApp" @mouseenter="hoverLogo" @mouseleave="hoverIsLogo">
-      <img class="jiaerweima" :src="jiaerweima" alt="" />
-      <div class="saomaDiv" v-show="isActive">
-        <div class="saoma"></div>
-      </div>
-    </div>
-    <div class="top">
-      <div class="logo">
-        <img src="~@/assets/images/logo.png" alt="" />
-      </div>
-      <h3>欢迎登录小竹熊 云科技</h3>
-      <p>
-        <span class="topP">小竹熊 云科技后台订单处理系统</span>
-      </p>
-    </div>
-    <div class="loginFormBox">
-      <div class="formIten left">
-        <div class="leftBox">
-          <p class="title">
-            <span>二维码登录</span>
-          </p>
-          <div class="erweima">
-            <div class="erweimaBox">
-              <vue-qr
-                :text="options.url"
-                :logoSrc="options.icon + '?cache'"
-                colorDark="#018e37"
-                colorLight="#fff"
-                :margin="10"
-                :size="198"
-              ></vue-qr>
-              <div class="refresh" v-show="showQrCode">
-                <div class="refreshIcon" @click="getQrCodeUrl">
-                  <i class="el-icon-refresh"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="info">{{ qrcodeTitle }}</p>
-        </div>
-      </div>
-      <div class="formIten right">
-        <p class="title">
-          <span>验证码登录</span>
-        </p>
-        <div class="myForm">
-          <el-form :model="loginForm" ref="erpLoginRef" :rules="mobileRules">
-            <el-form-item prop="PhoneNumber">
-              <div class="myInputBox">
-                <i class="inputIcon mobile"></i>
-                <el-input
-                  v-model="loginForm.PhoneNumber"
-                  class="myInput"
-                  placeholder="请输入手机号码"
-                ></el-input>
-              </div>
-            </el-form-item>
-            <el-form-item prop="identifyCode">
-              <div class="getCode">
-                <div class="myInputBox">
-                  <i class="inputIcon idCode"></i>
-                  <el-input
-                    v-model="loginForm.identifyCode"
-                    class="verifycode myInput"
-                    placeholder="请输入验证码"
-                    @keyup.enter.native="toErpOrder"
-                    :disabled="
-                      loginForm.PhoneNumber.search(
-                        /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|8[0-9]|9[89])\d{8}$/
-                      ) === -1
-                    "
-                  ></el-input>
-                </div>
-                <span
-                  v-show="show"
-                  :style="{
-                    opacity:
-                      loginForm.PhoneNumber.search(
-                        /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|8[0-9]|9[89])\d{8}$/
-                      ) === -1
-                        ? 0.5
-                        : 1
-                  }"
-                  @click="getCode"
-                  >获取验证码</span
-                >
-                <span v-show="!show" class="count active"
-                  >{{ count }}s重新获取</span
-                >
-              </div>
-            </el-form-item>
-            <el-form-item>
-              <el-button
-                type="primary"
-                :class="{ loginBtn: true, active: !loginForm.identifyCode }"
-                :disabled="!loginForm.identifyCode"
-                @click="toErpOrder"
-                >登录</el-button
-              >
-            </el-form-item>
-          </el-form>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -397,8 +292,8 @@ export default {
         // 初始化weosocket
         // 测试
         // this.ws = new WebSocket(
-        //   'ws://139.9.71.135:8090/ws?UserId=' + this.randomCode
-        // )
+        //   "ws://139.9.71.135:8090/ws?UserId=" + this.randomCode
+        // );
         // 正式
         this.myWs = new WebSocket(
           "wss://impush.toysbear.com/ws?UserId=" + this.randomCode

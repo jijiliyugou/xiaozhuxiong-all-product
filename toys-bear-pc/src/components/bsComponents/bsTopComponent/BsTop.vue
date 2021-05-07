@@ -80,6 +80,7 @@
 
 <script>
 import { mapState } from "vuex";
+import eventBus from "@/assets/js/common/eventBus";
 export default {
   props: {
     isCollapse: {
@@ -141,6 +142,8 @@ export default {
     },
     // 注册全局点击事件
     globalEvent() {
+      // 好友名片弹框关闭
+      eventBus.$emit("handleDialogBusiness", false);
       //如果提供了事件对象，则这是一个非IE浏览器
       // if (e && e.stopPropagation)
       //   //因此它支持W3C的stopPropagation()方法

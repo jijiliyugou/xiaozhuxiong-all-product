@@ -1,14 +1,21 @@
 <template>
   <div class="footBox">
     <div class="footWrap">
-      <div class="item">
-        {{ userInfo.companyName }}
+      <div class="item" v-if="currentLang.companyName">
+        {{ currentLang.companyName }}
       </div>
       <div class="item">
-        Tel: {{ userInfo.companyTel }} Mobile:
-        {{ userInfo.companyPhoneNumber }} e-mail: {{ userInfo.companyEmail }}
+        <span v-if="currentLang.telephone">
+          Tel: {{ currentLang.telephone }}
+        </span>
+        <span v-if="currentLang.phoneNumber">
+          Mobile: {{ currentLang.phoneNumber }}
+        </span>
+        <span v-if="currentLang.email">e-mail: {{ currentLang.email }}</span>
       </div>
-      <div class="item">Address: {{ userInfo.companyAddress }}</div>
+      <div class="item" v-if="currentLang.contactAddress">
+        Address: {{ currentLang.contactAddress }}
+      </div>
     </div>
   </div>
 </template>
@@ -22,7 +29,7 @@ export default {
   methods: {},
   mounted() {},
   computed: {
-    ...mapState(["userInfo"])
+    ...mapState(["currentLang"])
   }
 };
 </script>
@@ -44,6 +51,9 @@ export default {
       margin-top: 10px;
       &:first-of-type {
         margin-top: 0;
+      }
+      span {
+        margin: 0 5px;
       }
     }
   }

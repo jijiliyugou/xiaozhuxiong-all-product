@@ -173,8 +173,8 @@
                   placeholder="请选择"
                 >
                   <el-option
-                    v-for="item in staffList"
-                    :key="item.id"
+                    v-for="(item, i) in staffList"
+                    :key="i"
                     :label="item.linkman"
                     :value="item.id"
                   >
@@ -517,7 +517,10 @@ export default {
         orgCompanyID: this.currentComparnyId
       });
       if (res.data.result.code === 200) {
-        this.staffList = res.data.result.item.personnels;
+        this.staffList = [
+          { id: null, linkman: "全部" },
+          ...res.data.result.item.personnels
+        ];
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,

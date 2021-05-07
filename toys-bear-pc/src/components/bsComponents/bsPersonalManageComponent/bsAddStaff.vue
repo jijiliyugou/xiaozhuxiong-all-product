@@ -109,7 +109,7 @@ export default {
         password: "",
         sex: 1,
         isMain: false,
-        enabled: false,
+        enabled: true,
         remark: "",
         birthday: "",
         userImage: "",

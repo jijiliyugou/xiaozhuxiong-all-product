@@ -815,9 +815,6 @@ export default {
         websiteInfoId: null,
         isCustomerInfo: true
       };
-      this.clienFormData.totalCost = 0;
-      this.clienFormData.url = null;
-      this.clienFormData.customerInfoId = null;
       this.dialogTitle = "新增站点";
       this.defaultFormula = JSON.stringify(this.customerTemplate[0]);
       this.$nextTick(() => {

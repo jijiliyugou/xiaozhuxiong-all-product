@@ -14,9 +14,9 @@
             <img :src="require('@/assets/images/logo.png')" />
           </div>
         </el-image>
-        <span class="leftTitleText">{{
-          userInfo && userInfo.companyName
-        }}</span>
+        <span class="leftTitleText">
+          {{ currentLang.companyName }}
+        </span>
       </div>
       <div class="right">
         <div class="myInput">
@@ -49,15 +49,15 @@
         <div class="langBox">
           <el-dropdown @command="handleCommand" trigger="click">
             <span class="el-dropdown-link">
-              {{ currentLang.name
-              }}<i class="el-icon-arrow-down el-icon--right"></i>
+              {{ language.label }}
+              <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item
                 :command="item"
-                v-for="(item, i) in langs"
-                :key="i"
-                >{{ item.name }}</el-dropdown-item
+                v-for="(item, index) in langList"
+                :key="index"
+                >{{ item.label }}</el-dropdown-item
               >
             </el-dropdown-menu>
           </el-dropdown>
@@ -199,12 +199,27 @@ export default {
     ...mapGetters({
       shoppingList: "myShoppingList"
     }),
-    ...mapState(["searchForm"]),
-    ...mapState(["userInfo"]),
-    ...mapState(["currentLang"])
+    ...mapState([
+      "searchForm",
+      "langs",
+      "userInfo",
+      "currentLang",
+      "globalLang"
+    ])
   },
   data() {
     return {
+      language: {},
+      langList: [
+        {
+          label: "简体中文",
+          value: "zh-CN"
+        },
+        {
+          label: "英文",
+          value: "en"
+        }
+      ],
       headers: {
         Authorization: "bearer " + this.$store.state.userInfo.token
       },
@@ -232,21 +247,11 @@ export default {
         centerBox: true, // 截图框是否被限制在图片里面
         infoTrue: false // true 为展示真实输出图片宽高 false 展示看到的截图框宽高
       },
-      activeIndex2: "1",
-      langs: [
-        {
-          name: "简体中文",
-          value: "zh-CN"
-        },
-        {
-          name: "English",
-          value: "en"
-        }
-      ]
+      activeIndex2: "1"
     };
   },
   mounted() {
-    this.initLang();
+    this.language = this.langList.find(val => val.value == this.globalLang);
   },
   methods: {
     // 打开按图找样
@@ -328,45 +333,30 @@ export default {
         this.$root.eventHub.$emit("resetProducts");
       else this.$router.push("/index/product?productType=1");
     },
-    // 初始化语言
-    initLang() {
-      switch (this.$store.state.globalLang) {
-        case "zh-CN":
-          // this.currentLang = {
-          //   name: "简体中文",
-          //   value: "zh-CN"
-          // };
-          this.$store.commit("handleCurrentLang", {
-            name: "简体中文",
-            value: "zh-CN"
-          });
-          break;
-        case "en":
-          // this.currentLang = {
-          //   name: "English",
-          //   value: "en"
-          // };
-          this.$store.commit("handleCurrentLang", {
-            name: "English",
-            value: "en"
-          });
-          break;
-        default:
-          // this.currentLang = {
-          //   name: "请选择语言"
-          // };
-          this.$store.commit("handleCurrentLang", {
-            name: "Please select language"
-          });
-          break;
-      }
-    },
     // 选择了语言
     handleCommand(lang) {
+      this.language = lang;
       this.$i18n.locale = lang.value;
-      console.log(lang);
-      this.$store.commit("handleCurrentLang", lang);
       this.$store.commit("setLang", lang.value);
+      // 如果存在
+      if (this.langs) {
+        let currentLang = this.langs.find(
+          val => val.language == this.globalLang
+        );
+        // 如果上次的语言存在  用上次的
+        if (currentLang) {
+          this.$store.commit("handleCurrentLang", currentLang);
+        } else {
+          currentLang = this.langs.find(val => val.language == "en");
+          // 有英文用英文
+          if (currentLang) {
+            this.$store.commit("handleCurrentLang", currentLang);
+          } else {
+            // 没有英文用第一个
+            this.$store.commit("handleCurrentLang", this.langs[0]);
+          }
+        }
+      }
     }
   }
 };

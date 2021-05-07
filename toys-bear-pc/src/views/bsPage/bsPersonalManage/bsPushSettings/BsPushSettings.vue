@@ -220,7 +220,7 @@ export default {
     },
     // 打开新增推送
     openAddLanguage() {
-      this.dialogTitle = "新增常用语";
+      this.dialogTitle = "新增消息模板";
       this.isEdit = false;
       this.addLangDialog = true;
     },
@@ -228,7 +228,7 @@ export default {
     openEdit(row) {
       this.currentRow = row;
       this.isEdit = true;
-      this.dialogTitle = "编辑常用语";
+      this.dialogTitle = "编辑消息模板";
       this.addLangDialog = true;
     },
     // 删除推送

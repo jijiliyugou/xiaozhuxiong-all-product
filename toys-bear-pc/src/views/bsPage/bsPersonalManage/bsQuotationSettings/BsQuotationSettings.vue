@@ -76,40 +76,29 @@
         <el-table-column label="序号" type="index" align="center" width="70">
         </el-table-column>
         <el-table-column label="模板名称" prop="name"> </el-table-column>
-        <el-table-column label="报价方式" prop="offerMethod" align="center">
+        <el-table-column
+          label="报价方式"
+          prop="offerMethod"
+          align="center"
+          show-overflow-tooltip
+        >
         </el-table-column>
         <el-table-column
           prop="cu_deName"
           label="币种"
-          width="100"
           align="center"
         ></el-table-column>
-        <el-table-column
-          prop="exchange"
-          label="汇率"
-          align="center"
-          width="100"
-        >
+        <el-table-column prop="exchange" label="汇率" align="center">
         </el-table-column>
         <el-table-column label="小数位数" prop="decimalPlaces" align="center">
         </el-table-column>
         <el-table-column prop="profit" label="利润率" align="center">
         </el-table-column>
-        <el-table-column
-          label="每车尺码"
-          prop="size"
-          align="center"
-          width="100"
-        >
+        <el-table-column label="每车尺码" prop="size" align="center">
         </el-table-column>
         <el-table-column label="取舍方式" prop="rejectionMethod" align="center">
         </el-table-column>
-        <el-table-column
-          label="价格小于"
-          prop="miniPrice"
-          align="center"
-          width="100"
-        >
+        <el-table-column label="价格小于" prop="miniPrice" align="center">
         </el-table-column>
         <el-table-column
           label="业务员"
@@ -129,12 +118,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="remark" label="备注"> </el-table-column>
-        <el-table-column
-          label="操作"
-          header-align="center"
-          align="center"
-          show-overflow-tooltip
-        >
+        <el-table-column label="操作" align="center" width="150">
           <template slot-scope="scope">
             <el-button type="primary" @click="openEdit(scope.row)" size="mini"
               >编辑</el-button

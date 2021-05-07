@@ -8,13 +8,15 @@
         <div class="item">
           <span class="label">关键字：</span>
           <el-input
-            v-focus
             type="text"
             size="medium"
             v-model="keyword"
             clearable
             placeholder="请输入关键词"
             @keyup.native.enter="search"
+            @focus="showHistoryModal(true)"
+            @blur="showHistoryModalY(false)"
+            @change="showHistoryModal(false)"
           ></el-input>
         </div>
         <div class="item">
@@ -27,6 +29,26 @@
             搜索
           </el-button>
         </div>
+      </div>
+      <div
+        class="history"
+        v-if="isShowHistoryPanel && searchHistoryList.length"
+      >
+        <ul class="history_list">
+          <li class="history_item del">
+            最近搜索
+            <div class="del_all" @click="historyDel">清空</div>
+          </li>
+          <template v-for="(item, index) in searchHistoryList">
+            <li
+              class="history_item"
+              @click="historySearch(item.value)"
+              :key="index"
+            >
+              {{ item.value }}
+            </li>
+          </template>
+        </ul>
       </div>
     </div>
 
@@ -119,7 +141,11 @@ export default {
       currentPage: 1,
       keyword: null,
       dateTime: null,
-      tableData: []
+      tableData: [],
+      myKeyword: "",
+      isShowHistoryPanel: false,
+      searchHistoryList: [],
+      vuex: {}
     };
   },
   methods: {
@@ -158,6 +184,27 @@ export default {
     },
     // 搜索
     search() {
+      var uid = this.vuex.userInfo.uid;
+      var id = {
+        value: this.keyword
+      };
+      var history = {};
+      localStorage.getItem("searchHistory")
+        ? (history = JSON.parse(localStorage.getItem("searchHistory")))
+        : (history = {});
+      if (history[uid + "_cs"] && history[uid + "_cs"].length != 0) {
+        history[uid + "_cs"].forEach((res, index) => {
+          res.value == id.value ? history[uid + "_cs"].splice(index, 1) : "";
+        });
+      } else {
+        history[uid + "_cs"] = [];
+      }
+      history[uid + "_cs"].unshift(id);
+      if (history[uid + "_cs"].length > 8) {
+        history[uid + "_cs"].splice(8, history[uid + "_cs"].length - 8);
+      }
+      localStorage.setItem("searchHistory", JSON.stringify(history));
+      this.showHistoryModal(false);
       this.currentPage = 1;
       this.getVendorListPage();
     },
@@ -175,9 +222,47 @@ export default {
     handleCurrentChange(page) {
       this.currentPage = page;
       this.getVendorListPage();
+    },
+    //是否显示历史搜索面板
+    showHistoryModal(value) {
+      if (value) {
+        var history = {};
+        var uid = this.vuex.userInfo.uid;
+        localStorage.getItem("searchHistory")
+          ? (history = JSON.parse(localStorage.getItem("searchHistory")))
+          : (history = {});
+        this.searchHistoryList = history[uid + "_cs"] || [];
+      }
+      this.isShowHistoryPanel = value;
+    },
+    showHistoryModalY(value) {
+      var me = this;
+      setTimeout(function() {
+        me.isShowHistoryPanel = value;
+      }, 500);
+    },
+    //点击历史搜索
+    historySearch(value) {
+      this.keyword = value;
+      this.search();
+    },
+    //搜索清空
+    historyDel() {
+      var uid = this.vuex.userInfo.uid;
+      var history = {};
+      localStorage.getItem("searchHistory")
+        ? (history = JSON.parse(localStorage.getItem("searchHistory")))
+        : (history = {});
+      if (history[uid + "_cs"] && history[uid + "_cs"].length != 0) {
+        history[uid + "_cs"] = [];
+        localStorage.setItem("searchHistory", JSON.stringify(history));
+        this.showHistoryModal(false);
+      }
     }
   },
-  created() {},
+  created() {
+    this.vuex = JSON.parse(sessionStorage.getItem("vuex"));
+  },
   mounted() {
     this.getVendorListPage();
   }
@@ -267,6 +352,44 @@ export default {
         .label {
           width: 58px;
           min-width: 58px;
+        }
+      }
+    }
+    .history {
+      position: absolute;
+      left: 77px;
+      transform-origin: center top;
+      z-index: 2037;
+      width: 315px;
+      margin: 5px 0;
+      box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+      border-radius: 4px;
+      border: 1px solid #e4e7ed;
+      box-sizing: border-box;
+      background-color: #fff;
+      top: 130px;
+      .history_list {
+        .history_item {
+          padding: 0 20px;
+          margin: 0;
+          line-height: 34px;
+          cursor: pointer;
+          color: #5e8ce8;
+          font-size: 14px;
+          list-style: none;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: #666666;
+        }
+        .del {
+          color: #333333;
+          .del_all {
+            float: right;
+          }
+        }
+        .history_item:hover {
+          background-color: #f9fafc;
         }
       }
     }

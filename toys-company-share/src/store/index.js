@@ -14,6 +14,7 @@ function myForEach(oList, yList) {
 }
 const store = new Vuex.Store({
   state: {
+    langs: [], // 语言列表
     imageSearchValue: null, // 图搜结果
     searchImgPreview: null, // 图搜预览
     screenWidth: 0,
@@ -47,6 +48,10 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
+    // 初始化语言列表
+    initLangs(state, payLoad) {
+      Vue.prototype.$set(state, "langs", payLoad);
+    },
     // 初始化搜索条件
     resetSearchProduct(state) {
       state.searchForm.keyword = ""; // 关键字

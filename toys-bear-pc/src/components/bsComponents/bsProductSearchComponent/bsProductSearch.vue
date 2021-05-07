@@ -6,34 +6,58 @@
         <el-tag effect="plain" @close="closeTag" closable v-if="searchHallCate">
           {{ searchHallCate.companyInfo.companyName }}
         </el-tag>
-        <el-input
-          v-focus
-          size="medium"
-          ref="focusKeyword"
-          @keyup.native.enter="searchProducts"
-          style="width: 340px; margin: 0 15px"
-          placeholder="输入关键词+空格可模糊搜索"
-          v-model="myKeyword"
-          clearable
-        >
-          <template slot="prefix">
-            <el-upload
-              :auto-upload="false"
-              ref="uploadRef"
-              accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
-              class="upload-demo"
-              action="/api/WebsiteShare/SearchProductsByPicture"
-              :show-file-list="false"
-              :on-change="openUpload"
-            >
-              <i class="iconXj"></i>
-              <!-- <i
-              style="font-size: 20px;"
-              class="el-input__icon el-icon-camera-solid"
-            ></i> -->
-            </el-upload>
-          </template>
-        </el-input>
+        <div class="history_box">
+          <el-input
+            size="medium"
+            ref="focusKeyword"
+            @keyup.native.enter="searchProducts"
+            style="width: 340px; margin: 0 15px"
+            placeholder="输入关键词+空格可模糊搜索"
+            v-model="myKeyword"
+            clearable
+            @focus="showHistoryModal(true)"
+            @blur="showHistoryModalY(false)"
+            @change="showHistoryModal(false)"
+          >
+            <template slot="prefix">
+              <el-upload
+                :auto-upload="false"
+                ref="uploadRef"
+                accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
+                class="upload-demo"
+                action="/api/WebsiteShare/SearchProductsByPicture"
+                :show-file-list="false"
+                :on-change="openUpload"
+              >
+                <i class="iconXj"></i>
+                <!-- <i
+                style="font-size: 20px;"
+                class="el-input__icon el-icon-camera-solid"
+              ></i> -->
+              </el-upload>
+            </template>
+          </el-input>
+          <div
+            class="history"
+            v-if="isShowHistoryPanel && searchHistoryList.length"
+          >
+            <ul class="history_list">
+              <li class="history_item del">
+                最近搜索
+                <div class="del_all" @click="historyDel">清空</div>
+              </li>
+              <template v-for="(item, index) in searchHistoryList">
+                <li
+                  class="history_item"
+                  @click="historySearch(item.value)"
+                  :key="index"
+                >
+                  {{ item.value }}
+                </li>
+              </template>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <el-button
@@ -80,7 +104,10 @@ export default {
     return {
       synthesis: false,
       advanced: true,
-      myKeyword: ""
+      myKeyword: "",
+      isShowHistoryPanel: false,
+      searchHistoryList: [],
+      vuex: {}
     };
   },
   watch: {
@@ -102,6 +129,27 @@ export default {
     },
     // 文本搜索产品
     searchProducts() {
+      var uid = this.vuex.userInfo.uid;
+      var id = {
+        value: this.myKeyword
+      };
+      var history = {};
+      localStorage.getItem("searchHistory")
+        ? (history = JSON.parse(localStorage.getItem("searchHistory")))
+        : (history = {});
+      if (history[uid + "_pr"] && history[uid + "_pr"].length != 0) {
+        history[uid + "_pr"].forEach((res, index) => {
+          res.value == id.value ? history[uid + "_pr"].splice(index, 1) : "";
+        });
+      } else {
+        history[uid + "_pr"] = [];
+      }
+      history[uid + "_pr"].unshift(id);
+      if (history[uid + "_pr"].length > 8) {
+        history[uid + "_pr"].splice(8, history[uid + "_pr"].length - 8);
+      }
+      localStorage.setItem("searchHistory", JSON.stringify(history));
+      this.showHistoryModal(false);
       eventBus.$emit("searchProducts");
       // const fd = {
       //   name: "/bsIndex/bsProductSearchIndex",
@@ -132,9 +180,48 @@ export default {
     advancedSearchProducts() {
       this.advanced = !this.advanced;
       this.$emit("screeningShow");
+    },
+    //是否显示历史搜索面板
+    showHistoryModal(value) {
+      if (value) {
+        var history = {};
+        var uid = this.vuex.userInfo.uid;
+        localStorage.getItem("searchHistory")
+          ? (history = JSON.parse(localStorage.getItem("searchHistory")))
+          : (history = {});
+        this.searchHistoryList = history[uid + "_pr"] || [];
+      }
+      this.isShowHistoryPanel = value;
+    },
+    showHistoryModalY(value) {
+      var me = this;
+      setTimeout(function() {
+        me.isShowHistoryPanel = value;
+      }, 500);
+    },
+    //点击历史搜索
+    historySearch(value) {
+      this.$emit("input", value);
+      this.myKeyword = value;
+      this.searchProducts();
+    },
+    //搜索清空
+    historyDel() {
+      var uid = this.vuex.userInfo.uid;
+      var history = {};
+      localStorage.getItem("searchHistory")
+        ? (history = JSON.parse(localStorage.getItem("searchHistory")))
+        : (history = {});
+      if (history[uid + "_pr"] && history[uid + "_pr"].length != 0) {
+        history[uid + "_pr"] = [];
+        localStorage.setItem("searchHistory", JSON.stringify(history));
+        this.showHistoryModal(false);
+      }
     }
   },
-  created() {},
+  created() {
+    this.vuex = JSON.parse(sessionStorage.getItem("vuex"));
+  },
   mounted() {
     eventBus.$on("imgSearchChange", () => {
       this.$refs.uploadRef.$children[0].$refs.input.click();
@@ -167,12 +254,54 @@ export default {
     align-items: center;
     .inputBox {
       margin-left: 5px;
+      display: flex;
       .el-tag {
         margin-left: 10px;
         height: 36px;
         line-height: 36px;
         vertical-align: top;
         box-sizing: border-box;
+      }
+      .history_box {
+        position: relative;
+        .history {
+          position: absolute;
+          // top: 50px;
+          left: 15px;
+          transform-origin: center top;
+          z-index: 2037;
+          width: 340px;
+          margin: 5px 0;
+          box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+          border-radius: 4px;
+          border: 1px solid #e4e7ed;
+          box-sizing: border-box;
+          background-color: #fff;
+          .history_list {
+            .history_item {
+              padding: 0 20px;
+              margin: 0;
+              line-height: 34px;
+              cursor: pointer;
+              color: #5e8ce8;
+              font-size: 14px;
+              list-style: none;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              color: #666666;
+            }
+            .del {
+              color: #333333;
+              .del_all {
+                float: right;
+              }
+            }
+            .history_item:hover {
+              background-color: #f9fafc;
+            }
+          }
+        }
       }
     }
     .advancedBox {

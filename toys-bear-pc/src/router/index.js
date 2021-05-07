@@ -127,6 +127,7 @@ export async function getMenuFuc() {
 // 拦截
 router.beforeEach(async (to, from, next) => {
   // 如果没有登录token
+  console.log(store.state.userInfo, "如果没有登录token");
   if (!store.state.userInfo) {
     const token = Vue.prototype.$cookies.get("userInfo");
     sessionStorage.clear();
@@ -200,7 +201,7 @@ router.beforeEach(async (to, from, next) => {
         store.commit("setToken", obj);
         store.commit("initShoppingCart", []);
       }
-      if (to.path == "/login") {
+      if (to.path == "/login" || to.path == "/loginConfirm") {
         next();
       } else {
         return next({ path: "/login" });
