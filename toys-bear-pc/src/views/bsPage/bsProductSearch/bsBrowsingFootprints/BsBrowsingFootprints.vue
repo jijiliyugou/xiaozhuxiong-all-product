@@ -101,7 +101,8 @@
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
-import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+// import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
 import { mapGetters } from "vuex";
 export default {
@@ -117,8 +118,8 @@ export default {
       totalCount: 0,
       pageSize: 48,
       currentPage: 1,
-      productList: [],
-      footprintArr: []
+      productList: []
+      //   footprintArr: [],
     };
   },
   computed: {
@@ -129,31 +130,6 @@ export default {
   watch: {
     shoppingList() {
       eventBus.$emit("upDateProductView");
-      //   if (list) {
-      //     if (list.length) {
-      //       for (let index = 0; index < this.productList.length; index++) {
-      //         for (let i = 0; i < this.productList[index].list.length; i++) {
-      //           for (let j = 0; j < list.length; j++) {
-      //             if (
-      //               this.productList[index].list[i].productNumber ==
-      //               list[j].productNumber
-      //             ) {
-      //               this.productList[index].list.isShopping = true;
-      //               break;
-      //             } else {
-      //               this.productList[index].list.isShopping = false;
-      //             }
-      //           }
-      //         }
-      //       }
-      //     } else {
-      //       for (let index = 0; index < this.productList.length; index++) {
-      //         this.productList[index].list.forEach(val => {
-      //           val.isShopping = false;
-      //         });
-      //       }
-      //     }
-      //   }
     }
   },
   methods: {
@@ -175,22 +151,25 @@ export default {
       if (code === 200) {
         if (this.shoppingList) {
           for (let i = 0; i < item.items.length; i++) {
+            this.$set(item.items[i], "isShopping", false);
             for (let j = 0; j < this.shoppingList.length; j++) {
               if (
                 item.items[i].productNumber ===
                 this.shoppingList[j].productNumber
-              )
-                item.items[i].isShopping = true;
+              ) {
+                this.$set(item.items[i], "isShopping", true);
+              }
             }
           }
         }
         // item.items.forEach(val => {
         //   this.footprintArr.push(val);
         // });
+        let footprintArr = [];
         for (let i = 0; i < item.items.length; i++) {
-          this.footprintArr.push(item.items[i]);
+          footprintArr.push(item.items[i]);
         }
-        this.dataResort(this.footprintArr);
+        this.dataResort(footprintArr);
         this.totalCount = res.data.result.item.totalCount;
       } else {
         this.totalCount = 0;
@@ -223,8 +202,11 @@ export default {
           newArr[index].list.push(item);
         }
       });
-
-      this.productList = newArr;
+      for (let i = 0; i < newArr.length; i++) {
+        this.$set(this.productList, i, newArr[i]);
+      }
+      //   this.productList = newArr;
+      console.log(this.productList);
       // return newArr;
     },
     // 清空浏览记录
@@ -241,7 +223,6 @@ export default {
             fd
           });
           if (res.data.result.code === 200) {
-            this.footprintArr = [];
             this.getCollectList();
             this.$common.handlerMsgState({
               msg: "清空成功",
@@ -269,7 +250,6 @@ export default {
       };
       const res = await this.$http.post("/api/DeleteProductRecord", fd);
       if (res.data.result.code === 200) {
-        this.footprintArr = [];
         this.getCollectList();
         this.$common.handlerMsgState({
           msg: "删除成功",
@@ -354,7 +334,7 @@ export default {
     });
     // 刷新页面
     eventBus.$on("refreshHtml", () => {
-      this.footprintArr = [];
+      //   this.footprintArr = [];
       this.getCollectList();
     });
 

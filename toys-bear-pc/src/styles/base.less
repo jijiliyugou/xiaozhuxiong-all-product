@@ -128,9 +128,25 @@ a:hover {
 		border-top: 1px solid #EBEEF5;
 		padding-top: 10px;
 		padding-bottom: 45px;
-		.el-message-box__message p{
-			color: #333;
-			font-size: 15px;
+		.el-message-box__container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			.el-message-box__status {
+				color: #FF9203;
+				position: static;
+				display: block;
+				transform: none;
+			}
+		}
+		.el-message-box__status+.el-message-box__message {
+			padding-left: 20px;
+		}
+		.el-message-box__message {
+			p{
+				color: #333;
+				font-size: 15px;
+			}
 		}
 	}
 	.el-message-box__btns{

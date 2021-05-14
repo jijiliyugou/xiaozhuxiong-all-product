@@ -219,6 +219,7 @@
     <el-dialog
       :title="dialogTitle"
       :visible.sync="addClienDialog"
+      v-if="addClienDialog"
       :close-on-click-modal="false"
       top="50px"
       width="800px"
@@ -287,6 +288,31 @@
             </el-option>
           </el-select>
         </el-form-item>
+        <!-- 选择语言 -->
+        <div class="selectLang">
+          <el-form-item label="语言选择：" prop="websiteLanguage">
+            <el-checkbox-group v-model="clienFormData.websiteLanguage">
+              <el-checkbox
+                v-for="item in langs"
+                :label="item.id"
+                :key="item.id"
+              >
+                {{ item.itemText }}
+              </el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item
+            label="客户提交订单，是否需填资料："
+            prop="isCustomerInfo"
+          >
+            <el-radio v-model="clienFormData.isCustomerInfo" :label="true"
+              >是</el-radio
+            >
+            <el-radio v-model="clienFormData.isCustomerInfo" :label="false"
+              >否</el-radio
+            >
+          </el-form-item>
+        </div>
         <el-form-item label="默认公式：">
           <el-select v-model="defaultFormula" placeholder="请选择">
             <el-option
@@ -466,17 +492,6 @@
           >
           </el-date-picker>
         </el-form-item>
-        <div class="isData">
-          <div class="label">
-            <span>客户提交订单，是否需填资料：</span>
-            <el-radio v-model="clienFormData.isCustomerInfo" :label="true"
-              >是</el-radio
-            >
-            <el-radio v-model="clienFormData.isCustomerInfo" :label="false"
-              >否</el-radio
-            >
-          </div>
-        </div>
         <center style="margin-top: 10px;">
           <template>
             <el-button type="primary" @click="subProcessingLog">确定</el-button>
@@ -559,6 +574,7 @@ export default {
   },
   data() {
     return {
+      langs: [],
       chufa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)/(1-报价利润%)/汇率",
       chengfa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)*(1+报价利润%)/汇率",
       dateTime: null,
@@ -594,8 +610,9 @@ export default {
       dialogTitle: "新增站点",
       defaultShareDomain: [],
       clienFormData: {
-        miniPrice: 0,
-        miniPriceDecimalPlaces: 0,
+        websiteLanguage: [],
+        miniPrice: 1,
+        miniPriceDecimalPlaces: 1,
         url: null,
         isExportExcel: false,
         profit: 0,
@@ -606,7 +623,7 @@ export default {
         currencyType: "¥",
         currencyTypeName: "RMB",
         totalCost: "0",
-        exchange: 0,
+        exchange: 1,
         size: "24",
         decimalPlaces: 3,
         rejectionMethod: "四舍五入",
@@ -622,13 +639,19 @@ export default {
         size: []
       },
       addRules: {
-        url: [{ required: true, message: "请输入站点域名", trigger: "blur" }],
+        websiteLanguage: [
+          { required: true, message: "请选择语言", trigger: "change" }
+        ],
+        isCustomerInfo: [
+          { required: true, message: "请选择是否提交资料", trigger: "change" }
+        ],
+        url: [{ required: true, message: "请选择站点域名", trigger: "change" }],
         isExportExcel: [
-          { required: true, message: "请输入站点域名", trigger: "change" }
+          { required: true, message: "请选择允许导出", trigger: "change" }
         ],
         profit: [{ required: true, message: "请输入利润率", trigger: "blur" }],
         customerInfoId: [
-          { required: true, message: "请选择客户", trigger: "blur" }
+          { required: true, message: "请选择客户", trigger: "change" }
         ],
         offerMethod: [
           { required: true, message: "请选择报价方式", trigger: "change" }
@@ -642,10 +665,10 @@ export default {
         exchange: [{ required: true, message: "请输入汇率", trigger: "blur" }],
         size: [{ required: true, message: "请选择尺寸", trigger: "change" }],
         decimalPlaces: [
-          { required: true, message: "请选择小数位数", trigger: "blur" }
+          { required: true, message: "请选择小数位数", trigger: "change" }
         ],
         rejectionMethod: [
-          { required: true, message: "请选择取舍方式", trigger: "blur" }
+          { required: true, message: "请选择取舍方式", trigger: "change" }
         ],
         miniPrice: [{ required: true, message: "请输入价格", trigger: "blur" }],
         miniPriceDecimalPlaces: [
@@ -695,6 +718,20 @@ export default {
         basisParameters: "CompanyProductOffer"
       });
       if (res.data.result.code === 200) this.options = res.data.result.item;
+      else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.getLanguageType();
+    },
+    // 获取系统配置语言列表
+    async getLanguageType() {
+      const res = await this.$http.post("/api/ServiceConfigurationList", {
+        basisParameters: "languageType"
+      });
+      if (res.data.result.code === 200) this.langs = res.data.result.item;
       else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -796,8 +833,9 @@ export default {
     // 打开新增分享
     openAddClien() {
       this.clienFormData = {
-        miniPrice: 0,
-        miniPriceDecimalPlaces: 0,
+        websiteLanguage: [],
+        miniPrice: 1,
+        miniPriceDecimalPlaces: 1,
         profitCalcMethod: 2,
         url: null,
         isExportExcel: false,
@@ -808,7 +846,7 @@ export default {
         currencyType: "¥",
         currencyTypeName: "RMB",
         totalCost: "0",
-        exchange: 0,
+        exchange: 1,
         size: "24",
         decimalPlaces: 3,
         rejectionMethod: "四舍五入",
@@ -838,29 +876,17 @@ export default {
     },
     // 打开编辑分享
     openEdit(row) {
-      //   this.clienFormData = {
-      //     miniPrice: 0,
-      //     miniPriceDecimalPlaces: 1,
-      //     url: null,
-      //     isExportExcel: false,
-      //     profit: 0,
-      //     expireTime: null,
-      //     customerInfoId: null,
-      //     offerMethod: "汕头",
-      //     currencyType: "¥",
-      //     currencyTypeName: "RMB",
-      //     totalCost: "0",
-      //     exchange: 0,
-      //     size: "24",
-      //     decimalPlaces: 3,
-      //     rejectionMethod: "四舍五入",
-      //     websiteInfoId: null,
-      //     isCustomerInfo: true
-      //   };
       this.defaultFormula = null;
       this.dialogTitle = "编辑站点";
       for (const key in row) {
         this.clienFormData[key] = row[key];
+      }
+      if (row.websiteLanguage) {
+        this.clienFormData.websiteLanguage = JSON.parse(
+          row.websiteLanguage
+        ).map(val => val.id);
+      } else {
+        this.clienFormData.websiteLanguage = [];
       }
       for (let i = 0; i < this.clientList.length; i++) {
         if (this.clientList[i].id == row.customerId) {
@@ -954,6 +980,16 @@ export default {
           if (this.dialogTitle === "编辑站点")
             url = "/api/UpdateWebsiteShareInfo";
           console.log(this.clienFormData);
+          const list = [];
+          for (let i = 0; i < this.clienFormData.websiteLanguage.length; i++) {
+            for (let j = 0; j < this.langs.length; j++) {
+              if (this.langs[j].id == this.clienFormData.websiteLanguage[i]) {
+                list.push(this.langs[j]);
+                break;
+              }
+            }
+          }
+          this.clienFormData.websiteLanguage = JSON.stringify(list);
           for (const key in this.clienFormData) {
             if (
               this.clienFormData[key] == "undefined" ||
@@ -1191,7 +1227,21 @@ export default {
     }
   }
 }
-.isData {
-  margin-left: 20px;
+@{deep} .selectLang {
+  display: flex;
+  .el-form-item {
+    flex: 1;
+    .el-checkbox-group {
+      width: 100%;
+    }
+    &:last-of-type {
+      .el-form-item__label {
+        width: 220px !important;
+      }
+      .el-form-item__content {
+        margin: 0 !important;
+      }
+    }
+  }
 }
 </style>

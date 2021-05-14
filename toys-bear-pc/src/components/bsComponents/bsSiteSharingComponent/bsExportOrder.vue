@@ -16,6 +16,9 @@
       <li :class="{ item: true, active: tp == 5 }" @click="checkTp(5)">
         宏升导入EXCEL模板
       </li>
+      <!-- <li :class="{ item: true, active: tp == 6 }" @click="checkTp(6)">
+        报出价不带厂商资料 (英文)
+      </li> -->
     </div>
     <div class="right">
       <div class="tp1" v-show="tp === 1">
@@ -281,6 +284,63 @@
           </div>
           <div class="label">
             <el-button type="warning" size="medium" @click="exportOrder(5)">
+              <i class="iconfont icon-daochujinruchukou"></i>
+              确定导出
+            </el-button>
+          </div>
+        </div>
+      </div>
+      <div class="tp1" v-show="tp === 6">
+        <div class="orderTitle">报出价不带厂商资料 (英文)</div>
+        <div class="imgBox">
+          <el-image
+            fit="contain"
+            class="myImg"
+            :src="require('@/assets/images/mode2.png')"
+          ></el-image>
+        </div>
+        <div class="selectTions">
+          <div class="label">
+            是否按厂商单独导出图片：
+            <!-- <el-radio-group class="myExportWay" v-model="imageExportWay">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="2">否</el-radio>
+            </el-radio-group> -->
+            <el-checkbox-group
+              class="myExportWay"
+              @change="changeCheckBox"
+              v-model="imageExportWay"
+            >
+              <el-checkbox :label="2">是</el-checkbox>
+              <el-checkbox :label="1">否</el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <div class="label">
+            是否带图：
+            <el-radio-group class="myExportWay" v-model="exportWay">
+              <el-radio :label="1">是</el-radio>
+              <el-radio :label="2">否</el-radio>
+            </el-radio-group>
+          </div>
+          <div class="label">
+            图片大小：
+            <el-select
+              size="medium"
+              style="width: 100px;"
+              v-model="imgSize"
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="(item, i) in imageSizeList"
+                :key="i"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+          </div>
+          <div class="label">
+            <el-button type="warning" size="medium" @click="exportOrder(6)">
               <i class="iconfont icon-daochujinruchukou"></i>
               确定导出
             </el-button>

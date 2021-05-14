@@ -43,7 +43,7 @@
                   :move="moveGonggaoImg"
                 >
                   <el-col
-                    :span="8"
+                    :span="6"
                     v-for="(value, i) in formData.fileList"
                     :key="i"
                   >
@@ -96,7 +96,7 @@
                   />
                 </div>
               </template>
-              <el-col class="imgsItemBox" :span="8">
+              <el-col class="imgsItemBox" :span="6">
                 <el-upload
                   action="#"
                   list-type="picture-card"
@@ -145,6 +145,19 @@
                 />
               </el-dialog>
             </div>
+            <!-- <div class="sendGonggaoBtn">
+              <el-button type="primary" class="sendBtn" @click="isSelectPush"
+                >发 布</el-button
+              >
+            </div> -->
+          </el-form-item>
+          <el-form-item label="是否广播" prop="isPush">
+            <el-radio-group v-model="formData.isPush">
+              <el-radio label="false">否</el-radio>
+              <el-radio label="true">是</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item>
             <div class="sendGonggaoBtn">
               <el-button type="primary" class="sendBtn" @click="isSelectPush"
                 >发 布</el-button
@@ -156,12 +169,12 @@
     </div>
     <!-- 选择公告推送人 -->
     <el-dialog
-      title="选择收信人"
+      title="选择广播对象"
       :visible.sync="selectPush"
       destroy-on-close
       append-to-body
-      width="800px"
-      top="50px"
+      width="700px"
+      top="70px"
     >
       <el-radio-group class="myRadios" v-model="radio" @change="changeRadios">
         <el-radio
@@ -173,7 +186,10 @@
               $store.state.userInfo.commparnyList[0].companyType === 'Sales'
           "
         >
-          <el-avatar :size="30" src=""></el-avatar>平台所有人
+          <div class="icon_box">
+            <i class="el-icon-s-custom"></i>
+          </div>
+          <span class="icon_box_text">平台所有人</span>
         </el-radio>
         <el-radio
           label="Sales"
@@ -181,7 +197,10 @@
             $store.state.userInfo.commparnyList[0].companyType === 'Supplier'
           "
         >
-          <el-avatar :size="30" src=""></el-avatar>所有公司联系人
+          <div class="icon_box_cs">
+            <i class="el-icon-s-custom"></i>
+          </div>
+          <span class="icon_box_text">所有公司</span>
         </el-radio>
         <el-radio
           label="Supplier"
@@ -191,7 +210,10 @@
               $store.state.userInfo.commparnyList[0].companyType === 'Sales'
           "
         >
-          <el-avatar :size="30" src=""></el-avatar>所有厂商联系人
+          <div class="icon_box_cs">
+            <i class="el-icon-s-home"></i>
+          </div>
+          <span class="icon_box_text">所有厂商</span>
         </el-radio>
       </el-radio-group>
       <div class="tongxunlu">
@@ -238,7 +260,8 @@ export default {
       formData: {
         type: null,
         content: null,
-        fileList: []
+        fileList: [],
+        isPush: "false"
       },
       rules: {
         type: [
@@ -246,6 +269,9 @@ export default {
         ],
         content: [
           { required: true, message: "请输入公告内容", trigger: "blur" }
+        ],
+        isPush: [
+          { required: true, message: "请选择是否广播", trigger: "change" }
         ]
       },
       type: "",
@@ -543,23 +569,37 @@ export default {
     isSelectPush() {
       this.$refs.refGonggao.validate(valid => {
         if (valid) {
-          this.$confirm("是否需要推送公告?", {
-            distinguishCancelAndClose: true,
-            cancelButtonText: "需要推送",
-            confirmButtonText: "不了，谢谢"
-          })
-            .then(() => {
-              this.sendGonggao();
-            })
-            .catch(action => {
-              if (action === "cancel") {
-                this.orgListCurrentPage = 1;
-                this.getOrgList(false);
-                this.radio = "";
-                this.checkUserList = [];
-                this.selectPush = true;
-              }
-            });
+          // this.$confirm("是否需要推送公告?", "提示", {
+          //   distinguishCancelAndClose: true,
+          //   cancelButtonText: "需要推送",
+          //   confirmButtonText: "不了，谢谢",
+          //   iconClass: "iconfont icon-laba2"
+          // })
+          //   .then(() => {
+          //     this.sendGonggao();
+          //   })
+          //   .catch(action => {
+          //     if (action === "cancel") {
+          //       this.$common.handlerMsgState({
+          //         msg: "敬请期待",
+          //         type: "warning"
+          //       });
+          //       // this.orgListCurrentPage = 1;
+          //       // this.getOrgList(false);
+          //       // this.radio = "";
+          //       // this.checkUserList = [];
+          //       // this.selectPush = true;
+          //     }
+          //   });
+          if (this.formData.isPush == "true") {
+            this.orgListCurrentPage = 1;
+            this.getOrgList(false);
+            this.radio = "";
+            this.checkUserList = [];
+            this.selectPush = true;
+          } else {
+            this.sendGonggao();
+          }
         }
       });
     }
@@ -613,10 +653,13 @@ export default {
       .syllable_ul {
         .el-col {
           margin-top: 5px;
+          width: 148px;
+          margin-right: 10px;
           box-sizing: border-box;
           .imgItemBox {
-            width: 100%;
+            width: 148px;
             box-sizing: border-box;
+            border: 1px solid #dcdfe6;
             height: 0;
             padding-bottom: 100%;
             position: relative;
@@ -688,9 +731,11 @@ export default {
     .sendGonggaoBtn {
       text-align: center;
       margin: 20px 0;
+      width: 264px;
+      margin-left: 143px;
       .sendBtn {
         width: 80%;
-        border-radius: 20px;
+        border-radius: 5px;
       }
     }
   }
@@ -748,7 +793,9 @@ export default {
   }
 }
 @{deep} .myRadios {
+  display: flex;
   .el-radio {
+    flex: 1;
     font-size: 30px;
     display: flex;
     align-items: center;
@@ -764,6 +811,35 @@ export default {
     .el-radio__inner {
       display: flex;
       align-items: center;
+    }
+    .icon_box {
+      opacity: 1;
+      background: #6b3bed;
+      border: 1px solid #6b3bed;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      font-size: 27px;
+    }
+    .icon_box_cs {
+      opacity: 1;
+      background: #ff6060;
+      border: 1px solid #ff6060;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      font-size: 27px;
+    }
+    .icon_box_text {
+      margin-left: 10px;
     }
   }
 }

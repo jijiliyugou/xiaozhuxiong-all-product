@@ -91,14 +91,14 @@
                     {{ scope.row.supplierName }}
                   </div>
                   <div class="icons">
-                    <el-tooltip
+                    <!-- <el-tooltip
                       class="item"
                       effect="dark"
                       :content="scope.row.supplierPhone || '暂时没有厂商电话'"
                       placement="top"
                     >
                       <div class="cartPhoneIcon"></div>
-                    </el-tooltip>
+                    </el-tooltip> -->
                     <div class="cartInfoIcon" @click="toNews(scope.row)"></div>
                   </div>
                 </div>
@@ -106,19 +106,19 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="资料来源">
+        <el-table-column label="联系厂商" prop="supplierPhone" align="center">
           <template slot-scope="scope">
-            <div
-              style="
-                width: 110px;
-                overflow: hidden;
-                max-width: 100px;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-              "
-            >
-              {{ scope.row.exhibitionName }}
+            <div v-if="scope.row.supplierPhone">
+              {{ scope.row.supplierPhone }}
             </div>
+            <div v-if="scope.row.supplierTelephoneNumber">
+              {{ scope.row.supplierTelephoneNumber }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="资料来源" show-overflow-tooltip>
+          <template slot-scope="scope">
+            {{ scope.row.exhibitionName }}
           </template>
         </el-table-column>
         <el-table-column prop="fa_no" label="出厂货号"></el-table-column>

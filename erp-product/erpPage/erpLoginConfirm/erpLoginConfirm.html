@@ -79,6 +79,7 @@
 <script>
   $(function () {
     var baseUrl = "https://www.toysbear.com";
+    // var baseUrl = "http://139.9.71.135:8081";
     var token = window.localStorage.getItem("token");
     var userList = JSON.parse(window.localStorage.getItem("userList"));
     var userId = JSON.parse(window.localStorage.getItem("userId"));
@@ -102,8 +103,13 @@
         }
       }).then(function (res) {
         if (res.result.isLogin) {
+            
+            window.localStorage.setItem("userInfoIsMain", res.result.userInfo.isMain);
+            window.localStorage.setItem("orgCompanyID", currentUser.commparnyId);
           window.localStorage.setItem("token", res.result.accessToken);
           window.location.href = 'https://www.toysbear.com/erpProduct/erpPage/erpOrder/erpOrder.html';
+
+        //   window.location.href = 'http://139.9.71.135:8080/erpProduct/erpPage/erpOrder/erpOrder.html';
         } else {
           alert(res.result.message);
         }
@@ -111,6 +117,9 @@
     })
     $(".toHome").click(function () {
       window.location.href = 'https://www.toysbear.com/erpProduct/erpPage/erpHome/erpHome.html';
+
+    //   window.location.href = 'http://139.9.71.135:8080/erpProduct/erpPage/erpHome/erpHome.html';
+      
     })
   })
 </script>

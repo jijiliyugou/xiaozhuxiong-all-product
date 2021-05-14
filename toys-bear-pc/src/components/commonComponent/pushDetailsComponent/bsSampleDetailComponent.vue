@@ -57,9 +57,9 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="资料来源" align="center">
+        <el-table-column label="资料来源" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
-            {{ scope.row.supplierName }}
+            {{ scope.row.exhibitionName }}
           </template>
         </el-table-column>
         <el-table-column

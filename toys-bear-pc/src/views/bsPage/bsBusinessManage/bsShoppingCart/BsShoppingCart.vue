@@ -47,14 +47,14 @@
                     {{ scope.row.supplierName }}
                   </div>
                   <div class="icons">
-                    <el-tooltip
+                    <!-- <el-tooltip
                       class="item"
                       effect="dark"
                       :content="scope.row.supplierPhone || '暂时没有厂商电话'"
                       placement="top"
                     >
                       <div class="cartPhoneIcon"></div>
-                    </el-tooltip>
+                    </el-tooltip> -->
                     <div class="cartInfoIcon" @click="toNews(scope.row)"></div>
                   </div>
                 </div>
@@ -62,18 +62,24 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="资料来源" min-width="80">
+        <el-table-column align="center" label="联系厂商">
           <template slot-scope="scope">
-            <div
-              style="
-                overflow: hidden;
-                width: 80px;
-                white-space: nowrap;
-                text-overflow: ellipsis;
-              "
-            >
-              {{ scope.row.exhibitionName }}
+            <div v-if="scope.row.supplierPhone">
+              {{ scope.row.supplierPhone }}
             </div>
+            <div v-if="scope.row.supplierTelephoneNumber">
+              {{ scope.row.supplierTelephoneNumber }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          align="center"
+          label="资料来源"
+          min-width="80"
+          show-overflow-tooltip
+        >
+          <template slot-scope="scope">
+            {{ scope.row.exhibitionName }}
           </template>
         </el-table-column>
         <el-table-column
@@ -84,7 +90,12 @@
         ></el-table-column>
         <el-table-column width="60" align="center" prop="ch_pa" label="包装">
         </el-table-column>
-        <el-table-column align="center" label="产品规格" min-width="100">
+        <el-table-column
+          align="center"
+          label="产品规格"
+          min-width="100"
+          show-overflow-tooltip
+        >
           <template slot-scope="scope">
             <span>
               {{ scope.row.pr_le }}x{{ scope.row.pr_wi }}x{{
@@ -93,7 +104,12 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="包装规格" min-width="130">
+        <el-table-column
+          align="center"
+          label="包装规格"
+          min-width="100"
+          show-overflow-tooltip
+        >
           <template slot-scope="scope">
             <span>
               {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
@@ -102,7 +118,12 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="外箱规格" min-width="130">
+        <el-table-column
+          align="center"
+          label="外箱规格"
+          min-width="100"
+          show-overflow-tooltip
+        >
           <template slot-scope="scope">
             <span>
               {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -111,19 +132,24 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="体积/材积" min-width="130">
+        <el-table-column
+          align="center"
+          label="体积/材积"
+          min-width="100"
+          show-overflow-tooltip
+        >
           <template slot-scope="scope">
             <span>
               {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
             </span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="毛重/净重">
+        <el-table-column align="center" label="毛重/净重" show-overflow-tooltip>
           <template slot-scope="scope">
             <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="装箱量">
+        <el-table-column align="center" label="装箱量" show-overflow-tooltip>
           <template slot-scope="scope">
             <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
           </template>
@@ -140,7 +166,12 @@
             />
           </template>
         </el-table-column>
-        <el-table-column align="center" label="总数量" min-width="60">
+        <el-table-column
+          align="center"
+          label="总数量"
+          min-width="60"
+          show-overflow-tooltip
+        >
           <template slot-scope="scope">
             <span>
               {{ multiply(scope.row.ou_lo, scope.row.shoppingCount) }}

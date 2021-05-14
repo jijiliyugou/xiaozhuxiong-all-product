@@ -119,6 +119,19 @@
                 <div class="item-desc">
                   <em>{{ item.bearNotice.notice }}</em>
                 </div>
+                <div
+                  class="linkNotice"
+                  v-if="item.bearNotice.noticeType === 'Product'"
+                >
+                  <el-link
+                    type="info"
+                    :href="item.bearNotice.urlLink"
+                    target="_blank"
+                  >
+                    {{ item.bearNotice.urlLink }}
+                    <!-- <i class="el-icon-document-copy"></i> -->
+                  </el-link>
+                </div>
                 <div class="item-content">
                   <div class="imgComtent" v-if="item.video">
                     <div class="demo1-video">
@@ -216,52 +229,54 @@
                     "
                   >
                     <div
-                      :class="{
-                        userItem: val.interactionType == 'Comment'
-                      }"
+                      class="userItem"
                       v-for="(val, i) in item.noticeInteraction"
                       :key="i"
                     >
-                      <template v-if="val.interactionType == 'Comment'">
-                        <div class="left">
-                          <el-avatar
-                            style="background-color: #e4efff"
-                            :size="40"
-                            :src="val.userImage"
+                      <div class="left">
+                        <el-avatar
+                          style="background-color: #e4efff"
+                          :size="40"
+                          :src="val.userImage"
+                        >
+                          <p class="errText">{{ val.userName }}</p>
+                        </el-avatar>
+                      </div>
+                      <div class="nameAndDate">
+                        <div class="nameBox">
+                          <span class="name">{{ val.userName }}</span>
+                          <span
+                            class="toName"
+                            v-if="val.interactionType !== 'Comment'"
                           >
-                            <p class="errText">{{ val.userName }}</p>
-                          </el-avatar>
-                        </div>
-                        <div class="nameAndDate">
-                          <div class="nameBox">
-                            <span class="name">{{ val.userName }}</span>
-                            <span class="comment">
-                              {{ val.comment }}
-                            </span>
-                          </div>
-                          <div class="date">
-                            {{ myDateDiff(val.createdOn) }}
-                          </div>
-                        </div>
-                      </template>
-                      <template v-else>
-                        <div class="huifuWrapBox">
-                          <span class="myName">{{ val.userName }}:</span>
-                          <span class="toName">
                             @{{ val.replyToUserName }}
                           </span>
-                          <span class="content">{{ val.comment }}</span>
+                          <span class="comment">
+                            {{ val.comment }}
+                          </span>
                         </div>
-                      </template>
+                        <div class="date">
+                          {{ myDateDiff(val.createdOn) }}
+                        </div>
+                      </div>
                       <div
                         class="right"
-                        v-show="val.createdBy != userInfo.userInfo.id"
+                        v-if="val.createdBy === userInfo.userInfo.id"
+                        @click="
+                          handlerDeleteNotice(val, item.noticeInteraction)
+                        "
+                      >
+                        删除
+                      </div>
+                      <div
+                        class="right"
+                        v-show="
+                          val.interactionType == 'Comment' &&
+                            val.createdBy != userInfo.userInfo.id
+                        "
                         @click="openHuiPinglun(item, val)"
                       >
-                        <div
-                          class="huifu"
-                          v-if="val.interactionType == 'Comment'"
-                        >
+                        <div class="huifu">
                           回复
                         </div>
                       </div>
@@ -269,7 +284,7 @@
                     <div class="userItem"></div>
                   </div>
                   <div
-                    class="pinglunInput"
+                    class="pinglunqu"
                     v-if="item.isHuiPinglun || item.isPinglun"
                   >
                     <!-- 回复 -->
@@ -351,7 +366,7 @@
       title="发布公告"
       :visible.sync="sendNoticeDialog"
       v-if="sendNoticeDialog"
-      width="1200px"
+      width="800px"
     >
       <bsSendNotice @close="closeSendNotice" />
     </el-dialog>
@@ -403,6 +418,50 @@ export default {
     };
   },
   methods: {
+    // 删除评论 | 删除回复
+    handlerDeleteNotice(item, list) {
+      // /api/DeleteNoticeInteractive
+      this.$confirm("确定要删除吗?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const res = await this.$http.post("/api/DeleteNoticeInteractive", {
+            id: item.id
+          });
+          if (res.data.result.code === 200) {
+            this.$common.handlerMsgState({
+              msg: "删除成功",
+              type: "success"
+            });
+            if (item.interactionType === "Comment") {
+              for (let i = 0; i < list.length; i++) {
+                if (list[i].commentId === item.id) {
+                  list.splice(i, 1);
+                  i--;
+                }
+              }
+            }
+            for (let i = 0; i < list.length; i++) {
+              if (item.id == list[i].id) {
+                list.splice(i, 1);
+              }
+            }
+          } else {
+            this.$common.handlerMsgState({
+              msg: res.data.result.msg,
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "取消删除",
+            type: "warning"
+          });
+        });
+    },
+    // 回到顶部
     scrollEvent(val) {
       val.scrollTop = 0;
     },
@@ -482,7 +541,7 @@ export default {
         })
         .catch(() => {
           this.$common.handlerMsgState({
-            msg: "已取消删除",
+            msg: "取消删除",
             type: "warning"
           });
         });
@@ -729,6 +788,7 @@ export default {
         });
         item.noticeInteraction.push({
           userImage: this.userInfo.userInfo.userImage,
+          id: res.data.result.item.id,
           userName: this.userInfo.userInfo.linkman,
           interactionType: "Comment",
           comment: this.pinglunValue,
@@ -742,17 +802,20 @@ export default {
     // 回复评论
     async subHuiPinglun(item) {
       let fd = {
+        userImage: this.userInfo.userInfo.userImage,
         noticeNumber: item.bearNotice.noticeNumber,
         userName: this.userInfo.userInfo.linkman,
         interactionType: "Reply",
-        replyCompanyID: this.huifuUser.companyID,
+        replyCompanyID: this.currentComparnyId,
         replyToUser: this.huifuUser.createdBy,
         replyToUserName: this.huifuUser.userName,
+        createdBy: this.userInfo.userInfo.id,
         commentId: this.huifuUser.id,
         comment: this.pinglunValue
       };
       const res = await this.$http.post("/api/CreateNoticeInteraction", fd);
       if (res.data.result.code === 200) {
+        fd.id = res.data.result.item.id;
         item.noticeInteraction.push(fd);
         this.$common.handlerMsgState({
           msg: "回复成功",
@@ -781,7 +844,7 @@ export default {
         }
         setTimeout(() => {
           this.canClick = true;
-        }, 1000);
+        }, 500);
       } else {
         this.$common.handlerMsgState({
           msg: "操作过于频繁",
@@ -799,8 +862,11 @@ export default {
         case "Supply":
           msg = "供应公告";
           break;
-        default:
+        case "Ordinary":
           msg = "普通公告";
+          break;
+        default:
+          msg = "";
           break;
       }
       return msg;
@@ -894,7 +960,6 @@ export default {
   width: 100%;
   min-height: 100%;
   height: 100%;
-  padding: 10px;
   position: relative;
   box-sizing: border-box;
   .returnTop {
@@ -973,16 +1038,15 @@ export default {
     }
   }
   .noticeContent {
-    height: calc(100% - 85px);
-    width: 1660px;
-    min-width: 1660;
+    // height: calc(100% - 65px);
+    height: 100%;
+    width: 100%;
+    min-width: 1600;
     position: relative;
     overflow: hidden;
-    padding-right: 20px;
-    padding-bottom: 20px;
     border-radius: 4px;
     .vue-waterfall {
-      width: 1640px;
+      width: 100%;
       &::-webkit-scrollbar {
         // 谷歌隐藏滚动条
         display: none;
@@ -998,6 +1062,10 @@ export default {
         font-weight: 400;
         color: #333333;
         word-wrap: break-word;
+      }
+      .linkNotice {
+        margin-top: 10px;
+        word-break: break-all;
       }
       .item-content {
         padding: 16px 0;
@@ -1157,7 +1225,10 @@ export default {
                 line-height: 22px;
                 .name {
                   color: #3368a9;
-                  margin-right: 10px;
+                }
+                .toName {
+                  margin: 0 5px;
+                  color: #9da1a7;
                 }
               }
             }
@@ -1182,11 +1253,23 @@ export default {
             padding-top: 10px;
             padding-bottom: 10px;
             line-height: 10px;
-            .myName {
-              color: #3368a9;
+            display: flex;
+            .left {
+              flex: 1;
+              line-height: 18px;
+              .myName {
+                color: #3368a9;
+              }
+              .toName {
+                margin: 0 10px;
+              }
             }
-            .toName {
-              margin: 0 10px;
+            .right {
+              width: 30px;
+              font-size: 12px;
+              text-align: center;
+              color: #3368a9;
+              cursor: pointer;
             }
           }
         }
@@ -1212,10 +1295,14 @@ export default {
       }
     }
     .cell-item-box {
-      width: 540px;
+      // width: 540px;
+      width: 100%;
       min-width: 540px;
       margin-bottom: 20px;
       border-radius: 6px;
+      width: 100% !important;
+      padding-right: 20px;
+      box-sizing: border-box;
       //   overflow: hidden;
       box-sizing: border-box;
     }
@@ -1224,8 +1311,9 @@ export default {
       border-radius: 4px;
       box-sizing: border-box;
       padding: 20px;
-      width: 520px;
+      // width: 520px;
       min-width: 520px;
+      width: 100%;
       .item-top {
         height: 60px;
         display: flex;
@@ -1386,8 +1474,7 @@ export default {
     }
   }
 }
-@{deep} .el-input-group__append,
-@{deep} .el-input-group__prepend {
+@{deep} .el-input-group__append {
   background-color: #3368a9;
   color: #fff;
 }

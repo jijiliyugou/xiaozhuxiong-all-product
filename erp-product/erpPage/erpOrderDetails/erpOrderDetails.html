@@ -222,7 +222,8 @@
 
 </html>
 <script>
-  var url = "https://www.toysbear.com"
+  var baseUrl = "https://www.toysbear.com"
+//   var baseUrl = "http://139.9.71.135:8081";
   var orderNumber = window.localStorage.getItem("orderNumber")
   var userToken = window.localStorage.getItem("token")
   var orderType = window.localStorage.getItem("orderType")
@@ -335,7 +336,7 @@
   function getSampleOrderDetailPageThree() {
     $.ajax({
       type: "post",
-      url: url + "/api/SampleOrderDetailPageThree",
+      url: baseUrl + "/api/SampleOrderDetailPageThree",
       data: JSON.stringify(data),
       headers: {
         "Utoken": userToken//此处放置请求到的用户token
@@ -443,13 +444,19 @@
   function signOut() {
     window.localStorage.clear()
     window.location.href = "https://www.toysbear.com/erpProduct/erpPage/erpLogin/erpLogin.html"
+
+    // window.location.href = "http://139.9.71.135:8080/erpProduct/erpPage/erpLogin/erpLogin.html"
   }
   // 返回
   function fanhui() {
     window.location.href = "https://www.toysbear.com/erpProduct/erpPage/erpOrder/erpOrder.html"
+
+    // window.location.href = "http://139.9.71.135:8080/erpProduct/erpPage/erpOrder/erpOrder.html"
   }
   function toHome() {
     window.location.href = "https://www.toysbear.com/erpProduct/erpPage/erpHome/erpHome.html"
+
+    // window.location.href = "http://139.9.71.135:8080/erpProduct/erpPage/erpHome/erpHome.html"
   }
   // 选中是否导出事件
   function changeCheckBox(e) {

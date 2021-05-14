@@ -14,6 +14,7 @@ function myForEach(oList, yList) {
 }
 const store = new Vuex.Store({
   state: {
+    langList: null, // 下拉语言列表
     langs: [], // 语言列表
     imageSearchValue: null, // 图搜结果
     searchImgPreview: null, // 图搜预览
@@ -84,6 +85,9 @@ const store = new Vuex.Store({
     handlerSearchDate(state, payLoad) {
       state.searchForm.startTime = payLoad.startTime;
       state.searchForm.endTime = payLoad.endTime;
+    },
+    localLangs(state, payLoad) {
+      state.langList = payLoad;
     },
     setLang(state, payLoad) {
       state.globalLang = payLoad;

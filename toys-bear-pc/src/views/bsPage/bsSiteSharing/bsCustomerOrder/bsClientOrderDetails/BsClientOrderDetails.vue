@@ -66,7 +66,7 @@
       >
         <el-table-column label="序号" type="index" align="center" width="50">
         </el-table-column>
-        <el-table-column label="产品" width="300">
+        <el-table-column label="产品" width="220">
           <template slot-scope="scope">
             <div class="imgBox">
               <el-image
@@ -91,18 +91,28 @@
                     {{ scope.row.supplierName }}
                   </div>
                   <div class="icons">
-                    <el-tooltip
+                    <!-- <el-tooltip
                       class="item"
                       effect="dark"
                       :content="scope.row.supplierPhone || '暂时没有厂商电话'"
                       placement="top"
                     >
                       <div class="cartPhoneIcon"></div>
-                    </el-tooltip>
+                    </el-tooltip> -->
                     <div class="cartInfoIcon" @click="toNews(scope.row)"></div>
                   </div>
                 </div>
               </div>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="联系厂商" prop="supplierPhone" align="center">
+          <template slot-scope="scope">
+            <div v-if="scope.row.supplierPhone">
+              {{ scope.row.supplierPhone }}
+            </div>
+            <div v-if="scope.row.supplierTelephoneNumber">
+              {{ scope.row.supplierTelephoneNumber }}
             </div>
           </template>
         </el-table-column>
@@ -632,14 +642,14 @@ export default {
           cursor: pointer;
         }
         .productName {
-          width: 190px;
+          width: 120px;
           height: 60px;
           margin-left: 15px;
           .name,
           .factory {
-            width: 190px;
+            width: 120px;
             cursor: pointer;
-            max-width: 190px;
+            max-width: 120px;
             overflow: hidden; /*超出部分隐藏*/
             white-space: nowrap; /*不换行*/
             text-overflow: ellipsis; /*超出部分文字以...显示*/

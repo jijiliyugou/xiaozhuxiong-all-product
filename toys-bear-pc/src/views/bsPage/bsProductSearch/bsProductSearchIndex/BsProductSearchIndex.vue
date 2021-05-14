@@ -382,7 +382,12 @@
               </div>
             </div>
           </div>
-          <div class="productListBox">
+          <div
+            class="productListBox"
+            :style="
+              isGrid === 'bsColumnComponent' ? ' padding:0' : ' padding:0 20px'
+            "
+          >
             <!-- 产品列表 -->
             <component :is="isGrid" :productList="productList"></component>
             <!-- 分页 -->
@@ -750,7 +755,7 @@
                 @click="handerIsGrid('bsColumnComponent')"
               ></div>
               <div class="line"></div>
-              <div class="totalCount" style="margin-right: 20px;">
+              <div class="totalCount" style="margin-right: 20px">
                 <span>共</span>
                 <span class="totalCountText">{{ totalCount }}</span>
                 <span>条数据</span>
@@ -766,7 +771,12 @@
               </div> -->
             </div>
           </div>
-          <div class="picProductListBox">
+          <div
+            class="picProductListBox"
+            :style="
+              isGrid === 'bsColumnComponent' ? ' padding:0' : ' padding:0 20px'
+            "
+          >
             <!-- 产品列表 -->
             <component
               :is="isGrid"
@@ -841,8 +851,9 @@
 
 <script>
 import bsProductSearch from "@/components/bsComponents/bsProductSearchComponent/bsProductSearch";
-import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+// import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
+import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import eventBus from "@/assets/js/common/eventBus";
 import { mapGetters, mapState } from "vuex";
 import { VueCropper } from "vue-cropper";
@@ -952,7 +963,7 @@ export default {
     },
     // 确定裁剪图片
     onCubeImg() {
-      this.isGrid = "bsColumnComponent";
+      this.isGrid = "bsGridComponent";
       this.loading = true;
       let startDate = Date.now();
       // 获取cropper的截图的base64 数据
@@ -986,6 +997,17 @@ export default {
             let endDate = Date.now();
             this.searchHttpTime = (endDate - startDate) / 1000;
             this.$store.commit("searchValues", res.data.result.object);
+            const items = res.data.result.object;
+            for (let i = 0; i < items.length; i++) {
+              this.$set(items[i], "isShopping", false);
+              for (let j = 0; j < this.shoppingList.length; j++) {
+                if (
+                  items[i].productNumber === this.shoppingList[j].productNumber
+                ) {
+                  this.$set(items[i], "isShopping", true);
+                }
+              }
+            }
             this.productList = res.data.result.object;
             this.totalCount = res.data.result.object.length;
             this.cropperCancel();
@@ -1191,33 +1213,30 @@ export default {
         if (fd[key] === null || fd[key] === undefined || fd[key] === "")
           delete fd[key];
       }
-      console.log(fd);
       const res = await this.$http.post("/api/SearchBearProductPage", fd);
       const { code, item, msg } = res.data.result;
       if (code === 200) {
-        console.log(this.shoppingList);
         if (this.typeId === 1) {
-          if (this.offerProductList) {
-            for (let i = 0; i < item.items.length; i++) {
-              for (let j = 0; j < this.offerProductList.length; j++) {
-                if (
-                  item.items[i].productNumber ===
-                  this.offerProductList[j].productNumber
-                ) {
-                  item.items[i].isShoppingUpdate = true;
-                }
+          for (let i = 0; i < item.items.length; i++) {
+            this.$set(item.items[i], "isShoppingUpdate", false);
+            for (let j = 0; j < this.offerProductList.length; j++) {
+              if (
+                item.items[i].productNumber ===
+                this.offerProductList[j].productNumber
+              ) {
+                this.$set(item.items[i], "isShoppingUpdate", true);
               }
             }
           }
         } else {
-          if (this.shoppingList) {
-            for (let i = 0; i < item.items.length; i++) {
-              for (let j = 0; j < this.shoppingList.length; j++) {
-                if (
-                  item.items[i].productNumber ===
-                  this.shoppingList[j].productNumber
-                )
-                  item.items[i].isShopping = true;
+          for (let i = 0; i < item.items.length; i++) {
+            this.$set(item.items[i], "isShopping", false);
+            for (let j = 0; j < this.shoppingList.length; j++) {
+              if (
+                item.items[i].productNumber ===
+                this.shoppingList[j].productNumber
+              ) {
+                this.$set(item.items[i], "isShopping", true);
               }
             }
           }
@@ -1431,10 +1450,12 @@ export default {
           for (let i = 0; i < this.productList.length; i++) {
             for (let j = 0; j < item.length; j++) {
               if (this.productList[i].productNumber == item[j].productNumber) {
-                this.productList[i].isShopping = true;
+                this.$set(this.productList[i], "isShopping", true);
+                // this.productList[i].isShopping = true;
                 break;
               } else {
-                this.productList[i].isShopping = false;
+                this.$set(this.productList[i], "isShopping", false);
+                // this.productList[i].isShopping = false;
               }
             }
           }
@@ -1520,25 +1541,6 @@ export default {
     shoppingList: {
       deep: true,
       handler() {
-        // if (list) {
-        //   if (list.length) {
-        //     for (let i = 0; i < this.productList.length; i++) {
-        //       for (let j = 0; j < list.length; j++) {
-        //         if (
-        //           this.productList[i].productNumber == list[j].productNumber
-        //         ) {
-        //           this.productList[i].isShopping = true;
-        //           break;
-        //         } else {
-        //           this.productList[i].isShopping = false;
-        //         }
-        //       }
-        //     }
-        //   } else {
-        //     this.productList.forEach(val => {
-        //       val.isShopping = false;
-        //     });
-        //   }
         eventBus.$emit("upDateProductView");
       }
     },

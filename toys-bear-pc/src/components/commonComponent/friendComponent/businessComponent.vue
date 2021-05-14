@@ -1,6 +1,6 @@
 <!--  -->
 <template>
-  <div class="businessComponent">
+  <div class="businessComponent" @click.stop>
     <div class="header">
       <!-- <img  style="width: 50px; height: 50px; border-radius: 50%; z-index:99" :src="userData.userImage" alt=""> -->
       <el-image
@@ -76,9 +76,7 @@ export default {
     };
   },
   //生命周期 - 创建完成（访问当前this实例）
-  created() {
-    console.log(this.userData);
-  },
+  created() {},
   //生命周期 - 挂载完成（访问DOM元素）
   mounted() {},
   methods: {
@@ -95,6 +93,7 @@ export default {
 <style scoped lang="less">
 @deep: ~">>>";
 .businessComponent {
+  cursor: default;
   width: 300px;
   height: 410px;
   background: #ffffff;

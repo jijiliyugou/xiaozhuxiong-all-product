@@ -49,15 +49,15 @@
         <div class="langBox">
           <el-dropdown @command="handleCommand" trigger="click">
             <span class="el-dropdown-link">
-              {{ language.label }}
+              {{ language.itemText }}
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item
                 :command="item"
-                v-for="(item, index) in langList"
-                :key="index"
-                >{{ item.label }}</el-dropdown-item
+                v-for="item in langList"
+                :key="item.id"
+                >{{ item.itemText }}</el-dropdown-item
               >
             </el-dropdown-menu>
           </el-dropdown>
@@ -204,22 +204,13 @@ export default {
       "langs",
       "userInfo",
       "currentLang",
-      "globalLang"
+      "globalLang",
+      "langList"
     ])
   },
   data() {
     return {
       language: {},
-      langList: [
-        {
-          label: "简体中文",
-          value: "zh-CN"
-        },
-        {
-          label: "英文",
-          value: "en"
-        }
-      ],
       headers: {
         Authorization: "bearer " + this.$store.state.userInfo.token
       },
@@ -251,7 +242,7 @@ export default {
     };
   },
   mounted() {
-    this.language = this.langList.find(val => val.value == this.globalLang);
+    this.language = this.langList.find(val => val.parameter == this.globalLang);
   },
   methods: {
     // 打开按图找样
@@ -336,8 +327,7 @@ export default {
     // 选择了语言
     handleCommand(lang) {
       this.language = lang;
-      this.$i18n.locale = lang.value;
-      this.$store.commit("setLang", lang.value);
+      this.$store.commit("setLang", lang.parameter);
       // 如果存在
       if (this.langs) {
         let currentLang = this.langs.find(

@@ -6,6 +6,10 @@ const BsMyClients = () =>
 const BsVendorQuery = () =>
   import("@/views/bsPage/bsMyClients/bsVendorQuery/BsVendorQuery.vue");
 
+// 公司查询
+const BsCompanyQuery = () =>
+  import("@/views/bsPage/bsMyClients/bsCompanyQuery/BsCompanyQuery.vue");
+
 //货场查询
 const BsGoodsYardSearch = () =>
   import("@/views/bsPage/bsMyClients/bsGoodsYardSearch/BsGoodsYardSearch.vue");
@@ -23,6 +27,14 @@ export default [
     path: "/bsIndex/bsVendorQuery",
     name: "bsVendorQuery",
     component: BsVendorQuery,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsCompanyQuery",
+    name: "bsCompanyQuery",
+    component: BsCompanyQuery,
     meta: {
       keepAlive: true
     }

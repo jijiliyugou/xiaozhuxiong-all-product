@@ -15,7 +15,7 @@
       </div>
       <div class="searchBox">
         <div class="left">
-          <div class="item" style="min-width:350px">
+          <div class="item" style="min-width: 350px">
             <span class="label">关键字：</span>
             <el-input
               v-focus
@@ -70,7 +70,7 @@
         <!-- 产品列表 -->
         <component :is="isGrid" :productList="productList"></component>
         <!-- 分页 -->
-        <center style="padding:30px 0;">
+        <center style="padding: 30px 0">
           <el-pagination
             layout="total, sizes, prev, pager, next, jumper"
             :page-sizes="[12, 24, 36, 48]"
@@ -91,7 +91,8 @@
 </template>
 
 <script>
-import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+// import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
 import { mapGetters } from "vuex";
 import eventBus from "@/assets/js/common/eventBus";
@@ -149,12 +150,14 @@ export default {
         if (this.shoppingList) {
           const item = res.data.result.item;
           for (let i = 0; i < item.items.length; i++) {
+            this.$set(item.items[i], "isShopping", false);
             for (let j = 0; j < this.shoppingList.length; j++) {
               if (
                 item.items[i].productNumber ===
                 this.shoppingList[j].productNumber
-              )
-                item.items[i].isShopping = true;
+              ) {
+                this.$set(item.items[i], "isShopping", true);
+              }
             }
           }
         }

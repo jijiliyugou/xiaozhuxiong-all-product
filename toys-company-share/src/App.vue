@@ -57,11 +57,18 @@ export default {
       this.$router.push("/index/shoppingCart");
     }
   },
+  watch: {
+    globalLang(val) {
+      console.log(val);
+      this.$i18n.locale = val;
+    }
+  },
   computed: {
     ...mapGetters({
       shoppingList: "myShoppingList"
     }),
-    ...mapState(["userInfo"])
+    ...mapState(["userInfo"]),
+    ...mapState(["globalLang"])
   }
 };
 </script>

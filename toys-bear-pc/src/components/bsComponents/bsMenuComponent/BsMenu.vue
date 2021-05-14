@@ -1,3 +1,13 @@
+<!--
+ * @Description: 
+ * @Author: gaojiahao
+ * @Date: 2021-03-31 17:09:19
+ * @FilePath: \projectd:\LittleBearPC\toys-bear-pc\src\components\bsComponents\bsMenuComponent\BsMenu.vue
+ * @LastEditTime: 2021-05-11 15:47:32
+ * @LastEditors: sueRimn
+ * @Descripttion: 
+ * @version: 1.0.0
+-->
 <template>
   <div class="bsMenu">
     <el-scrollbar style="height: 100%;">
@@ -70,9 +80,6 @@ export default {
     };
   },
   methods: {
-    refresh() {
-      this.$common.refreshTab();
-    },
     // 点击菜单事件
     addRouterEvent(route) {
       const list = route.linkUrl.split("/");
@@ -81,7 +88,7 @@ export default {
         name: route.linkUrl,
         linkUrl: route.linkUrl,
         component: component,
-        refresh: true,
+        refresh: false,
         label: route.name
       };
       this.$store.commit("myAddTab", fd);

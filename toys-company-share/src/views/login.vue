@@ -107,6 +107,22 @@ export default {
       const { code, data } = res.data.result;
       if (code === 200) {
         this.userLogo = data;
+        // data.websiteLanguage ? this.$store.commit("localLangs",  || []);
+        if (data.websiteLanguage) {
+          const list = JSON.parse(data.websiteLanguage);
+          if (list.length) {
+            this.$store.commit("localLangs", list);
+            const flag = list.find(val => val.parameter == this.globalLang);
+            console.log(flag, list);
+            if (!flag) {
+              this.$store.commit("setLang", list[0].parameter);
+            }
+          } else {
+            this.$store.commit("localLangs", []);
+          }
+        } else {
+          this.$store.commit("localLangs", []);
+        }
         this.$store.commit("initLangs", data.contactInfoList || []);
         // 如果存在
         if (data.contactInfoList) {

@@ -95,12 +95,24 @@ export default {
       }
     },
     // 绑定员工
-    async bindEmployee() {
-      const res = await this.$http.post("/api/BindPersinnel", {
-        personnelNo: this.isBind ? this.relatedConfig.id : null,
-        id: this.id
-      });
-      console.log(res);
+    async bindEmployee(row, type) {
+      let fd = {
+        id: row.id
+      };
+      if (type === 1) {
+        fd.personnelNo = this.id;
+      } else {
+        fd.personnelNo = null;
+      }
+      const res = await this.$http.post("/api/BindPersinnel", fd);
+      if (res.data.result.code === 200) {
+        this.getPersinnelList();
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
     }
   },
   created() {},

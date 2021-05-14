@@ -341,20 +341,20 @@ const store = new Vuex.Store({
       let tab = state.tabList;
       n["refresh"] || (n["refresh"] = true);
       let flag = true;
-      tab.find(val => val.name == val.name) || (tab.push(n), (flag = false));
-      flag && v.$common.refreshTab(n.name);
+      tab.find(val => val.name == n.name) || (tab.push(n), (flag = false));
       this.commit("updateActiveTab", n);
+      flag && v.$common.refreshTab(n.name);
     },
     updateActiveTab(state, n) {
       state.activeTab = n.name;
-      let flag = false;
+      let flag = true;
       for (let i = 0; i < state.tabList.length; i++) {
         if (state.tabList[i].name == n.name) {
-          flag = true;
+          flag = false;
           break;
         }
       }
-      if (!flag) {
+      if (flag) {
         state.tabList.push(n);
       }
     }
@@ -375,10 +375,11 @@ const store = new Vuex.Store({
   },
   getters: {
     myShoppingList(state) {
-      if (!state.userInfo || !state.userInfo.uid) {
+      if (state && state.userInfo && state.userInfo.uid) {
+        return state[state.userInfo.uid];
+      } else {
         return [];
       }
-      return state[state.userInfo.uid];
     },
     tabList(state) {
       return state.tabList.map(val => {

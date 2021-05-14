@@ -331,7 +331,7 @@ export default {
         this.callbackShopping();
         setTimeout(() => {
           this.canClick = true;
-        }, 1000);
+        }, 500);
       } else {
         this.$common.handlerMsgState({
           msg: "操作过于频繁",

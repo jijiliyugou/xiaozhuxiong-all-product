@@ -22,7 +22,7 @@
         >
           <el-table-column label="序号" type="index" align="center" width="60">
           </el-table-column>
-          <el-table-column prop="img" label="产品" width="280">
+          <el-table-column prop="img" label="产品" width="220">
             <template slot-scope="scope">
               <div class="imgBox">
                 <el-image
@@ -63,18 +63,33 @@
                       {{ scope.row.supplierName }}
                     </div>
                     <div class="icons">
-                      <el-tooltip
+                      <!-- <el-tooltip
                         class="item"
                         effect="dark"
                         :content="scope.row.supplierPhone || '暂时没有厂商电话'"
                         placement="top"
                       >
                         <div class="cartPhoneIcon"></div>
-                      </el-tooltip>
+                      </el-tooltip> -->
                       <div class="cartInfoIcon"></div>
                     </div>
                   </div>
                 </div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="supplierPhone"
+            label="联系厂商"
+            align="center"
+            min-width="100"
+          >
+            <template slot-scope="scope">
+              <div v-if="scope.row.supplierPhone">
+                {{ scope.row.supplierPhone }}
+              </div>
+              <div v-if="scope.row.supplierTelephoneNumber">
+                {{ scope.row.supplierTelephoneNumber }}
               </div>
             </template>
           </el-table-column>
@@ -84,7 +99,7 @@
             show-overflow-tooltip
           >
             <template slot-scope="scope">
-              {{ scope.row.supplierName }}
+              {{ scope.row.companyName }}
             </template>
           </el-table-column>
           <el-table-column
@@ -721,14 +736,14 @@ export default {
           cursor: pointer;
         }
         .productName {
-          width: 190px;
+          width: 130px;
           height: 60px;
           margin-left: 15px;
           cursor: pointer;
           .name,
           .factory {
-            width: 190px;
-            max-width: 190px;
+            width: 130px;
+            max-width: 130px;
             overflow: hidden; /*超出部分隐藏*/
             white-space: nowrap; /*不换行*/
             text-overflow: ellipsis; /*超出部分文字以...显示*/

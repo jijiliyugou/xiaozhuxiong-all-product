@@ -18,6 +18,7 @@
             @focus="showHistoryModal(true)"
             @blur="showHistoryModalY(false)"
             @change="showHistoryModal(false)"
+            @input="showHistoryModalI"
           >
             <template slot="prefix">
               <el-upload
@@ -39,7 +40,7 @@
           </el-input>
           <div
             class="history"
-            v-if="isShowHistoryPanel && searchHistoryList.length"
+            v-show="isShowHistoryPanel && searchHistoryList.length"
           >
             <ul class="history_list">
               <li class="history_item del">
@@ -49,7 +50,7 @@
               <template v-for="(item, index) in searchHistoryList">
                 <li
                   class="history_item"
-                  @click="historySearch(item.value)"
+                  @mousedown="historySearch(item.value)"
                   :key="index"
                 >
                   {{ item.value }}
@@ -99,6 +100,7 @@
 import eventBus from "@/assets/js/common/eventBus";
 import { mapGetters, mapState } from "vuex";
 export default {
+  name: "bsProductSearch",
   props: ["keyword"],
   data() {
     return {
@@ -149,6 +151,7 @@ export default {
         history[uid + "_pr"].splice(8, history[uid + "_pr"].length - 8);
       }
       localStorage.setItem("searchHistory", JSON.stringify(history));
+      this.searchHistoryList = history[uid + "_pr"] || [];
       this.showHistoryModal(false);
       eventBus.$emit("searchProducts");
       // const fd = {
@@ -184,20 +187,28 @@ export default {
     //是否显示历史搜索面板
     showHistoryModal(value) {
       if (value) {
-        var history = {};
-        var uid = this.vuex.userInfo.uid;
-        localStorage.getItem("searchHistory")
-          ? (history = JSON.parse(localStorage.getItem("searchHistory")))
-          : (history = {});
-        this.searchHistoryList = history[uid + "_pr"] || [];
+        this.initSearchList();
       }
       this.isShowHistoryPanel = value;
+    },
+    initSearchList() {
+      var history = {};
+      var uid = this.vuex.userInfo.uid;
+      localStorage.getItem("searchHistory")
+        ? (history = JSON.parse(localStorage.getItem("searchHistory")))
+        : (history = {});
+      this.searchHistoryList = history[uid + "_pr"] || [];
     },
     showHistoryModalY(value) {
       var me = this;
       setTimeout(function() {
         me.isShowHistoryPanel = value;
       }, 500);
+    },
+    showHistoryModalI(value) {
+      if (!value) {
+        this.isShowHistoryPanel = true;
+      }
     },
     //点击历史搜索
     historySearch(value) {

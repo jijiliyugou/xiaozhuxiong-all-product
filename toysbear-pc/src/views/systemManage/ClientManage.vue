@@ -789,388 +789,14 @@
       </el-dialog>
       <!-- 员工管理dialog -->
       <el-dialog
-        :title="employeeMan.title"
-        :visible.sync="employeeMan.dialog"
+        :title="staffManageTitle"
+        :visible.sync="staffManageDialog"
+        v-if="staffManageDialog"
         width="70%"
         :close-on-click-modal="true"
         destroy-on-close
       >
-        <!-- 嵌套新增员工 -->
-        <el-dialog
-          width="50%"
-          top="50px"
-          :title="employeeMan.employeeTitle"
-          :visible.sync="innerVisible"
-          destroy-on-close
-          append-to-body
-        >
-          <el-form
-            :model="addEmployeeForm"
-            ref="addEmployeeRef"
-            :rules="addEmployeeRules"
-          >
-            <el-form-item label="员工头像" label-width="100px" prop="userImage">
-              <el-upload
-                :action="baseAPI + '/api/File/InsertPic'"
-                list-type="picture-card"
-                ref="upload"
-                :auto-upload="false"
-                :on-change="changeUpload"
-                :on-preview="handlePicEmployeePreview"
-                :http-request="successUpload"
-                :file-list="editImages"
-                accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
-              >
-                <i class="el-icon-plus"></i>
-              </el-upload>
-              <el-dialog
-                :visible.sync="dialogUpload"
-                destroy-on-close
-                :modal="false"
-              >
-                <img width="100%" :src="LogoUrl" alt />
-              </el-dialog>
-            </el-form-item>
-
-            <div class="flexLayout">
-              <el-form-item
-                label="员工账号"
-                label-width="100px"
-                prop="phoneNumber"
-              >
-                <el-input
-                  v-model="addEmployeeForm.phoneNumber"
-                  :disabled="employeeMan.employeeTitle === '员工编辑'"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="昵称" label-width="100px" prop="linkman">
-                <el-input v-model="addEmployeeForm.linkman"></el-input>
-              </el-form-item>
-              <!-- <el-form-item label="密码" v-if="employeeMan.employeeTitle === '编辑员工'" label-width="100px">
-              <el-input v-model="addEmployeeForm.newPassword"></el-input>
-            </el-form-item>-->
-              <el-form-item
-                label="密码"
-                label-width="100px"
-                :prop="
-                  employeeMan.employeeTitle === '员工编辑' ? '' : 'password'
-                "
-              >
-                <el-input v-model="addEmployeeForm.password"></el-input>
-              </el-form-item>
-            </div>
-            <div class="flexLayout">
-              <el-form-item label="性别" label-width="100px" prop="sex">
-                <el-radio-group v-model="addEmployeeForm.sex">
-                  <el-radio :label="1">男</el-radio>
-                  <el-radio :label="2">女</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item
-                label="是否主账号"
-                label-width="100px"
-                prop="isMain"
-              >
-                <el-radio-group v-model="addEmployeeForm.isMain">
-                  <el-radio :label="true">是</el-radio>
-                  <el-radio :label="false">否</el-radio>
-                </el-radio-group>
-              </el-form-item>
-
-              <el-form-item label="是否激活" label-width="100px" prop="enabled">
-                <el-radio-group v-model="addEmployeeForm.enabled">
-                  <el-radio :label="true">是</el-radio>
-                  <el-radio :label="false">否</el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </div>
-            <el-form-item label="生日" label-width="100px">
-              <el-date-picker
-                type="date"
-                placeholder="选择日期"
-                v-model="addEmployeeForm.birthday"
-                style="width: 100%"
-              ></el-date-picker>
-            </el-form-item>
-            <el-form-item label="备注" label-width="100px">
-              <el-input
-                type="textarea"
-                v-model="addEmployeeForm.remark"
-              ></el-input>
-            </el-form-item>
-          </el-form>
-          <center>
-            <el-button type="primary" @click="addEmployee"
-              ><i :class="{ 'el-icon-loading': isShowLoading }"></i>
-              保存</el-button
-            >
-            <el-button type="danger" @click="resetForm">取消</el-button>
-          </center>
-        </el-dialog>
-        <div class="addStaffBtn">
-          <div class="left">
-            <el-input
-              clearable
-              style="width: 250px;margin: 0 20px;"
-              @keyup.enter.native="searchStaffList"
-              v-model="staffKeyword"
-              placeholder="输入关键字"
-            ></el-input>
-            <el-button type="primary" @click="searchStaffList">搜 索</el-button>
-          </div>
-          <div class="right">
-            <el-button type="primary" @click="openAddemployee">新 增</el-button>
-          </div>
-        </div>
-        <el-table
-          :data="employeeList"
-          style="width: 100%; font-size: 12px"
-          :default-sort="{ prop: 'createdOn', order: 'descending' }"
-        >
-          <!-- v-loading="$store.state.vueElementLoading"
-        element-loading-text="拼命加载中"
-        element-loading-spinner="el-icon-loading" -->
-          <el-table-column
-            prop="userImage"
-            label="头像"
-            align="center"
-            width="80"
-          >
-            <template slot-scope="scope">
-              <el-image
-                shape="square"
-                style="background-color: #165af7;width:50px;height:50px;color:#fff;"
-                :src="scope.row.userImage"
-                :key="scope.row.userImage"
-                fit="cover"
-              >
-                <div
-                  slot="error"
-                  class="image-slot"
-                  style="width:100%;height:100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  padding:0 5px;
-                  text-align:center;"
-                >
-                  <span
-                    style="display: -webkit-box;
-                  -webkit-line-clamp: 2;
-                  overflow: hidden;
-                  text-overflow: clip;
-                  -webkit-box-orient: vertical;"
-                    >{{ scope.row.linkman }}</span
-                  >
-                </div>
-                <div
-                  slot="placeholder"
-                  class="image-slot"
-                  style="width:100%;height:100%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  padding:0 5px;
-                  text-align:center;"
-                >
-                  <span
-                    style="display: -webkit-box;
-                  -webkit-line-clamp: 2;
-                  overflow: hidden;
-                  text-overflow: clip;
-                  -webkit-box-orient: vertical;"
-                    >{{ scope.row.linkman }}</span
-                  >
-                </div>
-              </el-image>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="phoneNumber"
-            label="员工账号"
-            align="center"
-            width="120"
-          ></el-table-column>
-          <el-table-column
-            prop="linkman"
-            label="昵称"
-            align="center"
-            width="120"
-          ></el-table-column>
-          <el-table-column prop="password" label="密码"></el-table-column>
-          <el-table-column
-            prop="isMain"
-            label="是否主账号"
-            align="center"
-            width="80"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.isMain ? "是" : "否" }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="sex" label="性别" width="50" align="center">
-            <template slot-scope="scope">{{
-              scope.row.sex === 1 ? "男" : "女"
-            }}</template>
-          </el-table-column>
-          <el-table-column
-            prop="birthday"
-            label="生日"
-            align="center"
-            width="200"
-          ></el-table-column>
-          <el-table-column
-            prop="enabled"
-            label="是否激活"
-            align="center"
-            width="80"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.enabled ? "是" : "否" }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="remark"
-            label="备注"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            label="操作"
-            width="250"
-            align="center"
-            fixed="right"
-          >
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                type="success"
-                @click="openBindEmployees(scope.row)"
-                >绑定员工</el-button
-              >
-              <!-- <el-button size="mini" type="warning" @click="bindEmployees(scope.row,2)">解绑</el-button> -->
-              <el-button
-                size="mini"
-                type="primary"
-                @click="editEmployees(scope.row)"
-                >编辑</el-button
-              >
-              <el-popconfirm
-                style="margin-left: 10px"
-                title="确定要删除该员工吗？"
-                @confirm="deleteEmployees(scope.row)"
-              >
-                <el-button size="mini" type="danger" slot="reference"
-                  >删除</el-button
-                >
-              </el-popconfirm>
-            </template>
-          </el-table-column>
-        </el-table>
-        <center style="margin-top: 20px">
-          <el-pagination
-            layout="total, sizes, prev, pager, next, jumper"
-            background
-            :page-sizes="[10, 20, 30, 50]"
-            :page-size="employeeMan.pageSize"
-            :total="employeeMan.totalCount"
-            :current-page.sync="employeeMan.currentPage"
-            @current-change="employeeManCurrentChange"
-            @size-change="employeeManSizeChange"
-          ></el-pagination>
-        </center>
-        <!-- 嵌套员工关联dialog -->
-        <el-dialog
-          :title="relatedConfig.title"
-          destroy-on-close
-          :visible.sync="relatedConfig.relatedDialog"
-          width="70%"
-          append-to-body
-        >
-          <el-table
-            :data="relatedConfig.relatedDataList"
-            style="width: 100%; min-height: 300px"
-            :default-sort="{ prop: 'createdOn', order: 'descending' }"
-          >
-            <el-table-column
-              prop="client_acc_nu"
-              label="员工账号"
-            ></el-table-column>
-            <el-table-column
-              prop="client_nu"
-              label="员工编号"
-            ></el-table-column>
-            <el-table-column
-              prop="hallNumber"
-              label="展厅编号"
-            ></el-table-column>
-            <el-table-column prop="linkman" label="联系人"></el-table-column>
-            <el-table-column
-              label="新增日期"
-              prop="createdOn"
-              sortable
-              width="180"
-            >
-              <template slot-scope="scope">
-                {{
-                  scope.row.createdOn
-                    ? scope.row.createdOn.replace(/T/gi, " ")
-                    : ""
-                }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="状态"
-              prop="personnelNo"
-              width="50"
-              align="center"
-            >
-              <template slot-scope="scope">
-                <i
-                  class="el-icon-success"
-                  v-if="scope.row.personnelNo"
-                  style="color: #85ce61"
-                ></i>
-                <i class="el-icon-error" v-else style="color: #f581b0"></i>
-              </template>
-            </el-table-column>
-
-            <el-table-column
-              label="操作"
-              align="center"
-              min-width="180"
-              fixed="right"
-            >
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="primary"
-                  v-if="!scope.row.personnelNo"
-                  @click="bindEmployee(scope.row, 1)"
-                  >绑定</el-button
-                >
-                <el-button
-                  size="mini"
-                  type="danger"
-                  v-else
-                  @click="bindEmployee(scope.row, 2)"
-                  >取消绑定</el-button
-                >
-              </template>
-            </el-table-column>
-          </el-table>
-          <!-- <center
-          style="margin-top:20px;"
-          v-if="relatedConfig.relatedDataList.length > 10"
-        >
-          <el-pagination
-            layout="prev, pager, next"
-            background
-            :total="relatedConfig.totalCount"
-            :page-size="relatedConfig.pageSize"
-            @current-change="relatedCurrentChange"
-          ></el-pagination>
-        </center> -->
-        </el-dialog>
+        <staffManage :currentCompany="currentCompany" />
       </el-dialog>
     </el-main>
     <el-footer style="padding:0;" height="162px">
@@ -1183,10 +809,13 @@
 import bsTop from "@/components/BsTop";
 import bsFooter from "@/components/oldFooter";
 import BMapComponent from "@/components/attrsMap.vue";
+import staffManage from "@/components/staffManage";
 export default {
-  components: { bsTop, bsFooter, BMapComponent },
+  components: { bsTop, bsFooter, BMapComponent, staffManage },
   data() {
     return {
+      staffManageTitle: "员工管理",
+      staffManageDialog: false,
       staffKeyword: null,
       hide1Upload: false,
       hide2Upload: false,
@@ -1197,49 +826,7 @@ export default {
       isShowLoading: false,
       isShowAttrsList: false,
       attrsList: [],
-      relatedConfig: {
-        title: "员工绑定",
-        relatedDialog: false,
-        relatedDataList: [],
-        totalCount: 10,
-        currentPage: 1,
-        pageSize: 10,
-        id: null,
-        phoneNumber: null
-      },
-      innerVisible: false,
       LogoUrl: "",
-      addEmployeeForm: {
-        // 新增员工表单
-        personnelNo: null,
-        phoneNumber: "",
-        password: "",
-        sex: 1,
-        isMain: false,
-        enabled: true,
-        remark: "",
-        birthday: "",
-        userImage: "",
-        weCharUserJson: null,
-        wecharName: null,
-        wecharNo: null,
-        wecharOpenID: null,
-        linkman: null,
-        CompanyId: null,
-        newPassword: null // 编辑时的密码
-      },
-      employeeMan: {
-        title: "员工管理",
-        dialog: false,
-        totalCount: 100,
-        currentPage: 1,
-        pageSize: 10,
-        companyNumber: null,
-        phoneNumber: null,
-        id: null,
-        employeeTitle: "新增员工"
-      },
-      employeeList: [],
       companyConfig: {},
       searchCount: 0,
       editImages: [],
@@ -1268,34 +855,6 @@ export default {
         companyNumber: null
       },
       dialogTitle: "新增客户",
-      addEmployeeRules: {
-        userImage: [
-          { required: true, message: "请选择员工头像", trigger: "change" }
-        ],
-        phoneNumber: [
-          { required: true, message: "请输入员工账号", trigger: "blur" },
-          {
-            pattern: /^1[2,3,4,5,6,7,8,9][0-9]{9}$/,
-            message: "手机格式不正确",
-            trigger: "blur"
-          }
-        ],
-        linkman: [
-          { required: true, message: "请输入员工昵称", trigger: "blur" },
-          { min: 1, max: 20, message: "请输入1-20个字符", trigger: "blur" }
-        ],
-        password: [
-          { required: true, message: "请输入员工密码", trigger: "blur" },
-          { min: 6, max: 20, message: "最少输入6-20个字符", trigger: "blur" }
-        ],
-        sex: [{ required: true, message: "请选择员工性别", trigger: "change" }],
-        isMain: [
-          { required: true, message: "请选择是否主账号", trigger: "change" }
-        ],
-        enabled: [
-          { required: true, message: "请选择是否激活", trigger: "change" }
-        ]
-      },
       addRules: {
         companyName: [
           { required: true, message: "请输入公司名称", trigger: "blur" },
@@ -1460,67 +1019,6 @@ export default {
           break;
       }
     },
-    // 删除员工
-    async deleteEmployees(row) {
-      const res = await this.$http.post("/api/DeleteCompanyUser", {
-        OrgCompanyID: this.employeeMan.id,
-        OrgPersonnelID: row.id
-      });
-      if (res.data.result.code === 200) {
-        this.$message.success("删除成功");
-        this.getEmployeeList(this.employeeMan.id);
-      } else {
-        this.$message.error(res.data.result.msg);
-      }
-    },
-    // 打开编辑员工
-    editEmployees(row) {
-      this.isEdit = true;
-      this.editImages = [];
-      this.employeeMan.employeeTitle = "员工编辑";
-      this.innerVisible = true;
-      this.$nextTick(() => {
-        this.$refs.addEmployeeRef.clearValidate();
-      });
-      for (const key in this.addEmployeeForm) {
-        this.addEmployeeForm[key] = row[key];
-      }
-      this.addEmployeeForm.newPassword = row.password;
-      this.addEmployeeForm.password = null;
-      row.userImage && (this.editImages[0] = { url: row.userImage });
-      this.addEmployeeForm.id = row.id;
-      this.addEmployeeForm.weCharUserJson = row.weCharUserJson;
-      this.addEmployeeForm.wecharName = row.wecharName;
-      this.addEmployeeForm.wecharNo = row.wecharNo;
-      this.addEmployeeForm.wecharOpenID = row.wecharOpenID;
-    },
-    // 获取弹出员工列表
-    async getPersinnelList(phoneNumber) {
-      const res = await this.$http.post("/api/SearchPersinnel", {
-        Client_acc_nu: phoneNumber,
-        companyNumber: this.employeeMan.companyNumber
-      });
-      if (res.data.result.code === 200) {
-        this.relatedConfig.relatedDataList = res.data.result.item;
-      }
-    },
-    // 打开绑定员工
-    async openBindEmployees(row) {
-      this.relatedConfig.id = row.id;
-      this.relatedConfig.phoneNumber = row.phoneNumber;
-      this.relatedConfig.relatedDialog = true;
-      this.getPersinnelList(row.phoneNumber);
-    },
-    // 绑定员工
-    async bindEmployee(row, code) {
-      console.log(code);
-      const res = await this.$http.post("/api/BindPersinnel", {
-        personnelNo: code === 1 ? this.relatedConfig.id : null,
-        id: row.id
-      });
-      this.getPersinnelList(this.relatedConfig.phoneNumber);
-      console.log(res);
-    },
     // 获取当前日期
     getCurrentDate() {
       var now = new Date();
@@ -1535,41 +1033,27 @@ export default {
     },
     // 新增员工
     async addEmployee() {
-      this.addEmployeeForm.CompanyId = this.employeeMan.id;
-      const imgRes = await this.successUpload();
-      if (imgRes.data.result.code === 200) {
-        this.addEmployeeForm.userImage =
-          imgRes.data.result.object[0] && imgRes.data.result.object[0].filePath
-            ? imgRes.data.result.object[0].filePath
-            : this.addEmployeeForm.userImage;
-      } else {
-        this.$message.error(imgRes.data.result.message);
-      }
       if (this.isEdit) {
-        this.$refs.addEmployeeRef.validate(async valid => {
-          if (valid) {
-            this.isShowLoading = true;
-            this.addEmployeeForm.password = this.addEmployeeForm.password
-              ? this.$md5("LitterBear" + this.addEmployeeForm.password)
-              : this.addEmployeeForm.newPassword;
-            const res = await this.$http.post(
-              "/api/UpdateOrgPersonnel",
-              this.addEmployeeForm
-            );
-            if (res.data.result.code === 200) {
-              this.getCurrentDate();
-              this.innerVisible = false;
-              this.$message.closeAll();
-              this.$message.success("员工编辑成功");
-              this.getEmployeeList(this.employeeMan.id);
-              this.isShowLoading = false;
-            } else {
-              this.$message.error(res.data.result.msg);
-              this.addEmployeeForm.password = null;
-              this.isShowLoading = false;
-            }
-          }
-        });
+        this.isShowLoading = true;
+        this.addEmployeeForm.password = this.addEmployeeForm.password
+          ? this.$md5("LitterBear" + this.addEmployeeForm.password)
+          : this.addEmployeeForm.newPassword;
+        const res = await this.$http.post(
+          "/api/UpdateOrgPersonnel",
+          this.addEmployeeForm
+        );
+        if (res.data.result.code === 200) {
+          this.getCurrentDate();
+          this.innerVisible = false;
+          this.$message.closeAll();
+          this.$message.success("员工编辑成功");
+          this.getEmployeeList(this.employeeMan.id);
+          this.isShowLoading = false;
+        } else {
+          this.$message.error(res.data.result.msg);
+          this.addEmployeeForm.password = null;
+          this.isShowLoading = false;
+        }
       } else {
         this.$refs.addEmployeeRef.validate(async valid => {
           if (valid) {
@@ -1595,40 +1079,6 @@ export default {
         });
       }
     },
-    // 取消新增员工
-    resetForm() {
-      this.innerVisible = false;
-    },
-    // 打开新增员工
-    openAddemployee() {
-      this.isEdit = false;
-      this.employeeMan.employeeTitle = "新增员工";
-      this.editImages = [];
-      this.addEmployeeForm = {
-        personnelNo: null,
-        phoneNumber: "",
-        password: "",
-        sex: 1,
-        isMain: false,
-        enabled: true,
-        remark: "",
-        birthday: "",
-        userImage: "",
-        weCharUserJson: null,
-        wecharName: null,
-        wecharNo: null,
-        wecharOpenID: null,
-        linkman: null,
-        CompanyId: null,
-        newPassword: null // 编辑时的密码
-      };
-      this.file = null;
-      this.getCurrentDate();
-      this.innerVisible = true;
-      this.$nextTick(() => {
-        this.$refs.addEmployeeRef.clearValidate();
-      });
-    },
     // 员工管理预览头像
     handlePicEmployeePreview(file) {
       this.LogoUrl = file.url;
@@ -1646,33 +1096,6 @@ export default {
         this.addClientForm.bgImg = "";
         this.fileList2 = [];
         this.hide2Upload = false;
-      }
-    },
-    searchStaffList() {
-      this.getEmployeeList(this.employeeMan.id);
-    },
-    // 获取员工列表
-    async getEmployeeList(id) {
-      const fd = {
-        orgCompanyID: id,
-        keyword: this.staffKeyword,
-        skipCount: this.employeeMan.currentPage,
-        maxResultCount: this.employeeMan.pageSize
-      };
-      for (const key in fd) {
-        if (fd[key] === undefined || fd[key] === null || fd[key] === "")
-          delete fd[key];
-      }
-      try {
-        const res = await this.$http.post("/api/CompanyUserPage", fd);
-        if (res.data.result.code === 200) {
-          this.employeeList = res.data.result.item.items || [];
-          this.employeeMan.totalCount = res.data.result.item.totalCount;
-        } else {
-          this.$message.error(res.data.result.msg);
-        }
-      } catch (error) {
-        console.log(error);
       }
     },
     // 删除客户 | 删除公司
@@ -1701,14 +1124,8 @@ export default {
     },
     // 打开员工管理
     openEmployeeMan(row) {
-      this.employeeList = [];
-      this.employeeMan.currentPage = 1;
-      this.employeeMan.companyNumber = row.companyNumber;
-      this.employeeMan.phoneNumber = row.phoneNumber;
-      this.employeeMan.id = row.id;
-      this.getEmployeeList(row.id);
-      this.staffKeyword = null;
-      this.employeeMan.dialog = true;
+      this.currentCompany = row;
+      this.staffManageDialog = true;
     },
     // 审核
     async byAudit(id) {
@@ -2089,18 +1506,6 @@ export default {
       this.userManCurrentPage = currentPage;
       this.getUserMan(this.UserManConfig.companyNumber);
     },
-    // 员工管理分页
-    employeeManCurrentChange(page) {
-      this.employeeMan.currentPage = page;
-      this.getEmployeeList(this.employeeMan.id);
-    },
-    // 员工管理修改每页条数
-    employeeManSizeChange(pageSize) {
-      this.employeeMan.pageSize = pageSize;
-      if (this.employeeMan.currentPage * pageSize > this.employeeMan.totalCount)
-        return false;
-      this.getEmployeeList(this.employeeMan.id);
-    },
     // 打开编辑客户列表
     openEdit(row) {
       this.hide1Upload = false;
@@ -2328,14 +1733,6 @@ export default {
     input {
       height: 30px;
     }
-  }
-}
-.addStaffBtn {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  .left {
-    flex: 1;
   }
 }
 </style>

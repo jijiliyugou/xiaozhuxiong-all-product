@@ -16,9 +16,15 @@ const BsPushSettings = () =>
 const BsPushIndex = () =>
   import("@/components/commonComponent/pushDetailsComponent/bsPushIndex.vue");
 
-// 好友方式
+// 联系方式
 const BsContactWay = () =>
   import("@/views/bsPage/bsPersonalManage/bsContactWay/BsContactWay.vue");
+
+// 屏蔽设置
+const BsShieldSettings = () =>
+  import(
+    "@/views/bsPage/bsPersonalManage/bsShieldSettings/BsShieldSettings.vue"
+  );
 
 export default [
   {
@@ -57,6 +63,14 @@ export default [
     path: "/bsIndex/bsContactWay",
     name: "bsContactWay",
     component: BsContactWay,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsShieldSettings",
+    name: "bsShieldSettings",
+    component: BsShieldSettings,
     meta: {
       keepAlive: true
     }

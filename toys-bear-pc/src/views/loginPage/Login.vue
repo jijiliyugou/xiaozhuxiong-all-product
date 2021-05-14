@@ -32,9 +32,9 @@ export default {
     return {};
   },
   mounted() {
-    if (this.$route.query.id === "signOut") {
-      this.$store.commit("removeLoginItems");
-    }
+    // if (this.$route.query.id === "signOut") {
+    this.$store.commit("removeLoginItems");
+    // }
   }
 };
 </script>

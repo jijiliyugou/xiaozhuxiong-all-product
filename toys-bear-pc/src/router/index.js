@@ -127,15 +127,12 @@ export async function getMenuFuc() {
 // 拦截
 router.beforeEach(async (to, from, next) => {
   // 如果没有登录token
-  console.log(store.state.userInfo, "如果没有登录token");
   if (!store.state.userInfo) {
     const token = Vue.prototype.$cookies.get("userInfo");
     sessionStorage.clear();
     if (token) {
       const res = await resetPersonInfo(token);
-      console.log("有cookit_token", res, token);
       Vue.prototype.$cookies.remove("userInfo");
-      console.log("删除了 cookit_token", token);
       store.commit("handlerLogin", true);
       // 设置token
       store.commit("setToken", res.data.result);
@@ -173,17 +170,7 @@ router.beforeEach(async (to, from, next) => {
       );
       Json.PlatForm = await getClientTypeList("PlatForm", token);
       Json.packageManage = await getClientTypeList("packageManage", token);
-      console.log(Json);
       store.commit("globalJson/setGlobalJson", Json);
-      const localKey = res.data.result.uid;
-      console.log(localKey);
-      let localShoppingCart = localStorage.getItem(localKey);
-      if (localShoppingCart && localKey != "undefined") {
-        localShoppingCart = JSON.parse(localShoppingCart);
-        store.commit("initShoppingCart", localShoppingCart);
-      } else {
-        store.commit("initShoppingCart", []);
-      }
       // 登录成功获取菜单
       const menus = await getUserRoleMenu(token);
       if (menus.data.result.code === 200) {
@@ -192,14 +179,11 @@ router.beforeEach(async (to, from, next) => {
       }
       next();
     } else {
-      console.log("没有cookit_token", store.state);
       sessionStorage.clear();
       const res = await getToken();
-      console.log(res, "没有cookit_Token获取到的临时token");
       if (res.data.result.code === 200) {
         const obj = { accessToken: res.data.result.item };
         store.commit("setToken", obj);
-        store.commit("initShoppingCart", []);
       }
       if (to.path == "/login" || to.path == "/loginConfirm") {
         next();
@@ -209,12 +193,6 @@ router.beforeEach(async (to, from, next) => {
     }
   } else {
     if (store.state.isLogin) {
-      const localKey = store.state.userInfo.uid;
-      let localShoppingCart = localStorage.getItem(localKey);
-      if (localShoppingCart && localKey != undefined) {
-        localShoppingCart = JSON.parse(localShoppingCart);
-        store.commit("initShoppingCart", localShoppingCart);
-      }
       next();
     } else {
       if (to.path == "/login" || to.path == "/loginConfirm") {

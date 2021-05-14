@@ -15,33 +15,46 @@
             >
               <el-image
                 class="img"
-                style="width: 60px; height: 60px;"
+                style="width: 60px; height: 60px"
                 :src="item.companyLogo"
                 fit="cover"
               >
                 <div
                   slot="error"
                   class="image-slot"
-                  style="width:100%;height:100%;display:flex;align-items:center;text-align:center;"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    text-align: center;
+                  "
                 >
                   <img :src="require('@/assets/images/imgError.png')" alt="" />
                 </div>
                 <div
                   slot="placeholder"
                   class="image-slot"
-                  style="width:100%;height:100%;display:flex;align-items:center;white-space: nowrap;text-align:center;"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    white-space: nowrap;
+                    text-align: center;
+                  "
                 >
                   <img :src="require('@/assets/images/imgError.png')" alt="" />
                 </div>
               </el-image>
-              <p style="box-sizing:border-box;padding-right:10px;">
+              <p style="box-sizing: border-box; padding-right: 10px">
                 {{ item.companyName }}
               </p>
-              <el-radio
-                v-if="$route.query.id === 'checkted'"
+              <el-checkbox
+                v-if="$route.query.id === 'checkted' || isLogin"
                 v-model="item.checked"
                 :label="true"
-                ><span style="display:none;">1</span></el-radio
+                ><span style="display: none">1</span></el-checkbox
               >
             </li>
           </template>
@@ -78,7 +91,6 @@ export default {
       const res = await this.$http.post("/api/GetUserCompanyList", {
         phoneNumber: this.userInfo.userInfo.phoneNumber
       });
-      console.log(res);
       if (res.data.result.code === 200) {
         for (let i = 0; i < res.data.result.item.length; i++) {
           if (
@@ -134,14 +146,6 @@ export default {
           res.data.result.commparnyList[0].commparnyId
         );
         this.$store.commit("updateAppLoading", true);
-        const localKey = res.data.result.uid;
-        let localShoppingCart = localStorage.getItem(localKey);
-        if (localShoppingCart) {
-          localShoppingCart = JSON.parse(localShoppingCart);
-          this.$store.commit("initShoppingCart", localShoppingCart);
-        } else {
-          this.$store.commit("initShoppingCart", []);
-        }
         await this.waitTime(1);
         // 登录成功获取系统参数
         const Json = {};
@@ -185,6 +189,11 @@ export default {
             refresh: true
           };
           switch (item.companyType) {
+            // case "Admin":
+            //   break;
+            // case "Supplier":
+            //   break;
+            // case "Exhibition":
             case "Sales":
               this.$store.commit("updateActiveTab", fd);
               this.$store.commit("closeTabAll", this.$router);
@@ -209,11 +218,11 @@ export default {
     }
   },
   computed: {
-    ...mapState(["userInfo"])
+    ...mapState(["userInfo", "isLogin"])
   },
   mounted() {
     this.userList = this.userInfo.commparnyList;
-    if (this.$route.query.id === "checkted") {
+    if (this.$route.query.id === "checkted" || this.isLogin) {
       this.loginTow();
     }
   }
@@ -221,6 +230,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@deep: ~">>>";
 .confirmBox {
   width: 100%;
   height: 100vh;
@@ -267,10 +277,17 @@ export default {
           cursor: pointer;
           margin-bottom: 30px;
           position: relative;
-          .el-radio {
+          @{deep} .el-checkbox {
             position: absolute;
             bottom: 10px;
             right: 0;
+            overflow: hidden;
+            .el-checkbox__input {
+              .el-checkbox__inner {
+                border-radius: 50% !important;
+                overflow: hidden;
+              }
+            }
           }
           &.active {
             border: 2px solid #3368a9;

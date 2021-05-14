@@ -68,6 +68,7 @@ export default {
     })
   },
   mounted() {
+    this.$store.commit("updateAppLoading", false);
     this.$store.commit("handlerShowGlobalMsg", false);
     this.$store.commit("handlerIsJindu", false);
     this.$store.commit("handlerimgSearch", false);

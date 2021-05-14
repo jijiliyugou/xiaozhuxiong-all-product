@@ -71,6 +71,12 @@ import bsClientOrderDetails from "@/views/bsPage/bsSiteSharing/bsCustomerOrder/b
 /** 展厅业务订单详情 */
 import bsHallBusinessOrderDetails from "@/views/bsPage/bsBusinessManage/bsHallBusiness/bsHallBusinessOrderDetails/BsHallBusinessOrderDetails.vue";
 
+/** 公司业务订单详情 */
+import bsCompanyBusinessOrderDetails from "@/views/bsPage/bsBusinessManage/bsCompanyBusiness/bsCompanyBusinessOrderDetails/BsCompanyBusinessOrderDetails.vue";
+
+/** 厂商业务订单详情 */
+import bsVendorBusinessOrderDetails from "@/views/bsPage/bsBusinessManage/bsVendorBusiness/bsVendorBusinessOrderDetails/BsVendorBusinessOrderDetails.vue";
+
 // 站点列表
 import bsSiteLlis from "@/views/bsPage/bsSiteSharing/bsSiteLlis/BsSiteLlis.vue";
 
@@ -114,6 +120,9 @@ import bsPushSettings from "@/views/bsPage/bsPersonalManage/bsPushSettings/BsPus
 // 联系方式
 import bsContactWay from "@/views/bsPage/bsPersonalManage/bsContactWay/BsContactWay.vue";
 
+// 屏蔽设置
+import bsShieldSettings from "@/views/bsPage/bsPersonalManage/bsShieldSettings/BsShieldSettings.vue";
+
 // 我的消息
 import bsNews from "@/views/bsPage/bsMyNews/bsNews/BsNews.vue";
 // 我的好友
@@ -129,6 +138,8 @@ import bsVendorQuery from "@/views/bsPage/bsMyClients/bsVendorQuery/BsVendorQuer
 // 厂商查询-详情页
 import bsMyClientsDetail from "@/components/bsComponents/bsMyClientsComponent/bsMyClientsDetail.vue";
 
+// 公司查询
+import bsCompanyQuery from "@/views/bsPage/bsMyClients/bsCompanyQuery/BsCompanyQuery.vue";
 // 货场查询
 import bsGoodsYardSearch from "@/views/bsPage/bsMyClients/bsGoodsYardSearch/BsGoodsYardSearch.vue";
 
@@ -136,6 +147,12 @@ import bsGoodsYardSearch from "@/views/bsPage/bsMyClients/bsGoodsYardSearch/BsGo
 import bsHallSample from "@/views/bsPage/bsBusinessManage/bsHallSample/BsHallSample.vue";
 // 展厅业务
 import bsHallBusiness from "@/views/bsPage/bsBusinessManage/bsHallBusiness/BsHallBusiness.vue";
+// 公司业务
+import bsCompanyBusiness from "@/views/bsPage/bsBusinessManage/bsCompanyBusiness/BsCompanyBusiness.vue";
+// 厂商业务
+import bsVendorBusiness from "@/views/bsPage/bsBusinessManage/bsVendorBusiness/BsVendorBusiness.vue";
+// 择样明细
+import bsHallSampleDetails from "@/views/bsPage/bsBusinessManage/bsHallSampleDetails/BsHallSampleDetails.vue";
 // 购物车
 import bsShoppingCart from "@/views/bsPage/bsBusinessManage/bsShoppingCart/BsShoppingCart.vue";
 // 找样报价
@@ -168,6 +185,8 @@ export default {
     bsProductDetails,
     bsClientOrderDetails,
     bsHallBusinessOrderDetails,
+    bsCompanyBusinessOrderDetails,
+    bsVendorBusinessOrderDetails,
     bsSiteLlis,
     bsSiteSettings,
     bsCustomerOrder,
@@ -183,15 +202,20 @@ export default {
     bsPushIndex,
     bsPushSettings,
     bsContactWay,
+    bsShieldSettings,
     bsNews,
     bsMyGoodFriend,
     bsToyCircle,
     bsMyClients,
     bsVendorQuery,
     bsMyClientsDetail,
+    bsCompanyQuery,
     bsGoodsYardSearch,
     bsHallSample,
     bsHallBusiness,
+    bsCompanyBusiness,
+    bsVendorBusiness,
+    bsHallSampleDetails,
     bsShoppingCart,
     bsSampleQuotation,
     bsSampleQuotationDetails,
@@ -225,9 +249,6 @@ export default {
       let len = this.tabList.length;
       len > 1 && this.$store.commit("closeTab", e);
       this.$nextTick(() => {});
-    },
-    refresh() {
-      this.$common.refreshTab();
     },
     // 关闭所有tab标签
     closeAll() {
@@ -267,7 +288,6 @@ export default {
   },
   watch: {
     "$route.path"(path) {
-      console.log(path);
       if (
         path.includes("bsProductSearchIndex") ||
         path.includes("bsLatestProducts") ||

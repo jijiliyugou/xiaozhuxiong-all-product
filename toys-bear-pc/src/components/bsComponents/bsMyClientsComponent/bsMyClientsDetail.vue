@@ -39,7 +39,7 @@
                 在线咨询
               </p>
             </div>
-            <p v-if="companyInfo.address" style="color: #666;">
+            <p v-if="companyInfo.address" style="color: #666">
               地址：{{ companyInfo.address }}
             </p>
           </div>
@@ -219,7 +219,8 @@
 </template>
 
 <script>
-import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+// import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
 import eventBus from "@/assets/js/common/eventBus.js";
 import { mapGetters } from "vuex";
@@ -340,7 +341,6 @@ export default {
       });
       if (res.data.result.code === 200) {
         this.companyInfo = res.data.result.item;
-        console.log(res.data.result.item);
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -365,9 +365,29 @@ export default {
         }
       }
       const res = await this.$http.post("/api/SupplierProduct", fd);
-      if (res.data.result.code === 200) {
-        this.totalCount = res.data.result.item.totalCount;
-        this.productList = res.data.result.item.items;
+      const { code, item, msg } = res.data.result;
+      if (code === 200) {
+        if (this.shoppingList) {
+          for (let i = 0; i < item.items.length; i++) {
+            this.$set(item.items[i], "isShopping", false);
+            for (let j = 0; j < this.shoppingList.length; j++) {
+              if (
+                item.items[i].productNumber ===
+                this.shoppingList[j].productNumber
+              ) {
+                this.$set(item.items[i], "isShopping", true);
+              }
+            }
+          }
+        }
+        this.productList = item.items;
+        this.totalCount = item.totalCount;
+      } else {
+        this.totalCount = 0;
+        this.$common.handlerMsgState({
+          msg: msg,
+          type: "danger"
+        });
       }
     },
     //推荐产品接口

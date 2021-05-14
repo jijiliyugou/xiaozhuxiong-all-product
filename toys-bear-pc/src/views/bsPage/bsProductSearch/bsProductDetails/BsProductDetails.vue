@@ -12,6 +12,7 @@
           :thumbnailCount="5"
           :imageUrls="productDetail.imgUrlList"
           :videoAddress="productDetail.videoAddress"
+          :threeDimensional="productDetail.threeDimensional"
         />
       </div>
       <div class="right">
@@ -271,14 +272,16 @@ export default {
       this.item.isShopping = !this.item.isShopping;
       if (this.item.isShopping) {
         this.item.shoppingCount = 1;
-        this.$store.commit("pushShopping", this.item);
+        this.productDetail.shoppingCount = 1;
+        this.$store.commit("pushShopping", this.productDetail);
         this.$common.handlerMsgState({
           msg: "加购成功",
           type: "success"
         });
       } else {
         this.item.shoppingCount = 0;
-        this.$store.commit("popShopping", this.item);
+        this.productDetail.shoppingCount = 0;
+        this.$store.commit("popShopping", this.productDetail);
         this.$common.handlerMsgState({
           msg: "取消加购成功",
           type: "warning"

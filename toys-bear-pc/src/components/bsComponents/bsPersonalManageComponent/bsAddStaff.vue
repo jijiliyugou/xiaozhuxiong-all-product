@@ -125,7 +125,8 @@ export default {
           { required: true, message: "请输入员工账号", trigger: "blur" },
           {
             // pattern: /^1[2,3,4,5,6,7,8,9][0-9]{9}$/,
-            pattern: /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[0-8]|8\d|9\d)\d{8}$/,
+            pattern: /^1[3456789]\d{9}$/,
+            // pattern: /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[0-8]|8\d|9\d)\d{8}$/,
             message: "手机格式不正确",
             trigger: "blur"
           }

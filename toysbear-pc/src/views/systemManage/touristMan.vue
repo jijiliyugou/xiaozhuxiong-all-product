@@ -186,6 +186,39 @@
           <el-form-item label="公司名称：" prop="companyName">
             <el-input v-model="itemData.companyName" disabled></el-input>
           </el-form-item>
+          <el-form-item label="营业执照：">
+            <el-image
+              :z-index="9999"
+              style="width: 100px; height: 100px"
+              :src="itemData.businessLicense"
+              :preview-src-list="[itemData.businessLicense]"
+            >
+              <div
+                slot="placeholder"
+                class="image-slot"
+                style="width: 100px; height:100px;"
+              >
+                <img
+                  class="errorImg"
+                  style="width: 100px; height:100px;"
+                  src="~@/assets/images/imgError.png"
+                  alt
+                />
+              </div>
+              <div
+                slot="error"
+                class="image-slot"
+                style="width: 100px; height:100px;"
+              >
+                <img
+                  class="errorImg"
+                  style="width: 100px; height:100px;"
+                  src="~@/assets/images/imgError.png"
+                  alt
+                />
+              </div>
+            </el-image>
+          </el-form-item>
           <div class="items">
             <el-form-item label="公司类型：" prop="companyType">
               <el-select

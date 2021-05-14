@@ -104,6 +104,14 @@ export default {
       timer: null,
       activeName: "mobile",
       search: "",
+      bsHome: {
+        //跳转首页
+        component: "bsHome",
+        label: "后台首页",
+        linkUrl: "/bsIndex/bsHome",
+        name: "/bsIndex/bsHome",
+        refresh: true
+      },
       options: {
         // 二维码配置
         url: " ",
@@ -118,7 +126,8 @@ export default {
           {
             required: true,
             // pattern: /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|8[0-9]|9[89])\d{8}$/,
-            pattern: /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[0-8]|8\d|9\d)\d{8}$/,
+            // pattern: /^1(?:3\d|4[4-9]|5[0-35-9]|6[67]|7[0-8]|8\d|9\d)\d{8}$/,
+            pattern: /^1[3456789]\d{9}$/,
             message: "格式不正确",
             trigger: "blur"
           }
@@ -230,9 +239,16 @@ export default {
             );
             Json.PlatForm = await this.getClientTypeList("PlatForm");
             this.$store.commit("globalJson/setGlobalJson", Json);
+
             switch (res.data.result.commparnyList[0].companyType) {
+              // case "Admin":
+              //   break;
+              // case "Supplier":
+              //   break;
+              // case "Exhibition":
               case "Sales":
-                this.$router.push("/bsIndex");
+                this.$store.commit("updateActiveTab", this.bsHome);
+                this.$store.commit("closeTabAll", this.$router);
                 break;
               default:
                 location.href =
@@ -326,14 +342,6 @@ export default {
                 "setComparnyId",
                 res.data.result.commparnyList[0].commparnyId
               );
-              const localKey = res.data.result.uid;
-              let localShoppingCart = localStorage.getItem(localKey);
-              if (localShoppingCart) {
-                localShoppingCart = JSON.parse(localShoppingCart);
-                this.$store.commit("initShoppingCart", localShoppingCart);
-              } else {
-                this.$store.commit("initShoppingCart", []);
-              }
               // 获取系统参数
               const Json = {};
               Json.MessageRestriction = await this.getClientTypeList(
@@ -369,22 +377,14 @@ export default {
                 this.$store.commit("removeLoginItems");
               }
               console.log(res.data.result.commparnyList);
-              const fd = {
-                component: "bsHome",
-                label: "后台首页",
-                linkUrl: "/bsIndex/bsHome",
-                name: "/bsIndex/bsHome",
-                refresh: true
-              };
               switch (res.data.result.commparnyList[0].companyType) {
                 // case "Admin":
                 //   break;
                 // case "Supplier":
                 //   break;
                 // case "Exhibition":
-                //   break;
                 case "Sales":
-                  this.$store.commit("updateActiveTab", fd);
+                  this.$store.commit("updateActiveTab", this.bsHome);
                   this.$store.commit("closeTabAll", this.$router);
                   break;
                 default:
@@ -413,13 +413,9 @@ export default {
     },
     // 手机验证倒计时
     async getCode() {
-      if (
-        !/^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|8[0-9]|9[89])\d{8}$/.test(
-          this.loginforms.username
-        )
-      ) {
+      if (!/^1[3456789]\d{9}$/.test(this.loginforms.username)) {
         this.$common.handlerMsgState({
-          msg: "请输入手机号",
+          msg: "手机号格式不正确",
           type: "danger"
         });
         return;

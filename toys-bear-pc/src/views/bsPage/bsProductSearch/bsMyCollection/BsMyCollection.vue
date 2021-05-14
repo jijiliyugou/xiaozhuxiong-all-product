@@ -93,7 +93,8 @@
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
-import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+// import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
+import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
 import { mapGetters } from "vuex";
 export default {
@@ -148,12 +149,14 @@ export default {
       if (code === 200) {
         if (this.shoppingList) {
           for (let i = 0; i < item.items.length; i++) {
+            this.$set(item.items[i], "isShopping", false);
             for (let j = 0; j < this.shoppingList.length; j++) {
               if (
                 item.items[i].productNumber ===
                 this.shoppingList[j].productNumber
-              )
-                item.items[i].isShopping = true;
+              ) {
+                this.$set(item.items[i], "isShopping", true);
+              }
             }
           }
         }
