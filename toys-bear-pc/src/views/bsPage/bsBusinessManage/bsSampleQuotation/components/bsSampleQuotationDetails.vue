@@ -7,8 +7,8 @@
     ></bsSampleQuotationTopComponent>
     <div class="bsSampleTable">
       <div class="top">
-        <div class="left">报价产品列表({{ tableData.length }})</div>
-        <div class="right" v-if="tableData.length > 0">
+        <div class="left">报价产品列表({{ tableData.data.length }})</div>
+        <div class="right" v-if="tableData.data.length > 0">
           <el-button @click="exportOrder()" type="warning"> 导出列表</el-button>
         </div>
       </div>
@@ -317,6 +317,7 @@ export default {
             color: "#3368a9",
             align: "left",
             isHiden: true,
+            infoBox: true,
             productInfo: true,
             elImage: row => {
               return row.imgUrlList;

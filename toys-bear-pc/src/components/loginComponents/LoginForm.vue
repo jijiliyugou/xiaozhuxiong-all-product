@@ -242,9 +242,7 @@ export default {
 
             switch (res.data.result.commparnyList[0].companyType) {
               // case "Admin":
-              //   break;
               // case "Supplier":
-              //   break;
               // case "Exhibition":
               case "Sales":
                 this.$store.commit("updateActiveTab", this.bsHome);
@@ -379,9 +377,7 @@ export default {
               console.log(res.data.result.commparnyList);
               switch (res.data.result.commparnyList[0].companyType) {
                 // case "Admin":
-                //   break;
                 // case "Supplier":
-                //   break;
                 // case "Exhibition":
                 case "Sales":
                   this.$store.commit("updateActiveTab", this.bsHome);

@@ -75,47 +75,6 @@
     </div>
     <div class="tableBox">
       <bsTables :table="tableData" />
-      <!-- <el-table
-        :data="tableData"
-        style="width: 100%"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column
-          prop="totalAmount"
-          label="总价"
-          width="150"
-          align="center"
-        >
-          <template slot-scope="scope">
-            <span style="color: #ff0b00">
-              {{ scope.row.totalAmount }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="createdOn"
-          label="下单时间"
-          width="150"
-          align="center"
-        >
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.createdOn.replace(/T/, " ") }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="150">
-          <template slot-scope="scope">
-            <el-button
-              style="margin-right: 10px"
-              size="mini"
-              type="warning"
-              @click="openSelectTemplate(scope.row)"
-              >导出</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table> -->
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
