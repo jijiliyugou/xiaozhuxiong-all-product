@@ -47,7 +47,6 @@
     <div class="tableTitle">
       <div class="left">员工列表 ({{ totalCount }})</div>
       <div class="right">
-        <!-- v-show="myInfo.isMain" -->
         <el-button
           v-show="myInfo.isMain"
           type="primary"
@@ -60,103 +59,7 @@
       </div>
     </div>
     <!-- 表格数据 -->
-    <el-table
-      :data="tableData"
-      :header-cell-style="{ backgroundColor: '#f9fafc', color: '#666' }"
-      style="width: 100%"
-    >
-      <el-table-column label="序号" type="index" align="center" width="70">
-      </el-table-column>
-      <el-table-column label="员工" min-width="300">
-        <template slot-scope="scope">
-          <div class="nameBox">
-            <el-avatar
-              style="background-color: #e4efff"
-              :size="40"
-              :src="scope.row.userImage"
-            >
-              <p class="errText">
-                {{ scope.row.linkman }}
-              </p>
-            </el-avatar>
-            <span class="name">{{ scope.row.linkman }}</span>
-            <span class="isMain" v-if="scope.row.isMain"><i>主账号</i></span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="sex" label="性别" min-width="100" align="center">
-        <template slot-scope="scope">
-          <span v-if="scope.row.sex == 1">男</span>
-          <span v-else-if="scope.row.sex == 2">女</span>
-          <span v-else>未知</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="phoneNumber"
-        label="账号"
-        align="center"
-        min-width="150"
-      ></el-table-column>
-      <el-table-column
-        prop="isMain"
-        label="是否主账号"
-        min-width="100"
-        align="center"
-      >
-        <template slot-scope="scope">
-          <span v-if="scope.row.isMain">是</span>
-          <span v-else>否</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="enabled"
-        label="是否激活"
-        min-width="100"
-        align="center"
-      >
-        <template slot-scope="scope">
-          <span v-if="scope.row.enabled">是</span>
-          <span v-else>否</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="createdOn"
-        label="添加时间"
-        min-width="150"
-        align="center"
-      >
-        <template slot-scope="scope">
-          {{ scope.row.createdOn.replace(/[T].*/, "") }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" min-width="250" align="center">
-        <template slot-scope="scope">
-          <el-button
-            :disabled="!myInfo.isMain"
-            @click="openBind(scope.row)"
-            size="mini"
-            type="primary"
-          >
-            绑定员工
-          </el-button>
-          <el-button
-            :disabled="!myInfo.isMain"
-            @click="openEdit(scope.row)"
-            size="mini"
-            type="success"
-          >
-            编辑
-          </el-button>
-          <el-button
-            :disabled="!myInfo.isMain"
-            size="mini"
-            type="danger"
-            @click="handleDelete(scope.row)"
-            >删除</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
+    <Table :table="tableData"></Table>
     <!-- 新增员工 | 编辑员工 -->
     <el-dialog
       width="800px"
@@ -221,6 +124,7 @@
 
 <script>
 import { mapState } from "vuex";
+import Table from "@/components/table";
 import bsAddStaff from "@/components/bsComponents/bsPersonalManageComponent/bsAddStaff";
 import bsBindStaff from "@/components/bsComponents/bsPersonalManageComponent/bsBindStaff";
 import bsBindCompany from "@/components/bsComponents/bsPersonalManageComponent/bsBindCompany";
@@ -231,7 +135,8 @@ export default {
     bsAddStaff,
     bsBindStaff,
     bsBindCompany,
-    bsEditCompanyInfo
+    bsEditCompanyInfo,
+    Table
   },
   data() {
     return {
@@ -240,12 +145,112 @@ export default {
       totalCount: 0,
       myInfo: {},
       currentEditRow: {},
-      tableData: [],
       yuangongTitle: "新增员工",
       addEmployDialog: false,
       bindEmployDialog: false,
       isEdit: false,
-      currentRow: {}
+      currentRow: {},
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "",
+            label: "员工",
+            align: "left",
+            companyInfo: true,
+            width: 300,
+            companyLogo: row => {
+              return row.userImage;
+            },
+            linkman: row => {
+              return row.linkman;
+            },
+            companyName: row => {
+              return row.linkman;
+            }
+          },
+          {
+            prop: "yardType",
+            label: "性别",
+            render: row => {
+              return row.yardType === 1 ? "男" : "女";
+            }
+          },
+          { prop: "phoneNumber", label: "账号" },
+          {
+            prop: "isMain",
+            label: "是否主账号",
+            width: 100,
+            render: row => {
+              return row.isMain === true ? "是" : "否";
+            }
+          },
+          {
+            prop: "enabled",
+            label: "是否激活",
+            width: 100,
+            render: row => {
+              return row.enabled === true ? "是" : "否";
+            }
+          },
+          {
+            prop: "createdOn",
+            width: 150,
+            label: "添加时间",
+            render: row => {
+              return row.createdOn.replace(/T.*/, "");
+            }
+          }
+        ],
+        btnWidth: 300,
+        actions: [
+          {
+            disabledWrapper: () => {
+              return !this.myInfo.isMain;
+            },
+            classWrapper: () => {
+              return "success";
+            },
+            textWrapper: () => {
+              return "绑定员工";
+            },
+            methods: row => {
+              this.openBind(row);
+            }
+          },
+          {
+            disabledWrapper: () => {
+              return !this.myInfo.isMain;
+            },
+            classWrapper: () => {
+              return "primary";
+            },
+            textWrapper: () => {
+              return "编辑";
+            },
+            methods: row => {
+              this.openEdit(row);
+            }
+          },
+          {
+            disabledWrapper: () => {
+              return !this.myInfo.isMain;
+            },
+            classWrapper: () => {
+              return "danger";
+            },
+            textWrapper: () => {
+              return "删除";
+            },
+            methods: row => {
+              this.handleDelete(row);
+            }
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -367,7 +372,7 @@ export default {
       const { code, item, msg } = res.data.result;
       if (code === 200) {
         this.myInfo = item;
-        this.tableData = item.personnels;
+        this.tableData.data = item.personnels;
         this.totalCount = item.personnels.length;
       } else {
         this.$common.handlerMsgState({

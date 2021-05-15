@@ -74,38 +74,7 @@
       </div>
     </div>
     <div class="tableBox">
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column label="客户">
-          <template slot-scope="scope">
-            <i class="el-icon-view"></i>
-            <span style="margin-left: 15px">{{ scope.row.customerName }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="siteRegion" label="站点"></el-table-column>
-        <el-table-column
-          prop="createdBy"
-          label="业务员"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="email"
-          label="登录邮箱"
-          align="center"
-        ></el-table-column>
-        <el-table-column prop="createdOn" label="浏览时间" align="center">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.createdOn.replace(/T/, " ") }}
-            </span>
-          </template>
-        </el-table-column>
-      </el-table>
+      <Table :table="tableData"></Table>
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -124,8 +93,12 @@
 
 <script>
 import { mapState } from "vuex";
+import Table from "@/components/table";
 export default {
   name: "bsBrowsingHistory",
+  components: {
+    Table
+  },
   data() {
     return {
       staffList: [],
@@ -133,11 +106,38 @@ export default {
       websiteInfoId: null,
       keyword: null,
       dateTime: null,
-      tableData: [],
       sitesList: [],
       totalCount: 0,
       pageSize: 10,
-      currentPage: 1
+      currentPage: 1,
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "customerName",
+            label: "客户",
+            render: row => {
+              return (
+                "<i style='margin-right: 15px' class='el-icon-view'></i>" +
+                row.customerName
+              );
+            }
+          },
+          { prop: "siteRegion", label: "站点" },
+          { prop: "createdBy", label: "业务员" },
+          { prop: "email", label: "登录邮箱" },
+          {
+            prop: "createdOn",
+            label: "浏览时间",
+            render: row => {
+              return row.createdOn.replace(/T.*/, "");
+            }
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -174,7 +174,7 @@ export default {
       const res = await this.$http.post("/api/SearchLoginLogPage", fd);
       if (res.data.result.code === 200) {
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -200,7 +200,6 @@ export default {
     // 获取站点列表
     async getDefaultSites() {
       const res = await this.$http.post("/api/SearchDropdownWebsiteInfos", {});
-      console.log(res);
       if (res.data.result.code === 200) {
         this.sitesList = [{ name: "全部", id: null }, ...res.data.result.item];
       } else {

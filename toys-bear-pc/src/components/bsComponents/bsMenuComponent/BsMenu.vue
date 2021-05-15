@@ -52,7 +52,9 @@
             :key="item.id"
             :index="item.linkUrl"
           >
-            <i class="iconfont icon-dian"></i>
+            <span style="font-size: 26px;position: relative; top: -2px;"
+              >·</span
+            >
             <span> {{ item.name }}</span>
           </el-menu-item>
         </el-submenu>

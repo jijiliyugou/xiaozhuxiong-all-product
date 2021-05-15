@@ -117,7 +117,7 @@ export default {
         username: [
           {
             required: true,
-            pattern: /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|8[0-9]|9[89])\d{8}$/,
+            pattern: /^1[3456789]\d{9}$/,
             message: "格式不正确",
             trigger: "blur"
           }
@@ -391,12 +391,8 @@ export default {
     },
     // 手机验证倒计时
     async getCode() {
-      if (
-        !/^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|8[0-9]|9[89])\d{8}$/.test(
-          this.loginforms.username
-        )
-      ) {
-        this.$message.error("请输入手机号");
+      if (!/^1[3456789]\d{9}$/.test(this.loginforms.username)) {
+        this.$message.error("手机号格式错误");
         return;
       }
       const res = await this.$http.post("/api/SendSMS", {

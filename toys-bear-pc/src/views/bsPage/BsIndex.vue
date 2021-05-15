@@ -34,7 +34,7 @@
                 </el-tooltip>
               </span>
 
-              <div class="myScrollbar" ref="myScrollbar">
+              <div class="myScrollbar" @scroll="scrollevent" ref="myScrollbar">
                 <component
                   class="componentContent"
                   :item="item.value"
@@ -157,13 +157,15 @@ import bsHallSampleDetails from "@/views/bsPage/bsBusinessManage/bsHallSampleDet
 import bsShoppingCart from "@/views/bsPage/bsBusinessManage/bsShoppingCart/BsShoppingCart.vue";
 // 找样报价
 import bsSampleQuotation from "@/views/bsPage/bsBusinessManage/bsSampleQuotation/BsSampleQuotation.vue";
+//数据统计
+import bsDataTotal from "@/views/bsPage/bsBusinessManage/bsDataTotal/bsDataTotal.vue";
 // 找样报价-报价详情
-import bsSampleQuotationDetails from "@/components/bsComponents/bsSampleComponent/bsSampleQuotationDetails";
+import bsSampleQuotationDetails from "@/views/bsPage/bsBusinessManage/bsSampleQuotation/components/bsSampleQuotationDetails";
 // 找样报价-选择报价产品
 import bsSampleOfferCommodity from "@/components/bsComponents/bsSampleComponent/bsSampleOfferCommodity";
 
 // 找样报价-编辑详情
-import bsSampleUpdata from "@/components/bsComponents/bsSampleComponent/bsSampleUpdata";
+import bsSampleUpdata from "@/views/bsPage/bsBusinessManage/bsSampleQuotation/components/bsSampleUpdata";
 // 采购订单
 import bsPurchaseOrder from "@/views/bsPage/bsBusinessManage/bsPurchaseOrder/BsPurchaseOrder.vue";
 // 采购订单详情
@@ -218,6 +220,7 @@ export default {
     bsHallSampleDetails,
     bsShoppingCart,
     bsSampleQuotation,
+    bsDataTotal,
     bsSampleQuotationDetails,
     bsSampleOfferCommodity,
     bsSampleUpdata,
@@ -234,6 +237,13 @@ export default {
     };
   },
   methods: {
+    // 滚动
+    scrollevent(e) {
+      if (this.$route.path == "/bsIndex/bsShoppingCart") {
+        // console.log(e.target.scrollLeft);
+        eventBus.$emit("handlerLeft", e.target.scrollLeft);
+      }
+    },
     // 刷新tab标签
     triggerTab() {
       for (let i = 0; i < this.tabList.length; i++) {

@@ -3,12 +3,13 @@
     <el-table
       :data="table.data"
       v-loading="table.showLoading"
-      :height="table.height || '100%'"
+      :height="table.height"
       fit
       :size="table.sizeMini"
       :header-cell-style="{ backgroundColor: '#f9fafc' }"
       @selection-change="handleSelectionChange"
       @current-change="handleTableCurrentChange"
+      @row-click="handleDetail"
     >
       <el-table-column
         v-if="table.selection || false"
@@ -21,44 +22,96 @@
         label="序号"
         type="index"
         align="center"
-        width="60"
+        width="50"
       >
       </el-table-column>
       <el-table-column
         v-for="(col, index) in table.columns"
         :width="col.width"
+        :min-width="col.minWidth"
         :align="col.align || 'center'"
         :key="index"
         :prop="col.prop"
         :label="col.label"
-        :show-overflow-tooltip="table.isHiden || true"
+        :show-overflow-tooltip="col.isHiden"
         cell-mouse-enter
       >
+        <template v-if="col.renderHeard" slot="header">
+          <div v-html="col.renderHeard()"></div>
+        </template>
         <template slot-scope="scope">
-          <span v-if="col.render" v-html="col.render(scope.row)"></span>
+          <span
+            v-if="col.render"
+            :style="{ color: col.color }"
+            v-html="col.render(scope.row)"
+          ></span>
           <div class="productInfo" v-else-if="col.productInfo">
-            <el-image
-              v-if="col.elImage"
-              @click.native="goDetails(scope.row)"
-              style="width: 80px; height: 60px; min-width: 70px"
-              :src="col.elImage(scope.row)"
-              fit="contain"
+            <el-tooltip
+              effect="light"
+              placement="right"
+              popper-class="testtooltip"
             >
-              <div slot="placeholder" class="image-slot">
-                <img
-                  style="width: 80px; height: 60px"
-                  :src="require('@/assets/images/imgError.png')"
-                />
+              <div slot="content">
+                <el-image
+                  v-if="col.elImage"
+                  style="width: 300px; height: auto; cursor: pointer"
+                  :preview-src-list="isArray(col.elImage(scope.row))"
+                  :src="isString(col.elImage(scope.row))"
+                  fit="contain"
+                >
+                  <div
+                    slot="placeholder"
+                    class="image-slot"
+                    style="width: 300px; height: 280px; min-width: 300px"
+                  >
+                    <img
+                      style="width: 300px; height: 280px; min-width: 300px"
+                      :src="require('@/assets/images/imgError.png')"
+                    />
+                  </div>
+                  <div
+                    slot="error"
+                    class="image-slot"
+                    style="width: 300px; height: 280px; min-width: 300px"
+                  >
+                    <img
+                      style="width: 300px; height: 280px; min-width: 300px"
+                      :src="require('@/assets/images/imgError.png')"
+                    />
+                  </div>
+                </el-image>
               </div>
-              <div slot="error" class="image-slot">
-                <img
-                  style="width: 80px; height: 60px"
-                  @click="goDetails(scope.row)"
-                  :src="require('@/assets/images/imgError.png')"
-                />
-              </div>
-            </el-image>
-            <div class="infoBox">
+              <el-image
+                v-if="col.elImage"
+                @click.native="goDetails(scope.row)"
+                style="width: 82px; height: 62px; min-width: 82px"
+                :src="isString(col.elImage(scope.row))"
+                fit="contain"
+              >
+                <div
+                  slot="placeholder"
+                  class="image-slot"
+                  style="width: 82px; height: 62px"
+                >
+                  <img
+                    style="width: 82px; height: 62px"
+                    :src="require('@/assets/images/imgError.png')"
+                  />
+                </div>
+                <div
+                  slot="error"
+                  class="image-slot"
+                  style="width: 82px; height: 62px"
+                >
+                  <img
+                    style="width: 82px; height: 62px"
+                    @click="goDetails(scope.row)"
+                    :src="require('@/assets/images/imgError.png')"
+                  />
+                </div>
+              </el-image>
+            </el-tooltip>
+            <div class="infoBox" v-if="col.infoBox">
               <div
                 class="name"
                 @click="goDetails(scope.row)"
@@ -87,10 +140,26 @@
               </div>
             </div>
           </div>
+          <div class="nameBox" v-else-if="col.companyInfo">
+            <el-avatar
+              style="background-color: #e4efff"
+              :size="40"
+              :src="col.companyLogo(scope.row)"
+            >
+              <p class="errText" v-html="col.linkman(scope.row)"></p>
+            </el-avatar>
+            <span
+              style="margin-left: 10px"
+              class="name"
+              v-html="col.companyName(scope.row)"
+            ></span>
+            <span class="isMain" v-if="scope.row.isMain"><i>主账号</i></span>
+          </div>
           <span
-            v-else-if="col.textData"
+            v-else-if="col.isCallback"
+            @click="col.event(scope.row)"
             :style="{ color: col.color }"
-            v-html="col.textData(scope.row)"
+            v-html="col.isCallback(scope.row)"
           >
           </span>
           <span v-else-if="register(col)">
@@ -116,18 +185,20 @@
       >
         <template slot-scope="scope">
           <div v-if="table.actions">
-            <el-button
-              v-for="btn in table.actions"
-              :key="btn.index"
-              :type="btn.classWrapper(scope.row)"
-              :disabled="btn.disabledWrapper(scope.row)"
-              size="mini"
-              @click="btn.methods(scope.row)"
-              :icon="btn.icon"
-              :style="{ margin: btn.margin }"
-            >
-              {{ btn.textWrapper(scope.row) }}
-            </el-button>
+            <template v-for="btn in table.actions">
+              <el-button
+                v-if="!btn.hidden || btn.hidden(scope.row)"
+                :key="btn.index"
+                :type="btn.classWrapper(scope.row)"
+                :disabled="btn.disabledWrapper(scope.row)"
+                size="mini"
+                @click="btn.methods(scope.row)"
+                :icon="btn.icon"
+                :style="{ margin: btn.margin }"
+              >
+                {{ btn.textWrapper(scope.row) }}
+              </el-button>
+            </template>
           </div>
         </template>
       </el-table-column>
@@ -212,6 +283,23 @@ export default {
   },
   mounted() {},
   methods: {
+    isString(img) {
+      if (Array.isArray(img)) {
+        return img[0];
+      } else {
+        return img;
+      }
+    },
+    // 图片是数组或字符串
+    isArray(img) {
+      if (Array.isArray(img)) {
+        return img;
+      } else if (typeof img == "string") {
+        return [img];
+      } else {
+        return [];
+      }
+    },
     // 点击产品名字跳转
     goDetails(row) {
       const fd = {
@@ -244,6 +332,10 @@ export default {
       };
       this.$router.push("/bsIndex/bsVendorQuery");
       this.$store.commit("myAddTab", fd);
+    },
+    //厂商跳转
+    handleDetail(v) {
+      this.$emit("handleDetail", v);
     },
     // 去聊天
     toNews(item) {
@@ -379,6 +471,11 @@ export default {
   .cell {
     padding: 0 5px;
   }
+  .el-table__body-wrapper {
+    .cell {
+      padding: 8px 0;
+    }
+  }
 }
 .operate-menu img {
   float: left;
@@ -399,6 +496,7 @@ export default {
       line-height: 25px;
     }
     .name {
+      margin-top: 5px;
       cursor: pointer;
       overflow: hidden; /*超出部分隐藏*/
       white-space: nowrap; /*不换行*/
@@ -446,6 +544,18 @@ export default {
     min-width: 70px;
   }
 }
+.nameBox {
+  width: 300px;
+  display: flex;
+  align-items: center;
+  .el-avatar {
+    color: #3368a9;
+    img {
+      width: 40px;
+      min-height: 40px;
+    }
+  }
+}
 .addIcon {
   height: 60px;
   display: flex;
@@ -454,7 +564,6 @@ export default {
   .right {
     width: 46px;
     min-width: 46px;
-    padding-left: 10px;
     display: flex;
     align-items: center;
     justify-content: center;

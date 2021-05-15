@@ -13,7 +13,8 @@
         </div>
       </div>
       <div class="tableBox">
-        <el-table
+        <bsTable :table="tableData" />
+        <!-- <el-table
           :data="tableData"
           size="mini"
           style="width: 100%"
@@ -63,14 +64,6 @@
                       {{ scope.row.supplierName }}
                     </div>
                     <div class="icons">
-                      <!-- <el-tooltip
-                        class="item"
-                        effect="dark"
-                        :content="scope.row.supplierPhone || '暂时没有厂商电话'"
-                        placement="top"
-                      >
-                        <div class="cartPhoneIcon"></div>
-                      </el-tooltip> -->
                       <div class="cartInfoIcon"></div>
                     </div>
                   </div>
@@ -178,18 +171,6 @@
               </span>
             </template>
           </el-table-column>
-          <!-- <el-table-column label="箱数" align="center" width="100">
-            <template slot-scope="scope">
-              <input
-                class="inputNumber"
-                type="number"
-                @input="changeInputNumber($event, scope.row)"
-                @focus="selectInputValue($event)"
-                @keydown="nextInput($event)"
-                v-model="scope.row.boxNumber"
-              />
-            </template>
-          </el-table-column> -->
           <el-table-column prop="ch_pa" label="总数量" align="center">
             <template slot-scope="scope">
               <span>
@@ -235,24 +216,26 @@
               </span>
             </template>
           </el-table-column>
-        </el-table>
+        </el-table> -->
         <!-- 统计 -->
         <div class="tableBtoBox">
           <div class="tableBto">
             <div class="right">
               <p class="item">
                 <span class="itemTitle">总款数：</span>
-                <span>{{ tableData.length }}</span>
+                <span>{{ tableData.data.length }}</span>
               </p>
               <p class="item">
                 <span class="itemTitle">总箱数：</span>
-                <span>{{ myTotalQuantity(tableData) }}</span>
+                <span>{{ myTotalQuantity(tableData.data) }}</span>
               </p>
               <p class="item">
                 <span class="itemTitle">总体积/总材积：</span>
                 <span
-                  >{{ handleOffer(myTotalVolume(tableData).outerBoxStere) }}/{{
-                    handleOffer(myTotalVolume(tableData).outerBoxFeet)
+                  >{{
+                    handleOffer(myTotalVolume(tableData.data).outerBoxStere)
+                  }}/{{
+                    handleOffer(myTotalVolume(tableData.data).outerBoxFeet)
                   }}</span
                 >
               </p>
@@ -267,7 +250,7 @@
               <p class="item">
                 <span class="itemTitle">总金额：</span>
                 <span class="price"
-                  >{{ item.cu_de + handleOffer(myTotalPrice(tableData)) }}
+                  >{{ item.cu_de + handleOffer(myTotalPrice(tableData.data)) }}
                 </span>
               </p>
             </div>
@@ -306,11 +289,13 @@
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gongsizhaoyangbaojia.vue";
 import bsSampleQuotationTopComponent from "@/components/bsComponents/bsSampleComponent/bsSampleQuotationTopComponent";
+import bsTable from "@/components/table";
 export default {
   name: "bsSampleQuotationDetails",
   components: {
     bsExportOrder,
-    bsSampleQuotationTopComponent
+    bsSampleQuotationTopComponent,
+    bsTable
   },
   props: {
     item: {
@@ -319,10 +304,159 @@ export default {
   },
   data() {
     return {
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "name",
+            label: "产品",
+            width: 300,
+            color: "#3368a9",
+            align: "left",
+            isHiden: true,
+            productInfo: true,
+            elImage: row => {
+              return row.imgUrlList;
+            },
+            nameHtml: row => {
+              return row.name;
+            },
+            fcatoryNameHtml: row => {
+              return row.supplierName;
+            }
+          },
+          {
+            prop: "supplierPhone",
+            label: "联系厂商",
+            render: row => {
+              switch (row.supplierTelephoneNumber) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                  row.supplierTelephoneNumber = "";
+                  break;
+              }
+              switch (row.supplierPhone) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                  row.supplierTelephoneNumber = "";
+                  break;
+              }
+              return row.supplierPhone + "<br>" + row.supplierTelephoneNumber;
+            }
+          },
+          {
+            prop: "companyName",
+            isHiden: true,
+            label: "资料来源"
+          },
+          { prop: "fa_no", width: 60, label: "出厂货号", isHiden: true },
+          { prop: "ch_pa", width: 50, label: "包装", isHiden: true },
+          {
+            prop: "pr_le",
+            label: "产品规格(cm)",
+            isHiden: true,
+            render: row => {
+              return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
+            }
+          },
+          {
+            prop: "pr_le",
+            label: "包装规格(cm)",
+            isHiden: true,
+            render: row => {
+              return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
+            }
+          },
+          {
+            prop: "pr_le",
+            label: "外箱规格(cm)",
+            isHiden: true,
+            render: row => {
+              return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
+            }
+          },
+          {
+            prop: "bulk_stere",
+            label: "体积(cbm)/材积(cuft)",
+            isHiden: true,
+            width: 150,
+            render: row => {
+              return row.bulk_stere + "/" + row.bulk_feet;
+            }
+          },
+          {
+            prop: "gr_we",
+            label: "毛重/净重(kg)",
+            isHiden: true,
+            render: row => {
+              return row.gr_we + "/" + row.ne_we;
+            }
+          },
+          {
+            prop: "in_en",
+            label: "装箱量(pcs)",
+            isHiden: true,
+            render: row => {
+              return row.in_en + "/" + row.ou_lo;
+            }
+          },
+          {
+            prop: "boxNumber",
+            label: "箱数",
+            width: 50
+          },
+          {
+            label: "总数量",
+            width: 50,
+            render: row => {
+              return this.sumPriceCount(row.boxNumber, row.ou_lo);
+            }
+          },
+          {
+            prop: "price",
+            label: "厂价",
+            width: 50,
+            color: "red",
+            render: row => {
+              return "￥ " + row.price;
+            }
+          },
+          {
+            prop: "offerAmount",
+            label: "报出价",
+            width: 50,
+            color: "red",
+            render: row => {
+              return row.cu_de + " " + row.offerAmount;
+            }
+          },
+          {
+            prop: "OfferTotalAmount",
+            label: "报出总价",
+            width: 60,
+            color: "red",
+            render: row => {
+              return (
+                row.cu_de +
+                " " +
+                this.priceCount(row.offerAmount, row.ou_lo, row.boxNumber)
+              );
+            }
+          }
+        ]
+      },
       orderRow: {},
       exportTemplateDialog: false,
       handerTabData: [],
-      tableData: [],
       currentPage: 1,
       pageSize: 500,
       totalCount: 0,
@@ -402,7 +536,7 @@ export default {
         const res = await this.$http.post("/api/ProductOfferDetailPage", fd);
         if (res.data.result.code === 200) {
           this.totalCount = res.data.result.item.totalCount;
-          this.tableData = res.data.result.item.items;
+          this.tableData.data = res.data.result.item.items;
         } else {
           this.$message.error(res.data.result.msg);
         }
@@ -418,7 +552,7 @@ export default {
         );
         if (res.data.result.code === 200) {
           this.totalCount = res.data.result.item.totalCount;
-          this.tableData = res.data.result.item.items;
+          this.tableData.data = res.data.result.item.items;
         } else {
           this.$message.error(res.data.result.msg);
         }

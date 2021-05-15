@@ -41,7 +41,7 @@
         </li>
       </div>
     </ul>
-    <div class="tableBox">
+    <div class="mytableBox">
       <div class="tableTitle">
         <div class="titleText">
           <span class="title">产品列表</span>
@@ -52,18 +52,8 @@
           导出列表
         </el-button>
       </div>
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="myTableRef"
-        size="mini"
-        :header-cell-style="{
-          'font-size': '14px',
-          color: '#666',
-          backgroundColor: '#f9fafc',
-          'font-weight': '400'
-        }"
-      >
+      <bsTables :table="tableData" />
+      <!-- <el-table
         <el-table-column label="序号" type="index" align="center" width="50">
         </el-table-column>
         <el-table-column label="产品" width="220">
@@ -91,14 +81,6 @@
                     {{ scope.row.supplierName }}
                   </div>
                   <div class="icons">
-                    <!-- <el-tooltip
-                      class="item"
-                      effect="dark"
-                      :content="scope.row.supplierPhone || '暂时没有厂商电话'"
-                      placement="top"
-                    >
-                      <div class="cartPhoneIcon"></div>
-                    </el-tooltip> -->
                     <div class="cartInfoIcon" @click="toNews(scope.row)"></div>
                   </div>
                 </div>
@@ -239,7 +221,7 @@
             </span>
           </template>
         </el-table-column>
-      </el-table>
+      </el-table> -->
       <div class="totalBox">
         <p class="item">
           <span class="itemTitle">总款数：</span>
@@ -310,8 +292,9 @@
 
 <script>
 import bsExportOrder from "@/components/bsComponents/bsSiteSharingComponent/bsExportOrder";
+import bsTables from "@/components/table";
 export default {
-  components: { bsExportOrder },
+  components: { bsExportOrder, bsTables },
   props: {
     item: {
       type: Object
@@ -319,9 +302,184 @@ export default {
   },
   data() {
     return {
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "productName",
+            label: "产品",
+            width: 300,
+            color: "#3368a9",
+            align: "left",
+            isHiden: true,
+            infoBox: true,
+            productInfo: true,
+            elImage: row => {
+              return row.productImage;
+            },
+            nameHtml: row => {
+              return row.productName;
+            },
+            fcatoryNameHtml: row => {
+              return row.supplierName;
+            }
+          },
+          {
+            prop: "supplierPhone",
+            label: "联系厂商",
+            render: row => {
+              switch (row.supplierTelephoneNumber) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                  row.supplierTelephoneNumber = "";
+                  break;
+              }
+              switch (row.supplierPhone) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                  row.supplierTelephoneNumber = "";
+                  break;
+              }
+              return row.supplierPhone + "<br>" + row.supplierTelephoneNumber;
+            }
+          },
+          {
+            prop: "exhibitionName",
+            isHiden: true,
+            label: "资料来源"
+          },
+          { prop: "fa_no", label: "出厂货号", isHiden: true },
+          { prop: "ch_pa", label: "包装", isHiden: true, width: 90 },
+          {
+            prop: "pr_le",
+            label: "产品规格(cm)",
+            renderHeard: () => {
+              return "产品规格<br /> (cm)";
+            },
+            isHiden: true,
+            render: row => {
+              return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
+            }
+          },
+          {
+            prop: "pr_le",
+            label: "包装规格(cm)",
+            renderHeard: () => {
+              return "包装规格<br /> (cm)";
+            },
+            isHiden: true,
+            render: row => {
+              return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
+            }
+          },
+          {
+            prop: "pr_le",
+            label: "外箱规格(cm)",
+            renderHeard: () => {
+              return "外箱规格<br /> (cm)";
+            },
+            isHiden: true,
+            render: row => {
+              return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
+            }
+          },
+          {
+            prop: "bulk_stere",
+            label: "体积(cbm)/材积(cuft)",
+            isHiden: true,
+            renderHeard: () => {
+              return "体积/材积<br />(cbm)/(cuft)";
+            },
+            width: 150,
+            render: row => {
+              return row.bulk_stere + "/" + row.bulk_feet;
+            }
+          },
+          {
+            prop: "gr_we",
+            label: "毛重/净重(kg)",
+            isHiden: true,
+            renderHeard: () => {
+              return "毛重/净重<br />(kg)";
+            },
+            width: 100,
+            render: row => {
+              return row.gr_we + "/" + row.ne_we;
+            }
+          },
+          {
+            prop: "in_en",
+            label: "装箱量(pcs)",
+            renderHeard: () => {
+              return "装箱量<br />(pcs)";
+            },
+            isHiden: true,
+            render: row => {
+              return row.in_en + "/" + row.ou_lo;
+            }
+          },
+          {
+            prop: "productCount",
+            label: "箱数",
+            width: 50,
+            isHiden: true
+          },
+          {
+            label: "总数量",
+            isHiden: true,
+            width: 50,
+            render: row => {
+              return row.productCount * row.ou_lo;
+            }
+          },
+          {
+            prop: "costPrice",
+            label: "参考单价",
+            isHiden: true,
+            width: 70,
+            color: "#3368a9",
+            render: row => {
+              return "￥" + row.costPrice;
+            }
+          },
+          {
+            prop: "productPrice",
+            label: "报出价",
+            isHiden: true,
+            width: 70,
+            color: "#f56c6c",
+            render: row => {
+              return this.options.currencyType + row.productPrice;
+            }
+          },
+          {
+            prop: "OfferTotalAmount",
+            label: "报出总价",
+            width: 70,
+            isHiden: true,
+            color: "#f56c6c",
+            render: row => {
+              return this.priceCount(
+                row.productCount,
+                row.ou_lo,
+                row.productPrice
+              );
+            }
+          }
+        ],
+        btnWidth: 100
+      },
       exportTemplateDialog: false,
       isOrderDetailDialog: false,
-      tableData: [],
       options: {},
       currentPage: 1,
       pageSize: 10,
@@ -399,8 +557,7 @@ export default {
       );
       if (res.data.result.code === 200) {
         this.options = res.data.result.item;
-        this.tableData = res.data.result.item.shareOrderDetails.items;
-        console.log(this.options);
+        this.tableData.data = res.data.result.item.shareOrderDetails.items;
         this.totalCount = res.data.result.item.shareOrderDetails.totalCount;
       } else {
         this.$common.handlerMsgState({
@@ -586,7 +743,7 @@ export default {
       }
     }
   }
-  .tableBox {
+  .mytableBox {
     .tableTitle {
       padding-bottom: 18px;
       box-sizing: border-box;
@@ -598,97 +755,6 @@ export default {
         .title {
           font-weight: 700;
           border: none;
-        }
-      }
-    }
-    @{deep} .el-table {
-      .cell {
-        padding: 0 2px;
-      }
-      .el-table__header-wrapper .el-checkbox {
-        display: none;
-      }
-      // .cell {
-      // white-space: nowrap;
-      // width: fit-content;
-      // }
-      font-size: 12px;
-      .inputNumber {
-        width: 50px;
-        outline: none;
-        -moz-appearance: textfield;
-        text-align: center;
-        color: #ff3e3e;
-        &::-webkit-outer-spin-button,
-        &::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-          appearance: none;
-          margin: 0;
-        }
-      }
-      .price {
-        color: #ff3e3e;
-      }
-      .tableTotalNumber {
-        color: #ff3e3e;
-        font-size: 14px;
-        margin-top: 5px;
-      }
-      .imgBox {
-        text-align: left;
-        display: flex;
-        font-size: 14px;
-        .el-image {
-          cursor: pointer;
-        }
-        .productName {
-          width: 120px;
-          height: 60px;
-          margin-left: 15px;
-          .name,
-          .factory {
-            width: 120px;
-            cursor: pointer;
-            max-width: 120px;
-            overflow: hidden; /*超出部分隐藏*/
-            white-space: nowrap; /*不换行*/
-            text-overflow: ellipsis; /*超出部分文字以...显示*/
-          }
-          .factory {
-            color: #3368a9;
-            display: flex;
-            align-items: center;
-            .fcatoryName {
-              width: 100px;
-              max-width: 100px;
-              overflow: hidden; /*超出部分隐藏*/
-              white-space: nowrap; /*不换行*/
-              text-overflow: ellipsis; /*超出部分文字以...显示*/
-            }
-            .icons {
-              display: flex;
-              .cartPhoneIcon,
-              .cartInfoIcon {
-                width: 20px;
-                height: 20px;
-                margin-left: 15px;
-                cursor: pointer;
-              }
-              .cartPhoneIcon {
-                background: url("~@/assets/images/cartPhoneIcon.png") no-repeat
-                  center;
-                background-size: contain;
-              }
-              .cartInfoIcon {
-                background: url("~@/assets/images/cartInfoIcon.png") no-repeat
-                  center;
-                background-size: contain;
-              }
-            }
-          }
-          .name {
-            margin-top: 8px;
-          }
         }
       }
     }

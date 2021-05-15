@@ -54,7 +54,8 @@
           导出列表
         </el-button>
       </div>
-      <el-table
+      <Table :table="tableData"></Table>
+      <!-- <el-table
         :data="tableData"
         style="width: 100%"
         ref="myTableRef"
@@ -93,14 +94,6 @@
                     {{ scope.row.supplierName }}
                   </div>
                   <div class="icons">
-                    <el-tooltip
-                      class="item"
-                      effect="dark"
-                      :content="scope.row.supplierPhone || '暂时没有厂商电话'"
-                      placement="top"
-                    >
-                      <div class="cartPhoneIcon"></div>
-                    </el-tooltip>
                     <div class="cartInfoIcon"></div>
                   </div>
                 </div>
@@ -108,7 +101,16 @@
             </div>
           </template>
         </el-table-column>
-
+        <el-table-column label="联系厂商" align="center">
+          <template slot-scope="scope">
+            <div v-if="scope.row.supplierPhone">
+              {{ scope.row.supplierPhone }}
+            </div>
+            <div v-if="scope.row.supplierTelephoneNumber">
+              {{ scope.row.supplierTelephoneNumber }}
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="资料来源" show-overflow-tooltip>
           <template slot-scope="scope">
             {{ scope.row.exhibitionName }}
@@ -205,7 +207,7 @@
             </template>
           </template>
         </el-table-column>
-      </el-table>
+      </el-table> -->
       <div class="totalBox">
         <p class="item">
           <span class="itemTitle">总款数：</span>
@@ -225,10 +227,8 @@
           <span>{{ options.sumGr_we }}/{{ options.sumNe_we }}(KG)</span>
         </p>
         <p class="item">
-          <span class="itemTitle">总出厂价/总金额：</span>
+          <span class="itemTitle">总出厂价：</span>
           <span class="price">￥{{ options.sumAmountFa_pr }}</span>
-          <span>/</span>
-          <span class="price">{{ options.sumFa_pr_pr }}</span>
         </p>
       </div>
     </div>
@@ -268,10 +268,12 @@
 </template>
 
 <script>
+import Table from "@/components/table";
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/zhantingyewu.vue";
+
 export default {
   name: "bsVendorBusinessOrderDetails",
-  components: { bsExportOrder },
+  components: { bsExportOrder, Table },
   props: {
     item: {
       type: Object
@@ -281,7 +283,7 @@ export default {
     return {
       exportTemplateDialog: false,
       isOrderDetailDialog: false,
-      tableData: [],
+      // tableData: [],
       options: {
         sumtAmount: null,
         sumAmountFa_pr: null,
@@ -294,7 +296,144 @@ export default {
       },
       currentPage: 1,
       pageSize: 10,
-      totalCount: 0
+      totalCount: 0,
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "name",
+            label: "产品",
+            width: 300,
+            color: "#3368a9",
+            align: "left",
+            isHiden: true,
+            productInfo: true,
+            elImage: row => {
+              return row.imgUrl;
+            },
+            nameHtml: row => {
+              return row.pr_na;
+            },
+            fcatoryNameHtml: row => {
+              return row.supplierName;
+            }
+          },
+          {
+            prop: "supplierPhone",
+            label: "联系厂商",
+            render: row => {
+              switch (row.supplierTelephoneNumber) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                  row.supplierTelephoneNumber = "";
+                  break;
+              }
+              switch (row.supplierPhone) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                  row.supplierTelephoneNumber = "";
+                  break;
+              }
+              return row.supplierPhone + "<br>" + row.supplierTelephoneNumber;
+            }
+          },
+          {
+            prop: "exhibitionName",
+            isHiden: true,
+            label: "资料来源"
+          },
+          { prop: "fa_no", label: "出厂货号", isHiden: true },
+          { prop: "ch_pa", label: "包装", isHiden: true, width: 90 },
+          {
+            prop: "pr_le",
+            label: "产品规格(cm)",
+            isHiden: true,
+            renderHeard: () => {
+              return "产品规格(cm)";
+            },
+            render: row => {
+              return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
+            }
+          },
+          {
+            prop: "pr_le",
+            label: "包装规格(cm)",
+            isHiden: true,
+            renderHeard: () => {
+              return "包装规格(cm)";
+            },
+            render: row => {
+              return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
+            }
+          },
+          {
+            prop: "pr_le",
+            label: "外箱规格",
+            isHiden: true,
+            renderHeard: () => {
+              return "外箱规格(cm)";
+            },
+            render: row => {
+              return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
+            }
+          },
+          {
+            prop: "bulk_stere",
+            label: "体积(cbm)/材积(cuft)",
+            isHiden: true,
+            width: 150,
+            render: row => {
+              return row.bulk_stere + row.bulk_feet;
+            }
+          },
+          {
+            prop: "gr_we",
+            label: "毛重/净重(kg)",
+            isHiden: true,
+            render: row => {
+              return row.gr_we + "/" + row.ne_we;
+            }
+          },
+          {
+            prop: "in_en",
+            label: "装箱量(pcs)",
+            width: 90,
+            isHiden: true,
+            render: row => {
+              return row.in_en + "/" + row.ou_lo;
+            }
+          },
+          {
+            prop: "fa_pr",
+            label: "参考单价",
+            isHiden: true,
+            width: 80,
+            color: "red",
+            render: row => {
+              return row.cu_de + " " + row.fa_pr;
+            }
+          },
+          {
+            prop: "messageStatus",
+            label: "状态",
+            isHiden: true,
+            width: 80,
+            color: "red",
+            render: row => {
+              return this.getSatusByMessageModal(row); //报出价没有 用单价
+            }
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -365,8 +504,9 @@ export default {
         id: this.item.erpOrderID
       });
       if (res.data.result.code === 200) {
-        this.tableData = res.data.result.item.items;
+        //this.tableData = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
+        this.$set(this.tableData, "data", res.data.result.item.items);
         console.log(this.tableData);
       } else {
         this.$common.handlerMsgState({
@@ -390,6 +530,48 @@ export default {
       )
         return false;
       this.getSearchCompanyShareOrderDetailsPage();
+    },
+    //根据消息类型返回状态
+    getSatusByMessageModal(row) {
+      var text = "";
+      var color = "#ed4014";
+      if (row.messageExt == "3") {
+        if (row.messageStatus == "1") {
+          text = "不补样";
+          color = "#67c23a";
+        } else {
+          text = "补样";
+          color = "#ed4014";
+        }
+      } else if (row.messageExt == "5") {
+        if (row.messageStatus == "1") {
+          text = "不借样";
+          color = "#67c23a";
+        } else {
+          text = "借样";
+          color = "#ed4014";
+        }
+      } else if (row.messageExt == "11") {
+        if (row.messageStatus == "1") {
+          text = "借样";
+          color = "#ed4014";
+        } else if (row.messageStatus == "2") {
+          text = "不允许";
+          color = "#67c23a";
+        } else {
+          text = "补样";
+          color = "#ed4014";
+        }
+      } else if (row.messageExt == "12") {
+        if (row.messageStatus == "1") {
+          text = "不接受";
+          color = "#ed4014";
+        } else {
+          text = "接受";
+          color = "#67c23a";
+        }
+      }
+      return "<span style='display:" + color + "'>" + text + "</span>";
     }
   },
   created() {},

@@ -101,83 +101,7 @@
       </div>
     </div>
     <div class="tableBox">
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="collecTable"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column label="择样单号" min-width="100">
-          <template slot-scope="scope">
-            <div
-              style="color: #3368a9; cursor: pointer"
-              @click="toDetails(scope.row)"
-            >
-              {{ scope.row.orderNumber }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="择样类型" align="center">
-          <template slot-scope="scope">
-            {{ scope.row.messageExt | switchMessageExt }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="the_nu"
-          label="本次代号"
-          align="center"
-          width="100"
-        >
-        </el-table-column>
-        <el-table-column label="择样日期" align="center" min-width="150">
-          <template slot-scope="scope">
-            <span>
-              {{
-                scope.row.happenDate && scope.row.happenDate.replace(/T/, " ")
-              }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="hall_na" label="展厅名称" align="center">
-        </el-table-column>
-        <el-table-column prop="orgPersonnelName" label="业务员" align="center">
-        </el-table-column>
-        <el-table-column
-          prop="pushContent"
-          label="备注"
-          align="center"
-          show-overflow-tooltip
-        >
-        </el-table-column>
-        <el-table-column prop="state" label="状态" align="center" width="100">
-          <template slot-scope="scope">
-            <span style="color: #f56c6c" v-if="scope.row.readStatus == 0">
-              未读
-            </span>
-            <span style="color: #f56c6c" v-else-if="scope.row.readStatus == 1">
-              已读
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          header-align="center"
-          align="center"
-          width="100"
-        >
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              type="warning"
-              @click="exportOrder(scope.row)"
-            >
-              导出
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <bsTables :table="tableData" />
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -216,13 +140,130 @@
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/zhantingyewu.vue";
 import { mapState } from "vuex";
+import bsTables from "@/components/table";
 export default {
   name: "bsHallBusiness",
   components: {
-    bsExportOrder
+    bsExportOrder,
+    bsTables
   },
   data() {
     return {
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: this.size,
+        isIndex: true,
+        columns: [
+          {
+            prop: "orderNumber",
+            minWidth: 100,
+            isHiden: true,
+            label: "择样单号",
+            event: row => {
+              const fd = {
+                name: row.orderNumber,
+                linkUrl: "/bsIndex/bsHallBusiness",
+                component: "bsHallBusinessOrderDetails",
+                refresh: true,
+                label: row.orderNumber,
+                value: row
+              };
+              this.$store.commit("myAddTab", fd);
+            },
+            isCallback: row => {
+              return (
+                "<span style='color: #3368a9; cursor: pointer;'>" +
+                row.orderNumber +
+                "</span>"
+              );
+            }
+          },
+          {
+            prop: "messageExt",
+            isHiden: true,
+            label: "择样类型",
+            render: row => {
+              let msg;
+              switch (row.messageExt) {
+                case "0":
+                  msg = "系统通知";
+                  break;
+                case "3":
+                  msg = "补样";
+                  break;
+                case "5":
+                  msg = "借样";
+                  break;
+                case "11":
+                  msg = "补样借样";
+                  break;
+                case "12":
+                  msg = "洽谈";
+                  break;
+              }
+              return msg;
+            }
+          },
+          {
+            prop: "the_nu",
+            isHiden: true,
+            label: "本次代号"
+          },
+          {
+            prop: "happenDate",
+            isHiden: true,
+            label: "择样日期",
+            render: row => {
+              return row.happenDate ? row.happenDate.replace(/T.*/, "") : "";
+            }
+          },
+          {
+            prop: "hall_na",
+            isHiden: true,
+            label: "展厅名称"
+          },
+          {
+            prop: "orgPersonnelName",
+            isHiden: true,
+            label: "业务员"
+          },
+          {
+            prop: "pushContent",
+            isHiden: true,
+            label: "备注"
+          },
+          {
+            prop: "readStatus",
+            isHiden: true,
+            label: "状态",
+            render: row => {
+              let msg = "";
+              switch (row.readStatus) {
+                case false:
+                  msg = "<span style='color: green'>未读</span>";
+                  break;
+                case true:
+                  msg = "<span style='color: #f56c6c'>已读</span>";
+                  break;
+              }
+              return msg;
+            }
+          }
+        ],
+        btnWidth: 100,
+        actions: [
+          {
+            type: "success",
+            textWrapper() {
+              return "导出";
+            },
+            methods: row => {
+              this.exportOrder(row);
+            }
+          }
+        ]
+      },
       staffList: [],
       exportTemplateDialog: false,
       orderRow: {},
@@ -270,7 +311,6 @@ export default {
         readStatus: "-1",
         dateTime: null
       },
-      tableData: [],
       totalCount: 0,
       pageSize: 10,
       currentPage: 1
@@ -311,7 +351,6 @@ export default {
     },
     // 获取列表
     async getTableDataList() {
-      console.log(this.searchForm.fromCompanyName);
       const fd = {
         readStatus: this.searchForm.readStatus,
         sampleFrom: "hall",
@@ -332,7 +371,7 @@ export default {
       const res = await this.$http.post("/api/GetERPOrderListByPage", fd);
       if (res.data.result.code === 200) {
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
       }
     },
     // 删除
@@ -436,41 +475,41 @@ export default {
       }
     }
   }
-  @{deep} .tableBox {
-    .el-table {
-      font-size: 13px;
-      .imgBox {
-        text-align: left;
-        display: flex;
-        font-size: 14px;
-        .productName {
-          width: 190px;
-          height: 60px;
-          margin-left: 15px;
-          .name,
-          .factory {
-            width: 190px;
-            max-width: 190px;
-            overflow: hidden; /*超出部分隐藏*/
-            white-space: nowrap; /*不换行*/
-            text-overflow: ellipsis; /*超出部分文字以...显示*/
-          }
-          .factory {
-            color: #3368a9;
-          }
-          .name {
-            margin-top: 8px;
-          }
-        }
-      }
-    }
-    .errorImg {
-      img {
-        width: 80px;
-        height: 60px;
-      }
-    }
-  }
+  // @{deep} .tableBox {
+  // .el-table {
+  //   font-size: 13px;
+  //   .imgBox {
+  //     text-align: left;
+  //     display: flex;
+  //     font-size: 14px;
+  //     .productName {
+  //       width: 190px;
+  //       height: 60px;
+  //       margin-left: 15px;
+  //       .name,
+  //       .factory {
+  //         width: 190px;
+  //         max-width: 190px;
+  //         overflow: hidden; /*超出部分隐藏*/
+  //         white-space: nowrap; /*不换行*/
+  //         text-overflow: ellipsis; /*超出部分文字以...显示*/
+  //       }
+  //       .factory {
+  //         color: #3368a9;
+  //       }
+  //       .name {
+  //         margin-top: 8px;
+  //       }
+  //     }
+  //   }
+  // }
+  // .errorImg {
+  //   img {
+  //     width: 80px;
+  //     height: 60px;
+  //   }
+  // }
+  // }
 }
 @{deep} .exportOrder {
   .el-dialog__body {

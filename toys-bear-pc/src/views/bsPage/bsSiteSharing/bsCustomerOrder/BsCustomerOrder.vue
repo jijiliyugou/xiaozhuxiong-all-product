@@ -74,44 +74,12 @@
       </div>
     </div>
     <div class="tableBox">
-      <el-table
+      <bsTables :table="tableData" />
+      <!-- <el-table
         :data="tableData"
         style="width: 100%"
         :header-cell-style="{ backgroundColor: '#f9fafc' }"
       >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column prop="orderNumber" label="订单编号" width="220">
-          <template slot-scope="scope">
-            <div class="orderNumberBox" @click="toOrderDetails(scope.row)">
-              <i class="el-icon-tickets"></i>
-              <span style="margin-left: 15px">
-                {{ scope.row.orderNumber }}
-              </span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="siteRegion"
-          label="站点"
-          width="100"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="customerName"
-          label="客户"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="createdBy"
-          label="业务员"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="totalKuanshu"
-          label="产品总款数"
-          align="center"
-        ></el-table-column>
         <el-table-column
           prop="totalAmount"
           label="总价"
@@ -147,7 +115,7 @@
             >
           </template>
         </el-table-column>
-      </el-table>
+      </el-table> -->
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -187,9 +155,9 @@
             <li :class="{ item: true, active: tp == 5 }" @click="checkTp(5)">
               宏升导入EXCEL模板
             </li>
-            <!-- <li :class="{ item: true, active: tp == 6 }" @click="checkTp(6)">
+            <li :class="{ item: true, active: tp == 6 }" @click="checkTp(6)">
               报出价不带厂商资料 (英文)
-            </li> -->
+            </li>
           </div>
           <div class="right">
             <div class="tp1" v-show="tp === 1">
@@ -197,6 +165,8 @@
               <div class="imgBox">
                 <el-image
                   fit="contain"
+                  :z-index="5000"
+                  :preview-src-list="[require('@/assets/images/mode1.png')]"
                   class="myImg"
                   :src="require('@/assets/images/mode1.png')"
                 ></el-image>
@@ -258,6 +228,8 @@
               <div class="imgBox">
                 <el-image
                   fit="contain"
+                  :z-index="5000"
+                  :preview-src-list="[require('@/assets/images/mode2.png')]"
                   class="myImg"
                   :src="require('@/assets/images/mode2.png')"
                 ></el-image>
@@ -319,6 +291,8 @@
               <div class="imgBox">
                 <el-image
                   fit="contain"
+                  :z-index="5000"
+                  :preview-src-list="[require('@/assets/images/mode3.png')]"
                   class="myImg"
                   :src="require('@/assets/images/mode3.png')"
                 ></el-image>
@@ -380,6 +354,8 @@
               <div class="imgBox">
                 <el-image
                   fit="contain"
+                  :z-index="5000"
+                  :preview-src-list="[require('@/assets/images/mode4.png')]"
                   class="myImg"
                   :src="require('@/assets/images/mode4.png')"
                 ></el-image>
@@ -442,6 +418,8 @@
                 <el-image
                   fit="contain"
                   class="myImg"
+                  :z-index="5000"
+                  :preview-src-list="[require('@/assets/images/mode5.png')]"
                   :src="require('@/assets/images/mode5.png')"
                 ></el-image>
               </div>
@@ -479,7 +457,9 @@
                 <el-image
                   fit="contain"
                   class="myImg"
-                  :src="require('@/assets/images/mode2.png')"
+                  :src="require('@/assets/images/mode6.png')"
+                  :z-index="5000"
+                  :preview-src-list="[require('@/assets/images/mode6.png')]"
                 ></el-image>
               </div>
               <div class="selectTions">
@@ -556,11 +536,90 @@
 import bsExportOrder from "@/components/bsComponents/bsSiteSharingComponent/bsExportOrder";
 import { getCurrentTime } from "@/assets/js/common/common.js";
 import { mapState } from "vuex";
+import bsTables from "@/components/table";
 export default {
   name: "bsCustomerOrder",
-  components: { bsExportOrder },
+  components: { bsExportOrder, bsTables },
   data() {
     return {
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: this.size,
+        isIndex: true,
+        columns: [
+          {
+            prop: "orderNumber",
+            minWidth: 100,
+            isHiden: true,
+            label: "订单编号",
+            event: row => {
+              this.toOrderDetails(row);
+            },
+            isCallback: row => {
+              return (
+                "<div style='color: #3368a9; cursor: pointer;'><i style='margin-right: 5px;' class='el-icon-tickets'></i><span>" +
+                row.orderNumber +
+                "</span></div>"
+              );
+            }
+          },
+          {
+            prop: "siteRegion",
+            isHiden: true,
+            label: "站点"
+          },
+          {
+            prop: "customerName",
+            isHiden: true,
+            label: "客户"
+          },
+          {
+            prop: "createdBy",
+            isHiden: true,
+            label: "业务员"
+          },
+          {
+            prop: "totalKuanshu",
+            isHiden: true,
+            label: "产品总款数"
+          },
+          {
+            prop: "totalAmount",
+            isHiden: true,
+            label: "总价",
+            color: "#eb1515",
+            render: row => {
+              return (
+                "<spam style='margin-right:5px;'>" +
+                row.currencyType +
+                "</spam>" +
+                row.totalAmount
+              );
+            }
+          },
+          {
+            prop: "createdOn",
+            isHiden: true,
+            label: "下单时间",
+            render: row => {
+              return row.createdOn ? row.createdOn.replace(/T.*/, "") : "";
+            }
+          }
+        ],
+        btnWidth: 100,
+        actions: [
+          {
+            type: "warning",
+            textWrapper() {
+              return "导出";
+            },
+            methods: row => {
+              this.openSelectTemplate(row);
+            }
+          }
+        ]
+      },
       websiteInfoId: null,
       userId: null,
       staffList: [],
@@ -574,7 +633,6 @@ export default {
       currentOrder: {},
       keyword: null,
       dateTime: null,
-      tableData: [],
       sitesList: [],
       totalCount: 0,
       pageSize: 10,
@@ -691,7 +749,7 @@ export default {
         fd
       );
       if (res.data.result.code === 200) {
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
       }
     },

@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-03-31 17:09:19
  * @FilePath: \projectd:\LittleBearPC\toys-bear-pc\src\router\bsRouter\bsBusinessManage\index.js
- * @LastEditTime: 2021-05-11 16:27:55
+ * @LastEditTime: 2021-05-14 14:47:09
  * @LastEditors: sueRimn
  * @Descripttion:
  * @version: 1.0.0
@@ -41,6 +41,9 @@ const BsSampleQuotation = () =>
 // 采购订单
 const BsPurchaseOrder = () =>
   import("@/views/bsPage/bsBusinessManage/bsPurchaseOrder/BsPurchaseOrder.vue");
+//数据统计
+const BsDataTotal = () =>
+  import("@/views/bsPage/bsBusinessManage/bsDataTotal/bsDataTotal.vue");
 
 export default [
   {
@@ -100,6 +103,14 @@ export default [
     path: "/bsIndex/bsPurchaseOrder",
     name: "bsPurchaseOrder",
     component: BsPurchaseOrder,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsDataTotal",
+    name: "bsDataTotal",
+    component: BsDataTotal,
     meta: {
       keepAlive: true
     }

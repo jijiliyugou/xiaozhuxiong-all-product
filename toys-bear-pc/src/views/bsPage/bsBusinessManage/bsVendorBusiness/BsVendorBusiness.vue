@@ -101,7 +101,8 @@
       </div>
     </div>
     <div class="tableBox">
-      <el-table
+      <Table :table="tableData"></Table>
+      <!-- <el-table
         :data="tableData"
         style="width: 100%"
         ref="collecTable"
@@ -168,13 +169,6 @@
           width="100"
         >
           <template slot-scope="scope">
-            <!-- <el-button
-              size="mini"
-              type="primary"
-              @click="exportOrder(scope.row)"
-            >
-              推送
-            </el-button> -->
             <el-button
               size="mini"
               type="warning"
@@ -184,7 +178,7 @@
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
+      </el-table> -->
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -221,12 +215,14 @@
 </template>
 
 <script>
+import Table from "@/components/table";
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/zhantingyewu.vue";
 import { mapState } from "vuex";
 export default {
   name: "bsVendorBusiness",
   components: {
-    bsExportOrder
+    bsExportOrder,
+    Table
   },
   data() {
     return {
@@ -277,10 +273,113 @@ export default {
         readStatus: "-1",
         dateTime: null
       },
-      tableData: [],
+      // tableData: [],
       totalCount: 0,
       pageSize: 10,
-      currentPage: 1
+      currentPage: 1,
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "orderNumber",
+            minWidth: 100,
+            isHiden: true,
+            label: "择样单号",
+            event: row => {
+              const fd = {
+                name: row.orderNumber,
+                linkUrl: "/bsIndex/bsVendorBusiness",
+                component: "bsVendorBusinessOrderDetails",
+                refresh: true,
+                label: row.orderNumber,
+                value: row
+              };
+              this.$store.commit("myAddTab", fd);
+            },
+            isCallback: row => {
+              return (
+                "<span style='color: #3368a9; cursor: pointer;'>" +
+                row.orderNumber +
+                "</span>"
+              );
+            }
+          },
+          {
+            prop: "messageExt",
+            isHiden: true,
+            label: "择样类型",
+            render: row => {
+              let msg;
+              switch (row.messageExt) {
+                case "0":
+                  msg = "系统通知";
+                  break;
+                case "3":
+                  msg = "补样";
+                  break;
+                case "5":
+                  msg = "借样";
+                  break;
+                case "11":
+                  msg = "补样借样";
+                  break;
+                case "12":
+                  msg = "洽谈";
+                  break;
+              }
+              return msg;
+            }
+          },
+          {
+            prop: "the_nu",
+            isHiden: true,
+            label: "本次代号"
+          },
+          {
+            prop: "happenDate",
+            isHiden: true,
+            label: "择样日期",
+            render: row => {
+              return row.happenDate ? row.happenDate.replace(/T.*/, "") : "";
+            }
+          },
+          {
+            prop: "hall_na",
+            isHiden: true,
+            label: "展厅名称"
+          },
+          {
+            prop: "orgPersonnelName",
+            isHiden: true,
+            label: "业务员"
+          },
+          {
+            prop: "pushContent",
+            isHiden: true,
+            label: "备注"
+          },
+          {
+            prop: "readStatus",
+            isHiden: true,
+            label: "状态",
+            render: row => {
+              let msg = "";
+              switch (row.readStatus) {
+                case false:
+                  msg = "<span style='color: green'>未读</span>";
+                  break;
+                case true:
+                  msg = "<span style='color: #f56c6c'>已读</span>";
+                  break;
+              }
+              return msg;
+            }
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -340,7 +439,8 @@ export default {
       const res = await this.$http.post("/api/GetERPOrderListByPage", fd);
       if (res.data.result.code === 200) {
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        // this.tableData = res.data.result.item.items;
+        this.$set(this.tableData, "data", res.data.result.item.items);
       }
     },
     // 删除

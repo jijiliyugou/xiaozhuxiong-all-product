@@ -60,70 +60,7 @@
       </div>
     </div>
     <div class="tableBox">
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="collecTable"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column align="center" label="语种" prop="languageName">
-        </el-table-column>
-        <el-table-column align="center" label="公司名称" prop="companyName">
-        </el-table-column>
-        <el-table-column label="地址" prop="contactAddress" width="300">
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="contactName"
-          label="联系人"
-        ></el-table-column>
-        <el-table-column
-          align="center"
-          prop="telephone"
-          label="联系电话"
-        ></el-table-column>
-        <el-table-column
-          align="center"
-          prop="phoneNumber"
-          label="联系手机"
-        ></el-table-column>
-        <el-table-column
-          align="center"
-          prop="email"
-          label="邮箱"
-        ></el-table-column>
-        <el-table-column align="center" prop="qq" label="QQ"></el-table-column>
-        <el-table-column
-          align="center"
-          prop="staffName"
-          label="业务员"
-        ></el-table-column>
-        <el-table-column
-          label="操作"
-          header-align="center"
-          align="center"
-          min-width="120"
-        >
-          <template slot-scope="scope">
-            <el-button
-              style="margin-right: 10px"
-              size="mini"
-              type="success"
-              @click.stop="openEdit(scope.row)"
-              >编辑</el-button
-            >
-            <el-button
-              size="mini"
-              type="warning"
-              @click.stop="handleDelete(scope.row)"
-              slot="reference"
-              >删除</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
+      <Table :table="tableData"></Table>
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -235,9 +172,13 @@
 </template>
 
 <script>
+import Table from "@/components/table";
 import { mapState } from "vuex";
 export default {
   name: "BsContactWay",
+  components: {
+    Table
+  },
   computed: {
     ...mapState(["currentComparnyId", "userInfo"])
   },
@@ -257,7 +198,48 @@ export default {
         email: "",
         qq: ""
       },
-      tableData: [],
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          { prop: "languageName", label: "语种" },
+          { prop: "companyName", label: "公司名称" },
+          { prop: "contactAddress", label: "地址", isHiden: true, width: 300 },
+          { prop: "contactName", label: "联系人" },
+          { prop: "telephone", label: "联系电话" },
+          { prop: "phoneNumber", label: "联系手机" },
+          { prop: "email", label: "邮箱" },
+          { prop: "qq", label: "QQ" },
+          { prop: "staffName", label: "业务员" }
+        ],
+        btnWidth: 200,
+        actions: [
+          {
+            classWrapper: () => {
+              return "primary";
+            },
+            textWrapper: () => {
+              return "编辑";
+            },
+            methods: row => {
+              this.openEdit(row);
+            }
+          },
+          {
+            classWrapper: () => {
+              return "danger";
+            },
+            textWrapper: () => {
+              return "删除";
+            },
+            methods: row => {
+              this.handleDelete(row);
+            }
+          }
+        ]
+      },
       pageSize: 10,
       currentPage: 1,
       totalCount: 0,
@@ -305,7 +287,7 @@ export default {
       }
       const res = await this.$http.post("/api/ContactInformationPage", fd);
       if (res.data.result.code === 200) {
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
       }
     },

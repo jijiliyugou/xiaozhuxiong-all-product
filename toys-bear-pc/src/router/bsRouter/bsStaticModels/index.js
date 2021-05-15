@@ -22,7 +22,7 @@ const BsHallBusinessOrderDetails = () =>
 // 找样报价-报价详情
 const BsSampleQuotationDetails = () =>
   import(
-    "@/components/bsComponents/bsSampleComponent/bsSampleQuotationDetails.vue"
+    "@/views/bsPage/bsBusinessManage/bsSampleQuotation/components/bsSampleQuotationDetails"
   );
 // 找样报价-选择报价产品
 const BsSampleOfferCommodity = () =>

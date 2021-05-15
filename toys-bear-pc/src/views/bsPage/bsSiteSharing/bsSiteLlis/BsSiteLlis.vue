@@ -227,6 +227,7 @@
       <el-form
         ref="addClientFormRef"
         label-width="120px"
+        size="medium"
         :rules="addRules"
         :model="clienFormData"
       >

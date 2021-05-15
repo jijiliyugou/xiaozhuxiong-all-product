@@ -69,122 +69,7 @@
         </div>
       </div>
       <div class="tableBox">
-        <el-table
-          :data="tableData"
-          style="width: 100%"
-          ref="collecTable"
-          :header-cell-style="{ backgroundColor: '#f9fafc' }"
-        >
-          <el-table-column label="序号" type="index" align="center" width="50">
-          </el-table-column>
-          <el-table-column label="报价单号" min-width="100">
-            <template slot-scope="scope">
-              <span
-                @click="goDetails(scope.row)"
-                style="color: #3368a9; cursor: pointer"
-              >
-                {{ scope.row.offerNumber }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="customerName"
-            label="客户名称"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            prop="createdOn"
-            label="报价时间"
-            min-width="100"
-            align="center"
-          >
-            <template slot-scope="scope">
-              {{ scope.row.createdOn.replace(/T/, " ") }}
-            </template>
-          </el-table-column>
-          <el-table-column align="center" label="业务员">
-            <template slot-scope="scope">
-              <span>
-                {{ scope.row.linkman }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column label="报价总数" prop="total" align="center">
-          </el-table-column>
-          <el-table-column label="总金额" align="center">
-            <template slot-scope="scope">
-              <span style="color: #eb1515">
-                {{ scope.row.cu_de }}
-              </span>
-              <span style="color: #eb1515">
-                {{ scope.row.offerTotalAmount }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column label="币种" align="center">
-            <template slot-scope="scope">
-              <span>
-                {{ scope.row.cu_deName }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column label="汇率" align="center">
-            <template slot-scope="scope">
-              <span>{{ scope.row.exchange }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="profit" label="利润" align="center">
-          </el-table-column>
-          <el-table-column prop="status" label="状态" align="center">
-            <template slot-scope="scope">
-              {{
-                scope.row.status === 0
-                  ? "未审核"
-                  : scope.row.status === 1
-                  ? "审核通过"
-                  : "审核不通过"
-              }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="操作"
-            header-align="center"
-            align="center"
-            width="300"
-          >
-            <template slot-scope="scope">
-              <el-button
-                v-show="scope.row.offerNumber.indexOf('S') < 0"
-                size="mini"
-                type="success"
-                @click="handleEdit(scope.$index, scope.row)"
-                >编辑</el-button
-              >
-              <el-button
-                v-show="scope.row.offerNumber.indexOf('S') < 0"
-                size="mini"
-                type="info"
-                @click="toPushDetails(scope.$index, scope.row)"
-                >推送</el-button
-              >
-              <el-button
-                size="mini"
-                @click="exportOrder(scope.row)"
-                type="warning"
-              >
-                导出
-              </el-button>
-              <el-button
-                v-show="scope.row.offerNumber.indexOf('S') < 0"
-                style="margin-left: 10px"
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.row)"
-                >删除</el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
+        <bsTables :table="tableData" />
         <center style="padding: 20px 0">
           <el-pagination
             layout="total, sizes, prev, pager, next, jumper"
@@ -217,14 +102,170 @@
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gongsizhaoyangbaojia.vue";
 import eventBus from "@/assets/js/common/eventBus.js";
+import bsTables from "@/components/table";
 import { mapState } from "vuex";
 export default {
   name: "bsSampleQuotation",
   components: {
-    bsExportOrder
+    bsExportOrder,
+    bsTables
   },
   data() {
     return {
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: this.size,
+        isIndex: true,
+        columns: [
+          {
+            prop: "offerNumber",
+            minWidth: 100,
+            isHiden: true,
+            label: "报价单号",
+            event: row => {
+              const fd = {
+                name: "详情" + row.offerNumber,
+                linkUrl: "/bsIndex/bsSampleQuotation",
+                component: "bsSampleQuotationDetails",
+                refresh: true,
+                label: "详情" + row.offerNumber,
+                value: row
+              };
+              this.$store.commit("myAddTab", fd);
+            },
+            isCallback: row => {
+              return (
+                "<span style='color: #3368a9; cursor: pointer;'>" +
+                row.offerNumber +
+                "</span>"
+              );
+            }
+          },
+          {
+            prop: "customerName",
+            isHiden: true,
+            label: "客户名称"
+          },
+          {
+            prop: "createdOn",
+            isHiden: true,
+            label: "报价时间",
+            render: row => {
+              return row.createdOn ? row.createdOn.replace(/T.*/, "") : "";
+            }
+          },
+          {
+            prop: "linkman",
+            isHiden: true,
+            label: "业务员"
+          },
+          {
+            prop: "total",
+            isHiden: true,
+            label: "报价总数"
+          },
+          {
+            prop: "orgPersonnelName",
+            isHiden: true,
+            label: "总金额",
+            color: "#eb1515",
+            render: row => {
+              return row.cu_de + row.offerTotalAmount;
+            }
+          },
+          {
+            prop: "cu_deName",
+            isHiden: true,
+            label: "币种"
+          },
+          {
+            prop: "exchange",
+            isHiden: true,
+            label: "汇率"
+          },
+          {
+            prop: "profit",
+            isHiden: true,
+            label: "利润"
+          },
+          {
+            prop: "status",
+            isHiden: true,
+            label: "状态",
+            render(row) {
+              let str = "";
+              switch (row.status) {
+                case 0:
+                  str = "未审核";
+                  break;
+                case 1:
+                  str = "审核通过";
+                  break;
+                case 2:
+                  str = "审核不通过";
+                  break;
+              }
+              return str;
+            }
+          }
+        ],
+        actions: [
+          {
+            type: "success",
+            textWrapper() {
+              return "编辑";
+            },
+            hidden(row) {
+              return row.offerNumber[0] != "S";
+            },
+            methods: row => {
+              const fd = {
+                name: "编辑" + row.offerNumber,
+                linkUrl: "/bsIndex/bsSampleQuotation",
+                component: "bsSampleUpdata",
+                refresh: true,
+                label: "编辑" + row.offerNumber,
+                value: row
+              };
+              this.$store.commit("myAddTab", fd);
+            }
+          },
+          {
+            type: "info",
+            textWrapper() {
+              return "推送";
+            },
+            hidden(row) {
+              return row.offerNumber[0] != "S";
+            },
+            methods: row => {
+              console.log(row);
+            }
+          },
+          {
+            type: "danger",
+            textWrapper() {
+              return "删除";
+            },
+            hidden(row) {
+              return row.offerNumber[0] != "S";
+            },
+            methods: row => {
+              this.handleDelete(row);
+            }
+          },
+          {
+            type: "warning",
+            textWrapper() {
+              return "导出";
+            },
+            methods: row => {
+              this.exportOrder(row);
+            }
+          }
+        ]
+      },
       staffList: [],
       orderRow: {},
       exportTemplateDialog: false,
@@ -238,7 +279,6 @@ export default {
         contacts: null,
         dateTime: null
       },
-      tableData: [],
       totalCount: 0,
       pageSize: 10,
       currentPage: 1
@@ -280,7 +320,7 @@ export default {
       const res = await this.$http.post("/api/ProductOfferListByPage", fd);
       if (res.data.result.code === 200) {
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
       }
     },
     // 删除找样报价
@@ -350,7 +390,6 @@ export default {
         linkUrl: "/bsIndex/bsSampleQuotation",
         component: "bsSampleQuotationDetails",
         refresh: true,
-        noPush: true,
         label: "详情" + row.offerNumber,
         value: row
       };
@@ -381,7 +420,6 @@ export default {
         linkUrl: "/bsIndex/bsSampleQuotation",
         component: "bsSampleUpdata",
         refresh: true,
-        noPush: true,
         label: "编辑" + row.offerNumber,
         value: row
       };

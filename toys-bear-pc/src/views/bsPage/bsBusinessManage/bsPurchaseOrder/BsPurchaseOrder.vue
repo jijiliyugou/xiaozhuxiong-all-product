@@ -65,7 +65,8 @@
       </div>
     </div>
     <div class="tableBox">
-      <el-table
+      <bsTables :table="tableData" />
+      <!-- <el-table
         :data="tableData"
         style="width: 100%"
         ref="collecTable"
@@ -150,7 +151,7 @@
             </el-button>
           </template>
         </el-table-column>
-      </el-table>
+      </el-table> -->
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -188,13 +189,113 @@
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/caigoudingdan.vue";
 import { mapState } from "vuex";
+import bsTables from "@/components/table";
 export default {
   name: "bsPurchaseOrder",
   components: {
-    bsExportOrder
+    bsExportOrder,
+    bsTables
   },
   data() {
     return {
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: this.size,
+        isIndex: true,
+        columns: [
+          {
+            prop: "orderNumber",
+            minWidth: 100,
+            isHiden: true,
+            label: "采购单号",
+            event: row => {
+              this.toDetails(row);
+            },
+            isCallback: row => {
+              return (
+                "<span style='color: #3368a9; cursor: pointer;'>" +
+                row.orderNumber +
+                "</span>"
+              );
+            }
+          },
+          {
+            prop: "orgPersonnelName",
+            isHiden: true,
+            label: "业务员"
+          },
+          {
+            prop: "happenDate",
+            isHiden: true,
+            label: "操作时间",
+            render: row => {
+              return row.happenDate ? row.happenDate.replace(/T.*/, "") : "";
+            }
+          },
+          {
+            prop: "sumAmountOu_lo",
+            isHiden: true,
+            label: "采购总数"
+          },
+          {
+            prop: "sumFa_pr_pr",
+            isHiden: true,
+            label: "总金额",
+            color: "#eb1515",
+            render: row => {
+              return "￥" + row.sumFa_pr_pr;
+            }
+          },
+          {
+            prop: "pushContent",
+            isHiden: true,
+            label: "备注"
+          },
+          {
+            prop: "readStatus",
+            isHiden: true,
+            label: "状态",
+            render(row) {
+              if (row.readStatus) {
+                return "已读";
+              } else {
+                return "未读";
+              }
+            }
+          }
+        ],
+        actions: [
+          {
+            type: "primary",
+            textWrapper() {
+              return "推送";
+            },
+            methods: row => {
+              console.log(row);
+            }
+          },
+          {
+            type: "warning",
+            textWrapper() {
+              return "导出";
+            },
+            methods: row => {
+              this.exportOrder(row);
+            }
+          },
+          {
+            type: "danger",
+            textWrapper() {
+              return "删除";
+            },
+            methods: row => {
+              this.handlerDelete(row);
+            }
+          }
+        ],
+        btnWidth: 250
+      },
       staffList: [],
       orderRow: {},
       exportTemplateDialog: false,
@@ -203,7 +304,6 @@ export default {
         staffId: null,
         dateTime: null
       },
-      tableData: [],
       totalCount: 0,
       pageSize: 10,
       currentPage: 1
@@ -300,7 +400,7 @@ export default {
       const res = await this.$http.post("/api/GetERPOrderListByPage", fd);
       if (res.data.result.code === 200) {
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
       }
     },
     // 切換頁容量

@@ -60,47 +60,7 @@
     </div>
     <!-- 表格 -->
     <div class="tableBox">
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="collecTable"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column prop="title" label="主题"></el-table-column>
-        <el-table-column prop="content" label="内容"></el-table-column>
-        <el-table-column prop="staffName" label="业务员"></el-table-column>
-        <el-table-column
-          label="操作"
-          header-align="center"
-          align="center"
-          width="200"
-        >
-          <el-button
-            size="mini"
-            type="primary"
-            @click="openEdit(scope.row)"
-            slot="reference"
-            >编辑</el-button
-          >
-          <template slot-scope="scope">
-            <!-- <el-popconfirm
-              style="margin-left: 10px;"
-              title="确定要删除此消息吗？"
-              @confirm="handleDelete(scope.row)"
-            > -->
-            <el-button
-              size="mini"
-              type="warning"
-              @click.stop="handleDelete(scope.row)"
-              slot="reference"
-              >删除</el-button
-            >
-            <!-- </el-popconfirm> -->
-          </template>
-        </el-table-column>
-      </el-table>
+      <Table :table="tableData"></Table>
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -132,12 +92,14 @@
 </template>
 
 <script>
+import Table from "@/components/table";
 import bsAddOfferFormulaLang from "@/components/bsComponents/bsPersonalManageComponent/bsAddOfferFormulaLang";
 import { mapState } from "vuex";
 export default {
   name: "bsPushSettings",
   components: {
-    bsAddOfferFormulaLang
+    bsAddOfferFormulaLang,
+    Table
   },
   data() {
     return {
@@ -152,7 +114,42 @@ export default {
       totalCount: 0,
       pageSize: 10,
       currentPage: 1,
-      tableData: []
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          { prop: "title", label: "主题" },
+          { prop: "content", label: "内容" },
+          { prop: "staffName", label: "业务员" }
+        ],
+        btnWidth: 200,
+        actions: [
+          {
+            classWrapper: () => {
+              return "primary";
+            },
+            textWrapper: () => {
+              return "编辑";
+            },
+            methods: row => {
+              this.openEdit(row);
+            }
+          },
+          {
+            classWrapper: () => {
+              return "danger";
+            },
+            textWrapper: () => {
+              return "删除";
+            },
+            methods: row => {
+              this.handleDelete(row);
+            }
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -172,7 +169,7 @@ export default {
       }
       const res = await this.$http.post("/api/PushSettings/ListByPage", fd);
       if (res.data.result.code === 200) {
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
       }
     },

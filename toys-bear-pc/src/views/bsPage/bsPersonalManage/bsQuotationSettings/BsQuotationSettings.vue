@@ -67,78 +67,7 @@
       </el-button>
     </div>
     <div class="tableBox">
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="collecTable"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column label="模板名称" prop="name"> </el-table-column>
-        <el-table-column
-          label="报价方式"
-          prop="offerMethod"
-          align="center"
-          show-overflow-tooltip
-        >
-        </el-table-column>
-        <el-table-column
-          prop="cu_deName"
-          label="币种"
-          align="center"
-        ></el-table-column>
-        <el-table-column prop="exchange" label="汇率" align="center">
-        </el-table-column>
-        <el-table-column label="小数位数" prop="decimalPlaces" align="center">
-        </el-table-column>
-        <el-table-column prop="profit" label="利润率" align="center">
-        </el-table-column>
-        <el-table-column label="每车尺码" prop="size" align="center">
-        </el-table-column>
-        <el-table-column label="取舍方式" prop="rejectionMethod" align="center">
-        </el-table-column>
-        <el-table-column label="价格小于" prop="miniPrice" align="center">
-        </el-table-column>
-        <el-table-column
-          label="业务员"
-          prop="staffName"
-          align="center"
-          show-overflow-tooltip
-        >
-        </el-table-column>
-        <el-table-column
-          prop="price"
-          label="创建时间"
-          align="center"
-          width="150"
-        >
-          <template slot-scope="scope">
-            {{ scope.row.createdOn && scope.row.createdOn.replace(/T/, " ") }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="remark" label="备注"> </el-table-column>
-        <el-table-column label="操作" align="center" width="150">
-          <template slot-scope="scope">
-            <el-button type="primary" @click="openEdit(scope.row)" size="mini"
-              >编辑</el-button
-            >
-            <!-- <el-popconfirm
-              style="margin-left: 10px;"
-              title="确定要删除此公式吗？"
-              @confirm="handleDelete(scope.row)"
-            > -->
-            <el-button
-              size="mini"
-              type="danger"
-              @click.stop="handleDelete(scope.row)"
-              slot="reference"
-              >删除</el-button
-            >
-            <!-- </el-popconfirm> -->
-          </template>
-        </el-table-column>
-      </el-table>
+      <Table :table="tableData"></Table>
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -170,12 +99,14 @@
 </template>
 
 <script>
+import Table from "@/components/table";
 import bsAddOfferFormula from "@/components/bsComponents/bsPersonalManageComponent/bsAddOfferFormula";
 import { mapState } from "vuex";
 export default {
   name: "bsQuotationSettings",
   components: {
-    bsAddOfferFormula
+    bsAddOfferFormula,
+    Table
   },
   data() {
     return {
@@ -190,7 +121,56 @@ export default {
       totalCount: 0,
       currentPage: 1,
       pageSize: 10,
-      tableData: []
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          { prop: "name", label: "模板名称" },
+          { prop: "offerMethod", label: "报价方式", isHiden: true },
+          { prop: "cu_deName", label: "币种" },
+          { prop: "exchange", label: "汇率" },
+          { prop: "profit", label: "利润率" },
+          { prop: "size", label: "每车尺码" },
+          { prop: "rejectionMethod", label: "取舍方式" },
+          { prop: "miniPrice", label: "价格小于" },
+          { prop: "staffName", label: "业务员" },
+          {
+            prop: "createdOn",
+            label: "创建时间",
+            width: 150,
+            render: row => {
+              return row.createdOn && row.createdOn.replace(/T.*/, "");
+            }
+          }
+        ],
+        btnWidth: 200,
+        actions: [
+          {
+            classWrapper: () => {
+              return "primary";
+            },
+            textWrapper: () => {
+              return "编辑";
+            },
+            methods: row => {
+              this.openEdit(row);
+            }
+          },
+          {
+            classWrapper: () => {
+              return "danger";
+            },
+            textWrapper: () => {
+              return "删除";
+            },
+            methods: row => {
+              this.handleDelete(row);
+            }
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -303,7 +283,7 @@ export default {
       }
       const res = await this.$http.post("/api/ProductOfferFormulaPage", fd);
       if (res.data.result.code === 200) {
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
       } else {
         this.$common.handlerMsgState({

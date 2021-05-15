@@ -200,7 +200,7 @@
                 </div>
               </div>
               <div class="detail_dialog_content_item_zixun">
-                <div class="label">
+                <div class="label chart" @click="toNews">
                   <div class="icon_box">
                     <i class="el-icon-chat-dot-round"></i>
                   </div>
@@ -420,6 +420,20 @@ export default {
     //是否显示图搜框
     isShowPicBox(value) {
       this.isShowPic = value;
+    },
+    // 去聊天
+    toNews() {
+      this.isShowModal = false;
+      const fd = {
+        name: this.detailInfo.companyNumber + "bsNews",
+        linkUrl: "/bsIndex/bsNews",
+        component: "bsNews",
+        refresh: true,
+        label: this.detailInfo.companyName,
+        value: this.detailInfo
+      };
+      this.$router.push("/bsIndex/bsNews");
+      this.$store.commit("myAddTab", fd);
     }
   },
   created() {
@@ -682,6 +696,9 @@ export default {
             .icon_title {
               margin-left: 10px;
             }
+          }
+          .chart:hover {
+            cursor: pointer;
           }
         }
       }

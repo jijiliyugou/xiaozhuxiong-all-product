@@ -225,7 +225,12 @@
           </div>
         </div>
       </div>
-      <div class="productWrap">
+      <div
+        class="productWrap"
+        :style="
+          isGrid === 'bsColumnComponent' ? ' padding:20px' : ' padding:0 20px'
+        "
+      >
         <!-- 产品列表 -->
         <component :is="isGrid" :productList="productList"></component>
         <!-- 分页 -->
@@ -728,6 +733,7 @@ export default {
       padding: 0 20px;
       background-color: #fff;
       box-sizing: border-box;
+      border-bottom: 1px solid #ebeef5;
       .titleItem {
         font-weight: 700;
         padding-left: 15px;

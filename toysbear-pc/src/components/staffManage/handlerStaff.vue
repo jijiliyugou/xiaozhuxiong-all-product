@@ -93,7 +93,7 @@ export default {
         phoneNumber: [
           { required: true, message: "请输入员工账号", trigger: "blur" },
           {
-            pattern: /^1[2,3,4,5,6,7,8,9][0-9]{9}$/,
+            pattern: /^1[3456789]\d{9}$/,
             message: "手机格式不正确",
             trigger: "blur"
           }

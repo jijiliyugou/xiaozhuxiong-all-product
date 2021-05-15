@@ -72,53 +72,8 @@
     </div>
     <div class="tableBox">
       <!-- 客户列表 -->
-      <el-table
-        :data="tableData"
-        stripe
-        style="width: 100%"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column prop="name" label="客户姓名" width="180">
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="phoneNumber"
-          label="电话"
-          width="180"
-        >
-        </el-table-column>
-        <el-table-column align="center" prop="email" label="邮箱" width="180">
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="staffName"
-          label="业务员"
-          show-overflow-tooltip
-        >
-        </el-table-column>
-        <el-table-column align="center" prop="createdOn" label="创建时间">
-        </el-table-column>
-        <el-table-column align="center" prop="remark" label="备注">
-        </el-table-column>
-        <el-table-column align="center" label="操作">
-          <template slot-scope="scope">
-            <el-button
-              size="mini"
-              type="primary"
-              @click="handleEdit(scope.$index, scope.row)"
-              >编辑</el-button
-            >
-            <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(scope.row)"
-              >删除</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
+      <Table :table="tableData"></Table>
+
       <!-- 分页 -->
       <center style="padding: 20px 0">
         <el-pagination
@@ -190,11 +145,51 @@
 </template>
 
 <script>
+import Table from "@/components/table";
 import { mapState } from "vuex";
 export default {
   name: "bsMyClients",
+  components: {
+    Table
+  },
   data() {
     return {
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          { prop: "name", label: "客户姓名", width: 180 },
+          { prop: "phoneNumber", label: "电话", width: 180 },
+          { prop: "email", label: "出厂货号", width: 180 },
+          { prop: "staffName", label: "业务员", isHiden: true },
+          { prop: "createdOn", label: "创建时间", width: 180 },
+          { prop: "remark", label: "备注", isHiden: true, width: 180 },
+          { prop: "email", label: "出厂货号", width: 180 }
+        ],
+        btnWidth: 200,
+        actions: [
+          {
+            type: "primary",
+            textWrapper: () => {
+              return "编辑";
+            },
+            methods: row => {
+              this.handleEdit(row);
+            }
+          },
+          {
+            type: "danger",
+            textWrapper: () => {
+              return "删除";
+            },
+            methods: row => {
+              this.handleDelete(row);
+            }
+          }
+        ]
+      },
       staffList: [],
       staffId: null,
       dialogTitle: "新增客户",
@@ -207,7 +202,6 @@ export default {
       dateTime: null,
       showOpen: false,
       labelPosition: "right",
-      tableData: [],
       formData: {
         name: null,
         PhoneNumber: null,
@@ -237,7 +231,7 @@ export default {
       const res = await this.$http.post("/api/SearchCustomerInfosPage", fd);
       if (res.data.result.code === 200) {
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
       }
     },
     // 获取公司下的员工列表
@@ -300,7 +294,7 @@ export default {
       });
     },
     //编辑客户
-    handleEdit(index, row) {
+    handleEdit(row) {
       this.formData = JSON.parse(JSON.stringify(row));
       this.dialogTitle = "编辑客户";
       this.dialogVisible = true;

@@ -80,65 +80,7 @@
     <!-- 厂商列表 -->
     <div class="tableBox">
       <div class="title">厂商列表 ({{ totalCount }})</div>
-      <el-table
-        :data="tableData"
-        stripe
-        style="width: 100%"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-        @row-click="handleDetail"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column label="厂商">
-          <template slot-scope="scope">
-            <div class="nameBox">
-              <el-avatar
-                style="background-color: #e4efff"
-                :size="40"
-                :src="scope.row.companyLogo"
-              >
-                <p class="errText">
-                  {{ scope.row.linkman }}
-                </p>
-              </el-avatar>
-              <span style="margin-left: 10px" class="name">{{
-                scope.row.companyName
-              }}</span>
-              <span class="isMain" v-if="scope.row.isMain"><i>主账号</i></span>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="contactsMan"
-          label="联系人"
-          width="180"
-        >
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="phoneNumber"
-          label="手机"
-          width="180"
-        >
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="telePhoneNumber"
-          label="电话"
-          width="180"
-        >
-        </el-table-column>
-        <el-table-column align="center" prop="address" label="地址">
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="productCount"
-          label="产品数量"
-          width="200"
-        >
-        </el-table-column>
-      </el-table>
+      <Table :table="tableData" @handleDetail="handleDetail"></Table>
       <!-- 分页 -->
       <center style="padding: 20px 0" v-if="!isShowPic">
         <el-pagination
@@ -157,8 +99,12 @@
 </template>
 
 <script>
+import Table from "@/components/table";
 export default {
   name: "bsVendorQuery",
+  components: {
+    Table
+  },
   data() {
     return {
       totalCount: 0,
@@ -166,7 +112,60 @@ export default {
       currentPage: 1,
       keyword: null,
       dateTime: null,
-      tableData: [],
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "",
+            label: "厂商",
+            align: "left",
+            companyInfo: true,
+            companyLogo: row => {
+              return row.companyLogo;
+            },
+            linkman: row => {
+              return row.linkman;
+            },
+            companyName: row => {
+              return row.companyName;
+            }
+          },
+          { prop: "contactsMan", label: "联系人", width: 180 },
+          { prop: "phoneNumber", label: "手机", width: 180 },
+          { prop: "telePhoneNumber", label: "电话", isHiden: true },
+          { prop: "address", label: "地址", width: 180 },
+          {
+            prop: "productCount",
+            label: "产品数量",
+            isHiden: true,
+            width: 180
+          }
+        ],
+        btnWidth: 200,
+        actions: [
+          {
+            type: "primary",
+            textWrapper: () => {
+              return "编辑";
+            },
+            methods: row => {
+              this.handleEdit(row);
+            }
+          },
+          {
+            type: "danger",
+            textWrapper: () => {
+              return "删除";
+            },
+            methods: row => {
+              this.handleDelete(row);
+            }
+          }
+        ]
+      },
       myKeyword: "",
       isShowHistoryPanel: false,
       searchHistoryList: [],
@@ -190,9 +189,8 @@ export default {
       }
       const res = await this.$http.post("/api/ContactsCompanyListByID", fd);
       if (res.data.result.code === 200) {
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
-        console.log("contactsMan", this.tableData);
       }
     },
     //点击详情
@@ -232,6 +230,7 @@ export default {
         history[uid + "_cs"].splice(8, history[uid + "_cs"].length - 8);
       }
       localStorage.setItem("searchHistory", JSON.stringify(history));
+      this.searchHistoryList = history[uid + "_cs"] || [];
       this.showHistoryModal(false);
       this.currentPage = 1;
       this.getVendorListPage();
@@ -315,7 +314,7 @@ export default {
           let endDate = Date.now();
           this.searchHttpTime = (endDate - startDate) / 1000;
           this.$store.commit("searchValues", res.data.result.object);
-          this.tableData = res.data.result.item.items;
+          this.tableData.data = res.data.result.item.items;
           this.totalCount = res.data.result.item.totalCount;
           this.$nextTick(() => {
             const f = window.URL.createObjectURL(file.raw);

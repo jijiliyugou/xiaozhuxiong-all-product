@@ -67,58 +67,7 @@
       </el-button>
     </div>
     <div class="tableBox">
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="collecTable"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column label="站点" prop="name" width="300">
-          <template slot-scope="scope">
-            {{ scope.row.name }}
-          </template>
-        </el-table-column>
-        <el-table-column label="域名地址" prop="url" width="300">
-          <template slot-scope="scope">
-            {{ scope.row.url }}
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="业务员"
-          prop="createdBy"
-          width="300"
-        ></el-table-column>
-        <el-table-column label="新增时间" prop="createdOn" width="300">
-          <template slot-scope="scope">
-            <span> {{ scope.row.createdOn.replace(/T.*/, "") }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          header-align="center"
-          align="center"
-          min-width="200"
-        >
-          <template slot-scope="scope">
-            <el-button
-              style="margin-right: 10px"
-              size="mini"
-              type="success"
-              @click.stop="openEdit(scope.row)"
-              >编辑</el-button
-            >
-            <el-button
-              size="mini"
-              type="warning"
-              @click.stop="handleDelete(scope.row)"
-              slot="reference"
-              >删除</el-button
-            >
-          </template>
-        </el-table-column>
-      </el-table>
+      <Table :table="tableData"></Table>
       <center style="padding: 20px 0">
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
@@ -152,11 +101,13 @@
 
 <script>
 import { mapState } from "vuex";
+import Table from "@/components/table";
 import bsAddSiteDomain from "./bsAddSiteDomain/bsAddSiteDomain";
 export default {
   name: "bsSiteSettings",
   components: {
-    bsAddSiteDomain
+    bsAddSiteDomain,
+    Table
   },
   data() {
     return {
@@ -169,10 +120,53 @@ export default {
         keyword: null,
         dateTime: null
       },
-      tableData: [],
       pageSize: 10,
       currentPage: 1,
-      totalCount: 0
+      totalCount: 0,
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          { prop: "name", label: "站点", width: 300 },
+          { prop: "url", label: "域名地址" },
+          { prop: "createdBy", label: "业务员", width: 300 },
+          {
+            prop: "createdOn",
+            width: 300,
+            label: "新增时间",
+            render: row => {
+              return row.createdOn.replace(/T.*/, "");
+            }
+          }
+        ],
+        btnWidth: 200,
+        actions: [
+          {
+            classWrapper: () => {
+              return "primary";
+            },
+            textWrapper: () => {
+              return "编辑";
+            },
+            methods: row => {
+              this.openEdit(row);
+            }
+          },
+          {
+            classWrapper: () => {
+              return "danger";
+            },
+            textWrapper: () => {
+              return "删除";
+            },
+            methods: row => {
+              this.handleDelete(row);
+            }
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -203,7 +197,6 @@ export default {
       })
         .then(async () => {
           const res = await this.$http.post("/api/DeleteWebsiteInfo", row);
-          console.log(res);
           const { code, msg } = res.data.result;
           if (code === 200) {
             this.$common.handlerMsgState({
@@ -240,7 +233,6 @@ export default {
     openAddClien() {
       this.isEdit = false;
       this.showAddDomain = true;
-      console.log(123);
     },
     // 获取站点列表
     async getSites() {
@@ -258,9 +250,8 @@ export default {
         }
       }
       const res = await this.$http.post("/api/SearchWebsiteInfosPage", fd);
-      console.log(res);
       if (res.data.result.code === 200) {
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
       } else {
         this.$common.handlerMsgState({

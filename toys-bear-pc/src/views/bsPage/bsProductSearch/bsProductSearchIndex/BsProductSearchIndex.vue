@@ -385,7 +385,9 @@
           <div
             class="productListBox"
             :style="
-              isGrid === 'bsColumnComponent' ? ' padding:0' : ' padding:0 20px'
+              isGrid === 'bsColumnComponent'
+                ? ' padding:20px'
+                : ' padding:0 20px'
             "
           >
             <!-- 产品列表 -->

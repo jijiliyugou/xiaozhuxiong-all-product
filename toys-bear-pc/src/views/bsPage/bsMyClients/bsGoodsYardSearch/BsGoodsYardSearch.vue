@@ -62,69 +62,7 @@
     </div>
     <!-- 货场列表 -->
     <div class="tableBox">
-      <el-table
-        :data="tableData"
-        stripe
-        style="width: 100%"
-        :header-cell-style="{ backgroundColor: '#f9fafc' }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-
-        <el-table-column label="图片" min-width="125" align="center">
-          <template slot-scope="scope">
-            <div class="imgBox">
-              <el-image
-                fit="contain"
-                style="width: 125px; height: 70px"
-                :src="scope.row.imgUrl"
-              >
-                <div slot="placeholder" class="errorImg">
-                  <img
-                    style="width: 55px; height: 60px"
-                    src="~@/assets/images/imgError.png"
-                    alt
-                  />
-                </div>
-                <div slot="error" class="errorImg">
-                  <img
-                    style="width: 55px; height: 60px"
-                    src="~@/assets/images/imgError.png"
-                    alt
-                  />
-                </div>
-              </el-image>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="yardName" label="货场名称" align="center">
-        </el-table-column>
-        <el-table-column align="center" prop="yardType" label="货场类型">
-          <template slot-scope="scope">
-            <div>{{ scope.row.yardType === 0 ? "货场" : "货运" }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" prop="contactsMan" label="联系人">
-        </el-table-column>
-        <el-table-column align="center" prop="telephone" label="电话">
-        </el-table-column>
-        <el-table-column align="center" prop="phoneNumber" label="手机">
-        </el-table-column>
-        <el-table-column align="center" prop="address" label="地址">
-        </el-table-column>
-        <el-table-column
-          align="center"
-          prop="remark"
-          label="备注"
-          min-width="140"
-        >
-        </el-table-column>
-        <el-table-column align="center" prop="createdOn" label="时间">
-          <template slot-scope="scope">
-            <span> {{ scope.row.createdOn.replace(/T.*/, "") }}</span>
-          </template>
-        </el-table-column>
-      </el-table>
+      <Table :table="tableData"></Table>
       <!-- 分页 -->
       <center style="padding: 20px 0">
         <el-pagination
@@ -143,8 +81,12 @@
 </template>
 
 <script>
+import Table from "@/components/table";
 export default {
   name: "bsGoodsYardSearch",
+  components: {
+    Table
+  },
   data() {
     return {
       totalCount: 0,
@@ -152,7 +94,42 @@ export default {
       currentPage: 1,
       keyword: null,
       dateTime: null,
-      tableData: [],
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "imgUrl",
+            label: "图片",
+            productInfo: true,
+            elImage: row => {
+              return row.imgUrl;
+            }
+          },
+          { prop: "yardName", label: "货场名称" },
+          {
+            prop: "yardType",
+            label: "货场类型",
+            render: row => {
+              return row.yardType === 0 ? "货场" : "货运";
+            }
+          },
+          { prop: "contactsMan", label: "联系人" },
+          { prop: "telephone", label: "电话" },
+          { prop: "phoneNumber", label: "手机" },
+          { prop: "address", label: "地址" },
+          { prop: "remark", label: "备注", isHiden: true, width: 140 },
+          {
+            prop: "createdOn",
+            label: "时间",
+            render: row => {
+              return row.createdOn.replace(/T.*/, "");
+            }
+          }
+        ]
+      },
       yardTypeList: [
         {
           id: 0,
@@ -184,7 +161,7 @@ export default {
       const res = await this.$http.post("/api/ProductYardPage", fd);
       if (res.data.result.code === 200) {
         this.totalCount = res.data.result.item.totalCount;
-        this.tableData = res.data.result.item.items;
+        this.tableData.data = res.data.result.item.items;
       }
     },
     // 搜索

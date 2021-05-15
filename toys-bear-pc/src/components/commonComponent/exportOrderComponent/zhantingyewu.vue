@@ -16,9 +16,9 @@
       <li :class="{ item: true, active: tp == 5 }" @click="checkTp(5)">
         宏升导入EXCEL模板
       </li>
-      <!-- <li :class="{ item: true, active: tp == 6 }" @click="checkTp(6)">
+      <li :class="{ item: true, active: tp == 6 }" @click="checkTp(6)">
         报出价不带厂商资料 (英文)
-      </li> -->
+      </li>
     </div>
     <div class="right">
       <div class="tp1" v-show="tp === 1">
@@ -27,6 +27,8 @@
           <el-image
             fit="contain"
             class="myImg"
+            :z-index="5000"
+            :preview-src-list="[require('@/assets/images/zhantingyewuTp1.png')]"
             :src="require('@/assets/images/zhantingyewuTp1.png')"
           ></el-image>
         </div>
@@ -83,6 +85,8 @@
         <div class="imgBox">
           <el-image
             fit="contain"
+            :z-index="5000"
+            :preview-src-list="[require('@/assets/images/zhantingyewuTp2.png')]"
             class="myImg"
             :src="require('@/assets/images/zhantingyewuTp2.png')"
           ></el-image>
@@ -140,6 +144,8 @@
         <div class="imgBox">
           <el-image
             fit="contain"
+            :z-index="5000"
+            :preview-src-list="[require('@/assets/images/zhantingyewuTp3.png')]"
             class="myImg"
             :src="require('@/assets/images/zhantingyewuTp3.png')"
           ></el-image>
@@ -197,6 +203,8 @@
         <div class="imgBox">
           <el-image
             fit="contain"
+            :z-index="5000"
+            :preview-src-list="[require('@/assets/images/zhantingyewuTp4.png')]"
             class="myImg"
             :src="require('@/assets/images/zhantingyewuTp4.png')"
           ></el-image>
@@ -255,6 +263,8 @@
           <el-image
             fit="contain"
             class="myImg"
+            :z-index="5000"
+            :preview-src-list="[require('@/assets/images/zhantingyewuTp5.png')]"
             :src="require('@/assets/images/zhantingyewuTp5.png')"
           ></el-image>
         </div>
@@ -287,8 +297,10 @@
         <div class="imgBox">
           <el-image
             fit="contain"
+            :z-index="5000"
+            :preview-src-list="[require('@/assets/images/zhantingyewuTp6.png')]"
             class="myImg"
-            :src="require('@/assets/images/mode2.png')"
+            :src="require('@/assets/images/zhantingyewuTp6.png')"
           ></el-image>
         </div>
         <div class="selectTions">
