@@ -22,11 +22,7 @@
     <div class="cartBox" v-if="$route.path !== '/login'">
       <div class="cart" @click="toMyShoppingCart">
         <div class="cartIconBox">
-          <el-badge
-            :hidden="!shoppingList || shoppingList.length < 1"
-            :value="shoppingList && shoppingList.length"
-            class="item"
-          >
+          <el-badge :hidden="shopLength < 1" :value="shopLength" class="item">
             <i class="cartIcon"></i>
           </el-badge>
         </div>
@@ -38,7 +34,7 @@
   </div>
 </template>
 <script>
-import { mapState, mapGetters } from "vuex";
+import { mapState } from "vuex";
 export default {
   methods: {
     // 回到顶部
@@ -64,11 +60,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    }),
-    ...mapState(["userInfo"]),
-    ...mapState(["globalLang"])
+    ...mapState(["userInfo", "globalLang", "shopLength"])
   }
 };
 </script>

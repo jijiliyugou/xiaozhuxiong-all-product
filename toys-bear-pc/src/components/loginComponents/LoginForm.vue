@@ -5,6 +5,28 @@
       <h2 class="title">登录系统</h2>
     </div>
     <el-tabs v-model="activeName" class="loginFormLaout" stretch>
+      <el-tab-pane label="二维码登录" name="erweima">
+        <div class="qrCodeBox">
+          <div class="qrcode">
+            <vue-qr
+              :text="options.url"
+              :logoSrc="options.icon + '?cache'"
+              colorLight="#fff"
+              colorDark="#018e37"
+              :margin="0"
+              :size="230"
+            ></vue-qr>
+            <div class="refresh" v-show="showQrCode">
+              <div class="refreshIcon" @click="getQrCodeUrl">
+                <i class="el-icon-refresh"></i>
+              </div>
+            </div>
+          </div>
+          <p class="qrText">
+            {{ qrcodeTitle }}
+          </p>
+        </div>
+      </el-tab-pane>
       <el-tab-pane label="短信登录" name="mobile">
         <el-form
           :model="loginforms"
@@ -52,28 +74,6 @@
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="二维码登录" name="erweima">
-        <div class="qrCodeBox">
-          <div class="qrcode">
-            <vue-qr
-              :text="options.url"
-              :logoSrc="options.icon + '?cache'"
-              colorLight="#fff"
-              colorDark="#018e37"
-              :margin="0"
-              :size="230"
-            ></vue-qr>
-            <div class="refresh" v-show="showQrCode">
-              <div class="refreshIcon" @click="getQrCodeUrl">
-                <i class="el-icon-refresh"></i>
-              </div>
-            </div>
-          </div>
-          <p class="qrText">
-            {{ qrcodeTitle }}
-          </p>
-        </div>
-      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -102,7 +102,7 @@ export default {
       showQrCode: false,
       count: "",
       timer: null,
-      activeName: "mobile",
+      activeName: "erweima",
       search: "",
       bsHome: {
         //跳转首页
@@ -153,7 +153,7 @@ export default {
         this.ws = new WebSocket(this.wsBaseUrl + this.randomCode);
         // 测试
         // this.ws = new WebSocket(
-        //   'ws://139.9.71.135:8090/ws?UserId=' + this.randomCode
+        //   'ws://124.71.6.26:8090/ws?UserId=' + this.randomCode
         // )
         // 监听webSocket连接
         this.ws.onopen = this.websocketonopen;
@@ -374,7 +374,6 @@ export default {
                 });
                 this.$store.commit("removeLoginItems");
               }
-              console.log(res.data.result.commparnyList);
               switch (res.data.result.commparnyList[0].companyType) {
                 // case "Admin":
                 // case "Supplier":
@@ -444,12 +443,12 @@ export default {
     }
   },
   created() {},
-  mounted() {},
+  mounted() {
+    this.getQrCodeUrl();
+  },
   watch: {
     activeName(val) {
-      if (val === "erweima") {
-        this.getQrCodeUrl();
-      } else {
+      if (val === "mobile") {
         clearInterval(this.qrTimer);
         this.ws && this.ws.close();
       }
@@ -543,11 +542,18 @@ export default {
       justify-content: center;
       flex-wrap: wrap;
       .qrcode {
-        width: 230px;
-        height: 230px;
+        width: 190px;
+        height: 190px;
         position: relative;
+        margin-top: 15px;
+        img {
+          width: 190px;
+          height: 190px;
+        }
         .refresh {
           position: absolute;
+          left: 0;
+          top: 0;
           width: 100%;
           height: 100%;
           background-color: rgba(255, 255, 255, 0.9);
@@ -568,6 +574,7 @@ export default {
         }
       }
       .qrText {
+        width: 100%;
         padding-top: 5px;
         font-size: 14px;
         color: #4a85fd;

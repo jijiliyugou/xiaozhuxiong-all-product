@@ -19,7 +19,7 @@
       </el-form-item>
 
       <div class="flexLayout">
-        <el-form-item label="员工账号" label-width="100px" prop="phoneNumber">
+        <el-form-item label="手机号码" label-width="100px" prop="phoneNumber">
           <el-input
             v-model="addEmployeeForm.phoneNumber"
             :disabled="isEdit"
@@ -122,7 +122,7 @@ export default {
           { required: true, message: "请选择员工头像", trigger: "change" }
         ],
         phoneNumber: [
-          { required: true, message: "请输入员工账号", trigger: "blur" },
+          { required: true, message: "请输入手机号码", trigger: "blur" },
           {
             // pattern: /^1[2,3,4,5,6,7,8,9][0-9]{9}$/,
             pattern: /^1[3456789]\d{9}$/,

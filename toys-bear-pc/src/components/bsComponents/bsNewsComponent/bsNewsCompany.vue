@@ -2,9 +2,12 @@
   <div class="bsNewsCompany">
     <div class="headTop">
       <div :class="{ tabs: true, active: isDiyu === 0 }" @click="checkTabs(0)">
-        全部（23）
+        全部（{{ totalCount }}）
       </div>
       <div :class="{ tabs: true, active: isDiyu === 1 }" @click="checkTabs(1)">
+        带样借样 (10)
+      </div>
+      <div :class="{ tabs: true, active: isDiyu === 2 }" @click="checkTabs(2)">
         消息通知 (10)
       </div>
     </div>
@@ -13,9 +16,9 @@
         <li>
           <div class="tableHead">
             <p>采购单号：S123455678912345</p>
-            <div class="tableHeadIcon">
+            <!-- <div class="tableHeadIcon">
               <img src="@/assets/images/delete.png" alt="" />
-            </div>
+            </div> -->
           </div>
           <div class="tablemian">
             <div>
@@ -53,7 +56,8 @@ export default {
   data() {
     return {
       colorId: "2",
-      isDiyu: 0
+      isDiyu: 0,
+      totalCount: 0
     };
   },
   methods: {
@@ -86,6 +90,7 @@ export default {
       align-items: center;
       justify-content: center;
       font-size: 15px;
+      margin: 0 10px;
       cursor: pointer;
       &.active {
         font-weight: 700;

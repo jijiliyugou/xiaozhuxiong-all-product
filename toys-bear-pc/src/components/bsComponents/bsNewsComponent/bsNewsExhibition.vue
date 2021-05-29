@@ -2,7 +2,7 @@
   <div class="bsNewsExhibition">
     <div class="headTop">
       <div :class="{ tabs: true, active: isDiyu === 0 }" @click="checkTabs(0)">
-        全部（23）
+        全部（{{ totalCount }}）
       </div>
       <div :class="{ tabs: true, active: isDiyu === 1 }" @click="checkTabs(1)">
         带样借样 (10)
@@ -10,18 +10,15 @@
       <div :class="{ tabs: true, active: isDiyu === 2 }" @click="checkTabs(2)">
         消息通知 (10)
       </div>
-      <div :class="{ tabs: true, active: isDiyu === 3 }" @click="checkTabs(3)">
-        消息通知 (10)
-      </div>
     </div>
     <div class="main">
       <ul>
-        <li>
+        <li v-for="item in infoList" :key="item.erpOrderID">
           <div class="tableHead">
-            <p>悦翔展厅：择样单</p>
-            <div class="tableHeadIcon">
+            <p>{{ item.hall_na }}：{{ item.messageTitle }}</p>
+            <!-- <div class="tableHeadIcon">
               <img src="@/assets/images/delete.png" alt="" />
-            </div>
+            </div> -->
           </div>
           <div class="tablemian">
             <div class="mianName">
@@ -55,21 +52,47 @@
 <script>
 export default {
   name: "bsNewsExhibition",
+  props: ["dataOption"],
   data() {
     return {
       colorId: "1",
       isGrid: "",
-      isDiyu: 0
+      isDiyu: 0,
+      infoList: [],
+      pageSize: 10,
+      currentPage: 1,
+      totalCount: 0
     };
   },
   methods: {
     // 切换专区
     checkTabs(num) {
       this.isDiyu = num;
+    },
+    // 获取展厅业务菜单
+    async getERPOrderListByPage() {
+      const res = await this.$http.post("/api/GetERPOrderListByPage", {
+        maxResultCount: this.pageSize,
+        readStatus: "-1",
+        sampleFrom: "hall",
+        skipCount: this.currentPage
+      });
+      const { code, item, msg } = res.data.result;
+      if (code === 200) {
+        this.infoList = item.items;
+        this.totalCount = item.totalCount;
+      } else {
+        this.$common.handlerMsgState({
+          msg: msg,
+          type: "danger"
+        });
+      }
     }
   },
   created() {},
-  mounted() {}
+  mounted() {
+    this.getERPOrderListByPage();
+  }
 };
 </script>
 <style scoped lang="less">

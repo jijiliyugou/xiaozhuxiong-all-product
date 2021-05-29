@@ -242,10 +242,41 @@ export default {
       type: Object
     }
   },
+  watch: {
+    "addDefaultForm.profit": {
+      deep: true,
+      handler(newVal) {
+        if (newVal == 100) {
+          if (this.addDefaultForm.profitCalcMethod == 2) {
+            this.addDefaultForm.profit = 10;
+            this.$common.handlerMsgState({
+              msg: "除法利润率不可为100",
+              error: "danger"
+            });
+          }
+        }
+      }
+    },
+    "addDefaultForm.profitCalcMethod": {
+      deep: true,
+      handler(newVal) {
+        if (newVal == 2) {
+          if (this.addDefaultForm.profit == 100) {
+            this.addDefaultForm.profit = 10;
+            this.$common.handlerMsgState({
+              msg: "除法利润率不可为100",
+              error: "danger"
+            });
+          }
+        }
+      }
+    }
+  },
   data() {
     return {
-      chufa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)/(1-报价利润%)/汇率",
-      chengfa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)*(1+报价利润%)/汇率",
+      chufa: "(出厂价+(总费用/(每车尺码/体积*外箱装量)))/(1-报价利润/100)/汇率",
+      chengfa:
+        "(出厂价+(总费用/(每车尺码/体积*外箱装量)))*(1+报价利润/100)/汇率",
       configList: [],
       addDefaultForm: {
         profitCalcMethod: 2,

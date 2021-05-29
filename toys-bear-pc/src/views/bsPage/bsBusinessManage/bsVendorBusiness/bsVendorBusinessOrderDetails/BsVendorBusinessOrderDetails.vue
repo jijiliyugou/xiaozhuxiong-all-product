@@ -55,159 +55,7 @@
         </el-button>
       </div>
       <Table :table="tableData"></Table>
-      <!-- <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="myTableRef"
-        size="mini"
-        :header-cell-style="{
-          'font-size': '14px',
-          color: '#666',
-          backgroundColor: '#f9fafc',
-          'font-weight': '400'
-        }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="50">
-        </el-table-column>
-        <el-table-column label="产品" width="300">
-          <template slot-scope="scope">
-            <div class="imgBox">
-              <el-image
-                fit="contain"
-                @click.native="goDetails(scope.row)"
-                style="width: 80px; height: 60px"
-                :src="scope.row.imgUrl && scope.row.imgUrl[0]"
-              >
-                <div slot="placeholder" class="errorImg">
-                  <img src="~@/assets/images/imgError.png" alt />
-                </div>
-                <div slot="error" class="errorImg">
-                  <img src="~@/assets/images/imgError.png" alt />
-                </div>
-              </el-image>
-              <div class="productName">
-                <div class="name" @click="goDetails(scope.row)">
-                  {{ scope.row.pr_na }}
-                </div>
-                <div class="factory">
-                  <div class="fcatoryName" @click="toFactory(scope.row)">
-                    {{ scope.row.supplierName }}
-                  </div>
-                  <div class="icons">
-                    <div class="cartInfoIcon"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="联系厂商" align="center">
-          <template slot-scope="scope">
-            <div v-if="scope.row.supplierPhone">
-              {{ scope.row.supplierPhone }}
-            </div>
-            <div v-if="scope.row.supplierTelephoneNumber">
-              {{ scope.row.supplierTelephoneNumber }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="资料来源" show-overflow-tooltip>
-          <template slot-scope="scope">
-            {{ scope.row.exhibitionName }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="fa_no" label="出厂货号"></el-table-column>
-        <el-table-column prop="ch_pa" label="包装"> </el-table-column>
-        <el-table-column label="产品规格" min-width="100">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.pr_le }}x{{ scope.row.pr_wi }}x{{
-                scope.row.pr_hi
-              }}(cm)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="包装规格" min-width="100">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
-                scope.row.in_hi
-              }}(cm)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="外箱规格" min-width="100">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
-                scope.row.ou_hi
-              }}(cm)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="体积/材积" min-width="150">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="毛重/净重">
-          <template slot-scope="scope">
-            <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="装箱量">
-          <template slot-scope="scope">
-            <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="productPrice" label="参考单价">
-          <template slot-scope="scope">
-            <span style="color: #f56c6c">
-              {{ scope.row.cu_de + scope.row.fa_pr }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="状态">
-          <template slot-scope="scope">
-            <template v-if="scope.row.messageExt == '3'">
-              <span :class="[scope.row.messageStatus == '1' ? 'green' : 'red']">
-                {{ scope.row.messageStatus == "1" ? "不补样" : "补样" }}
-              </span>
-            </template>
-            <template v-else-if="scope.row.messageExt == '5'">
-              <span :class="[scope.row.messageStatus == '1' ? 'green' : 'red']">
-                {{ scope.row.messageStatus == "1" ? "不借样" : "借样" }}
-              </span>
-            </template>
-            <template v-else-if="scope.row.messageExt == '11'">
-              <span
-                :class="[
-                  scope.row.messageStatus == '1'
-                    ? 'red'
-                    : scope.row.messageStatus == '2'
-                    ? 'green'
-                    : 'red'
-                ]"
-              >
-                {{
-                  scope.row.messageStatus == "1"
-                    ? "借样"
-                    : scope.row.messageStatus == "2"
-                    ? "不允许"
-                    : "补样"
-                }}
-              </span>
-            </template>
-            <template v-else-if="scope.row.messageExt == '12'">
-              <span :class="[scope.row.messageStatus == '1' ? 'red' : 'green']">
-                {{ scope.row.messageStatus == "1" ? "不接受" : "结束" }}
-              </span>
-            </template>
-          </template>
-        </el-table-column>
-      </el-table> -->
+
       <div class="totalBox">
         <p class="item">
           <span class="itemTitle">总款数：</span>
@@ -228,7 +76,7 @@
         </p>
         <p class="item">
           <span class="itemTitle">总出厂价：</span>
-          <span class="price">￥{{ options.sumAmountFa_pr }}</span>
+          <span class="price">￥{{ options.sumFa_pr_pr }}</span>
         </p>
       </div>
     </div>
@@ -355,10 +203,9 @@ export default {
           { prop: "ch_pa", label: "包装", isHiden: true, width: 90 },
           {
             prop: "pr_le",
-            label: "产品规格(cm)",
             isHiden: true,
             renderHeard: () => {
-              return "产品规格(cm)";
+              return "产品规格</br>(cm)";
             },
             render: row => {
               return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
@@ -366,10 +213,10 @@ export default {
           },
           {
             prop: "pr_le",
-            label: "包装规格(cm)",
+
             isHiden: true,
             renderHeard: () => {
-              return "包装规格(cm)";
+              return "包装规格</br>(cm)";
             },
             render: row => {
               return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
@@ -377,10 +224,10 @@ export default {
           },
           {
             prop: "pr_le",
-            label: "外箱规格",
+
             isHiden: true,
             renderHeard: () => {
-              return "外箱规格(cm)";
+              return "外箱规格</br>(cm)";
             },
             render: row => {
               return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
@@ -388,7 +235,9 @@ export default {
           },
           {
             prop: "bulk_stere",
-            label: "体积(cbm)/材积(cuft)",
+            renderHeard: () => {
+              return "体积/材积</br>(cbm)/(cuft)";
+            },
             isHiden: true,
             width: 150,
             render: row => {
@@ -397,7 +246,9 @@ export default {
           },
           {
             prop: "gr_we",
-            label: "毛重/净重(kg)",
+            renderHeard: () => {
+              return "毛重/净重</br>(kg)";
+            },
             isHiden: true,
             render: row => {
               return row.gr_we + "/" + row.ne_we;
@@ -405,7 +256,9 @@ export default {
           },
           {
             prop: "in_en",
-            label: "装箱量(pcs)",
+            renderHeard: () => {
+              return "装箱量</br>(pcs)";
+            },
             width: 90,
             isHiden: true,
             render: row => {

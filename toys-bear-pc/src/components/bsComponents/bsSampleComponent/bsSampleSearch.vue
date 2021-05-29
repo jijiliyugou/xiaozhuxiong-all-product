@@ -92,7 +92,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="每车尺寸：" prop="size">
+          <el-form-item label="每车尺码：" prop="size">
             <el-select
               :disabled="isEdit"
               v-model="clienFormData.size"

@@ -7,7 +7,7 @@
       :model="formData"
       size="medium"
     >
-      <el-form-item label="名称：" style="margin-right:20px" prop="name">
+      <el-form-item label="站点名称：" style="margin-right:20px" prop="name">
         <el-input v-model="formData.name"></el-input>
       </el-form-item>
       <el-form-item label="域名地址：" style="margin-right:20px" prop="url">

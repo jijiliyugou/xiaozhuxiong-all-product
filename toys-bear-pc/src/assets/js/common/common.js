@@ -1,3 +1,6 @@
+// 解析二维码插件
+import QrCode from "qrcode-decoder";
+
 /**
  * 获取年月日时分秒
  * @returns YYYYmmddhhmfss
@@ -165,11 +168,115 @@ export function calculateDate(code) {
   }
 }
 // 格式化时间
-function formatTime(param) {
+export function formatTime(param) {
   var y = param.getFullYear();
   var m = param.getMonth() + 1;
   var d = param.getDate();
   m = m < 10 ? "0" + m : m;
   d = d < 10 ? "0" + d : d;
   return y + "-" + m + "-" + d;
+}
+
+// 筛选消息类型
+export function filterMsgTypes(param) {
+  let msg = "";
+  switch (param.messageType) {
+    case "RC:TxtMsg": // 文本消息
+      msg = param.content.content;
+      break;
+    case "XZX:ProductMessage": // 产品消息
+      msg = "[产品]";
+      break;
+    case "XZX:OrderMessage": // 订单消息
+      msg = "[订单]";
+      break;
+    case "XZX:VideoMessage": // 视频消息
+      msg = "[视频]";
+      break;
+    case "RC:VcMsg": // 语音消息
+    case "RC:HQVCMsg": // 语音消息
+      msg = "[语音]";
+      break;
+    case "XZX:LinkMessage": // 链接消息
+      msg = param.content;
+      break;
+    case "RC:ImgMsg": // 链接消息
+      msg = "[图片]";
+      break;
+    case "RC:ReferenceMsg": // 引用消息
+      msg = "[引用]";
+      break;
+  }
+  return msg;
+}
+
+// 压缩图片
+export function compress(file, size) {
+  let canvas = document.createElement("canvas");
+  let ctx = canvas.getContext("2d");
+  // let initSize = file.src.length;
+  let width = file.width;
+  let height = file.height;
+  canvas.width = width;
+  canvas.height = height;
+  // 铺底色
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(file, 0, 0, width, height);
+  //进行最小压缩
+  let ndata = canvas.toDataURL("image/jpeg", size);
+  console.log("*******压缩后的文件大小*******", ndata.length / 1024);
+  return ndata;
+}
+
+// 图片转bese64
+export function base64file(file, type) {
+  //判断支不支持FileReader
+  if (!file || !window.FileReader) {
+    console.log(window.FileReader);
+    return false;
+  }
+  return new Promise(resolve => {
+    let reader = new FileReader();
+    reader.readAsDataURL(file); // 把图片文件对象转换base64
+    if (type === "RC:ImgMsg") {
+      //读取成功后的回调
+      reader.onloadend = function() {
+        let result = this.result;
+        let img = new Image();
+        img.src = result;
+        img.onload = function() {
+          const dataURL = compress(img, 0.001);
+          resolve(dataURL);
+        };
+      };
+    } else if (type === "XZX:VideoMessage") {
+      reader.onloadend = function() {
+        let result = this.result;
+        let video = document.createElement("video");
+        video.setAttribute("crossOrigin", "anonymous"); //处理跨域
+        video.setAttribute("src", result);
+        video.currentTime = 1; // 第一帧
+        video.addEventListener("loadeddata", function() {
+          const dataURL = compress(video, 0.1);
+          resolve(dataURL);
+        });
+      };
+    }
+  });
+}
+export function getQrUrl(file) {
+  // 获取临时路径 chrome有效，其他浏览器的方法请自行查找
+  let url;
+  if (window.webkitURL) {
+    url = window.webkitURL.createObjectURL(file);
+  } else if (window.URL) {
+    url = window.URL.createObjectURL(file);
+  } else {
+    return false;
+  }
+  // 初始化
+  const qr = new QrCode();
+  // 解析二维码，返回promise
+  return qr.decodeFromImage(url);
 }

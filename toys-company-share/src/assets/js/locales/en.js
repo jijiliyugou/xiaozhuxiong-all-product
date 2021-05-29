@@ -7,6 +7,7 @@ export default {
       SignIn: "Sign In",
       InvitationCode: "Invitation Code",
       email: "E-mail",
+      userName: "user name",
       emailExplain: "（Email For Notification Only）",
       loginBtn: "Sign In",
       title: "login"

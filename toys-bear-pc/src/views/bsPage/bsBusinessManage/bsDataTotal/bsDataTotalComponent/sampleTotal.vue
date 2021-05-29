@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-05-14 18:06:13
  * @FilePath: \projectd:\LittleBearPC\toys-bear-pc\src\views\bsPage\bsBusinessManage\bsDataTotal\bsDataTotalComponent\sampleTotal.vue
- * @LastEditTime: 2021-05-15 12:41:06
+ * @LastEditTime: 2021-05-17 09:33:52
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0

@@ -378,6 +378,18 @@ export default {
               return msg;
             }
           }
+        ],
+        btnWidth: 100,
+        actions: [
+          {
+            type: "success",
+            textWrapper() {
+              return "导出";
+            },
+            methods: row => {
+              this.exportOrder(row);
+            }
+          }
         ]
       }
     };
@@ -420,7 +432,7 @@ export default {
       console.log(this.searchForm.fromCompanyName);
       const fd = {
         readStatus: this.searchForm.readStatus,
-        sampleFrom: "Hall",
+        sampleFrom: "supplier",
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyWord: this.searchForm.keyword,

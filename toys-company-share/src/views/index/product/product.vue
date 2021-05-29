@@ -124,7 +124,7 @@
 <script>
 import thumbnailProducts from "@/components/thumbnailProducts/thumbnailProducts.vue";
 import listProducts from "@/components/listProducts/listProducts.vue";
-import { mapState, mapGetters } from "vuex";
+import { mapState } from "vuex";
 export default {
   components: {
     thumbnailProducts,
@@ -213,7 +213,8 @@ export default {
         sortType: this.sortType,
         productType: this.$route.query.productType,
         pageIndex: this.currentPage,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
+        loginName: this.userInfo.loginEmail
       };
       if (fd.pa_nu) {
         const { packChMethods, packNumber } = JSON.parse(fd.pa_nu);
@@ -233,15 +234,6 @@ export default {
       );
       const { data, code, message } = res.data.result;
       if (code === 200) {
-        if (this.shoppingList) {
-          for (let i = 0; i < data.items.length; i++) {
-            for (let j = 0; j < this.shoppingList.length; j++) {
-              if (data.items[i].id === this.shoppingList[j].id)
-                data.items[i].isShopping = true;
-            }
-          }
-        }
-
         this.productList = data.items;
         this.totalCount = data.totalCount;
       } else this.$message.error(message);
@@ -266,19 +258,7 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next(_that => {
-      for (let i = 0; i < _that.productList.length; i++) {
-        _that.productList[i].isShopping = false;
-      }
-      if (_that.shoppingList.length) {
-        for (let i = 0; i < _that.productList.length; i++) {
-          for (let j = 0; j < _that.shoppingList.length; j++) {
-            if (_that.productList[i].id === _that.shoppingList[j].id)
-              _that.productList[i].isShopping = true;
-          }
-        }
-      }
-      _that.$root.eventHub.$emit("resetProductsItem", _that.productList);
-      // _that.getSearchCompanyShareProductPage();
+      _that.getSearchCompanyShareProductPage();
     });
   },
   mounted() {
@@ -286,9 +266,9 @@ export default {
       this.currentPage = 1;
       this.getSearchCompanyShareProductPage();
     });
-    if (this.$store.state.imageSearchValue instanceof Array) {
-      this.productList = this.$store.state.imageSearchValue;
-      this.totalCount = this.$store.state.imageSearchValue.length;
+    if (this.imageSearchValue instanceof Array) {
+      this.productList = this.imageSearchValue;
+      this.totalCount = this.imageSearchValue.length;
       // this.$store.commit("imageSearch", null);
       // this.$store.commit("handlerSearchImgPreview", null);
     } else {
@@ -299,7 +279,7 @@ export default {
     "$store.state.globalLang"(val) {
       if (val) document.title = this.productLang.title;
     },
-    "$store.state.imageSearchValue"(newVal) {
+    imageSearchValue(newVal) {
       if (newVal) {
         this.productList = newVal;
         this.totalCount = newVal.length;
@@ -316,15 +296,11 @@ export default {
     advancedSearchLang() {
       return this.$t("lang.advancedSearch");
     },
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    }),
-    ...mapState(["searchForm"])
+
+    ...mapState(["searchForm", "imageSearchValue", "userInfo", "shopLength"])
   },
   beforeDestroy() {
-    this.$root.eventHub.$off("resetProductsItem");
     this.$root.eventHub.$off("resetProducts");
-    this.$root.eventHub.$off("resetProductsForeach");
     this.$store.commit("imageSearch", null);
     this.$store.commit("handlerSearchImgPreview", null);
   }

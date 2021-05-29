@@ -56,45 +56,21 @@
       </div>
       <!-- 表格 -->
       <bsTables :table="tableData" />
-      <div class="totalBox">
-        <p class="item">
-          <span class="itemTitle">总款数：</span>
-          <span>{{ totalCount }}</span>
-        </p>
-        <p class="item">
-          <span class="itemTitle">总箱数：</span>
-          <span>{{ options.sumtAmount }}</span>
-        </p>
-        <p class="item">
-          <span class="itemTitle">总体积/总材积：</span>
-          <span>{{ options.sumBulk_stere }}</span
-          >/<span>{{ options.sumBulk_feet }}</span>
-        </p>
-        <p class="item">
-          <span class="itemTitle">总毛重/总净重：</span>
-          <span>{{ options.sumGr_we }}/{{ options.sumNe_we }}(KG)</span>
-        </p>
-        <p class="item">
-          <span class="itemTitle">总出厂价/总报出价</span>
-          <span class="price">{{ options.sumFa_pr_pr }}</span>
-          <span>/</span>
-          <span class="price">￥{{ options.SumHa_in_qu || 0 }}</span>
-        </p>
-      </div>
+      <center style="margin-top: 20px">
+        <el-pagination
+          layout="total, sizes, prev, pager, next, jumper"
+          background
+          :page-sizes="[10, 20, 30, 50]"
+          :page-size="pageSize"
+          :total="totalCount"
+          :current-page.sync="currentPage"
+          @current-change="currentChange"
+          @size-change="handleSizeChange"
+        ></el-pagination>
+      </center>
     </div>
-
-    <center style="margin-top: 20px">
-      <el-pagination
-        layout="total, sizes, prev, pager, next, jumper"
-        background
-        :page-sizes="[10, 20, 30, 50]"
-        :page-size="pageSize"
-        :total="totalCount"
-        :current-page.sync="currentPage"
-        @current-change="currentChange"
-        @size-change="handleSizeChange"
-      ></el-pagination>
-    </center>
+    <!-- 统计 -->
+    <Summary :summaryData="summaryData"></Summary>
     <!-- 导出订单模板dialog -->
     <transition name="el-zoom-in-center">
       <el-dialog
@@ -120,9 +96,10 @@
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/zhantingyewu.vue";
 import bsTables from "@/components/table";
+import Summary from "@/components/summaryComponent/summary";
 export default {
   name: "bsHallBusinessOrderDetails",
-  components: { bsExportOrder, bsTables },
+  components: { bsExportOrder, bsTables, Summary },
   props: {
     item: {
       type: Object
@@ -130,6 +107,20 @@ export default {
   },
   data() {
     return {
+      summaryData: {
+        //汇总数据
+        isHandle: false,
+        totalDegree: 0, //总款数
+        totalCartons: -1, //总箱数
+        totalQuantity: 0, //总数量
+        totalBulkStere: 0, //总体积
+        totalBulkFeet: 0, //总材积
+        totalGrWe: 0, //总毛重
+        totalNeWe: 0, //总净重
+        cu_de: "", //金额单位
+        totalMoney: 0 //总金额
+        // countData: [],
+      },
       tableData: {
         data: [],
         showLoading: false,
@@ -143,6 +134,7 @@ export default {
             color: "#3368a9",
             align: "left",
             isHiden: true,
+            infoBox: true,
             productInfo: true,
             elImage: row => {
               return row.imgUrl;
@@ -173,7 +165,7 @@ export default {
                 case undefined:
                 case "null":
                 case "undefined":
-                  row.supplierTelephoneNumber = "";
+                  row.supplierPhone = "";
                   break;
               }
               return row.supplierPhone + "<br>" + row.supplierTelephoneNumber;
@@ -188,10 +180,10 @@ export default {
           { prop: "ch_pa", label: "包装", isHiden: true, width: 90 },
           {
             prop: "pr_le",
-            label: "产品规格(cm)",
+
             isHiden: true,
             renderHeard: () => {
-              return "产品规格(cm)";
+              return "产品规格</br>(cm)";
             },
             render: row => {
               return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
@@ -199,10 +191,10 @@ export default {
           },
           {
             prop: "pr_le",
-            label: "包装规格(cm)",
+
             isHiden: true,
             renderHeard: () => {
-              return "包装规格(cm)";
+              return "包装规格</br>(cm)";
             },
             render: row => {
               return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
@@ -210,10 +202,10 @@ export default {
           },
           {
             prop: "pr_le",
-            label: "外箱规格",
+
             isHiden: true,
             renderHeard: () => {
-              return "外箱规格(cm)";
+              return "外箱规格</br>(cm)";
             },
             render: row => {
               return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
@@ -221,16 +213,20 @@ export default {
           },
           {
             prop: "bulk_stere",
-            label: "体积(cbm)/材积(cuft)",
+            renderHeard: () => {
+              return "体积/材积</br>(cbm)/(cuft)";
+            },
             isHiden: true,
             width: 150,
             render: row => {
-              return row.bulk_stere + row.bulk_feet;
+              return row.bulk_stere + "/" + row.bulk_feet;
             }
           },
           {
             prop: "gr_we",
-            label: "毛重/净重(kg)",
+            renderHeard: () => {
+              return "毛重/净重</br>(kg)";
+            },
             isHiden: true,
             render: row => {
               return row.gr_we + "/" + row.ne_we;
@@ -238,11 +234,22 @@ export default {
           },
           {
             prop: "in_en",
-            label: "装箱量(pcs)",
+            renderHeard: () => {
+              return "装箱量</br>(pcs)";
+            },
             width: 90,
             isHiden: true,
             render: row => {
               return row.in_en + "/" + row.ou_lo;
+            }
+          },
+          {
+            prop: "ou_lo",
+            label: "数量",
+            width: 90,
+            isHiden: true,
+            render: row => {
+              return row.ou_lo;
             }
           },
           {
@@ -337,6 +344,14 @@ export default {
       });
       if (res.data.result.code === 200) {
         this.options = res.data.result.item;
+        this.summaryData.totalDegree = this.totalCount;
+        this.summaryData.totalQuantity = this.options.sumAmountOu_lo;
+        this.summaryData.totalBulkStere = this.options.sumBulk_stere;
+        this.summaryData.totalBulkFeet = this.options.sumBulk_feet;
+        this.summaryData.totalGrWe = this.options.sumGr_we;
+        this.summaryData.totalNeWe = this.options.sumNe_we;
+        this.summaryData.sumAmountFa_pr = this.options.sumAmountFa_pr;
+        this.summaryData.sumHa_in_qu = this.options.sumHa_in_qu;
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -362,6 +377,7 @@ export default {
       }
       this.getERPOrderTotal();
     },
+
     // 切换当前页
     currentChange(page) {
       this.currentPage = page;
@@ -413,6 +429,7 @@ export default {
   min-height: 100%;
   background-color: #fff;
   padding: 0 20px;
+  padding-bottom: 100px;
   .title {
     height: 55px;
     line-height: 55px;
@@ -560,26 +577,6 @@ export default {
           .name {
             margin-top: 8px;
           }
-        }
-      }
-    }
-    .totalBox {
-      display: flex;
-      align-items: center;
-      height: 80px;
-      padding-left: 10px;
-      box-sizing: border-box;
-      justify-content: flex-end;
-      .item {
-        margin-right: 15px;
-        display: flex;
-        align-items: center;
-        // .itemTitle {
-        // }
-        .price {
-          color: #eb1515;
-          font-weight: 700;
-          font-size: 18px;
         }
       }
     }

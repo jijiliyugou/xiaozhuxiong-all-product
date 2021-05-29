@@ -14,263 +14,10 @@
       </div>
       <div class="tableBox">
         <bsTable :table="tableData" />
-        <!-- <el-table
-          :data="tableData"
-          size="mini"
-          style="width: 100%"
-          ref="collecTable"
-          :header-cell-style="{ background: '#f1f3f6' }"
-        >
-          <el-table-column label="序号" type="index" align="center" width="60">
-          </el-table-column>
-          <el-table-column prop="img" label="产品" width="220">
-            <template slot-scope="scope">
-              <div class="imgBox">
-                <el-image
-                  @click.native="goDetails(scope.row)"
-                  fit="contain"
-                  style="width: 80px; height: 60px"
-                  :src="scope.row.imgUrlList && scope.row.imgUrlList[0]"
-                >
-                  <div
-                    slot="placeholder"
-                    style="width:60px;height:60px;"
-                    class="errorImg"
-                  >
-                    <img
-                      style="width: 55px; height: 60px"
-                      src="~@/assets/images/imgError.png"
-                      alt
-                    />
-                  </div>
-                  <div
-                    slot="error"
-                    style="width:60px;height:60px;"
-                    class="errorImg"
-                  >
-                    <img
-                      style="width: 55px; height: 60px"
-                      src="~@/assets/images/imgError.png"
-                      alt
-                    />
-                  </div>
-                </el-image>
-                <div class="productName">
-                  <div class="name" @click="goDetails(scope.row)">
-                    {{ scope.row.name }}
-                  </div>
-                  <div class="factory">
-                    <div class="factoryName" @click="toFactory(scope.row)">
-                      {{ scope.row.supplierName }}
-                    </div>
-                    <div class="icons">
-                      <div class="cartInfoIcon"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="supplierPhone"
-            label="联系厂商"
-            align="center"
-            min-width="100"
-          >
-            <template slot-scope="scope">
-              <div v-if="scope.row.supplierPhone">
-                {{ scope.row.supplierPhone }}
-              </div>
-              <div v-if="scope.row.supplierTelephoneNumber">
-                {{ scope.row.supplierTelephoneNumber }}
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="资料来源"
-            align="center"
-            show-overflow-tooltip
-          >
-            <template slot-scope="scope">
-              {{ scope.row.companyName }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="fa_no"
-            label="出厂货号"
-            align="center"
-          ></el-table-column>
-          <el-table-column prop="ch_pa" label="包装" align="center">
-          </el-table-column>
-          <el-table-column
-            label="产品规格"
-            align="center"
-            show-overflow-tooltip
-          >
-            <template slot-scope="scope">
-              <span>
-                {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
-                  scope.row.ou_hi
-                }}(cm)
-              </span>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            label="包装规格"
-            align="center"
-            show-overflow-tooltip
-          >
-            <template slot-scope="scope">
-              <span>
-                {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
-                  scope.row.in_hi
-                }}(cm)
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="外箱规格"
-            align="center"
-            show-overflow-tooltip
-          >
-            <template slot-scope="scope">
-              <span>
-                {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
-                  scope.row.ou_hi
-                }}(cm)
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="体积/材积"
-            align="center"
-            min-width="100"
-            show-overflow-tooltip
-          >
-            <template slot-scope="scope">
-              <span>
-                {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column label="毛重/净重" align="center">
-            <template slot-scope="scope">
-              <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
-            </template>
-          </el-table-column>
-          <el-table-column label="装箱量" align="center">
-            <template slot-scope="scope">
-              <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="boxNumber" label="箱数" align="center">
-            <template slot-scope="scope">
-              <span>
-                {{ handleOffer(scope.row.boxNumber) }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="ch_pa" label="总数量" align="center">
-            <template slot-scope="scope">
-              <span>
-                {{
-                  handleOffer(
-                    sumPriceCount(scope.row.boxNumber, scope.row.ou_lo)
-                  )
-                }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="price" label="厂价" align="center">
-            <template slot-scope="scope">
-              <span style="color: #f56c6c"> ￥{{ scope.row.price }} </span>
-            </template>
-          </el-table-column>
-
-          <el-table-column prop="offerAmount" label="报出价" align="center">
-            <template slot-scope="scope">
-              <span style="color: #f56c6c">
-                {{ scope.row.cu_de + handleOffer(scope.row.offerAmount) }}
-              </span>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            prop="OfferTotalAmount"
-            label="报出总价"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <span style="color: #f56c6c">{{ scope.row.cu_de }}</span>
-              <span style="color: #f56c6c">
-                {{
-                  handleOffer(
-                    priceCount(
-                      scope.row.offerAmount,
-                      scope.row.ou_lo,
-                      scope.row.boxNumber
-                    )
-                  )
-                }}
-              </span>
-            </template>
-          </el-table-column>
-        </el-table> -->
-        <!-- 统计 -->
-        <div class="tableBtoBox">
-          <div class="tableBto">
-            <div class="right">
-              <p class="item">
-                <span class="itemTitle">总款数：</span>
-                <span>{{ tableData.data.length }}</span>
-              </p>
-              <p class="item">
-                <span class="itemTitle">总箱数：</span>
-                <span>{{ myTotalQuantity(tableData.data) }}</span>
-              </p>
-              <p class="item">
-                <span class="itemTitle">总体积/总材积：</span>
-                <span
-                  >{{
-                    handleOffer(myTotalVolume(tableData.data).outerBoxStere)
-                  }}/{{
-                    handleOffer(myTotalVolume(tableData.data).outerBoxFeet)
-                  }}</span
-                >
-              </p>
-              <p class="item">
-                <span class="itemTitle">总毛重/总净重：</span>
-                <span
-                  >{{ handleOffer(totalMaozhong()) }}/{{
-                    handleOffer(totalJingzhong())
-                  }}(KG)</span
-                >
-              </p>
-              <p class="item">
-                <span class="itemTitle">总金额：</span>
-                <span class="price"
-                  >{{ item.cu_de + handleOffer(myTotalPrice(tableData.data)) }}
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
-    <!-- 分页 -->
-    <!-- <center style="padding:20px 0;">
-          <el-pagination
-            layout="total, sizes, prev, pager, next, jumper"
-            :page-sizes="[12, 24, 36, 48]"
-            background
-            :total="totalCount"
-            :page-size="pageSize"
-            :current-page.sync="currentPage"
-            @current-change="handleCurrentChange"
-            @size-change="handleSizeChange"
-          ></el-pagination>
-        </center> -->
+    <!-- 统计值 -->
+    <Summary :summaryData="summaryData"></Summary>
     <!-- 导出订单模板dialog -->
     <transition name="el-zoom-in-center">
       <el-dialog
@@ -287,6 +34,7 @@
 </template>
 
 <script>
+import Summary from "@/components/summaryComponent/summary";
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gongsizhaoyangbaojia.vue";
 import bsSampleQuotationTopComponent from "@/components/bsComponents/bsSampleComponent/bsSampleQuotationTopComponent";
 import bsTable from "@/components/table";
@@ -295,7 +43,8 @@ export default {
   components: {
     bsExportOrder,
     bsSampleQuotationTopComponent,
-    bsTable
+    bsTable,
+    Summary
   },
   props: {
     item: {
@@ -316,7 +65,7 @@ export default {
             width: 300,
             color: "#3368a9",
             align: "left",
-            isHiden: true,
+            // isHiden: true,
             infoBox: true,
             productInfo: true,
             elImage: row => {
@@ -363,7 +112,9 @@ export default {
           { prop: "ch_pa", width: 50, label: "包装", isHiden: true },
           {
             prop: "pr_le",
-            label: "产品规格(cm)",
+            renderHeard: () => {
+              return "产品规格</br>(cm)";
+            },
             isHiden: true,
             render: row => {
               return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
@@ -371,7 +122,10 @@ export default {
           },
           {
             prop: "pr_le",
-            label: "包装规格(cm)",
+
+            renderHeard: () => {
+              return "包装规格</br>(cm)";
+            },
             isHiden: true,
             render: row => {
               return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
@@ -379,7 +133,10 @@ export default {
           },
           {
             prop: "pr_le",
-            label: "外箱规格(cm)",
+
+            renderHeard: () => {
+              return "外箱规格</br>(cm)";
+            },
             isHiden: true,
             render: row => {
               return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
@@ -387,7 +144,10 @@ export default {
           },
           {
             prop: "bulk_stere",
-            label: "体积(cbm)/材积(cuft)",
+
+            renderHeard: () => {
+              return "体积/材积</br>(cbm)/(cuft)";
+            },
             isHiden: true,
             width: 150,
             render: row => {
@@ -396,7 +156,10 @@ export default {
           },
           {
             prop: "gr_we",
-            label: "毛重/净重(kg)",
+
+            renderHeard: () => {
+              return "毛重/净重</br>(kg)";
+            },
             isHiden: true,
             render: row => {
               return row.gr_we + "/" + row.ne_we;
@@ -404,7 +167,10 @@ export default {
           },
           {
             prop: "in_en",
-            label: "装箱量(pcs)",
+
+            renderHeard: () => {
+              return "装箱量</br>(pcs)";
+            },
             isHiden: true,
             render: row => {
               return row.in_en + "/" + row.ou_lo;
@@ -416,10 +182,13 @@ export default {
             width: 50
           },
           {
-            label: "总数量",
+            label: "数量",
             width: 50,
             render: row => {
-              return this.sumPriceCount(row.boxNumber, row.ou_lo);
+              return this.$calculate.countTotalQuantity(
+                row.boxNumber,
+                row.ou_lo
+              );
             }
           },
           {
@@ -449,7 +218,11 @@ export default {
               return (
                 row.cu_de +
                 " " +
-                this.priceCount(row.offerAmount, row.ou_lo, row.boxNumber)
+                this.$calculate.countTotalprice(
+                  row.offerAmount,
+                  row.ou_lo,
+                  row.boxNumber
+                )
               );
             }
           }
@@ -461,7 +234,20 @@ export default {
       currentPage: 1,
       pageSize: 500,
       totalCount: 0,
-      itemList: {}
+      itemList: {},
+      summaryData: {
+        //汇总数据
+        totalDegree: 0, //总款数
+        totalCartons: 0, //总箱数
+        totalQuantity: 0, //总数量
+        totalBulkStere: 0, //总体积
+        totalBulkFeet: 0, //总材积
+        totalGrWe: 0, //总毛重
+        totalNeWe: 0, //总净重
+        cu_de: "", //金额单位
+        totalMoney: 0 //总金额
+        // countData: [],
+      }
     };
   },
   created() {},
@@ -538,6 +324,7 @@ export default {
         if (res.data.result.code === 200) {
           this.totalCount = res.data.result.item.totalCount;
           this.tableData.data = res.data.result.item.items;
+          this.handleCountData(res.data.result.item.items);
         } else {
           this.$message.error(res.data.result.msg);
         }
@@ -554,9 +341,57 @@ export default {
         if (res.data.result.code === 200) {
           this.totalCount = res.data.result.item.totalCount;
           this.tableData.data = res.data.result.item.items;
+          this.handleCountData(res.data.result.item.items);
         } else {
           this.$message.error(res.data.result.msg);
         }
+      }
+    },
+    //计算汇总数据
+    handleCountData(array) {
+      //总款数
+      this.summaryData.totalDegree = array.length;
+      this.summaryData.cu_de = this.item.cu_de;
+      //金额单位
+      for (let i = 0; i < array.length; i++) {
+        //总箱数
+        this.summaryData.totalCartons = this.$calculate.add(
+          this.summaryData.totalCartons,
+          array[i].boxNumber || 0
+        );
+        //总数量
+        this.summaryData.totalQuantity = this.$calculate.add(
+          this.summaryData.totalQuantity,
+          this.$calculate.multiply(array[i].boxNumber, array[i].ou_lo) || 0
+        );
+        //总体积
+        this.summaryData.totalBulkStere = this.$calculate.add(
+          this.summaryData.totalBulkStere,
+          this.$calculate.multiply(array[i].boxNumber, array[i].bulk_stere) || 0
+        );
+        //总材积
+        this.summaryData.totalBulkFeet = this.$calculate.add(
+          this.summaryData.totalBulkFeet,
+          this.$calculate.multiply(array[i].boxNumber, array[i].bulk_feet) || 0
+        );
+        //总毛重
+        this.summaryData.totalGrWe = this.$calculate.add(
+          this.summaryData.totalGrWe,
+          this.$calculate.multiply(array[i].boxNumber, array[i].gr_we) || 0
+        );
+        //总净重
+        this.summaryData.totalNeWe = this.$calculate.add(
+          this.summaryData.totalNeWe,
+          this.$calculate.multiply(array[i].boxNumber, array[i].ne_we) || 0
+        );
+        //总金额
+        this.summaryData.totalMoney = this.$calculate.add(
+          this.summaryData.totalMoney,
+          this.$calculate.multiply(
+            this.$calculate.multiply(array[i].offerAmount, array[i].boxNumber),
+            array[i].ou_lo
+          )
+        );
       }
     },
     // 导出找样
@@ -568,184 +403,6 @@ export default {
       };
       this.exportTemplateDialog = true;
     },
-    // 切換頁容量
-    handleSizeChange(pageSize) {
-      this.pageSize = pageSize;
-      if (
-        this.currentPage * pageSize > this.totalCount &&
-        this.currentPage != 1
-      )
-        return false;
-      this.getProductOfferDetailPage();
-    },
-    // 修改当前页
-    handleCurrentChange(page) {
-      this.currentPage = page;
-      this.getProductOfferDetailPage();
-    },
-
-    isInteger(obj) {
-      return Math.floor(obj) === obj;
-    },
-    /*
-     * 将一个浮点数转成整数，返回整数和倍数。如 3.14 >> 314，倍数是 100
-     * @param floatNum {number} 小数
-     * @return {object}
-     *   {times:100, num: 314}
-     */
-    toInteger(floatNum) {
-      const ret = { times: 1, num: 0 };
-      if (this.isInteger(floatNum)) {
-        ret.num = floatNum;
-        return ret;
-      }
-      const strfi = floatNum + "";
-      const dotPos = strfi.indexOf(".");
-      const len = strfi.substr(dotPos + 1).length;
-      const times = Math.pow(10, len);
-      const intNum = parseInt(floatNum * times + 0.5, 10);
-      ret.times = times;
-      ret.num = intNum;
-      return ret;
-    },
-    /*
-     * 核心方法，实现加减乘除运算，确保不丢失精度
-     * 思路：把小数放大为整数（乘），进行算术运算，再缩小为小数（除）
-     *
-     * @param a {number} 运算数1
-     * @param b {number} 运算数2
-     * @param digits {number} 精度，保留的小数点数，比如 2, 即保留为两位小数
-     * @param op {string} 运算类型，有加减乘除（add/subtract/multiply/divide）
-     *
-     */
-    operation(a, b, digits, op) {
-      const o1 = this.toInteger(a);
-      const o2 = this.toInteger(b);
-      const n1 = o1.num;
-      const n2 = o2.num;
-      const t1 = o1.times;
-      const t2 = o2.times;
-      const max = t1 > t2 ? t1 : t2;
-      let result = null;
-      switch (op) {
-        case "add":
-          if (t1 === t2) {
-            // 两个小数位数相同
-            result = n1 + n2;
-          } else if (t1 > t2) {
-            // o1 小数位 大于 o2
-            result = n1 + n2 * (t1 / t2);
-          } else {
-            // o1 小数位 小于 o2
-            result = n1 * (t2 / t1) + n2;
-          }
-          return result / max;
-        case "subtract":
-          if (t1 === t2) {
-            result = n1 - n2;
-          } else if (t1 > t2) {
-            result = n1 - n2 * (t1 / t2);
-          } else {
-            result = n1 * (t2 / t1) - n2;
-          }
-          return result / max;
-        case "multiply":
-          result = (n1 * n2) / (t1 * t2);
-          return result;
-        case "divide":
-          result = (n1 / n2) * (t2 / t1);
-          return result;
-      }
-    },
-    // 加
-    add(a, b, digits) {
-      return this.operation(a, b, digits, "add");
-    },
-    // 减
-    subtract(a, b, digits) {
-      return this.operation(a, b, digits, "subtract");
-    },
-    // 乘
-    multiply(a, b, digits) {
-      return this.operation(a, b, digits, "multiply");
-    },
-    // 除
-    divide(a, b, digits) {
-      return this.operation(a, b, digits, "divide");
-    },
-    // 总数量
-    sumPriceCount(boxNumber, ou_lo) {
-      return this.multiply(boxNumber, ou_lo);
-    },
-    // 单个产品总价
-    priceCount(price, ou_lo, boxNumber) {
-      return this.multiply(this.multiply(price, ou_lo), boxNumber);
-    },
-    // 计算总净重
-    totalJingzhong() {
-      let number = 0;
-      for (let i = 0; i < this.tableData.length; i++) {
-        number = this.add(
-          number,
-          this.multiply(this.tableData[i].boxNumber, this.tableData[i].ne_we)
-        );
-      }
-      return number;
-    },
-    // 计算总毛重
-    totalMaozhong() {
-      let number = 0;
-      for (let i = 0; i < this.tableData.length; i++) {
-        number = this.add(
-          number,
-          this.multiply(this.tableData[i].boxNumber, this.tableData[i].gr_we)
-        );
-      }
-      return number;
-    },
-    // 计算总体积材积
-    myTotalVolume(list) {
-      let outerBoxStere = 0,
-        outerBoxFeet = 0;
-      for (let i = 0; i < list.length; i++) {
-        outerBoxStere = this.add(
-          outerBoxStere,
-          this.multiply(list[i].bulk_stere, list[i].boxNumber)
-        );
-        outerBoxFeet = this.add(
-          outerBoxFeet,
-          this.multiply(list[i].bulk_feet, list[i].boxNumber)
-        );
-      }
-      return {
-        outerBoxStere,
-        outerBoxFeet
-      };
-    },
-    // 计算总箱数量
-    myTotalQuantity() {
-      let number = 0;
-      for (let i = 0; i < this.tableData.length; i++) {
-        number = this.add(number, this.tableData[i].boxNumber || 0);
-      }
-      return number;
-    },
-    // 计算总价
-    myTotalPrice(list) {
-      let price = 0;
-
-      for (let i = 0; i < list.length; i++) {
-        price = this.add(
-          price,
-          this.multiply(
-            this.multiply(list[i].offerAmount, list[i].boxNumber),
-            list[i].ou_lo
-          )
-        );
-      }
-      return price;
-    },
-
     // 点击箱数选中输入框中的所有值
     selectInputValue(e) {
       e.currentTarget.select();
@@ -808,6 +465,7 @@ export default {
   min-height: 100%;
   background-color: #fff;
   padding: 0 20px;
+  padding-bottom: 100px;
   .title {
     height: 50px;
     font-size: 15px;
@@ -833,6 +491,7 @@ export default {
   .bsSampleTable {
     padding-top: 15px;
     margin-bottom: 80px;
+
     .top {
       height: 55px;
       font-size: 15px;
@@ -849,7 +508,6 @@ export default {
   @{deep} .tableBox {
     .el-table {
       font-size: 13px;
-      padding-bottom: 60px;
       .inputNumber {
         width: 50px;
         outline: none;
@@ -917,43 +575,6 @@ export default {
         }
       }
     }
-    .tableBtoBox {
-      position: absolute;
-      width: 100%;
-      margin-right: 20px;
-      z-index: 1;
-      left: 0;
-      bottom: 0;
-      box-sizing: border-box;
-      padding-right: 20px;
-      .tableBto {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        background-color: #fff;
-        height: 80px;
-        padding: 0 30px;
-        box-sizing: border-box;
-        .right {
-          flex: 1;
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-          .item {
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            // .itemTitle {
-            // }
-            .price {
-              color: #eb1515;
-              font-weight: 700;
-              font-size: 18px;
-            }
-          }
-        }
-      }
-    }
   }
 }
 // 表格样式
@@ -981,7 +602,6 @@ export default {
   .el-table__header {
     .cell {
       font-weight: 400;
-      font-size: 14px;
       color: #666;
     }
   }

@@ -6,7 +6,9 @@
           <bsProductSearch
             ref="searchRef"
             :keyword="searchForm.keyword"
+            :MyisGaoji="searchForm.MyisGaoji"
             v-model="searchForm.keyword"
+            @handleIsgaoji="handleIsgaoji"
             @closeTag="closeTag"
             @handleSynthesis="handleSynthesis"
             @screeningShow="screeningShow"
@@ -155,11 +157,13 @@
                       </el-option>
                     </el-select>
                   </el-form-item>
-                  <el-form-item label="是否有图：">
-                    <el-radio-group v-model="advancedFormdata.isUpInsetImg">
-                      <el-radio label="是"></el-radio>
-                      <el-radio label="否"></el-radio>
-                    </el-radio-group>
+                  <el-form-item label="多媒体：" class="abbrLabel">
+                    <el-checkbox v-model="isUpInsetImg">是否有图</el-checkbox>
+                    <el-checkbox
+                      v-model="addrSearch"
+                      @change="handleraddrSearchChange"
+                      >3D展示</el-checkbox
+                    >
                   </el-form-item>
                   <el-form-item style="margin: 0" label="">
                     <el-button
@@ -391,9 +395,36 @@
             "
           >
             <!-- 产品列表 -->
-            <component :is="isGrid" :productList="productList"></component>
+            <component
+              ref="componentRef"
+              :is="isGrid"
+              :productList="productList"
+            ></component>
             <!-- 分页 -->
-            <center class="myPagination">
+            <center
+              :class="{
+                myPagination: true,
+                leftCheckbox: isGrid === 'bsColumnComponent'
+              }"
+            >
+              <div class="left" v-show="isGrid === 'bsColumnComponent'">
+                <el-checkbox
+                  :indeterminate="isIndeterminate"
+                  v-model="checkAll"
+                  @change="handleCheckAllChange"
+                >
+                  全选
+                </el-checkbox>
+
+                <el-button
+                  class="purchased"
+                  size="small"
+                  @click="handelrPurchased"
+                >
+                  <i class="selectionCart"></i>
+                  <span>本页选中一键加购</span>
+                </el-button>
+              </div>
               <el-pagination
                 background
                 @size-change="handleSizeChange"
@@ -554,11 +585,13 @@
                       </el-option>
                     </el-select>
                   </el-form-item>
-                  <el-form-item label="是否有图：">
-                    <el-radio-group v-model="advancedFormdata.isUpInsetImg">
-                      <el-radio label="是"></el-radio>
-                      <el-radio label="否"></el-radio>
-                    </el-radio-group>
+                  <el-form-item label="多媒体：">
+                    <el-checkbox v-model="isUpInsetImg">是否有图</el-checkbox>
+                    <el-checkbox
+                      v-model="addrSearch"
+                      @change="handleraddrSearchChange"
+                      >3D展示</el-checkbox
+                    >
                   </el-form-item>
                   <el-form-item style="margin: 0" label="">
                     <el-button
@@ -776,13 +809,16 @@
           <div
             class="picProductListBox"
             :style="
-              isGrid === 'bsColumnComponent' ? ' padding:0' : ' padding:0 20px'
+              isGrid === 'bsColumnComponent'
+                ? ' padding:0'
+                : ' padding:0 20px 65px'
             "
           >
             <!-- 产品列表 -->
             <component
               :is="isGrid"
               :productList="productList"
+              :selection="selection"
               :typeId="typeId"
             ></component>
           </div>
@@ -857,7 +893,7 @@ import bsProductSearch from "@/components/bsComponents/bsProductSearchComponent/
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
 import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import eventBus from "@/assets/js/common/eventBus";
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
 import { VueCropper } from "vue-cropper";
 export default {
   name: "bsProductSearchIndex",
@@ -870,13 +906,28 @@ export default {
   data() {
     return {
       loading: false,
+      selection: true,
       baseImg: null,
       fileinfo: null,
       isShowCropper: false,
+      selectTableData: null,
+      isIndeterminate: false,
+      checkAll: false,
       advancedFormdata: {
-        isUpInsetImg: "是"
-      }, //高级搜索条件
-      screeningFlag: false,
+        fa_no: "",
+        ch_pa: "",
+        pr_le: "",
+        pr_wi: "",
+        pr_hi: "",
+        ou_le: "",
+        ou_wi: "",
+        ou_hi: "",
+        in_le: "",
+        in_wi: "",
+        in_hi: ""
+      },
+      isUpInsetImg: true,
+      screeningFlag: false, //高级搜索条件
       isAccurate: "模糊",
       chpaList: [],
       // 裁剪组件的基础配置option
@@ -920,6 +971,7 @@ export default {
         maxPrice: "",
         categoryNumber: null,
         time: [],
+        MyisGaoji: false,
         fa_no: true,
         number: false,
         name: true,
@@ -963,6 +1015,10 @@ export default {
       this.currentPage = 1;
       this.getProductList(false);
     },
+    handleIsgaoji(val) {
+      this.$set(this.searchForm, "MyisGaoji", val);
+      this.advancedFormdata = {};
+    },
     // 确定裁剪图片
     onCubeImg() {
       this.isGrid = "bsGridComponent";
@@ -999,17 +1055,7 @@ export default {
             let endDate = Date.now();
             this.searchHttpTime = (endDate - startDate) / 1000;
             this.$store.commit("searchValues", res.data.result.object);
-            const items = res.data.result.object;
-            for (let i = 0; i < items.length; i++) {
-              this.$set(items[i], "isShopping", false);
-              for (let j = 0; j < this.shoppingList.length; j++) {
-                if (
-                  items[i].productNumber === this.shoppingList[j].productNumber
-                ) {
-                  this.$set(items[i], "isShopping", true);
-                }
-              }
-            }
+            this.selection = false;
             this.productList = res.data.result.object;
             this.totalCount = res.data.result.object.length;
             this.cropperCancel();
@@ -1180,8 +1226,9 @@ export default {
         sortOrder: this.sortOrder,
         sortType: this.sortType,
         // 高级搜索条件
+        isUpInsetImg: this.isUpInsetImg,
+        isUpInset3D: this.addrSearch,
         fa_no: this.advancedFormdata.fa_no,
-        isUpInsetImg: this.advancedFormdata.isUpInsetImg == "否" ? false : true,
         ch_pa: this.advancedFormdata.ch_pa,
         pr_le: this.advancedFormdata.pr_le,
         pr_wi: this.advancedFormdata.pr_wi,
@@ -1215,6 +1262,7 @@ export default {
         if (fd[key] === null || fd[key] === undefined || fd[key] === "")
           delete fd[key];
       }
+
       const res = await this.$http.post("/api/SearchBearProductPage", fd);
       const { code, item, msg } = res.data.result;
       if (code === 200) {
@@ -1230,20 +1278,10 @@ export default {
               }
             }
           }
-        } else {
-          for (let i = 0; i < item.items.length; i++) {
-            this.$set(item.items[i], "isShopping", false);
-            for (let j = 0; j < this.shoppingList.length; j++) {
-              if (
-                item.items[i].productNumber ===
-                this.shoppingList[j].productNumber
-              ) {
-                this.$set(item.items[i], "isShopping", true);
-              }
-            }
-          }
         }
-
+        if (Object.values(this.advancedFormdata).some(Boolean)) {
+          this.$set(this.searchForm, "MyisGaoji", true);
+        }
         this.productList = item.items;
         this.totalCount = item.totalCount;
         let endDate = Date.now();
@@ -1299,7 +1337,9 @@ export default {
         });
       }
     },
-
+    handleraddrSearchChange(val) {
+      this.$store.commit("handleraddrSearch", val);
+    },
     // 选择综合
     async handleSynthesis() {
       this.synthesis = !this.synthesis;
@@ -1412,6 +1452,9 @@ export default {
     clearRootEvent() {
       eventBus.$off("searchProducts");
       eventBus.$off("openUpload");
+      eventBus.$off("addrsearchProducts");
+      eventBus.$off("resetProductIsShop");
+      eventBus.$off("handleSelectionChangeBus");
     },
     // 关闭关联搜索
     closeTag() {
@@ -1422,10 +1465,81 @@ export default {
         msg: "关闭关联搜索",
         type: "warning"
       });
+    },
+    // 点击全选
+    handleCheckAllChange(val) {
+      let myTableRef = this.$refs.componentRef.$refs.bsTableItemRef.$refs
+        .myTableRef;
+      if (val) myTableRef.toggleAllSelection();
+      else myTableRef.clearSelection();
+      this.isIndeterminate = false;
+    },
+    // 一键加购
+    handelrPurchased() {
+      this.$confirm("确定要加购选中的产品吗？", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const selectProducts = this.$refs.componentRef.$refs.bsTableItemRef
+            .$refs.myTableRef.selection;
+
+          let productNumber = [];
+          for (let i = 0; i < selectProducts.length; i++) {
+            productNumber.push(selectProducts[i].productNumber);
+          }
+          const fd = {
+            userID: this.userInfo.userInfo.id,
+            companyNumber: this.userInfo.commparnyList[0].companyNumber,
+            sourceFrom: "active",
+            number: 1,
+            currency: "￥",
+            Price: 0,
+            shopType: "companysamples",
+            productNumber: productNumber.join()
+          };
+          const res = await this.$http.post("/api/AddShoppingCart", fd);
+          if (res.data.result.code === 200) {
+            this.$store.commit(
+              "handlerShoppingCartCount",
+              res.data.result.item
+            );
+            this.$common.handlerMsgState({
+              msg: " 一键加购成功",
+              type: "success"
+            });
+            this.getProductList(false);
+          } else {
+            this.$common.handlerMsgState({
+              msg: " 一键加购失败",
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "已取消一键加购",
+            type: "warning"
+          });
+        });
     }
   },
   created() {},
   mounted() {
+    // 选择中的产品
+    eventBus.$on("handleSelectionChangeBus", selection => {
+      this.selectTableData = selection;
+      if (selection.length) {
+        if (selection.length === this.productList.length) {
+          this.isIndeterminate = false;
+          this.checkAll = true;
+        } else this.isIndeterminate = true;
+      } else {
+        this.isIndeterminate = false;
+        this.checkAll = false;
+      }
+    });
+
     // 点击搜索-文字搜索
     eventBus.$on("searchProducts", () => {
       this.currentPage = 1;
@@ -1435,6 +1549,15 @@ export default {
     eventBus.$on("openUpload", file => {
       this.uploadPic(file);
     });
+    // 取消或加购样式/刷新页面
+    eventBus.$on("resetProductIsShop", item => {
+      for (let i = 0; i < this.productList.length; i++) {
+        if (this.productList[i].productNumber == item.productNumber) {
+          this.productList[i].isShop = item.isShop;
+        }
+      }
+    });
+
     // 取消收藏/刷新页面
     eventBus.$on("resetProductCollection", item => {
       // this.getProductList();
@@ -1444,37 +1567,7 @@ export default {
         }
       }
     });
-    // 加购删除购物车
-    eventBus.$on("resetMyCart", item => {
-      if (Object.prototype.toString.call(item) === "[object Array]") {
-        // 数组
-        if (item.length) {
-          for (let i = 0; i < this.productList.length; i++) {
-            for (let j = 0; j < item.length; j++) {
-              if (this.productList[i].productNumber == item[j].productNumber) {
-                this.$set(this.productList[i], "isShopping", true);
-                // this.productList[i].isShopping = true;
-                break;
-              } else {
-                this.$set(this.productList[i], "isShopping", false);
-                // this.productList[i].isShopping = false;
-              }
-            }
-          }
-        } else {
-          this.productList.forEach(val => {
-            val.isShopping = false;
-          });
-        }
-      } else if (Object.prototype.toString.call(item) === "[object Object]") {
-        // 对象;
-        for (let i = 0; i < this.productList.length; i++) {
-          if (item.productNumber == this.productList[i].productNumber) {
-            this.productList[i].isShopping = item.isShopping;
-          }
-        }
-      }
-    });
+
     this.$nextTick(async () => {
       if (this.searchTxt != "") {
         // 首页文字搜索跳转
@@ -1507,15 +1600,21 @@ export default {
     });
   },
   computed: {
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    }),
+    addrSearch: {
+      get() {
+        return this.$store.state.addrSearch;
+      },
+      set(val) {
+        this.$store.commit("handleraddrSearch", val);
+      }
+    },
     ...mapState([
       "myColles",
       "searchTxt",
       "searchHallCate",
       "imgSearch",
       "typeId",
+      "userInfo",
       "imageSearchValue",
       "offerProductList",
       "searchImgPreview",
@@ -1540,12 +1639,15 @@ export default {
         }
       }
     },
-    shoppingList: {
+    advancedFormdata: {
       deep: true,
-      handler() {
-        eventBus.$emit("upDateProductView");
+      handler(val) {
+        if (!Object.values(val).some(Boolean)) {
+          this.$set(this.searchForm, "MyisGaoji", false);
+        }
       }
     },
+
     "searchForm.time"(newVal) {
       if (newVal == null) {
         this.searchForm.time = [];
@@ -1625,7 +1727,11 @@ export default {
         width: 700px;
         form {
           display: flex;
-
+          .abbrLabel {
+            .el-form-item__label {
+              width: 82px;
+            }
+          }
           .el-form-item {
             height: 30px;
             display: flex;
@@ -1850,6 +1956,32 @@ export default {
       box-sizing: border-box;
       .myPagination {
         padding: 30px 0;
+      }
+      .leftCheckbox {
+        display: flex;
+        align-items: center;
+        width: 80%;
+
+        .left {
+          display: flex;
+          align-items: center;
+          padding: 0 300px 0 20px;
+          .purchased {
+            margin-left: 30px;
+            color: #3368a9;
+            border: 1px solid #3368a9;
+            .selectionCart {
+              display: inline-block;
+              vertical-align: bottom;
+              width: 14px;
+              height: 14px;
+              background: url("~@/assets/images/selectionCart.png") no-repeat
+                center;
+              background-size: contain;
+              margin-right: 10px;
+            }
+          }
+        }
       }
     }
   }

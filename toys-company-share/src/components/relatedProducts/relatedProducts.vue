@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import gonggeProductItem from "@/components/gonggeProductItem/gonggeProductItem.vue";
 export default {
   components: {
@@ -42,16 +41,6 @@ export default {
     };
   },
   methods: {
-    filterShopping(products) {
-      if (this.shoppingList) {
-        for (let i = 0; i < products.length; i++) {
-          for (let j = 0; j < this.shoppingList.length; j++) {
-            if (products[i].id === this.shoppingList[j].id)
-              products[i].isShopping = true;
-          }
-        }
-      }
-    },
     // 查看更多相关产品
     toProductList() {
       this.$router.push("/index/product?productType=1");
@@ -70,29 +59,18 @@ export default {
       );
       const { data, code, message } = res.data.result;
       if (code === 200) {
-        // for (let i = 0; i < data.items.length; i++) {
-        //   for (let j = 0; j < this.shoppingList.length; j++) {
-        //     if (data.items[i].id === this.shoppingList[j].id)
-        //       data.items[i].isShopping = true;
-        //   }
-        // }
-        this.filterShopping(data);
         this.productList = data;
         this.totalCount = data.totalCount;
-        // console.log(this.productList);
       } else this.$message.error(message);
     }
   },
   mounted() {
-    this.getSearchCompanyShareProductPage();
+    // this.getSearchCompanyShareProductPage();
   },
   computed: {
     productLang() {
       return this.$t("lang.product");
-    },
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    })
+    }
   }
 };
 </script>

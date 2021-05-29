@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import store from "@/store/index";
-import axios from "axios";
+// import axios from "axios";
 // import { Message } from "element-ui";
 import { staticRouters, setMenuTree } from "./routers";
 // const originalPush = VueRouter.prototype.push;
@@ -29,7 +29,7 @@ Vue.use(VueRouter);
 // 获取token
 function getToken() {
   return new Promise((result, reject) => {
-    axios
+    Vue.prototype.$http
       .post("/api/GetToken", {
         companyNum: "LittleBearWeb",
         platForm: "PC"
@@ -45,7 +45,7 @@ function getToken() {
 // 获取系统参数
 function getClientTypeList(type, token) {
   return new Promise((result, reject) => {
-    axios
+    Vue.prototype.$http
       .post(
         "/api/ServiceConfigurationList",
         {
@@ -73,18 +73,10 @@ function getClientTypeList(type, token) {
 // 刷新个人登录信息
 function resetPersonInfo(token) {
   return new Promise((result, reject) => {
-    axios
-      .post(
-        "/api/RefreshToken",
-        {
-          token: token
-        },
-        {
-          headers: {
-            "content-type": "application/json"
-          }
-        }
-      )
+    Vue.prototype.$http
+      .post("/api/RefreshToken", {
+        token: token
+      })
       .then(res => {
         result(res);
       })
@@ -96,7 +88,7 @@ function resetPersonInfo(token) {
 // 获取菜单
 function getUserRoleMenu(token) {
   return new Promise((result, reject) => {
-    axios
+    Vue.prototype.$http
       .post(
         "/api/GetUserRoleMenu",
         {},

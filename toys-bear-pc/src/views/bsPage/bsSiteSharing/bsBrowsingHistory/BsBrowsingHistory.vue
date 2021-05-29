@@ -1,6 +1,6 @@
 <template>
   <div class="bsMyCollection">
-    <div class="title">浏览记录 ({{ totalCount }})</div>
+    <div class="title">登录记录 ({{ totalCount }})</div>
     <div class="searchBox">
       <div class="item">
         <span class="label">关键字：</span>
@@ -131,7 +131,7 @@ export default {
           { prop: "email", label: "登录邮箱" },
           {
             prop: "createdOn",
-            label: "浏览时间",
+            label: "登录时间",
             render: row => {
               return row.createdOn.replace(/T.*/, "");
             }

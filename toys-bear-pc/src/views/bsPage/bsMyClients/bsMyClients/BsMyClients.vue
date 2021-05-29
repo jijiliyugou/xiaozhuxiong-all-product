@@ -162,11 +162,10 @@ export default {
         columns: [
           { prop: "name", label: "客户姓名", width: 180 },
           { prop: "phoneNumber", label: "电话", width: 180 },
-          { prop: "email", label: "出厂货号", width: 180 },
+          { prop: "email", label: "邮箱", width: 180 },
           { prop: "staffName", label: "业务员", isHiden: true },
           { prop: "createdOn", label: "创建时间", width: 180 },
-          { prop: "remark", label: "备注", isHiden: true, width: 180 },
-          { prop: "email", label: "出厂货号", width: 180 }
+          { prop: "remark", label: "备注", isHiden: true, width: 180 }
         ],
         btnWidth: 200,
         actions: [

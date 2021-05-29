@@ -7,6 +7,7 @@ export default {
       SignIn: "登录",
       InvitationCode: "邀请码",
       email: "邮箱",
+      userName: "用户名",
       emailExplain: "（电子邮件仅用于通知）",
       loginBtn: "登录",
       title: "登录"

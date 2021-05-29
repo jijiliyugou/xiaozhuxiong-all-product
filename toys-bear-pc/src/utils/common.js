@@ -181,6 +181,16 @@ export default {
         store.commit("handlerHallSearchCate", null);
         store.commit("handlerimgSearch", true);
         break;
+      case "3D展品":
+        fd = {
+          name: "/bsIndex/bsProductSearchIndex",
+          linkUrl: "/bsIndex/bsProductSearchIndex",
+          component: "bsProductSearchIndex",
+          refresh: true,
+          label: "产品查询"
+        };
+        store.commit("handleraddrSearch", true);
+        break;
       case "新品区":
         fd = {
           name: "/bsIndex/bsLatestProducts",

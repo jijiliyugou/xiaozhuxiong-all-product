@@ -9,7 +9,7 @@
           size="medium"
           @click="openAddLanguage"
         >
-          新增消息模板
+          新增推送模板
         </el-button>
       </div>
     </div>
@@ -109,7 +109,7 @@ export default {
       currentRow: {},
       isEdit: false,
       editRow: {},
-      dialogTitle: "新增消息模板",
+      dialogTitle: "新增推送模板",
       addLangDialog: false,
       totalCount: 0,
       pageSize: 10,
@@ -217,7 +217,7 @@ export default {
     },
     // 打开新增推送
     openAddLanguage() {
-      this.dialogTitle = "新增消息模板";
+      this.dialogTitle = "新增推送模板";
       this.isEdit = false;
       this.addLangDialog = true;
     },
@@ -225,7 +225,7 @@ export default {
     openEdit(row) {
       this.currentRow = row;
       this.isEdit = true;
-      this.dialogTitle = "编辑消息模板";
+      this.dialogTitle = "编辑推送模板";
       this.addLangDialog = true;
     },
     // 删除推送

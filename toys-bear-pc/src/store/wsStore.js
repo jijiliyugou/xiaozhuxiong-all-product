@@ -9,8 +9,8 @@ const wsConnection = {
   baseUrl:
     env === "production"
       ? "wss://impush.toysbear.com/ws?UserId="
-      : "ws://139.9.71.135:8090/ws?UserId=",
-  // baseUrl: env === 'production' ? 'ws://139.9.71.135:8090/ws?UserId=' : 'ws://139.9.71.135:8090/ws?UserId=',
+      : "ws://124.71.6.26:8090/ws?UserId=",
+  // baseUrl: env === 'production' ? 'ws://124.71.6.26:8090/ws?UserId=' : 'ws://124.71.6.26:8090/ws?UserId=',
   lockReturn: false,
   timeout: 280000,
   // timeout: 2000,

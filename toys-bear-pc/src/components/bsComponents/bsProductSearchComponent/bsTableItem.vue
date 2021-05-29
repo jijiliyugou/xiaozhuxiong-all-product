@@ -1,7 +1,11 @@
 <!--  -->
 <template>
   <div>
-    <Table :table="tableData"></Table>
+    <Table
+      ref="bsTableItemRef"
+      @selectionChange="selectionChange"
+      :table="tableData"
+    ></Table>
   </div>
 </template>
 
@@ -16,6 +20,11 @@ export default {
   props: {
     productList: {
       type: Array
+    },
+    // 浏览足迹没有分页，所以用传值修改
+    selection: {
+      type: Boolean,
+      default: true
     }
   },
   watch: {
@@ -31,6 +40,7 @@ export default {
     return {
       tableData: {
         data: [],
+        selection: true,
         showLoading: false,
         sizeMini: "mini",
         columns: [
@@ -40,7 +50,7 @@ export default {
             width: 300,
             color: "#3368a9",
             align: "left",
-            isHiden: true,
+            // isHiden: true,
             infoBox: true,
             productInfo: true,
             elImage: row => {
@@ -87,7 +97,9 @@ export default {
           { prop: "ch_pa", label: "包装", isHiden: true, width: 90 },
           {
             prop: "pr_le",
-            label: "产品规格(cm)",
+            renderHeard: () => {
+              return "产品规格</br>(cm)";
+            },
             isHiden: true,
             render: row => {
               return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
@@ -95,7 +107,9 @@ export default {
           },
           {
             prop: "pr_le",
-            label: "包装规格(cm)",
+            renderHeard: () => {
+              return "包装规格</br>(cm)";
+            },
             isHiden: true,
             render: row => {
               return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
@@ -103,7 +117,9 @@ export default {
           },
           {
             prop: "pr_le",
-            label: "外箱规格(cm)",
+            renderHeard: () => {
+              return "外箱规格</br>(cm)";
+            },
             isHiden: true,
             render: row => {
               return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
@@ -111,7 +127,9 @@ export default {
           },
           {
             prop: "bulk_stere",
-            label: "体积/材积(cuft)",
+            renderHeard: () => {
+              return "体积/材积</br>(cbm)/(cuft)";
+            },
             isHiden: true,
             width: 150,
             render: row => {
@@ -120,7 +138,9 @@ export default {
           },
           {
             prop: "gr_we",
-            label: "毛重/净重(kg)",
+            renderHeard: () => {
+              return "毛重/净重</br>(kg)";
+            },
             isHiden: true,
             render: row => {
               return row.gr_we + "/" + row.ne_we;
@@ -128,7 +148,9 @@ export default {
           },
           {
             prop: "in_en",
-            label: "装箱量(pcs)",
+            renderHeard: () => {
+              return "装箱量</br>(pcs)";
+            },
             width: 90,
             isHiden: true,
             render: row => {
@@ -153,15 +175,15 @@ export default {
   },
   created() {},
   mounted() {
+    this.tableData.selection = this.selection;
     this.tableData.data = this.productList;
     // this.$set(this.tableData, "data", this.productList);
-    eventBus.$on("upDateProductView", () => {
-      this.$nextTick(() => {
-        this.$forceUpdate();
-      });
-    });
   },
-  methods: {}
+  methods: {
+    selectionChange(val) {
+      eventBus.$emit("handleSelectionChangeBus", val);
+    }
+  }
 };
 </script>
 <style scoped lang="less"></style>

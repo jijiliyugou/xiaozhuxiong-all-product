@@ -35,8 +35,13 @@
       </div>
     </div>
     <div class="contentProduct">
-      <div class="bsGridItem" v-for="item in productList" :key="item.id">
-        <div class="itemImg" @click="toProductDetails">
+      <div
+        class="bsGridItem"
+        v-for="item in productList"
+        :key="item.id"
+        @click="toProductDetails(item)"
+      >
+        <div class="itemImg">
           <el-image
             style="width: 222px; height: 166px"
             fit="contain"
@@ -150,14 +155,28 @@
       <div class="kong"></div>
       <div class="kong"></div>
     </div>
+    <!-- 分页 -->
+    <center class="myPagination">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[12, 24, 36, 48]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalCount"
+      >
+      </el-pagination>
+    </center>
     <!-- 报价公式 -->
     <el-dialog
       title="报价公式"
       :visible.sync="showQuotationFormula"
       v-if="showQuotationFormula"
-      width="800"
+      width="800px"
     >
-      <quotationFormula />
+      <quotationFormula :sampleOption="sampleOption" />
     </el-dialog>
   </div>
 </template>
@@ -176,60 +195,28 @@ export default {
       totalCount: 0,
       productList: [],
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 12,
       showQuotationFormula: false,
       isDiyu: 0
     };
   },
   methods: {
-    // 切换tab
-    checkTabsAll(n) {
-      this.isDiyu = n;
-    },
-    // 找相似
-    similarityEvent() {
-      this.$common.handlerMsgState({
-        msg: "敬请期待",
-        type: "warning"
-      });
-      return false;
-      // const value = JSON.parse(JSON.stringify(this.item));
-      // value.type = "similarity";
-      // const fd = {
-      //   name: "similarity" + this.item.productNumber,
-      //   linkUrl: "/bsIndex/bsProductSearchIndex",
-      //   component: "bsSimilarProduct",
-      //   refresh: true,
-      //   label: "相似产品" + this.item.fa_no,
-      //   value: value
-      // };
-      // this.$store.commit("myAddTab", fd);
-    },
-    // 找同款
-    sameEvent(item) {
-      // this.$common.handlerMsgState({
-      //   msg: "敬请期待",
-      //   type: "warning"
-      // });
-      // return false;
-      if (!item.productNumber) {
-        this.$common.handlerMsgState({
-          msg: "没有产品编号",
-          type: "danger"
-        });
+    // 切換頁容量
+    handleSizeChange(pageSize) {
+      this.pageSize = pageSize;
+      if (
+        this.currentPage * pageSize > this.totalCount &&
+        this.currentPage != 1
+      ) {
         return false;
       }
-      item.type = "same";
-      const fd = {
-        name: "same" + item.productNumber,
-        linkUrl: "/bsIndex/bsProductSearchIndex",
-        component: "bsSimilarProduct",
-        refresh: true,
-        label: "同款产品" + item.fa_no,
-        value: item
-      };
-      this.$store.commit("myAddTab", fd);
-      this.$router.push("/bsIndex/bsProductSearchIndex");
+      this.getQuoteListBasicPage();
+    },
+    // 修改当前页
+    handleCurrentChange(page) {
+      eventBus.$emit("toTop");
+      this.currentPage = page;
+      this.getQuoteListBasicPage();
     },
     // 打开报价公式
     openQuotationFormula() {
@@ -237,6 +224,10 @@ export default {
     },
     // 去产品详情
     async toProductDetails() {
+      this.$common.handlerMsgState({
+        msg: "没有产品编号",
+        type: "danger"
+      });
       return false;
       // const fd = {
       //   name: this.item.productNumber,

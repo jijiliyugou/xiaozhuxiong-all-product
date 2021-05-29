@@ -36,6 +36,7 @@
 
               <div class="myScrollbar" @scroll="scrollevent" ref="myScrollbar">
                 <component
+                  :im="im"
                   class="componentContent"
                   :item="item.value"
                   v-if="item.refresh"
@@ -86,8 +87,14 @@ import bsSiteSettings from "@/views/bsPage/bsSiteSharing/bsSiteSettings/BsSiteSe
 // 客户订单
 import bsCustomerOrder from "@/views/bsPage/bsSiteSharing/bsCustomerOrder/BsCustomerOrder.vue";
 
+// 登录记录
+import bsLoginHistory from "@/views/bsPage/bsSiteSharing/bsLoginHistory/BsLoginHistory.vue";
+
 // 浏览记录
 import bsBrowsingHistory from "@/views/bsPage/bsSiteSharing/bsBrowsingHistory/BsBrowsingHistory.vue";
+
+// 广告管理
+import bsAdvertisingManage from "@/views/bsPage/bsSiteSharing/bsAdvertisingManage/BsAdvertisingManage.vue";
 
 // 产品搜索首页
 import bsProductSearchIndex from "@/views/bsPage/bsProductSearch/bsProductSearchIndex/BsProductSearchIndex.vue";
@@ -161,7 +168,7 @@ import bsSampleQuotation from "@/views/bsPage/bsBusinessManage/bsSampleQuotation
 import bsDataTotal from "@/views/bsPage/bsBusinessManage/bsDataTotal/bsDataTotal.vue";
 // 找样报价-报价详情
 import bsSampleQuotationDetails from "@/views/bsPage/bsBusinessManage/bsSampleQuotation/components/bsSampleQuotationDetails";
-// 找样报价-选择报价产品
+// 找样报价-选择其他产品
 import bsSampleOfferCommodity from "@/components/bsComponents/bsSampleComponent/bsSampleOfferCommodity";
 
 // 找样报价-编辑详情
@@ -177,10 +184,15 @@ import bsSimilarProduct from "@/components/bsComponents/bsProductSearchComponent
 // 展厅主页
 import bsExhibitionHallHome from "@/components/bsComponents/bsExhibitionHallHomeComponent/BsExhibitionHallHome.vue";
 
+// 业务消息
+import bsBusinessMsg from "@/views/bsPage/bsMyNews/bsBusinessMsg/BsBusinessMsg.vue";
+
 import bsTop from "@/components/bsComponents/bsTopComponent/BsTop";
 import bsMenu from "@/components/bsComponents/bsMenuComponent/BsMenu";
 import eventBus from "@/assets/js/common/eventBus.js";
 import { mapState } from "vuex";
+/** IM */
+import IM from "@/assets/js/common/im.js";
 export default {
   components: {
     bsHome,
@@ -193,6 +205,8 @@ export default {
     bsSiteSettings,
     bsCustomerOrder,
     bsBrowsingHistory,
+    bsLoginHistory,
+    bsAdvertisingManage,
     bsProductSearchIndex,
     bsMyCollection,
     bsLatestProducts,
@@ -229,10 +243,12 @@ export default {
     bsMenu,
     bsPurchaseOrderDetails,
     bsSimilarProduct,
-    bsExhibitionHallHome
+    bsExhibitionHallHome,
+    bsBusinessMsg
   },
   data() {
     return {
+      im: new IM().RongIMClient,
       isCollapse: false
     };
   },
@@ -256,6 +272,7 @@ export default {
     },
     // 关闭标签
     closeTab(e) {
+      this.$store.commit("handleraddrSearch", false);
       let len = this.tabList.length;
       len > 1 && this.$store.commit("closeTab", e);
       this.$nextTick(() => {});
@@ -313,6 +330,10 @@ export default {
       if (!path.includes("bsSampleQuotation")) {
         this.$store.commit("resetCheckTabstypeId", 0);
       }
+      console.log(path);
+      if (path.includes("bsShoppingCart")) {
+        eventBus.$emit("handlergetClientList");
+      }
     },
     activeTab(newN, oldN) {
       // console.log(newN, "现在", oldN, "上一次"); // tabName
@@ -335,6 +356,7 @@ export default {
   mounted() {},
   beforeDestroy() {
     eventBus.$emit("showCart", false);
+    this.im.disconnect().then(() => console.log("断开链接成功"));
   }
 };
 </script>

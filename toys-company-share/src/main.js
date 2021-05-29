@@ -1,7 +1,7 @@
 import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
-import myAxios from "@/request/http";
+import http from "@/request/index";
 import store from "./store";
 import "@/globalStyle/base.less";
 import "element-ui/lib/theme-chalk/index.css";
@@ -33,7 +33,7 @@ Vue.use(ElementUI, {
   i18n: (key, value) => i18n.t(key, value)
 });
 Vue.config.productionTip = false;
-Vue.use(myAxios);
+Vue.use(http);
 new Vue({
   i18n,
   router,

@@ -165,7 +165,7 @@
             <div class="itemBox">
               <el-form-item label="业务员：" v-if="userInfo.userInfo.isMain">
                 <el-select
-                  style="width: 215px;"
+                  style="width: 196px;"
                   v-model="searchFD.staffId"
                   filterable
                   size="medium"
@@ -273,15 +273,15 @@
                   effect="dark"
                   :content="scope.row.remark"
                   placement="top"
-                >
-                  <div class="remarkClass"> -->
-                {{
-                  scope.row.remark && scope.row.orderType != "Sample"
-                    ? scope.row.remark
-                    : ""
-                }}
-                <!-- </div>
-                </el-tooltip> -->
+                > -->
+                <div class="remarkClass">
+                  {{
+                    scope.row.remark && scope.row.orderType != "Sample"
+                      ? scope.row.remark
+                      : ""
+                  }}
+                </div>
+                <!--</el-tooltip> -->
               </template>
             </el-table-column>
             <el-table-column
@@ -527,7 +527,6 @@ export default {
           type: "danger"
         });
       }
-      this.getOrderList();
     },
     // 获取列表
     async getOrderList() {
@@ -574,6 +573,7 @@ export default {
   },
   mounted() {
     this.getStaffList();
+    this.getOrderList();
   },
   async beforeDestroy() {
     //  this.$store.dispatch("getToken");
@@ -807,5 +807,8 @@ export default {
 }
 @{deep} .el-table .ascending .sort-caret.ascending {
   border-bottom-color: #fff;
+}
+.remarkClass {
+  max-width: 180px;
 }
 </style>

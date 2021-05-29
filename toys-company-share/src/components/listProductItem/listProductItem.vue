@@ -25,7 +25,7 @@
         <div
           class="myCart"
           @click.stop="handlerShopping(item)"
-          v-if="!item.isShopping"
+          v-if="!item.isShop"
         ></div>
         <div
           class="activeCartIcon"
@@ -101,20 +101,66 @@ export default {
   },
   methods: {
     // 加购
-    handlerShopping(item) {
-      item.isShopping = !item.isShopping;
-      if (item.isShopping) {
-        item.shoppingCount = 1;
-        this.$store.commit("pushShopping", item);
-        this.$message.closeAll();
-        this.$message.success(this.publicLang.successfulPurchase);
-      } else {
-        item.shoppingCount = 0;
-        this.$message.closeAll();
-        this.$store.commit("popShopping", item);
-        this.$message.warning(this.publicLang.cancelSuccessfully);
+    addCart(item) {
+      let api = "/api/AddShoppingCart";
+      if (item.isShop) {
+        api = "/api/RemoveShoppingCart";
       }
-      this.$forceUpdate();
+      this.$toys
+        .post(api, {
+          shareID: this.userInfo.shareId,
+          customerRemarks: this.userInfo.loginEmail,
+          sourceFrom: "share",
+          shopType: "customersamples",
+          number: 1,
+          currency: "￥",
+          Price: 0,
+          productNumber: item.productNumber,
+          shareProductJson: JSON.stringify(item)
+        })
+        .then(res => {
+          if (res.data.result.code === 200) {
+            item.isShop = !item.isShop;
+            if (item.isShop) {
+              this.$message.success("加购成功");
+            } else {
+              this.$message.warning("取消加购");
+            }
+            this.$store.commit("handlerShopLength", res.data.result.item);
+            this.$forceUpdate();
+          } else {
+            this.$message.error(res.data.result.msg);
+          }
+        });
+    },
+    // 是否加购
+    async handlerShopping(item) {
+      if (!this.userInfo.loginEmail) {
+        this.$prompt("请输入用户名", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消"
+        })
+          .then(({ value }) => {
+            if (value) {
+              this.$store.commit("handlerLoginName", value);
+              this.addCart(item);
+            } else {
+              this.$message.error("输入有误");
+            }
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "取消输入"
+            });
+          });
+        return false;
+      } else if (this.shopLength >= 500) {
+        this.$message.error("购物车已满500条");
+        return false;
+      } else {
+        this.addCart(item);
+      }
     },
     // 查看详情
     toDetails(item) {
@@ -135,14 +181,6 @@ export default {
       }
     }
   },
-  mounted() {
-    this.$root.eventHub.$on("resetProductsItem", () => {
-      this.$forceUpdate();
-    });
-  },
-  beforeDestroy() {
-    // this.$root.eventHub.$off("resetProductsItem");
-  },
   created() {},
   computed: {
     productLang() {
@@ -151,8 +189,7 @@ export default {
     publicLang() {
       return this.$t("lang.publicLang");
     },
-    ...mapState(["globalLang"]),
-    ...mapState(["userInfo"])
+    ...mapState(["globalLang", "shopLength", "userInfo"])
   }
 };
 </script>

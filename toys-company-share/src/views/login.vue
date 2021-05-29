@@ -5,14 +5,20 @@
       <div class="loginBox">
         <div class="title">
           <el-image :src="userLogo.companyLogo"></el-image>
-          <span class="titleText">{{ currentLang.companyName }}</span>
+          <div class="titleText">
+            <notice-bar
+              v-if="currentLang.companyName"
+              :text="currentLang.companyName"
+              :startRoll="currentLang.companyName.length > 7"
+            />
+          </div>
         </div>
         <div class="minTitle">
           <el-image
             style="width:30px;height:37px"
             :src="require('@/assets/images/minTitleText.png')"
           ></el-image>
-          <span class="titleText">{{ loginLang.SignIn }}</span>
+          <div class="titleText">{{ loginLang.SignIn }}</div>
         </div>
         <div class="formBox">
           <el-form
@@ -31,8 +37,8 @@
             </el-form-item>
             <el-form-item>
               <div class="myEmail">
-                {{ loginLang.email }}
-                <span class="remak">{{ loginLang.emailExplain }}</span>
+                {{ loginLang.userName }}
+                <!-- <span class="remak">{{ loginLang.emailExplain }}</span> -->
               </div>
               <el-input
                 v-model="formLabelAlign.email"
@@ -54,9 +60,14 @@
 
 <script>
 import { mapState } from "vuex";
+import NoticeBar from "@/components/noticeBar/notice-bar";
 export default {
+  components: {
+    NoticeBar
+  },
   data() {
     return {
+      companyNameLength: false,
       userLogo: {
         companyLogo: "",
         companyName: ""
@@ -78,6 +89,31 @@ export default {
     initProduct() {
       this.$store.commit("resetSearchProduct");
     },
+    // 获取购物车数量
+    async getShopLength({ loginEmail, shareId }) {
+      const tokenRes = await this.$toys.post("/api/GetToken", {
+        companyNum: "LittleBearWeb",
+        platForm: "PC"
+      });
+      if (tokenRes.data.result.code === 200) {
+        console.log(tokenRes.data.result.item);
+        this.$store.commit("handlerTemporaryToken", tokenRes.data.result.item);
+        const res = await this.$toys.post("/api/ShoppingCartCount", {
+          shareID: shareId,
+          customerRemarks: loginEmail,
+          sourceFrom: "share",
+          shopType: "customersamples"
+        });
+        console.log(res);
+        if (res.data.result.code === 200) {
+          this.$store.commit("handlerShopLength", res.data.result.item);
+        } else {
+          this.$message.error(tokenRes.data.result.msg);
+        }
+      } else {
+        this.$message.error(tokenRes.data.result.msg);
+      }
+    },
     // 登录提交
     toHome() {
       this.$refs.myFormRef.validate(async valid => {
@@ -89,6 +125,7 @@ export default {
           const { code, message, data } = res.data.result;
           if (code === 200) {
             this.$store.commit("handlerUserInfo", data);
+            await this.getShopLength(data);
             this.$router.push({ path: "/index" });
           } else this.$message.error(message);
         }
@@ -165,6 +202,14 @@ export default {
     loginLang() {
       return this.$t("lang.login");
     }
+    // companyNameLength() {
+    //   if (this.currentLang.companyName) {
+    //     console.log(this.currentLang.companyName);
+    //     return this.currentLang.companyName.length > 7;
+    //   } else {
+    //     return false;
+    //   }
+    // }
   }
 };
 </script>
@@ -222,6 +267,7 @@ export default {
         }
         .titleText {
           margin-left: 20px;
+          width: 250px;
         }
       }
       .minTitle {
@@ -264,13 +310,13 @@ export default {
             border: 1px solid #707070;
             border-radius: 5px;
           }
-          .myEmail {
-            font-size: 12px;
-            .remak {
-              font-size: 12px;
-              color: #7a7a7a;
-            }
-          }
+          // .myEmail {
+          // font-size: 14px;
+          // .remak {
+          //   font-size: 12px;
+          //   color: #7a7a7a;
+          // }
+          // }
           .loginBtn {
             width: 100%;
             background-color: #3368a9;

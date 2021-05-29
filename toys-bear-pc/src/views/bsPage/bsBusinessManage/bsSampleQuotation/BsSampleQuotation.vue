@@ -104,6 +104,7 @@ import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gon
 import eventBus from "@/assets/js/common/eventBus.js";
 import bsTables from "@/components/table";
 import { mapState } from "vuex";
+import { proEnv, testEnv, devEnv } from "@/assets/js/config/config.js";
 export default {
   name: "bsSampleQuotation",
   components: {
@@ -263,6 +264,17 @@ export default {
             methods: row => {
               this.exportOrder(row);
             }
+          },
+          {
+            type: "warning",
+            color: "#F9AE3E",
+            textWrapper() {
+              return "分享";
+            },
+            methods: row => {
+              this.copyShare(row);
+            },
+            class: "copy"
           }
         ]
       },
@@ -429,6 +441,38 @@ export default {
     search() {
       this.currentPage = 1;
       this.getCompanySamplelistPage();
+    },
+    //分享链接
+    copyShare(row) {
+      const env = process.env.NODE_ENV;
+      let target = devEnv.hosturl;
+
+      // 默认是本地环境
+      switch (env) {
+        case "production": // 生产环境
+          target = proEnv.hosturl;
+          break;
+        case "test": // 测试环境
+          target = testEnv.hosturl;
+          break;
+        default:
+          // 本地环境
+          target = devEnv.hosturl;
+          break;
+      }
+      var url = target + "share/#/offerSharing?id=" + row.offerNumber;
+      const input = document.createElement("input");
+      document.body.appendChild(input);
+      input.setAttribute("value", url);
+      input.select();
+      if (document.execCommand("Copy")) {
+        document.execCommand("Copy");
+        this.$message({
+          message: "温馨提示：复制找样报价分享链接成功！",
+          type: "success"
+        });
+      }
+      document.body.removeChild(input);
     }
   },
   created() {},

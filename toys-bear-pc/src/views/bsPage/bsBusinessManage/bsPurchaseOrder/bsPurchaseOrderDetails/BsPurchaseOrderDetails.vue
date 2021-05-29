@@ -1,5 +1,5 @@
 <template>
-  <div class="clientOrderDetails">
+  <div class="BsPurchaseOrderDetails">
     <div class="title">采购订单详情</div>
     <ul class="customerInfoBox">
       <div class="clientContentBox">
@@ -51,164 +51,8 @@
           导出列表
         </el-button>
       </div>
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-        ref="myTableRef"
-        size="mini"
-        :header-cell-style="{
-          'font-size': '14px',
-          color: '#666',
-          backgroundColor: '#f9fafc',
-          'font-weight': '400'
-        }"
-      >
-        <el-table-column label="序号" type="index" align="center" width="70">
-        </el-table-column>
-        <el-table-column label="产品" width="300">
-          <template slot-scope="scope">
-            <div class="imgBox">
-              <el-image
-                fit="contain"
-                @click.native="toProductDetails(scope.row)"
-                style="width: 80px; height: 60px"
-                :src="scope.row.imgUrl && scope.row.imgUrl[0]"
-                :preview-src-list="scope.row.imgUrl || []"
-              >
-                <div slot="placeholder" class="errorImg">
-                  <img src="~@/assets/images/imgError.png" alt />
-                </div>
-                <div slot="error" class="errorImg">
-                  <img src="~@/assets/images/imgError.png" alt />
-                </div>
-              </el-image>
-              <div class="productName">
-                <div class="name" @click="toProductDetails(scope.row)">
-                  {{ scope.row.pr_na }}
-                </div>
-                <div class="factory">
-                  <div class="fcatoryName" @click="toFactory(scope.row)">
-                    {{ scope.row.supplierName }}
-                  </div>
-                  <div class="icons">
-                    <!-- <el-tooltip
-                      class="item"
-                      effect="dark"
-                      :content="scope.row.supplierPhone || '暂时没有厂商电话'"
-                      placement="top"
-                    >
-                      <div class="cartPhoneIcon"></div>
-                    </el-tooltip> -->
-                    <div class="cartInfoIcon" @click="toNews(scope.row)"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="联系厂商" prop="supplierPhone" align="center">
-          <template slot-scope="scope">
-            <div v-if="scope.row.supplierPhone">
-              {{ scope.row.supplierPhone }}
-            </div>
-            <div v-if="scope.row.supplierTelephoneNumber">
-              {{ scope.row.supplierTelephoneNumber }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="资料来源" show-overflow-tooltip>
-          <template slot-scope="scope">
-            {{ scope.row.exhibitionName }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="fa_no" label="出厂货号"></el-table-column>
-        <el-table-column prop="ch_pa" label="包装"> </el-table-column>
-        <el-table-column label="产品规格" min-width="100">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.pr_le }}x{{ scope.row.pr_wi }}x{{
-                scope.row.pr_hi
-              }}(cm)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="包装规格" min-width="100">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
-                scope.row.in_hi
-              }}(cm)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="外箱规格" min-width="100">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
-                scope.row.ou_hi
-              }}(cm)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="体积/材积" min-width="150">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="毛重/净重">
-          <template slot-scope="scope">
-            <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
-          </template>
-        </el-table-column>
-        <el-table-column label="装箱量">
-          <template slot-scope="scope">
-            <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}(pcs) </span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="fa_pr" label="参考单价">
-          <template slot-scope="scope">
-            <span style="color: #3368a9">
-              <span>{{ scope.row.cu_de }}</span>
-              {{ scope.row.fa_pr }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="fa_pr_pr" label="报出价">
-          <template slot-scope="scope">
-            <span style="color: #f56c6c">
-              <span>{{ scope.row.cu_de }}</span>
-              {{ scope.row.fa_pr_pr }}
-            </span>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="totalBox">
-        <p class="item">
-          <span class="itemTitle">总款数：</span>
-          <span>{{ totalCount }}</span>
-        </p>
-        <p class="item">
-          <span class="itemTitle">总箱数：</span>
-          <span>{{ options.sumtAmount }}</span>
-        </p>
-        <p class="item">
-          <span class="itemTitle">总体积/总材积：</span>
-          <span>{{ options.sumBulk_stere }}</span
-          >/<span>{{ options.sumBulk_feet }}</span>
-        </p>
-        <p class="item">
-          <span class="itemTitle">总毛重/总净重：</span>
-          <span>{{ options.sumGr_we }}/{{ options.sumNe_we }}(KG)</span>
-        </p>
-        <p class="item">
-          <span class="itemTitle">总金额：</span>
-          <span class="price">￥{{ options.sumFa_pr_pr }}</span>
-        </p>
-      </div>
+      <bsTables :table="tableData" />
     </div>
-
     <center style="margin-top: 20px">
       <el-pagination
         layout="total, sizes, prev, pager, next, jumper"
@@ -221,6 +65,8 @@
         @size-change="handleSizeChange"
       ></el-pagination>
     </center>
+    <!-- 统计 -->
+    <Summary :summaryData="summaryData"></Summary>
     <!-- 导出订单模板dialog -->
     <transition name="el-zoom-in-center">
       <el-dialog
@@ -244,8 +90,10 @@
 
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/caigoudingdan.vue";
+import bsTables from "@/components/table";
+import Summary from "@/components/summaryComponent/summary";
 export default {
-  components: { bsExportOrder },
+  components: { bsExportOrder, bsTables, Summary },
   props: {
     item: {
       type: Object
@@ -253,10 +101,178 @@ export default {
   },
   data() {
     return {
+      summaryData: {
+        //汇总数据
+        isHandle: false,
+        totalDegree: 0, //总款数
+        totalCartons: 0, //总箱数
+        totalQuantity: 0, //总数量
+        totalBulkStere: 0, //总体积
+        totalBulkFeet: 0, //总材积
+        totalGrWe: 0, //总毛重
+        totalNeWe: 0, //总净重
+        cu_de: "￥", //金额单位
+        totalMoney: 0, //总金额
+        sumAmountFa_pr: 0, //总出厂价
+        sumHa_in_qu: 0 //总报出价
+        // countData: [],
+      },
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: true,
+        columns: [
+          {
+            prop: "name",
+            label: "产品",
+            width: 300,
+            color: "#3368a9",
+            align: "left",
+            isHiden: true,
+            infoBox: true,
+            productInfo: true,
+            elImage: row => {
+              return row.imgUrl;
+            },
+            nameHtml: row => {
+              return row.pr_na;
+            },
+            fcatoryNameHtml: row => {
+              return row.supplierName;
+            }
+          },
+          {
+            prop: "supplierPhone",
+            label: "联系厂商",
+            render: row => {
+              switch (row.supplierTelephoneNumber) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                  row.supplierTelephoneNumber = "";
+                  break;
+              }
+              switch (row.supplierPhone) {
+                case "":
+                case null:
+                case undefined:
+                case "null":
+                case "undefined":
+                  row.supplierTelephoneNumber = "";
+                  break;
+              }
+              return row.supplierPhone + "<br>" + row.supplierTelephoneNumber;
+            }
+          },
+          {
+            prop: "exhibitionName",
+            isHiden: true,
+            label: "资料来源"
+          },
+          { prop: "fa_no", label: "出厂货号", isHiden: true },
+          { prop: "ch_pa", label: "包装", isHiden: true, width: 90 },
+          {
+            prop: "pr_le",
+
+            isHiden: true,
+            renderHeard: () => {
+              return "产品规格</br>(cm)";
+            },
+            render: row => {
+              return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
+            }
+          },
+          {
+            prop: "pr_le",
+
+            isHiden: true,
+            renderHeard: () => {
+              return "包装规格</br>(cm)";
+            },
+            render: row => {
+              return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
+            }
+          },
+          {
+            prop: "pr_le",
+
+            isHiden: true,
+            renderHeard: () => {
+              return "外箱规格</br>(cm)";
+            },
+            render: row => {
+              return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
+            }
+          },
+          {
+            prop: "bulk_stere",
+            renderHeard: () => {
+              return "体积/材积</br>(cbm)/(cuft)";
+            },
+            isHiden: true,
+            width: 150,
+            render: row => {
+              return row.bulk_stere + row.bulk_feet;
+            }
+          },
+          {
+            prop: "gr_we",
+            renderHeard: () => {
+              return "毛重/净重</br>(kg)";
+            },
+            isHiden: true,
+            render: row => {
+              return row.gr_we + "/" + row.ne_we;
+            }
+          },
+          {
+            prop: "in_en",
+            renderHeard: () => {
+              return "装箱量</br>(pcs)";
+            },
+            width: 90,
+            isHiden: true,
+            render: row => {
+              return row.in_en + "/" + row.ou_lo;
+            }
+          },
+          {
+            prop: "ou_lo",
+            label: "数量",
+            width: 90,
+            isHiden: true,
+            render: row => {
+              return row.ou_lo;
+            }
+          },
+          {
+            prop: "fa_pr",
+            label: "参考单价",
+            isHiden: true,
+            width: 80,
+            color: "red",
+            render: row => {
+              return row.cu_de + " " + row.fa_pr;
+            }
+          },
+          {
+            prop: "ha_in_qu",
+            label: "报出价",
+            isHiden: true,
+            width: 80,
+            color: "red",
+            render: row => {
+              return row.cu_de + " " + row.ha_in_qu;
+            }
+          }
+        ]
+      },
       options: {},
       exportTemplateDialog: false,
       isOrderDetailDialog: false,
-      tableData: [],
       currentPage: 1,
       pageSize: 10,
       totalCount: 0,
@@ -325,6 +341,14 @@ export default {
       });
       if (res.data.result.code === 200) {
         this.options = res.data.result.item;
+        this.summaryData.totalDegree = this.totalCount;
+        this.summaryData.totalCartons = this.options.sumtAmount;
+        this.summaryData.totalQuantity = this.options.sumAmountOu_lo;
+        this.summaryData.totalBulkStere = this.options.sumBulk_stere;
+        this.summaryData.totalBulkFeet = this.options.sumBulk_feet;
+        this.summaryData.totalGrWe = this.options.sumGr_we;
+        this.summaryData.totalNeWe = this.options.sumNe_we;
+        this.summaryData.totalMoney = this.options.sumFa_pr_pr;
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -351,8 +375,7 @@ export default {
         id: this.item.erpOrderID
       });
       if (res.data.result.code === 200) {
-        this.tableData = res.data.result.item.items;
-        console.log(this.tableData);
+        this.tableData.data = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
       } else {
         this.$common.handlerMsgState({
@@ -382,10 +405,11 @@ export default {
 </script>
 <style scoped lang="less">
 @deep: ~">>>";
-.clientOrderDetails {
+.BsPurchaseOrderDetails {
   min-height: 100%;
   background-color: #fff;
   padding: 0 20px;
+  padding-bottom: 100px;
   .title {
     height: 55px;
     line-height: 55px;
@@ -536,26 +560,6 @@ export default {
           .name {
             margin-top: 8px;
           }
-        }
-      }
-    }
-    .totalBox {
-      display: flex;
-      align-items: center;
-      height: 80px;
-      padding-left: 10px;
-      box-sizing: border-box;
-      justify-content: flex-end;
-      .item {
-        margin-right: 15px;
-        display: flex;
-        align-items: center;
-        // .itemTitle {
-        // }
-        .price {
-          color: #eb1515;
-          font-weight: 700;
-          font-size: 18px;
         }
       }
     }

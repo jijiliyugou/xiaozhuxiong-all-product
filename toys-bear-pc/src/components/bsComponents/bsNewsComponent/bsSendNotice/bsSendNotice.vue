@@ -11,23 +11,14 @@
           label-width="100px"
           class="demo-ruleForm"
         >
-          <el-form-item label="类型" prop="type">
+          <el-form-item label="类型：" prop="type">
             <el-radio-group v-model="formData.type">
               <el-radio label="普通公告"></el-radio>
               <el-radio label="采购公告"></el-radio>
               <el-radio label="供应公告"></el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="内容" prop="content">
-            <el-input
-              type="textarea"
-              :rows="6"
-              placeholder="请输入内容"
-              v-model="formData.content"
-            >
-            </el-input>
-          </el-form-item>
-          <el-form-item label="图片" prop="fileList">
+          <el-form-item label="图片：" prop="fileList">
             <div class="gonggaoImgList">
               <!-- 发图片玩具圈 -->
               <template v-if="this.fileType === 'image'">
@@ -151,12 +142,41 @@
               >
             </div> -->
           </el-form-item>
-          <el-form-item label="是否广播" prop="isPush">
+          <el-form-item label="内容：" prop="content">
+            <el-input
+              type="textarea"
+              :rows="6"
+              placeholder="请输入内容"
+              v-model="formData.content"
+            >
+            </el-input>
+          </el-form-item>
+          <el-form-item
+            :label="selectQuanxian[0] === '' ? '谁可以看：' : '不给谁看：'"
+          >
+            <div class="quanxianBox">
+              <el-cascader
+                :options="options"
+                v-model="selectQuanxian"
+                clearable
+                :props="{ expandTrigger: 'hover' }"
+                :show-all-levels="false"
+              ></el-cascader>
+              <div class="guangbo">
+                <span>是否广播：</span>
+                <el-radio-group v-model="formData.isPush">
+                  <el-radio label="false">否</el-radio>
+                  <el-radio label="true">是</el-radio>
+                </el-radio-group>
+              </div>
+            </div>
+          </el-form-item>
+          <!-- <el-form-item label="是否广播" prop="isPush">
             <el-radio-group v-model="formData.isPush">
               <el-radio label="false">否</el-radio>
               <el-radio label="true">是</el-radio>
             </el-radio-group>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
             <div class="sendGonggaoBtn">
               <el-button type="primary" class="sendBtn" @click="isSelectPush"
@@ -174,7 +194,6 @@
       destroy-on-close
       append-to-body
       width="700px"
-      top="70px"
     >
       <el-radio-group class="myRadios" v-model="radio" @change="changeRadios">
         <el-radio
@@ -227,16 +246,21 @@
             @change="handleCheckAllChange"
           >
             <el-checkbox v-for="(item, i) in orgList" :key="i" :label="item.id">
-              <el-image class="img" :src="item.userImage" fit="cover">
+              <el-image
+                class="img"
+                style="width:50px; height: 50px;border-radius:50px;"
+                :src="item.userImage"
+                fit="cover"
+              >
                 <div
                   slot="error"
                   class="image-slot"
                   style="width:100%;height:100%;display:flex;align-items:center;justify-content:left;white-space: nowrap;"
                 >
-                  {{ item.linkman }}
+                  {{ item.userName }}
                 </div>
               </el-image>
-              {{ item.linkman }}
+              {{ item.userName }}
             </el-checkbox>
           </el-checkbox-group>
         </div>
@@ -257,6 +281,31 @@ export default {
   },
   data() {
     return {
+      selectQuanxian: [""],
+      options: [
+        {
+          value: "",
+          label: "公开"
+        },
+        {
+          value: "noLook",
+          label: "不给谁看",
+          children: [
+            {
+              value: "Supplier",
+              label: "全部供应商"
+            },
+            {
+              value: "Sales",
+              label: "全部公司"
+            },
+            {
+              value: "Exhibition",
+              label: "全部展厅"
+            }
+          ]
+        }
+      ],
       formData: {
         type: null,
         content: null,
@@ -277,6 +326,9 @@ export default {
       type: "",
       fileType: "",
       radio: "",
+      orgListPageSize: 10,
+      orgListCurrentPage: 1,
+      orgListCount: 0,
       orgList: [],
       checkUserList: [],
       showViewer: false,
@@ -544,10 +596,9 @@ export default {
     },
     // 获取通讯录列表
     async getOrgList(flag) {
-      const res = await this.$http.post("/api/OrgPersonnelPage", {
+      const res = await this.$http.post("/api/GetFriendAddressBooksPage", {
         skipCount: this.orgListCurrentPage,
-        maxResultCount: this.orgListPageSize,
-        id: this.$store.state.userInfo.userInfo.id
+        maxResultCount: this.orgListPageSize
       });
       console.log(res);
       if (res.data.result.code === 200) {
@@ -569,28 +620,6 @@ export default {
     isSelectPush() {
       this.$refs.refGonggao.validate(valid => {
         if (valid) {
-          // this.$confirm("是否需要推送公告?", "提示", {
-          //   distinguishCancelAndClose: true,
-          //   cancelButtonText: "需要推送",
-          //   confirmButtonText: "不了，谢谢",
-          //   iconClass: "iconfont icon-laba2"
-          // })
-          //   .then(() => {
-          //     this.sendGonggao();
-          //   })
-          //   .catch(action => {
-          //     if (action === "cancel") {
-          //       this.$common.handlerMsgState({
-          //         msg: "敬请期待",
-          //         type: "warning"
-          //       });
-          //       // this.orgListCurrentPage = 1;
-          //       // this.getOrgList(false);
-          //       // this.radio = "";
-          //       // this.checkUserList = [];
-          //       // this.selectPush = true;
-          //     }
-          //   });
           if (this.formData.isPush == "true") {
             this.orgListCurrentPage = 1;
             this.getOrgList(false);
@@ -745,47 +774,6 @@ export default {
       font-weight: 600;
     }
   }
-  .tongxunluLianxiren {
-    max-height: 430px;
-    overflow: auto;
-    .myCheckBox {
-      .el-checkbox {
-        font-size: 30px;
-        display: flex;
-        align-items: center;
-        margin: 20px;
-        @{deep} .el-checkbox__label,
-        @{deep} .el-checkbox__input {
-          display: flex;
-          align-items: center;
-          .el-image {
-            transition: all 0.5s;
-            width: 30px;
-            height: 30px;
-            margin-right: 10px;
-            border-radius: 50%;
-            background-color: #165af7;
-            color: white;
-          }
-        }
-        &:hover {
-          @{deep} .el-image {
-            -webkit-transform: scale(1.1);
-            -moz-transform: scale(1.1);
-            -ms-transform: scale(1.1);
-            transform: scale(1.1);
-          }
-        }
-        .el-checkbox__label,
-        .is-checkbox,
-        .el-checkbox__inner {
-          display: flex;
-          align-items: center;
-          border-radius: 50%;
-        }
-      }
-    }
-  }
 }
 .videoDelete {
   &:hover {
@@ -840,6 +828,60 @@ export default {
     }
     .icon_box_text {
       margin-left: 10px;
+    }
+  }
+}
+.quanxianBox {
+  display: flex;
+  align-items: center;
+  .el-cascader {
+    width: 150px;
+  }
+  .guangbo {
+    margin-left: 50px;
+  }
+}
+.tongxunluLianxiren {
+  max-height: 430px;
+  overflow: auto;
+  @{deep} .el-checkbox-group {
+    .el-checkbox {
+      font-size: 30px;
+      display: flex;
+      align-items: center;
+      margin: 20px;
+      &:hover {
+        background-color: #f5f7fa;
+      }
+      .el-checkbox__label,
+      .el-checkbox__input {
+        display: flex;
+        align-items: center;
+        .el-image {
+          transition: all 0.5s;
+          width: 50px;
+          height: 50px;
+          margin-right: 10px;
+          border-radius: 50px;
+          background-color: #165af7;
+          color: white;
+        }
+      }
+      &:hover {
+        @{deep} .el-image {
+          -webkit-transform: scale(1.1);
+          -moz-transform: scale(1.1);
+          -ms-transform: scale(1.1);
+          transform: scale(1.1);
+        }
+      }
+      .el-checkbox__label,
+      .is-checkbox,
+      .el-checkbox__inner {
+        display: flex;
+        align-items: center;
+        border-radius: 50%;
+      }
     }
   }
 }

@@ -11,7 +11,7 @@
           <p>主题</p>
           <p>消息内容</p>
 
-          <p class="addTemplate" @click="addMsgTemplate">+新增消息模板</p>
+          <p class="addTemplate" @click="addMsgTemplate">+新增推送模板</p>
         </div>
         <div class="msgList">
           <ul class="item" v-for="item in arr" :key="item.index">
@@ -81,7 +81,7 @@ export default {
       textarea: "",
       isEdit: false,
       editRow: {},
-      dialogTitle: "新增消息模板",
+      dialogTitle: "新增推送模板",
       addLangDialog: false,
       arr: [
         {
@@ -112,7 +112,7 @@ export default {
     closeDialog() {
       this.$emit("handlePushDialog", false);
     },
-    //新增消息模板
+    //新增推送模板
     addMsgTemplate() {
       this.isEdit = false;
       this.addLangDialog = true;

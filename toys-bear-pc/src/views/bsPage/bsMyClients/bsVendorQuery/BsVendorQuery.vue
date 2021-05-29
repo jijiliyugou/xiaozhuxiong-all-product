@@ -144,27 +144,27 @@ export default {
             width: 180
           }
         ],
-        btnWidth: 200,
-        actions: [
-          {
-            type: "primary",
-            textWrapper: () => {
-              return "编辑";
-            },
-            methods: row => {
-              this.handleEdit(row);
-            }
-          },
-          {
-            type: "danger",
-            textWrapper: () => {
-              return "删除";
-            },
-            methods: row => {
-              this.handleDelete(row);
-            }
-          }
-        ]
+        btnWidth: 200
+        // actions: [
+        //   {
+        //     type: "primary",
+        //     textWrapper: () => {
+        //       return "编辑";
+        //     },
+        //     methods: row => {
+        //       this.handleEdit(row);
+        //     }
+        //   },
+        //   {
+        //     type: "danger",
+        //     textWrapper: () => {
+        //       return "删除";
+        //     },
+        //     methods: row => {
+        //       this.handleDelete(row);
+        //     }
+        //   }
+        // ]
       },
       myKeyword: "",
       isShowHistoryPanel: false,

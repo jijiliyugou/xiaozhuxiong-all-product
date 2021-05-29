@@ -91,18 +91,19 @@
             align="center"
             min-width="150"
             label="产品名称"
+            show-overflow-tooltip
           >
             <template slot-scope="scope">
-              <el-tooltip
+              <!-- <el-tooltip
                 class="item"
                 effect="dark"
                 :content="scope.row.pr_na"
                 placement="top"
-              >
-                <div class="productName">
-                  {{ scope.row.pr_na + "是的连接方式雷锋精神大幅降低了" }}
-                </div>
-              </el-tooltip>
+              > -->
+              <div class="productName">
+                {{ scope.row.pr_na }}
+              </div>
+              <!-- </el-tooltip> -->
             </template>
           </el-table-column>
           <el-table-column prop="client_nu" align="center" label="公司编号">
@@ -228,11 +229,11 @@
                 effect="dark"
                 :content="scope.row.remark"
                 placement="top"
-              >
-                <div class="remarkClass"> -->
-              {{ scope.row.remark }}
-              <!-- </div>
-              </el-tooltip> -->
+              > -->
+              <div class="remarkClass">
+                {{ scope.row.remark }}
+              </div>
+              <!-- </el-tooltip> -->
             </template>
           </el-table-column>
           <el-table-column prop="ma_na" align="center" label="厂家名称">
@@ -482,7 +483,7 @@ export default {
   }
 }
 .remarkClass {
-  max-width: 200px;
+  max-width: 180px;
   overflow: hidden;
   white-space: nowrap; /*不换行*/
   text-overflow: ellipsis; /*超出部分文字以...显示*/

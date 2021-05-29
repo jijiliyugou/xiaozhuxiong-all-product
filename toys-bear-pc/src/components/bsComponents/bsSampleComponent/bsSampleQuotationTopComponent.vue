@@ -86,7 +86,7 @@
 
         <el-table-column align="center" prop="cu_deName" label="币种">
         </el-table-column>
-        <el-table-column align="center" prop="size" label="每车尺寸">
+        <el-table-column align="center" prop="size" label="每车尺码">
         </el-table-column>
         <el-table-column align="center" prop="rejectionMethod" label="取舍方式">
         </el-table-column>

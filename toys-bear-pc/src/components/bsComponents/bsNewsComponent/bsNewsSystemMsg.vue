@@ -2,27 +2,35 @@
   <div class="bsNewsSystemMsg">
     <div class="head">
       <div class="headName">
-        <p>全部（23）</p>
+        <p>全部（{{ totalCount }}）</p>
       </div>
     </div>
     <div class="main">
       <ul>
-        <li>
+        <li v-for="item in infoList" :key="item.id">
           <div class="tableHead">
-            <p>小竹熊APP上新功能拉~</p>
-            <div class="tableHeadIcon">
+            <p>{{ item.title }}</p>
+            <div class="tableHeadIcon" @click="removeInfo(item)">
               <img src="@/assets/images/delete.png" alt="" />
             </div>
           </div>
           <div class="tablemian">
-            <div>
-              <p>
-                小竹熊app是一款智能商务移动办公平台，小竹熊app功能齐全，提供更安全的数据管理，能满足日常所有的订单查询以及产品查询功能，解决大家日常繁琐的工作，小竹熊app支持单聊
+            <div
+              style="flex: 1;overflow: hidden;white-space: nowrap; text-overflow: ellipsis;"
+            >
+              {{ item.content }}
+              <p style="margin-top: 14px;">
+                时间：
+                <span>
+                  {{ item.createdOn && item.createdOn.replace(/T/, " ") }}
+                </span>
               </p>
-              <p>时间：<span>2020-11-21 13:41:35</span></p>
             </div>
             <div class="mianBtn">
-              <el-button style="color:#3368A9;border-color: #3368A9;"
+              <el-button
+                size="medium"
+                @click="openDetails(item)"
+                style="color:#3368A9;border-color: #3368A9;"
                 >查看详情</el-button
               >
             </div>
@@ -30,18 +38,98 @@
         </li>
       </ul>
     </div>
+    <el-dialog :visible.sync="showInfoDetails" width="800">
+      <div class="infoDetailsBox">
+        <div class="title">{{ detailsOption.title }}</div>
+        <div class="dateBox">
+          时间：
+          <span>
+            {{
+              detailsOption.createdOn &&
+                detailsOption.createdOn.replace(/T/, " ")
+            }}
+          </span>
+        </div>
+        <div class="content">
+          {{ detailsOption.content }}
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 export default {
   name: "bsNewsSystemMsg",
+  props: ["dataOption"],
   data() {
-    return {};
+    return {
+      showInfoDetails: false,
+      detailsOption: {},
+      totalCount: 0,
+      currentPage: 1,
+      pageSize: 10,
+      infoList: []
+    };
   },
-  methods: {},
+  methods: {
+    // 删除消息
+    removeInfo(item) {
+      this.$confirm("确定要删除吗?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const res = await this.$http.post("/api/DeleteNotify", {
+            messageNotifyId: item.id
+          });
+          if (res.data.result.code === 200) {
+            this.$common.handlerMsgState({
+              msg: "删除成功",
+              type: "success"
+            });
+          } else {
+            this.$common.handlerMsgState({
+              msg: res.data.result.msg,
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "取消删除",
+            type: "warning"
+          });
+        });
+    },
+    // 打开消息详情
+    openDetails(item) {
+      this.detailsOption = item;
+      this.showInfoDetails = true;
+    },
+    // 获取系统消息列表
+    async getSystemList() {
+      const res = await this.$im_http.post("/api/Message/NotifyList", {
+        businessType: this.dataOption.businessType,
+        skipCount: this.currentPage,
+        maxResultCount: this.pageSize
+      });
+      const { code, item, msg } = res.data.result;
+      if (code === 200) {
+        this.infoList = item.items;
+        this.totalCount = item.totalCount;
+      } else {
+        this.$common.handlerMsgState({
+          msg: msg,
+          type: "danger"
+        });
+      }
+    }
+  },
   created() {},
-  mounted() {}
+  mounted() {
+    this.getSystemList();
+  }
 };
 </script>
 <style scoped lang="less">
@@ -80,6 +168,7 @@ export default {
       font-weight: bold;
       font-size: 16px;
       color: #333;
+      font-weight: 700;
       border-bottom: 2px solid #dcdfe6;
       .tableHeadIcon {
         width: 50px;
@@ -93,8 +182,11 @@ export default {
       }
     }
     ul li .tablemian {
-      padding: 20px 20px 0 20px;
+      color: #666;
+      padding: 0 20px;
       display: flex;
+      height: 96px;
+      align-items: center;
       justify-content: space-between;
       p {
         p {
@@ -105,7 +197,30 @@ export default {
       }
       .mianBtn {
         width: 100px;
+        min-width: 100px;
+        margin-left: 20px;
       }
+    }
+  }
+  .infoDetailsBox {
+    height: 600px;
+    overflow-y: auto;
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .dateBox {
+      color: #999;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .content {
+      color: #666;
+      line-height: 24px;
+      margin-top: 13px;
+      border-top: 1px solid #e5e5e5;
+      padding-top: 22px;
     }
   }
 }

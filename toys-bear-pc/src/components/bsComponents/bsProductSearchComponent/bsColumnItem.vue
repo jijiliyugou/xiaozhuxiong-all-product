@@ -144,7 +144,7 @@
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
 export default {
   props: {
     item: {
@@ -300,6 +300,7 @@ export default {
       if (this.item.isShopping) {
         this.item.shoppingCount = 1;
         this.$store.commit("pushShopping", this.item);
+
         this.$common.handlerMsgState({
           msg: "加购成功",
           type: "success"
@@ -319,13 +320,13 @@ export default {
     },
     // 加购
     handlerShopping() {
-      if (this.shoppingList.length >= 500 && !this.item.isShopping) {
-        this.$common.handlerMsgState({
-          msg: "购物车已满500条",
-          type: "warning"
-        });
-        return;
-      }
+      // if (this.shoppingList.length >= 500 && !this.item.isShopping) {
+      //   this.$common.handlerMsgState({
+      //     msg: "购物车已满500条",
+      //     type: "warning"
+      //   });
+      //   return;
+      // }
       if (this.canClick) {
         this.canClick = false;
         this.callbackShopping();
@@ -383,19 +384,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    }),
     ...mapState(["typeId"])
   },
   created() {},
-  mounted() {
-    eventBus.$on("upDateProductView", () => {
-      this.$nextTick(() => {
-        this.$forceUpdate();
-      });
-    });
-  }
+  mounted() {}
 };
 </script>
 <style scoped lang="less">

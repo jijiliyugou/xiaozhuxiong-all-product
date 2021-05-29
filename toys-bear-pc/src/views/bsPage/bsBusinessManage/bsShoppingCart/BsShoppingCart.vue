@@ -1,6 +1,24 @@
 <template>
   <div class="bsMyCollection">
-    <div class="title">购物车 ({{ tableData.length }})</div>
+    <div class="cartTitle">
+      <span>购物车 ({{ myShoppingCartCount }})</span>
+      <span>
+        <el-button type="warning" size="medium" @click="analysisCode">
+          <i class="iconfont icon-ico" style="margin-right: 5px;"></i>
+          解析二维码
+        </el-button>
+        <el-upload
+          action=""
+          ref="uploadFile"
+          :auto-upload="false"
+          :on-change="changeFile"
+          :http-request="httpFile"
+          :accept="globalJson.Json.MessageRestriction[0].itemCode"
+          style="display: none;"
+        >
+        </el-upload>
+      </span>
+    </div>
     <div class="tableBox" id="tableId">
       <el-table
         :data="tableData"
@@ -18,7 +36,7 @@
         ></el-table-column>
         <el-table-column label="序号" type="index" align="center" width="40">
         </el-table-column>
-        <el-table-column label="产品" width="280" show-overflow-tooltip>
+        <el-table-column label="产品" width="280">
           <template slot-scope="scope">
             <div class="imgBox">
               <el-tooltip
@@ -29,8 +47,8 @@
                 <div slot="content">
                   <el-image
                     style="width: 300px;height: auto; cursor: pointer;"
-                    :preview-src-list="[scope.row.img]"
-                    :src="scope.row.img"
+                    :preview-src-list="[scope.row.productImgs]"
+                    :src="scope.row.productImgs"
                     fit="contain"
                   >
                     <div
@@ -59,7 +77,7 @@
                   @click.native="goDetails(scope.row)"
                   fit="contain"
                   style="width: 80px; height: 60px"
-                  :src="scope.row.img"
+                  :src="scope.row.productImgs"
                 >
                   <div slot="placeholder" class="errorImg">
                     <img src="~@/assets/images/imgError.png" alt />
@@ -75,7 +93,19 @@
               </el-tooltip>
               <div class="productName">
                 <div class="name" @click="goDetails(scope.row)">
-                  {{ scope.row.name }}
+                  <el-tooltip
+                    effect="dark"
+                    :disabled="scope.row.productJson.name.length < 15"
+                    :content="scope.row.productJson.name"
+                    placement="top-start"
+                  >
+                    <span
+                      class=" spanName"
+                      style="max-width:190px; display:inline-block"
+                    >
+                      {{ scope.row.productJson.name }}</span
+                    >
+                  </el-tooltip>
                 </div>
                 <div class="factory">
                   <div class="fcatoryName" @click="toFactory(scope.row)">
@@ -91,11 +121,11 @@
         </el-table-column>
         <el-table-column align="center" label="联系厂商">
           <template slot-scope="scope">
-            <div v-if="scope.row.supplierPhone">
-              {{ scope.row.supplierPhone }}
+            <div v-if="scope.row.supplierJson.phoneNumber">
+              {{ scope.row.supplierJson.phoneNumber }}
             </div>
-            <div v-if="scope.row.supplierTelephoneNumber">
-              {{ scope.row.supplierTelephoneNumber }}
+            <div v-if="scope.row.supplierJson.telephoneNumber">
+              {{ scope.row.supplierJson.telephoneNumber }}
             </div>
           </template>
         </el-table-column>
@@ -106,16 +136,21 @@
           show-overflow-tooltip
         >
           <template slot-scope="scope">
-            {{ scope.row.exhibitionName }}
+            {{ scope.row.exhibitionCompany.companyName }}
           </template>
         </el-table-column>
         <el-table-column
           width="80"
           align="center"
-          prop="fa_no"
+          prop="productJson.fa_no"
           label="出厂货号"
         ></el-table-column>
-        <el-table-column width="60" align="center" prop="ch_pa" label="包装">
+        <el-table-column
+          width="60"
+          align="center"
+          prop="productJson.ch_pa"
+          label="包装"
+        >
         </el-table-column>
         <el-table-column
           align="center"
@@ -123,9 +158,15 @@
           min-width="100"
           show-overflow-tooltip
         >
+          <template slot="header">
+            <div>产品规格</div>
+            <div>(cm)</div>
+          </template>
           <template slot-scope="scope">
             <span>
-              {{ scope.row.pr_le }}x{{ scope.row.pr_wi }}x{{ scope.row.pr_hi }}
+              {{ scope.row.productJson.pr_le }}x{{
+                scope.row.productJson.pr_wi
+              }}x{{ scope.row.productJson.pr_hi }}
             </span>
           </template>
         </el-table-column>
@@ -135,9 +176,15 @@
           min-width="100"
           show-overflow-tooltip
         >
+          <template slot="header">
+            <div>包装规格</div>
+            <div>(cm)</div>
+          </template>
           <template slot-scope="scope">
             <span>
-              {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{ scope.row.in_hi }}
+              {{ scope.row.productJson.in_le }}x{{
+                scope.row.productJson.in_wi
+              }}x{{ scope.row.productJson.in_hi }}
             </span>
           </template>
         </el-table-column>
@@ -147,9 +194,15 @@
           min-width="100"
           show-overflow-tooltip
         >
+          <template slot="header">
+            <div>外箱规格</div>
+            <div>(cm)</div>
+          </template>
           <template slot-scope="scope">
             <span>
-              {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{ scope.row.ou_hi }}
+              {{ scope.row.productJson.ou_le }}x{{
+                scope.row.productJson.ou_wi
+              }}x{{ scope.row.productJson.ou_hi }}
             </span>
           </template>
         </el-table-column>
@@ -159,8 +212,16 @@
           width="150"
           show-overflow-tooltip
         >
+          <template slot="header">
+            <div>体积/材积</div>
+            <div>(cbm)/(cuft)</div>
+          </template>
           <template slot-scope="scope">
-            <span> {{ scope.row.bulk_stere }}/{{ scope.row.bulk_feet }} </span>
+            <span>
+              {{ scope.row.productJson.bulk_stere }}/{{
+                scope.row.productJson.bulk_feet
+              }}
+            </span>
           </template>
         </el-table-column>
         <el-table-column
@@ -169,8 +230,16 @@
           width="100"
           show-overflow-tooltip
         >
+          <template slot="header">
+            <div>毛重/净重</div>
+            <div>(kg)</div>
+          </template>
           <template slot-scope="scope">
-            <span>{{ scope.row.gr_we }}/{{ scope.row.ne_we }}</span>
+            <span
+              >{{ scope.row.productJson.gr_we }}/{{
+                scope.row.productJson.ne_we
+              }}</span
+            >
           </template>
         </el-table-column>
         <el-table-column
@@ -179,8 +248,16 @@
           width="80"
           show-overflow-tooltip
         >
+          <template slot="header">
+            <div>装箱量</div>
+            <div>(pcs)</div>
+          </template>
           <template slot-scope="scope">
-            <span> {{ scope.row.in_en }}/{{ scope.row.ou_lo }}</span>
+            <span>
+              {{ scope.row.productJson.in_en }}/{{
+                scope.row.productJson.ou_lo
+              }}</span
+            >
           </template>
         </el-table-column>
         <el-table-column align="center" label="箱数" width="50" min-width="50">
@@ -190,20 +267,26 @@
               type="number"
               @input="changeInputNumber($event, scope.row)"
               @focus="selectInputValue($event)"
+              @blur="blurInputValue($event, scope.row)"
               @keydown="nextInput($event)"
-              v-model="scope.row.shoppingCount"
+              v-model="scope.row.number"
             />
           </template>
         </el-table-column>
         <el-table-column
           align="center"
-          label="总数量"
+          label="数量"
           min-width="60"
           show-overflow-tooltip
         >
           <template slot-scope="scope">
             <span>
-              {{ multiply(scope.row.ou_lo, scope.row.shoppingCount) }}
+              {{
+                $calculate.multiply(
+                  scope.row.productJson.ou_lo,
+                  scope.row.number
+                )
+              }}
             </span>
           </template>
         </el-table-column>
@@ -216,20 +299,20 @@
         >
           <template slot-scope="scope">
             <span style="color: #f56c6c">
-              {{ scope.row.cu_de + scope.row.price }}
+              {{ scope.row.currency + scope.row.price }}
             </span>
           </template>
         </el-table-column>
         <el-table-column align="center" label="总价" min-width="60">
           <template slot-scope="scope">
             <p class="item price">
-              <span>{{ scope.row.cu_de }}</span>
+              <span>{{ scope.row.currency }}</span>
               <span>
                 {{
-                  priceCount(
-                    scope.row.price,
-                    scope.row.ou_lo,
-                    scope.row.shoppingCount
+                  $calculate.countTotalprice(
+                    scope.row.productJson.price,
+                    scope.row.productJson.ou_lo,
+                    scope.row.number
                   )
                 }}
               </span>
@@ -252,6 +335,7 @@
             title="确定要删除选中的产品吗？"
             @confirm="removeMyShoppingCart"
           > -->
+
             <el-button
               slot="reference"
               type="primary"
@@ -273,6 +357,10 @@
             </p>
             <p class="item">
               <span class="itemTitle">总箱数：</span>
+              <span>{{ myTotalCartons }}</span>
+            </p>
+            <p class="item">
+              <span class="itemTitle">总数量：</span>
               <span>{{ myTotalQuantity }}</span>
             </p>
             <p class="item">
@@ -314,7 +402,7 @@
             :rules="addInfoRules"
             :model="clienFormData"
           >
-            <el-form-item label="报价客户：" prop="customerId">
+            <el-form-item label="客户名称：" prop="customerId">
               <div class="formItemBox">
                 <el-select
                   v-model="clienFormData.customerId"
@@ -337,7 +425,7 @@
                 >
               </div>
             </el-form-item>
-            <el-form-item label="报价备注：">
+            <el-form-item label="备注：">
               <el-input
                 maxlength="50"
                 show-word-limit
@@ -604,25 +692,50 @@
         </el-form>
       </el-dialog>
     </el-dialog>
+    <!-- 解析二维码后的 -->
+    <el-dialog
+      title="解析二维码"
+      top="30vh"
+      :close-on-click-modal="false"
+      :visible.sync="showCodeValue"
+      width="450px"
+    >
+      <bsQRcodeValue
+        @close="showCodeValue = false"
+        @submitCode="submitCode"
+        :QRcodeValue="QRcodeValue"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
 import eventBus from "@/assets/js/common/eventBus";
+import { getQrUrl } from "@/assets/js/common/common.js";
+import bsQRcodeValue from "./bsQRcodeValue.vue";
 export default {
   name: "bsShoppingCart",
+  components: {
+    bsQRcodeValue
+  },
   data() {
     return {
-      chufa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)/(1-报价利润%)/汇率",
-      chengfa: "(出厂价+总费用/(每车尺码/外箱材积*外箱装量)*(1+报价利润%)/汇率",
+      QRcodeValue: {},
+      showCodeValue: false,
+      chufa: "(出厂价+(总费用/(每车尺码/体积*外箱装量)))/(1-报价利润/100)/汇率",
+      chengfa:
+        "(出厂价+(总费用/(每车尺码/体积*外箱装量)))*(1+报价利润/100)/汇率",
       myTotalPrice: 0,
       myTotalOuterBoxStere: 0,
       myTotalOuterBoxFeet: 0,
       myTotalJingzhong: 0,
       myTotalQuantity: 0,
+      myTotalCartons: 0,
       myTotalMaozhong: 0,
       selectTableData: [],
+      tableData: [],
+      cartList: [],
       addMyClientDialog: false,
       addClientFormData: {
         name: null,
@@ -738,112 +851,120 @@ export default {
       customerTemplate: [],
       isIndeterminate: false,
       checkAll: false,
-      tableData: [],
       subDialogVisible: false
     };
   },
   methods: {
-    /*
-     * 判断obj是否为一个整数
-     */
-    isInteger(obj) {
-      return Math.floor(obj) === obj;
-    },
-    /*
-     * 将一个浮点数转成整数，返回整数和倍数。如 3.14 >> 314，倍数是 100
-     * @param floatNum {number} 小数
-     * @return {object}
-     *   {times:100, num: 314}
-     */
-    toInteger(floatNum) {
-      const ret = { times: 1, num: 0 };
-      if (this.isInteger(floatNum)) {
-        ret.num = floatNum;
-        return ret;
+    // 提交扫码加购
+    async submitCode() {
+      const res = await this.$http.post("/api/AddShoppingCart", {
+        userID: this.userInfo.userInfo.id,
+        companyNumber: this.userInfo.commparnyList[0].companyNumber,
+        // sourceFrom: "active",
+        sourceFrom: "QRCodeSearch",
+        number: this.QRcodeValue.productCount,
+        currency: "￥",
+        Price: 0,
+        shopType: "companysamples",
+        productNumber: this.QRcodeValue.productNumber
+      });
+      if (res.data.result.code === 200) {
+        this.getShoppingCartList();
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "success"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
       }
-      const strfi = floatNum + "";
-      const dotPos = strfi.indexOf(".");
-      const len = strfi.substr(dotPos + 1).length;
-      const times = Math.pow(10, len);
-      const intNum = parseInt(floatNum * times + 0.5, 10);
-      ret.times = times;
-      ret.num = intNum;
-      return ret;
+
+      this.showCodeValue = false;
     },
-    /*
-     * 核心方法，实现加减乘除运算，确保不丢失精度
-     * 思路：把小数放大为整数（乘），进行算术运算，再缩小为小数（除）
-     *
-     * @param a {number} 运算数1
-     * @param b {number} 运算数2
-     * @param digits {number} 精度，保留的小数点数，比如 2, 即保留为两位小数
-     * @param op {string} 运算类型，有加减乘除（add/subtract/multiply/divide）
-     *
-     */
-    operation(a, b, digits, op) {
-      const o1 = this.toInteger(a);
-      const o2 = this.toInteger(b);
-      const n1 = o1.num;
-      const n2 = o2.num;
-      const t1 = o1.times;
-      const t2 = o2.times;
-      const max = t1 > t2 ? t1 : t2;
-      let result = null;
-      switch (op) {
-        case "add":
-          if (t1 === t2) {
-            // 两个小数位数相同
-            result = n1 + n2;
-          } else if (t1 > t2) {
-            // o1 小数位 大于 o2
-            result = n1 + n2 * (t1 / t2);
+    // 发送上传图片
+    async httpFile(file) {
+      const result = getQrUrl(file.raw);
+      result
+        .then(res => {
+          if (res.data) {
+            console.log(res.data, "识别二维码成功");
+            // this.$message.success("识别二维码成功!");
+            this.$http
+              .post("/api/QRCodeSearchProduct", { qRcode: res.data })
+              .then(res => {
+                if (res.data.result.code === 200) {
+                  this.QRcodeValue = res.data.result.item;
+                  this.showCodeValue = true;
+                } else {
+                  this.$common.handlerMsgState({
+                    msg: res.data.result.msg,
+                    type: "danger"
+                  });
+                }
+              });
           } else {
-            // o1 小数位 小于 o2
-            result = n1 * (t2 / t1) + n2;
+            this.$common.handlerMsgState({
+              msg: "识别二维码失败, 请重新上传",
+              type: "danger"
+            });
           }
-          return result / max;
-        case "subtract":
-          if (t1 === t2) {
-            result = n1 - n2;
-          } else if (t1 > t2) {
-            result = n1 - n2 * (t1 / t2);
-          } else {
-            result = n1 * (t2 / t1) - n2;
-          }
-          return result / max;
-        case "multiply":
-          result = (n1 * n2) / (t1 * t2);
-          return result;
-        case "divide":
-          result = (n1 / n2) * (t2 / t1);
-          return result;
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "识别二维码失败, 请重新上传",
+            type: "danger"
+          });
+        });
+    },
+    // 选择文件
+    changeFile(file) {
+      // 当前选中文件的大小
+      const rowFileSize = file.size;
+      // 图片
+      const imgSize = Number(
+        this.globalJson.Json.MessageRestriction[7].itemCode
+      );
+      // 图片大小验证
+      if (rowFileSize > imgSize) {
+        this.$common.handlerMsgState({
+          msg: "图片太大",
+          type: "danger"
+        });
+        return false;
       }
+      this.httpFile(file);
     },
-    // 加
-    add(a, b, digits) {
-      return this.operation(a, b, digits, "add");
+    // 打开解析二维码
+    analysisCode() {
+      this.$confirm("请上传二维码", {
+        title: "解析二维码",
+        confirmButtonText: "上传",
+        cancelButtonText: "取消"
+      })
+        .then(() => {
+          this.$refs.uploadFile.$refs["upload-inner"].handleClick();
+        })
+        .catch(() => {});
     },
-    // 减
-    subtract(a, b, digits) {
-      return this.operation(a, b, digits, "subtract");
+    // 计算总箱数量
+    calculationTotalBoxCartons(list) {
+      let number = 0;
+      for (let i = 0; i < list.length; i++) {
+        number = this.$calculate.add(number, list[i].number || 0);
+      }
+      this.myTotalCartons = number;
     },
-    // 乘
-    multiply(a, b, digits) {
-      return this.operation(a, b, digits, "multiply");
-    },
-    // 除
-    divide(a, b, digits) {
-      return this.operation(a, b, digits, "divide");
-    },
-    // 单个产品总价
-    priceCount(price, ou_lo, shoppingCount) {
-      return this.multiply(this.multiply(price, ou_lo), shoppingCount);
-    },
-    // 计算总箱数
+    // 计算总数量
     calculationTotalBox(list) {
       let number = 0;
       for (let i = 0; i < list.length; i++) {
-        number = this.add(number, list[i].shoppingCount || 0);
+        number = this.$calculate.add(
+          number,
+          this.$calculate.multiply(list[i].productJson.ou_lo, list[i].number) ||
+            0
+        );
       }
       this.myTotalQuantity = number;
     },
@@ -851,9 +972,9 @@ export default {
     calculationTotalMaozhong(list) {
       let number = 0;
       for (let i = 0; i < list.length; i++) {
-        number = this.add(
+        number = this.$calculate.add(
           number,
-          this.multiply(list[i].shoppingCount, list[i].gr_we)
+          this.$calculate.multiply(list[i].number, list[i].productJson.gr_we)
         );
       }
       this.myTotalMaozhong = number;
@@ -862,9 +983,9 @@ export default {
     calculationTotalJingzhong(list) {
       let number = 0;
       for (let i = 0; i < list.length; i++) {
-        number = this.add(
+        number = this.$calculate.add(
           number,
-          this.multiply(list[i].shoppingCount, list[i].ne_we)
+          this.$calculate.multiply(list[i].number, list[i].productJson.ne_we)
         );
       }
       this.myTotalJingzhong = number;
@@ -873,11 +994,11 @@ export default {
     calculationTotalPrice(list) {
       let price = 0;
       for (let i = 0; i < list.length; i++) {
-        price = this.add(
+        price = this.$calculate.add(
           price,
-          this.multiply(
-            this.multiply(list[i].price, list[i].shoppingCount),
-            list[i].ou_lo
+          this.$calculate.multiply(
+            this.$calculate.multiply(list[i].price, list[i].number),
+            list[i].productJson.ou_lo
           )
         );
       }
@@ -888,13 +1009,19 @@ export default {
       let outerBoxStere = 0,
         outerBoxFeet = 0;
       for (let i = 0; i < list.length; i++) {
-        outerBoxStere = this.add(
+        outerBoxStere = this.$calculate.add(
           outerBoxStere,
-          this.multiply(list[i].bulk_stere, list[i].shoppingCount)
+          this.$calculate.multiply(
+            list[i].productJson.bulk_stere,
+            list[i].number
+          )
         );
-        outerBoxFeet = this.add(
+        outerBoxFeet = this.$calculate.add(
           outerBoxFeet,
-          this.multiply(list[i].bulk_feet, list[i].shoppingCount)
+          this.$calculate.multiply(
+            list[i].productJson.bulk_feet,
+            list[i].number
+          )
         );
       }
       this.myTotalOuterBoxStere = outerBoxStere;
@@ -1009,22 +1136,32 @@ export default {
       })
         .then(async () => {
           const selectProducts = this.$refs.myTableRef.selection;
+          let productNumber = [];
           for (let i = 0; i < selectProducts.length; i++) {
-            for (let j = 0; j < this.tableData.length; j++) {
-              if (
-                selectProducts[i].productNumber ===
-                this.tableData[j].productNumber
-              ) {
-                this.tableData.splice(j, 1);
-              }
-            }
+            productNumber.push(selectProducts[i].productJson.productNumber);
           }
-          this.$common.handlerMsgState({
-            msg: "删除成功",
-            type: "success"
-          });
-          eventBus.$emit("resetMyCart", this.tableData);
-          this.$store.commit("resetShoppingCart", selectProducts);
+
+          const fd = {
+            userID: this.userInfo.userInfo.id,
+            companyNumber: this.userInfo.commparnyList[0].companyNumber,
+            sourceFrom: "active",
+            shopType: "companysamples",
+            productNumber: productNumber.join()
+          };
+          const res = await this.$http.post("/api/RemoveShoppingCart", fd);
+          if (res.data.result.code === 200) {
+            this.getShoppingCartList();
+            eventBus.$emit("searchProducts");
+            this.$common.handlerMsgState({
+              msg: "删除成功",
+              type: "success"
+            });
+          } else {
+            this.$common.handlerMsgState({
+              msg: "删除失败",
+              type: "danger"
+            });
+          }
         })
         .catch(() => {
           this.$common.handlerMsgState({
@@ -1045,8 +1182,21 @@ export default {
       } else if (e.target.value.length > 1 && e.target.value[0] == 0) {
         e.target.value = e.target.value.slice(1, 5);
       }
-      val.shoppingCount = Number(e.target.value);
-      this.$store.commit("replaceShoppingCartValueCount", this.tableData);
+      val.number = Number(e.target.value);
+      // this.$store.commit("replaceShoppingCartValueCount", this.tableData);
+    },
+    // 失去焦点事件修改箱数
+    async blurInputValue(e, val) {
+      let my = JSON.parse(JSON.stringify(val));
+      my.productJson = JSON.stringify(my.productJson);
+      my.supplierJson = JSON.stringify(my.supplierJson);
+      const res = await this.$http.post("/api/UpdateShoppingCart", my);
+      if (res.data.result.code != 200) {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
     },
     // 点击全选
     handleCheckAllChange(val) {
@@ -1062,7 +1212,7 @@ export default {
     selectionChange(selection) {
       this.selectTableData = selection;
       if (selection.length) {
-        if (selection.length === this.shoppingList.length) {
+        if (selection.length === this.tableData.length) {
           this.isIndeterminate = false;
           this.checkAll = true;
         } else this.isIndeterminate = true;
@@ -1143,13 +1293,18 @@ export default {
           const selectProducts = this.$refs.myTableRef.selection;
           this.clienFormData.quotationProductList = selectProducts.map(val => {
             return {
-              productNumber: val.productNumber,
-              boxNumber: val.shoppingCount,
+              productNumber: val.productJson.productNumber,
+              boxNumber: val.number,
               offerAmount: val.price
             };
           });
           if (this.userInfo.commparnyList[0].companyType == "Sales") {
             this.clienFormData.productOfferType = "company";
+          }
+          for (let i = 0; i < this.clientList.length; i++) {
+            if (this.clienFormData.customerId == this.clientList[i].id) {
+              this.clienFormData.customerName = this.clientList[i].name;
+            }
           }
           this.clienFormData.miniPrice = this.clienFormData.miniPrice || 0;
           this.clienFormData.miniPriceDecimalPlaces =
@@ -1164,14 +1319,25 @@ export default {
               msg: "提交成功",
               type: "success"
             });
-            for (let i = 0; i < this.tableData.length; i++) {
-              for (let j = 0; j < selectProducts.length; j++) {
-                if (
-                  this.tableData[i].productNumber ===
-                  selectProducts[j].productNumber
-                )
-                  this.tableData.splice(i, 1);
-              }
+            let productNumber = [];
+            for (let i = 0; i < selectProducts.length; i++) {
+              productNumber.push(selectProducts[i].productJson.productNumber);
+            }
+            const data = {
+              userID: this.userInfo.userInfo.id,
+              companyNumber: this.userInfo.commparnyList[0].companyNumber,
+              sourceFrom: "active",
+              shopType: "companysamples",
+              productNumber: productNumber.join()
+            };
+            const res = await this.$http.post("/api/RemoveShoppingCart", data);
+            if (res.data.result.code === 200) {
+              this.getShoppingCartList();
+              eventBus.$emit("searchProducts");
+              // this.$common.handlerMsgState({
+              //   msg: "删除成功",
+              //   type: "success"
+              // });
             }
             this.$store.commit("resetShoppingCart", selectProducts);
             this.subDialogVisible = false;
@@ -1243,6 +1409,42 @@ export default {
           type: "danger"
         });
       }
+    },
+    // 获取购物车列表
+    async getShoppingCartList() {
+      const fd = {
+        userID: this.userInfo.userInfo.id,
+        companyNumber: this.userInfo.commparnyList[0].companyNumber
+      };
+      const res = await this.$http.post("/api/ShoppingCartList", fd);
+      if (res.data.result.code === 200) {
+        this.cartList = res.data.result.item;
+        for (let i = 0; i < this.cartList.length; i++) {
+          this.cartList[i] = Object.assign(
+            this.cartList[i],
+            { productJson: JSON.parse(this.cartList[i].productJson) },
+            { supplierJson: JSON.parse(this.cartList[i].supplierJson) }
+          );
+        }
+        // console.log(this.cartList, "解析的列表");
+        this.tableData = this.cartList;
+        this.$store.commit(
+          "handlerShoppingCartCount",
+          res.data.result.item.length
+        );
+
+        this.$nextTick(() => {
+          const totalEl = document.getElementById("totalBox");
+          totalEl.style.width =
+            document.getElementById("tableId").offsetWidth + 60 + "px";
+        });
+        this.$refs.myTableRef.toggleAllSelection();
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
     }
   },
 
@@ -1252,38 +1454,32 @@ export default {
   },
   mounted() {
     this.getClientList();
-    this.tableData = this.shoppingList
-      ? JSON.parse(JSON.stringify(this.shoppingList))
-      : [];
+    this.getShoppingCartList();
+    eventBus.$on("handlergetClientList", () => {
+      this.getShoppingCartList();
+    });
+
     this.$nextTick(() => {
       this.$refs.myTableRef.toggleAllSelection();
-    });
-    eventBus.$on("resetMyShoppingCart", () => {
-      this.tableData = this.shoppingList
-        ? JSON.parse(JSON.stringify(this.shoppingList))
-        : [];
     });
     const totalEl = document.getElementById("totalBox");
     eventBus.$on("handlerLeft", left => {
       totalEl.style.left = -left + "px";
     });
-    totalEl.style.width =
-      document.getElementById("tableId").offsetWidth + 60 + "px";
+  },
+  beforeDestroy() {
+    eventBus.$off("handlergetClientList");
   },
   computed: {
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    }),
-    ...mapState(["userInfo"])
+    ...mapState(["userInfo", "myShoppingCartCount", "globalJson"])
   },
   watch: {
-    shoppingList(val) {
-      this.tableData = val;
-    },
     selectTableData: {
       deep: true,
       handler(list) {
         // 计算总箱数
+        this.calculationTotalBoxCartons(list);
+        // 计算总数量
         this.calculationTotalBox(list);
         // 计算总毛重
         this.calculationTotalMaozhong(list);
@@ -1312,6 +1508,34 @@ export default {
         }
       }
     },
+    "clienFormData.profit": {
+      deep: true,
+      handler(newVal) {
+        if (newVal == 100) {
+          if (this.clienFormData.profitCalcMethod == 2) {
+            this.clienFormData.profit = 10;
+            this.$common.handlerMsgState({
+              msg: "除法利润率不可为100",
+              error: "danger"
+            });
+          }
+        }
+      }
+    },
+    "clienFormData.profitCalcMethod": {
+      deep: true,
+      handler(newVal) {
+        if (newVal == 2) {
+          if (this.clienFormData.profit == 100) {
+            this.clienFormData.profit = 10;
+            this.$common.handlerMsgState({
+              msg: "除法利润率不可为100",
+              error: "danger"
+            });
+          }
+        }
+      }
+    },
     "clienFormData.cu_de": {
       deep: true,
       handler(newVal) {
@@ -1332,7 +1556,7 @@ export default {
   min-height: 100%;
   background-color: #fff;
   padding: 0 20px;
-  .title {
+  .cartTitle {
     height: 55px;
     line-height: 55px;
     font-size: 15px;
@@ -1341,6 +1565,8 @@ export default {
     box-sizing: border-box;
     position: relative;
     border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: space-between;
     &::before {
       width: 4px;
       height: 14px;
@@ -1409,6 +1635,11 @@ export default {
             overflow: hidden; /*超出部分隐藏*/
             white-space: nowrap; /*不换行*/
             text-overflow: ellipsis; /*超出部分文字以...显示*/
+            .spanName {
+              overflow: hidden; /*超出部分隐藏*/
+              white-space: nowrap; /*不换行*/
+              text-overflow: ellipsis; /*超出部分文字以...显示*/
+            }
           }
           .factory {
             color: #3368a9;

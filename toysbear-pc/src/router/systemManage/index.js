@@ -21,6 +21,8 @@ const DownloadStatistics = () =>
 const VipSpotNewProductsMan = () =>
   import("@/views/systemManage/vipSpotNewProductsMan.vue");
 const YardManage = () => import("@/views/systemManage/yardManage.vue");
+// 消息模板管理
+const MsgTemplateMan = () => import("@/views/systemManage/msgTemplateMan.vue");
 
 export default [
   {
@@ -117,5 +119,10 @@ export default [
     path: "/yardManage",
     name: "yardManage",
     component: YardManage
+  },
+  {
+    path: "/msgTemplateMan",
+    name: "msgTemplateMan",
+    component: MsgTemplateMan
   }
 ];

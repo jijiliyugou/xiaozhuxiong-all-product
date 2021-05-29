@@ -241,10 +241,10 @@ export default {
               let msg = "";
               switch (row.readStatus) {
                 case false:
-                  msg = "<span style='color: green'>未读</span>";
+                  msg = "<span style='color: #f56c6c'>未读</span>";
                   break;
                 case true:
-                  msg = "<span style='color: #f56c6c'>已读</span>";
+                  msg = "<span style='color: green'>已读</span>";
                   break;
               }
               return msg;
@@ -254,7 +254,7 @@ export default {
         btnWidth: 100,
         actions: [
           {
-            type: "success",
+            type: "warning",
             textWrapper() {
               return "导出";
             },

@@ -1,5 +1,8 @@
 // 我的消息
 const BsNews = () => import("@/views/bsPage/bsMyNews/bsNews/BsNews.vue");
+// 业务消息
+const BsBusinessMsg = () =>
+  import("@/views/bsPage/bsMyNews/bsBusinessMsg/BsBusinessMsg.vue");
 // 我的好友
 const BsMyGoodFriend = () =>
   import("@/views/bsPage/bsMyNews/bsMyGoodFriend/BsMyGoodFriend.vue");
@@ -13,7 +16,15 @@ export default [
     name: "bsNews",
     component: BsNews,
     meta: {
-      keepAlive: true
+      keepAlive: false
+    }
+  },
+  {
+    path: "/bsIndex/bsBusinessMsg",
+    name: "bsBusinessMsg",
+    component: BsBusinessMsg,
+    meta: {
+      keepAlive: false
     }
   },
   {
@@ -21,7 +32,7 @@ export default [
     name: "bsMyGoodFriend",
     component: BsMyGoodFriend,
     meta: {
-      keepAlive: true
+      keepAlive: false
     }
   },
   {
@@ -29,7 +40,7 @@ export default [
     name: "bsToyCircle",
     component: BsToyCircle,
     meta: {
-      keepAlive: true
+      keepAlive: false
     }
   }
 ];

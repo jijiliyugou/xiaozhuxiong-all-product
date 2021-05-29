@@ -71,6 +71,10 @@
         <el-table-column prop="ch_pa" label="包装" align="center" width="100">
         </el-table-column>
         <el-table-column label="产品规格" align="center">
+          <template slot="header">
+            <div>产品规格</div>
+            <div>(cm)</div>
+          </template>
           <template slot-scope="scope">
             <span>
               {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -81,6 +85,10 @@
         </el-table-column>
 
         <el-table-column label="包装规格" align="center">
+          <template slot="header">
+            <div>包装规格</div>
+            <div>(cm)</div>
+          </template>
           <template slot-scope="scope">
             <span>
               {{ scope.row.in_le }}x{{ scope.row.in_wi }}x{{
@@ -90,6 +98,10 @@
           </template>
         </el-table-column>
         <el-table-column label="外箱规格" align="center">
+          <template slot="header">
+            <div>外箱规格</div>
+            <div>(cm)</div>
+          </template>
           <template slot-scope="scope">
             <span>
               {{ scope.row.ou_le }}x{{ scope.row.ou_wi }}x{{
@@ -99,6 +111,10 @@
           </template>
         </el-table-column>
         <el-table-column label="体积/材积" align="center">
+          <template slot="header">
+            <div>体积/材积</div>
+            <div>(cbm)/(cuft)</div>
+          </template>
           <template slot-scope="scope">
             <span>
               {{ scope.row.bulk_stere }}(cbm)/{{ scope.row.bulk_feet }}(cuft)
@@ -106,6 +122,10 @@
           </template>
         </el-table-column>
         <el-table-column label="毛重/净重" align="center" width="100">
+          <template slot="header">
+            <div>毛重/净重</div>
+            <div>(kg)</div>
+          </template>
           <template slot-scope="scope">
             <span> {{ scope.row.gr_we }}/{{ scope.row.ne_we }}(kg) </span>
           </template>
@@ -376,7 +396,6 @@ export default {
     // 计算总价
     myTotalPrice(list) {
       let price = 0;
-
       for (let i = 0; i < list.length; i++) {
         price = this.add(
           price,

@@ -44,18 +44,34 @@
                 bsMyClientsIcon: item.parent.linkUrl === '/bsIndex/bsMyClients'
               }"
             ></i>
-            <span slot="title">{{ item.parent.name }}</span>
+
+            <span slot="title">
+              <el-badge
+                :is-dot="item.parent.linkUrl === '/bsIndex/bsMyNews'"
+                class="hongdian"
+              >
+                {{ item.parent.name }}
+              </el-badge>
+            </span>
           </template>
           <el-menu-item
-            @click="addRouterEvent(item)"
-            v-for="item in item.children"
-            :key="item.id"
-            :index="item.linkUrl"
+            @click="addRouterEvent(child)"
+            v-for="child in item.children"
+            :key="child.id"
+            :index="child.linkUrl"
           >
-            <span style="font-size: 26px;position: relative; top: -2px;"
-              >·</span
+            <el-badge
+              :is-dot="
+                item.parent.linkUrl === '/bsIndex/bsMyNews' &&
+                  child.linkUrl != '/bsIndex/bsToyCircle'
+              "
+              class="hongdian"
             >
-            <span> {{ item.name }}</span>
+              <span
+                style="font-size: 26px;position: relative; top: -2px;margin-right:5px;"
+                >·</span
+              >{{ child.name }}
+            </el-badge>
           </el-menu-item>
         </el-submenu>
       </el-menu>
@@ -93,6 +109,9 @@ export default {
         refresh: false,
         label: route.name
       };
+      if (route.linkUrl === "/bsIndex/bsProductSearchIndex") {
+        this.$store.commit("handleraddrSearch", false);
+      }
       this.$store.commit("myAddTab", fd);
     }
   },

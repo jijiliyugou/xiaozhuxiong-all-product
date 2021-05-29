@@ -7,12 +7,20 @@ const BsCustomerOrder = () =>
 // 站点设置
 const BsSiteSettings = () =>
   import("@/views/bsPage/bsSiteSharing/bsSiteSettings/BsSiteSettings.vue");
-// 浏览记录
+//登录记录
+const BsLoginHistory = () =>
+  import("@/views/bsPage/bsSiteSharing/bsLoginHistory/BsLoginHistory.vue");
+
+//浏览记录
 const BsBrowsingHistory = () =>
   import(
     "@/views/bsPage/bsSiteSharing/bsBrowsingHistory/BsBrowsingHistory.vue"
   );
-
+//广告管理
+const BsAdvertisingManage = () =>
+  import(
+    "@/views/bsPage/bsSiteSharing/bsAdvertisingManage/BsAdvertisingManage.vue"
+  );
 export default [
   {
     path: "/bsIndex/bsSiteLlis",
@@ -39,9 +47,25 @@ export default [
     }
   },
   {
+    path: "/bsIndex/bsLoginHistory",
+    name: "bsLoginHistory",
+    component: BsLoginHistory,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
     path: "/bsIndex/bsBrowsingHistory",
     name: "bsBrowsingHistory",
     component: BsBrowsingHistory,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsAdvertisingManage",
+    name: "bsAdvertisingManage",
+    component: BsAdvertisingManage,
     meta: {
       keepAlive: true
     }

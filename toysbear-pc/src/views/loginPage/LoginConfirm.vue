@@ -60,7 +60,7 @@ export default {
   data() {
     return {
       loginUrl: "https://www.toysbear.com/new/#/bsIndex",
-      // loginUrl: "http://139.9.71.135:8080/new/#/bsIndex",
+      // loginUrl: "http://124.71.6.26:8080/new/#/bsIndex",
       radioValue: null,
       commparnyList: []
     };
@@ -142,11 +142,11 @@ export default {
           switch (item.companyType) {
             case "Sales":
               location.href = this.loginUrl;
-              // location.href = "http://139.9.71.135:8080/new/#/bsIndex";
+              // location.href = "http://124.71.6.26:8080/new/#/bsIndex";
               break;
             default:
               this.$router.push("/me");
-              // location.href = "http://139.9.71.135:8080/#/me";
+              // location.href = "http://124.71.6.26:8080/#/me";
               break;
           }
           // let token = JSON.stringify(res.data.result);

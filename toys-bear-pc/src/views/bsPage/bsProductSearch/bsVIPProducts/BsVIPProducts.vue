@@ -18,7 +18,7 @@
           <el-button type="warning" size="medium" @click="toShoppingCart">
             <i class="whiteCart"></i>
             <span>购物车</span>
-            <span>({{ shoppingList.length }})</span>
+            <span>({{ myShoppingCartCount }})</span>
           </el-button>
         </div>
       </div>
@@ -95,19 +95,43 @@
       </div>
       <div class="tableBox">
         <!-- 产品列表 -->
-        <component :is="isGrid" :productList="productList"></component>
+        <component
+          ref="componentRef"
+          :is="isGrid"
+          :productList="productList"
+        ></component>
         <!-- 分页 -->
-        <center style="padding: 30px 0">
+        <center
+          :class="{
+            myPagination: true,
+            leftCheckbox: isGrid === 'bsColumnComponent'
+          }"
+        >
+          <div class="left" v-show="isGrid === 'bsColumnComponent'">
+            <el-checkbox
+              :indeterminate="isIndeterminate"
+              v-model="checkAll"
+              @change="handleCheckAllChange"
+            >
+              全选
+            </el-checkbox>
+
+            <el-button class="purchased" size="small" @click="handelrPurchased">
+              <i class="selectionCart"></i>
+              <span>本页选中一键加购</span>
+            </el-button>
+          </div>
           <el-pagination
-            layout="total, sizes, prev, pager, next, jumper"
-            :page-sizes="[12, 24, 36, 48]"
             background
-            :total="totalCount"
-            :page-size="pageSize"
-            :current-page.sync="currentPage"
-            @current-change="handleCurrentChange"
             @size-change="handleSizeChange"
-          ></el-pagination>
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[12, 24, 36, 48]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="totalCount"
+          >
+          </el-pagination>
         </center>
       </div>
     </div>
@@ -118,10 +142,10 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 // import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
 import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
-import { mapGetters } from "vuex";
 import eventBus from "@/assets/js/common/eventBus";
 export default {
   name: "bsVIPProducts",
@@ -145,6 +169,9 @@ export default {
       twoCount: 0,
       pageSize: 12,
       currentPage: 1,
+      selectTableData: null,
+      isIndeterminate: false,
+      checkAll: false,
       searchHttpTime: null
     };
   },
@@ -211,20 +238,6 @@ export default {
       }
       const res = await this.$http.post("/api/GetProductsByTypePage", fd);
       if (res.data.result.code === 200) {
-        if (this.shoppingList) {
-          const item = res.data.result.item;
-          for (let i = 0; i < item.items.length; i++) {
-            this.$set(item.items[i], "isShopping", false);
-            for (let j = 0; j < this.shoppingList.length; j++) {
-              if (
-                item.items[i].productNumber ===
-                this.shoppingList[j].productNumber
-              ) {
-                this.$set(item.items[i], "isShopping", true);
-              }
-            }
-          }
-        }
         this.totalCount = res.data.result.item.totalCount;
         this.productList = res.data.result.item.items;
         let endDate = Date.now();
@@ -279,11 +292,81 @@ export default {
     search() {
       this.currentPage = 1;
       this.getProductsList();
+    },
+    // 点击全选
+    handleCheckAllChange(val) {
+      let myTableRef = this.$refs.componentRef.$refs.bsTableItemRef.$refs
+        .myTableRef;
+      if (val) myTableRef.toggleAllSelection();
+      else myTableRef.clearSelection();
+      this.isIndeterminate = false;
+    },
+    // 一键加购
+    handelrPurchased() {
+      this.$confirm("确定要加购选中的产品吗？", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const selectProducts = this.$refs.componentRef.$refs.bsTableItemRef
+            .$refs.myTableRef.selection;
+
+          let productNumber = [];
+          for (let i = 0; i < selectProducts.length; i++) {
+            productNumber.push(selectProducts[i].productNumber);
+          }
+          const fd = {
+            userID: this.userInfo.userInfo.id,
+            companyNumber: this.userInfo.commparnyList[0].companyNumber,
+            sourceFrom: "active",
+            number: 1,
+            currency: "￥",
+            Price: 0,
+            shopType: "companysamples",
+            productNumber: productNumber.join()
+          };
+          const res = await this.$http.post("/api/AddShoppingCart", fd);
+          if (res.data.result.code === 200) {
+            this.$store.commit(
+              "handlerShoppingCartCount",
+              res.data.result.item
+            );
+            this.$common.handlerMsgState({
+              msg: " 一键加购成功",
+              type: "success"
+            });
+            this.getVipRegions();
+          } else {
+            this.$common.handlerMsgState({
+              msg: " 一键加购失败",
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "已取消一键加购",
+            type: "warning"
+          });
+        });
     }
   },
   created() {},
   mounted() {
     this.getVipRegions();
+    // 选择中的产品
+    eventBus.$on("handleSelectionChangeBus", selection => {
+      this.selectTableData = selection;
+      if (selection.length) {
+        if (selection.length === this.productList.length) {
+          this.isIndeterminate = false;
+          this.checkAll = true;
+        } else this.isIndeterminate = true;
+      } else {
+        this.isIndeterminate = false;
+        this.checkAll = false;
+      }
+    });
     // 取消收藏/刷新页面
     eventBus.$on("resetProductCollection", item => {
       // this.getProductsList();
@@ -293,68 +376,20 @@ export default {
         }
       }
     });
-    // 加购删除购物车
-    eventBus.$on("resetMyCart", item => {
-      if (Object.prototype.toString.call(item) === "[object Array]") {
-        // 数组
-        if (item.length) {
-          for (let i = 0; i < this.productList.length; i++) {
-            for (let j = 0; j < item.length; j++) {
-              if (this.productList[i].productNumber == item[j].productNumber) {
-                this.productList[i].isShopping = true;
-                break;
-              } else {
-                this.productList[i].isShopping = false;
-              }
-            }
-          }
-        } else {
-          this.productList.forEach(val => {
-            val.isShopping = false;
-          });
-        }
-      } else if (Object.prototype.toString.call(item) === "[object Object]") {
-        // 对象;
-        for (let i = 0; i < this.productList.length; i++) {
-          if (item.productNumber == this.productList[i].productNumber) {
-            this.productList[i].isShopping = item.isShopping;
-          }
+    // 取消或加购样式/刷新页面
+    eventBus.$on("resetProductIsShop", item => {
+      for (let i = 0; i < this.productList.length; i++) {
+        if (this.productList[i].productNumber == item.productNumber) {
+          this.productList[i].isShop = item.isShop;
         }
       }
     });
   },
-  computed: {
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    })
-  },
-  watch: {
-    shoppingList: {
-      deep: true,
-      handler() {
-        eventBus.$emit("upDateProductView");
-        // if (list) {
-        //   if (list.length) {
-        //     for (let i = 0; i < this.productList.length; i++) {
-        //       for (let j = 0; j < list.length; j++) {
-        //         if (
-        //           this.productList[i].productNumber == list[j].productNumber
-        //         ) {
-        //           this.productList[i].isShopping = true;
-        //           break;
-        //         } else {
-        //           this.productList[i].isShopping = false;
-        //         }
-        //       }
-        //     }
-        //   } else {
-        //     this.productList.forEach(val => {
-        //       val.isShopping = false;
-        //     });
-        //   }
-        // }
-      }
-    }
+  computed: { ...mapState(["userInfo", "myShoppingCartCount"]) },
+  watch: {},
+  beforeDestroy() {
+    eventBus.$off("resetProductCollection");
+    eventBus.$off("resetProductIsShop");
   }
 };
 </script>
@@ -525,6 +560,34 @@ export default {
       img {
         width: 80px;
         height: 60px;
+      }
+    }
+  }
+  .myPagination {
+    padding: 30px 0;
+  }
+  .leftCheckbox {
+    display: flex;
+    align-items: center;
+    width: 80%;
+
+    .left {
+      display: flex;
+      align-items: center;
+      padding: 0 300px 0 20px;
+      .purchased {
+        margin-left: 30px;
+        color: #3368a9;
+        border: 1px solid #3368a9;
+        .selectionCart {
+          display: inline-block;
+          vertical-align: bottom;
+          width: 14px;
+          height: 14px;
+          background: url("~@/assets/images/selectionCart.png") no-repeat center;
+          background-size: contain;
+          margin-right: 10px;
+        }
       }
     }
   }

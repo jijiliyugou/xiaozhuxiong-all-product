@@ -103,7 +103,7 @@ export default {
           {
             prop: "imgUrl",
             label: "图片",
-            productInfo: true,
+            elImageUrl: true,
             elImage: row => {
               return row.imgUrl;
             }

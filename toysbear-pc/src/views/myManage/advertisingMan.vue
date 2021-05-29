@@ -438,7 +438,7 @@ export default {
       urlHeader:
         process.env.NODE_ENV === "production"
           ? "http://img.toysbear.com/"
-          : "http://139.9.71.135:8087/",
+          : "http://124.71.6.26:8087/",
       adTypeList: [],
       editImages: [],
       platFormList: [

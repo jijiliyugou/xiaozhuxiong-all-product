@@ -424,6 +424,11 @@ export default {
           icon: require("@/assets/images/antuzhaoyang.png")
         },
         {
+          title: "3D展品",
+          content: "360度查看产品细节",
+          icon: require("@/assets/images/blue3D.png")
+        },
+        {
           title: "新品区",
           content: "新意产品不错过",
           icon: require("@/assets/images/xinpinqu.png")
@@ -437,12 +442,12 @@ export default {
           title: "VIP区",
           content: "品牌厂商不容错过",
           icon: require("@/assets/images/vipqu.png")
-        },
-        {
-          title: "玩具圈",
-          content: "查看发布玩具信息",
-          icon: require("@/assets/images/wanjuquan.png")
         }
+        // {
+        //   title: "玩具圈",
+        //   content: "查看发布玩具信息",
+        //   icon: require("@/assets/images/wanjuquan.png")
+        // }
       ],
       gongzuoList: [
         {

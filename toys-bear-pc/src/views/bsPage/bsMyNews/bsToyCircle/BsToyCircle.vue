@@ -366,7 +366,7 @@
       title="发布公告"
       :visible.sync="sendNoticeDialog"
       v-if="sendNoticeDialog"
-      width="800px"
+      width="703px"
     >
       <bsSendNotice @close="closeSendNotice" />
     </el-dialog>

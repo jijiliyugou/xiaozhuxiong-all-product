@@ -22,8 +22,8 @@
           <div class="cartIconBox">
             <el-badge
               class="appBadge"
-              :hidden="!shoppingList || shoppingList.length < 1"
-              :value="shoppingList && shoppingList.length"
+              :hidden="!myShoppingCartCount || myShoppingCartCount < 1"
+              :value="myShoppingCartCount"
             >
               <i class="cartIcon"></i>
             </el-badge>
@@ -42,7 +42,7 @@
 </template>
 <script>
 import eventBus from "@/assets/js/common/eventBus.js";
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
 const cubic = value => Math.pow(value, 3);
 const easeInOutCubic = value =>
   value < 0.5 ? cubic(value * 2) / 2 : 1 - cubic((1 - value) * 2) / 2;
@@ -55,17 +55,18 @@ export default {
     };
   },
   computed: {
-    ...mapState(["isJindu"]),
-    ...mapState(["confirmType"]),
-    ...mapState(["dialogVisible"]),
-    ...mapState(["dialogTitle"]),
-    ...mapState(["userInfo"]),
-    ...mapState(["showGlobalMsg"]),
-    ...mapState(["msgType"]),
-    ...mapState(["globalMsg"]),
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    })
+    ...mapState([
+      "confirmType",
+      "isJindu",
+      "isLogin",
+      "dialogVisible",
+      "dialogTitle",
+      "userInfo",
+      "showGlobalMsg",
+      "msgType",
+      "globalMsg",
+      "myShoppingCartCount"
+    ])
   },
   mounted() {
     this.$store.commit("updateAppLoading", false);
@@ -81,25 +82,6 @@ export default {
     });
   },
   methods: {
-    // 使用的地方
-    handleShowConfirm() {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      })
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "点击确认的回调!"
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "warning",
-            message: "点击取消或删除的回调"
-          });
-        });
-    },
     // 去购物车
     toMyShoppingCart() {
       const fd = {

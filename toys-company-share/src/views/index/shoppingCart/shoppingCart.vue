@@ -87,7 +87,7 @@
                   <el-image
                     style="width: 100px; height: 100px; cursor: pointer;"
                     fit="contain"
-                    :src="scope.row.imageUrls[0]"
+                    :src="scope.row.productImgs"
                   >
                     <div slot="placeholder" class="image-slot">
                       <img
@@ -106,41 +106,21 @@
                       />
                     </div>
                   </el-image>
-                  <!-- <div class="imgPreview">
-                    <el-image
-                      style="width: 300px; height: 300px; cursor: pointer;"
-                      fit="contain"
-                      :src="scope.row.imageUrls[0]"
-                    >
-                      <div slot="placeholder" class="image-slot">
-                        <img
-                          class="errorImg"
-                          style="width: 100%; height: 100px"
-                          src="~@/assets/images/logo.png"
-                          alt
-                        />
-                      </div>
-                      <div slot="error" class="image-slot">
-                        <img
-                          class="errorImg"
-                          style="width: 100px; height: 100px"
-                          src="~@/assets/images/logo.png"
-                          alt
-                        />
-                      </div>
-                    </el-image>
-                  </div> -->
                 </div>
                 <div class="productNameBox">
                   <p class="name">
                     {{
-                      globalLang === "zh-CN" ? scope.row.name : scope.row.ename
+                      globalLang === "zh-CN"
+                        ? scope.row.productJson.name
+                        : scope.row.productJson.ename
                     }}
                   </p>
-                  <p class="fa_no">No.{{ scope.row.outFactoryNumber }}</p>
+                  <p class="fa_no">No.{{ scope.row.productJson.fa_no }}</p>
                   <p class="price">
                     <span>{{ userInfo.currencyType }}</span>
-                    <span class="priceText">{{ scope.row.price }}</span>
+                    <span class="priceText">{{
+                      scope.row.productJson.price
+                    }}</span>
                   </p>
                 </div>
                 <div class="item">
@@ -149,32 +129,33 @@
                     <span>
                       {{
                         globalLang === "zh-CN"
-                          ? scope.row.packMethod
-                          : scope.row.ePackMethod
+                          ? scope.row.productJson.ch_pa
+                          : scope.row.productJson.en_pa
                       }}
                     </span>
                   </div>
                   <div class="content">
                     <span>{{ myShoppingCartLang.productSpecification }}：</span>
                     <span
-                      >{{ scope.row.sampleLenth }} x
-                      {{ scope.row.sampleWidth }} x
-                      {{ scope.row.sampleHeight }} (CM)</span
+                      >{{ scope.row.productJson.pr_le }} x
+                      {{ scope.row.productJson.pr_wi }} x
+                      {{ scope.row.productJson.pr_hi }} (CM)</span
                     >
                   </div>
                   <div class="content">
                     <span>{{ myShoppingCartLang.packageSpecification }}：</span>
                     <span
-                      >{{ scope.row.innerLenth }} x {{ scope.row.innerWidth }} x
-                      {{ scope.row.innerHeight }} (CM)</span
+                      >{{ scope.row.productJson.in_le }} x
+                      {{ scope.row.productJson.in_wi }} x
+                      {{ scope.row.productJson.in_hi }} (CM)</span
                     >
                   </div>
                   <div class="content">
                     <span>{{ myShoppingCartLang.outerBoxSize }}：</span>
                     <span
-                      >{{ scope.row.outerBoxLenth }} x
-                      {{ scope.row.outerBoxWidth }} x
-                      {{ scope.row.outerBoxHeight }} (CM)</span
+                      >{{ scope.row.productJson.ou_le }} x
+                      {{ scope.row.productJson.ou_wi }} x
+                      {{ scope.row.productJson.ou_hi }} (CM)</span
                     >
                   </div>
                 </div>
@@ -182,22 +163,22 @@
                   <div class="content">
                     <span>{{ myShoppingCartLang.packingQuantity }}：</span>
                     <span
-                      >{{ scope.row.innerEn }} /
-                      {{ scope.row.outerBoxLo }} (PCS)</span
+                      >{{ scope.row.productJson.in_en }} /
+                      {{ scope.row.productJson.ou_lo }} (PCS)</span
                     >
                   </div>
                   <div class="content">
                     <span>{{ myShoppingCartLang.volumeVolume }}：</span>
                     <span
-                      >{{ scope.row.outerBoxStere }} (CBM) /
-                      {{ scope.row.outerBoxFeet }} (CUFT)</span
+                      >{{ scope.row.productJson.bulk_stere }} (CBM) /
+                      {{ scope.row.productJson.bulk_feet }} (CUFT)</span
                     >
                   </div>
                   <div class="content">
                     <span>{{ myShoppingCartLang.grossNetWeight }}：</span>
                     <span
-                      >{{ scope.row.outerBoxWeight }} /
-                      {{ scope.row.outerBoxNetWeight }} (KG)</span
+                      >{{ scope.row.productJson.gr_we }} /
+                      {{ scope.row.productJson.ne_we }} (KG)</span
                     >
                   </div>
                 </div>
@@ -226,13 +207,14 @@
                     class="inputNumber"
                     type="number"
                     @input="changeInputNumber($event, scope.row)"
+                    @blur="blurInputValue($event, scope.row)"
                     @focus="selectInputValue($event)"
                     @keydown="nextInput($event)"
-                    v-model="scope.row.shoppingCount"
+                    v-model="scope.row.number"
                   />
                 </div>
                 <div class="tableTotalNumber">
-                  {{ scope.row.outerBoxLo * scope.row.shoppingCount }}
+                  {{ multiply(scope.row.productJson.ou_lo, scope.row.number) }}
                   <span>PCS</span>
                 </div>
               </div>
@@ -255,14 +237,17 @@
                   <p class="item">
                     {{
                       multiply(
-                        scope.row.shoppingCount,
-                        scope.row.outerBoxStere
+                        scope.row.number,
+                        scope.row.productJson.bulk_stere
                       )
                     }}cbm
                   </p>
                   <p class="item">
                     {{
-                      multiply(scope.row.shoppingCount, scope.row.outerBoxFeet)
+                      multiply(
+                        scope.row.number,
+                        scope.row.productJson.bulk_feet
+                      )
                     }}cuft
                   </p>
                 </div>
@@ -272,8 +257,8 @@
                     {{
                       priceCount(
                         scope.row.price,
-                        scope.row.outerBoxLo,
-                        scope.row.shoppingCount
+                        scope.row.productJson.ou_lo,
+                        scope.row.number
                       )
                     }}
                   </span>
@@ -417,7 +402,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
+import { mapState } from "vuex";
 export default {
   components: {},
   data() {
@@ -443,8 +428,7 @@ export default {
         email: "",
         remark: "",
         shareOrderDetails: []
-      },
-      tableList: []
+      }
     };
   },
   methods: {
@@ -614,12 +598,12 @@ export default {
             break;
           case 1:
             this.dataList.sort((a, b) => {
-              return a.shoppingCount - b.shoppingCount;
+              return a.number - b.number;
             });
             break;
           case 2:
             this.dataList.sort((a, b) => {
-              return b.shoppingCount - a.shoppingCount;
+              return b.number - a.number;
             });
             break;
         }
@@ -643,14 +627,16 @@ export default {
           case 1:
             this.dataList.sort((a, b) => {
               return (
-                a.outerBoxLo * a.shoppingCount - b.outerBoxLo * b.shoppingCount
+                this.multiply(a.productJson.ou_lo, a.number) -
+                this.multiply(b.productJson.ou_lo, b.number)
               );
             });
             break;
           case 2:
             this.dataList.sort((a, b) => {
               return (
-                b.outerBoxLo * b.shoppingCount - a.outerBoxLo * a.shoppingCount
+                this.multiply(b.productJson.ou_lo, b.number) -
+                this.multiply(a.productJson.ou_lo, a.number)
               );
             });
             break;
@@ -676,16 +662,28 @@ export default {
           case 1:
             this.dataList.sort((a, b) => {
               return (
-                a.shoppingCount * a.outerBoxLo * a.price -
-                b.shoppingCount * b.outerBoxLo * b.price
+                this.multiply(
+                  this.multiply(a.number, a.productJson.ou_lo),
+                  a.price
+                ) -
+                this.multiply(
+                  this.multiply(b.number, b.productJson.ou_lo),
+                  b.price
+                )
               );
             });
             break;
           case 2:
             this.dataList.sort((a, b) => {
               return (
-                b.shoppingCount * b.outerBoxLo * b.price -
-                a.shoppingCount * a.outerBoxLo * a.price
+                this.multiply(
+                  this.multiply(b.number, b.productJson.ou_lo),
+                  b.price
+                ) -
+                this.multiply(
+                  this.multiply(a.number, a.productJson.ou_lo),
+                  a.price
+                )
               );
             });
             break;
@@ -704,25 +702,27 @@ export default {
     // 提交订单
     async submitOrder() {
       const selectProducts = this.$refs.multipleTable.selection;
+      console.log(selectProducts);
       this.formInfo.currencyType = this.userInfo.currencyType;
       this.formInfo.shareOrderDetails = selectProducts.map(val => {
         return {
           productNumber: val.productNumber,
-          productName: val.name,
-          productEName: val.ename,
+          productName: val.productJson.name,
+          productEName: val.productJson.ename,
           productPrice: val.price,
-          productCount: val.shoppingCount,
-          productFeet: val.outerBoxFeet,
-          productStere: val.outerBoxStere,
-          productImage: val.imageUrls[0],
+          productCount: val.number,
+          productFeet: val.productJson.bulk_feet,
+          productStere: val.productJson.bulk_stere,
+          productImage: val.productImgs,
           currencyType: this.userInfo.currencyType,
-          outerBoxLo: val.outerBoxLo,
+          outerBoxLo: val.productJson.ou_lo,
           packMethod:
-            this.globalLang === "zh-CN" ? val.packMethod : val.ePackMethod,
-          productInfo: val
+            this.globalLang === "zh-CN"
+              ? val.productJson.ch_pa
+              : val.productJson.en_pa,
+          productInfo: JSON.parse(val.shareProductJson)
         };
       });
-      console.log(JSON.stringify(this.formInfo));
       const res = await this.$http.post(
         "/api/WebsiteShare/CreateShareOrder",
         this.formInfo
@@ -730,15 +730,7 @@ export default {
       const { code, message } = res.data.result;
       if (code === 200) {
         this.$message.success(this.publicLang.submittedSuccessfully);
-        for (let i = 0; i < this.dataList.length; i++) {
-          for (let j = 0; j < selectProducts.length; j++) {
-            if (this.dataList[i].id === selectProducts[j].id)
-              this.dataList.splice(i, 1);
-          }
-        }
-        this.$store.commit("resetShoppingCart", selectProducts);
         this.$router.push("/index/myOrder");
-        // this.$root.eventHub.$emit("resetProductsForeach", this.shoppingList);
       } else {
         this.$message.error(message);
       }
@@ -767,7 +759,7 @@ export default {
       for (let i = 0; i < list.length; i++) {
         number = this.add(
           number,
-          this.multiply(list[i].shoppingCount, list[i].outerBoxLo)
+          this.multiply(list[i].number, list[i].productJson.ou_lo)
         );
       }
       return number;
@@ -778,7 +770,7 @@ export default {
       for (let i = 0; i < list.length; i++) {
         number = this.add(
           number,
-          this.multiply(list[i].shoppingCount, list[i].outerBoxWeight)
+          this.multiply(list[i].number, list[i].productJson.gr_we)
         );
       }
       return number;
@@ -789,7 +781,7 @@ export default {
       for (let i = 0; i < list.length; i++) {
         number = this.add(
           number,
-          this.multiply(list[i].shoppingCount, list[i].outerBoxNetWeight)
+          this.multiply(list[i].number, list[i].productJson.ne_we)
         );
       }
       return number;
@@ -798,20 +790,33 @@ export default {
     calculationTotalQuantity(list) {
       let number = 0;
       for (let i = 0; i < list.length; i++) {
-        number = this.add(number, list[i].shoppingCount || 0);
+        number = this.add(number, list[i].number || 0);
       }
       return number;
     },
     // 删除购物车中的某项
-    handleDelete(row) {
-      this.$store.commit("popShopping", row);
-      this.dataList.forEach((val, i) => {
-        if (val.id === row.id) {
-          this.dataList.splice(i, 1);
-          this.$message.error(this.publicLang.deleteSuccessful);
-        }
+    async handleDelete(row) {
+      console.log(row);
+      const res = await this.$toys.post("/api/RemoveShoppingCart", {
+        shareID: this.userInfo.shareId,
+        customerRemarks: this.userInfo.loginEmail,
+        sourceFrom: "share",
+        shopType: "customersamples",
+        number: 1,
+        currency: "￥",
+        Price: 0,
+        productNumber: row.productNumber
       });
-      this.$root.eventHub.$emit("resetProductsForeach", this.dataList);
+      console.log(res);
+      if (res.data.result.code === 200) {
+        this.$store.commit("handlerShopLength", res.data.result.item);
+        this.$message.success("删除成功");
+        row.isShop = false; // 删除产品列表加购
+        this.$root.eventHub.$emit("resetShop", row);
+        this.getShoppingCartList();
+      } else {
+        this.$message.success(res.data.result.msg);
+      }
     },
     // 计算总价
     calculationTotalPrice(list) {
@@ -820,8 +825,8 @@ export default {
         price = this.add(
           price,
           this.multiply(
-            this.multiply(list[i].price, list[i].shoppingCount),
-            list[i].outerBoxLo
+            this.multiply(list[i].price, list[i].number),
+            list[i].productJson.ou_lo
           )
         );
       }
@@ -834,30 +839,60 @@ export default {
       for (let i = 0; i < list.length; i++) {
         outerBoxStere = this.add(
           outerBoxStere,
-          this.multiply(list[i].outerBoxStere, list[i].shoppingCount)
+          this.multiply(list[i].productJson.bulk_stere, list[i].number)
         );
         outerBoxFeet = this.add(
           outerBoxFeet,
-          this.multiply(list[i].outerBoxFeet, list[i].shoppingCount)
+          this.multiply(list[i].productJson.bulk_feet, list[i].number)
         );
       }
       this.myTotalOuterBoxStere = outerBoxStere;
       this.myTotalOuterBoxFeet = outerBoxFeet;
     },
-    // 修改购物车数量
-    changeInputNumber(e, val) {
-      const re = /^[0-9]+.?[0-9]*/;
-      if (!re.test(e.target.value)) {
-        e.target.value = 0;
-      } else if (e.target.value.length > 5) {
-        e.target.value = e.target.value.slice(0, 5);
-      } else if (!e.target.value) {
-        e.target.value = 0;
-      } else if (e.target.value.length > 1 && e.target.value[0] == 0) {
-        e.target.value = e.target.value.slice(1, 5);
+    // 获取购物车信息
+    async getShoppingCartList() {
+      const res = await this.$toys.post("/api/ShoppingCartList", {
+        shareID: this.userInfo.shareId,
+        customerRemarks: this.userInfo.loginEmail,
+        sourceFrom: "share",
+        shopType: "customersamples"
+      });
+      if (res.data.result.code === 200) {
+        this.dataList = res.data.result.item.map((val, i) => {
+          const product = JSON.parse(val.productJson);
+          val.productJson = product;
+          val.index = i + 1;
+          return val;
+        });
+        console.log(this.dataList);
+        this.$nextTick(() => {
+          this.$refs.multipleTable.toggleAllSelection();
+        });
+      } else {
+        this.$message.error(res.data.result.msg);
       }
-      val.shoppingCount = Number(e.target.value);
-      this.$store.commit("replaceShoppingCartValueCount", this.dataList);
+    },
+    // 失去焦点事件修改箱数
+    async blurInputValue(e, val) {
+      let my = JSON.parse(JSON.stringify(val));
+      my.productJson = JSON.stringify(my.productJson);
+      my.supplierJson = JSON.stringify(my.supplierJson);
+      const res = await this.$toys.post("/api/UpdateShoppingCart", my);
+      if (res.data.result.code != 200) {
+        this.$message.error(res.data.result.msg);
+      }
+    },
+    // 修改购物车数量
+    changeInputNumber(e, row) {
+      const re = /^[0-9]+.?[0-9]*/;
+      console.log(e.target.value, !re.test(e.target.value));
+      if (!re.test(e.target.value)) {
+        row.number = 0;
+      } else if (e.target.value.length > 5) {
+        row.number = e.target.value.slice(0, 5);
+      } else if (e.target.value.length > 1 && e.target.value[0] == 0) {
+        row.number = e.target.value.slice(1, 5);
+      }
     },
     // 点击选中输入框中的所有值
     selectInputValue(e) {
@@ -902,12 +937,12 @@ export default {
     document.title = this.myShoppingCartLang.myShoppingCart;
   },
   mounted() {
-    this.dataList = this.shoppingList
-      ? JSON.parse(JSON.stringify(this.shoppingList))
-      : [];
+    // this.dataList = this.shoppingList
+    //   ? JSON.parse(JSON.stringify(this.shoppingList))
+    //   : [];
+    this.formInfo.contactName = this.userInfo.loginEmail;
     this.formInfo.loginEmail = this.userInfo.loginEmail;
-    // 默认全选
-    this.$refs.multipleTable.toggleAllSelection();
+    this.getShoppingCartList();
   },
   watch: {
     selectTableData: {
@@ -944,11 +979,7 @@ export default {
     myOrderLang() {
       return this.$t("lang.myOrder");
     },
-    ...mapState(["globalLang"]),
-    ...mapState(["userInfo"]),
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    })
+    ...mapState(["globalLang", "userInfo"])
   },
   filters: {}
 };

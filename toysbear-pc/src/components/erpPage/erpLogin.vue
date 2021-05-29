@@ -291,13 +291,13 @@ export default {
       } else {
         // 初始化weosocket
         // 测试
-        // this.ws = new WebSocket(
-        //   "ws://139.9.71.135:8090/ws?UserId=" + this.randomCode
-        // );
-        // 正式
-        this.myWs = new WebSocket(
-          "wss://impush.toysbear.com/ws?UserId=" + this.randomCode
+        this.ws = new WebSocket(
+          "ws://124.71.6.26:8090/ws?UserId=" + this.randomCode
         );
+        // 正式
+        // this.myWs = new WebSocket(
+        //   "wss://impush.toysbear.com/ws?UserId=" + this.randomCode
+        // );
         // 监听webSocket连接
         this.myWs.onopen = this.websocketonopen;
         // 监听webSocket错误信息

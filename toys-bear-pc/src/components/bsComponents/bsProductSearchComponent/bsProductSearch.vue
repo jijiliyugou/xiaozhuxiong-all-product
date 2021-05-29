@@ -8,11 +8,12 @@
         </el-tag>
         <div class="history_box">
           <el-input
+            :class="{ isPadding: MyisGaoji === true }"
             size="medium"
             ref="focusKeyword"
             @keyup.native.enter="searchProducts"
             style="width: 340px; margin: 0 15px"
-            placeholder="输入关键词+空格可模糊搜索"
+            :placeholder="MyisGaoji === true ? '' : placeholderVal"
             v-model="myKeyword"
             clearable
             @focus="showHistoryModal(true)"
@@ -36,8 +37,13 @@
                 class="el-input__icon el-icon-camera-solid"
               ></i> -->
               </el-upload>
+              <!-- <div>高级搜索</div> -->
             </template>
           </el-input>
+          <div v-if="MyisGaoji" class="gaoji">
+            高级搜索
+            <i @click="handleIsgaoji" class="el-icon-close"></i>
+          </div>
           <div
             class="history"
             v-show="isShowHistoryPanel && searchHistoryList.length"
@@ -91,19 +97,21 @@
     >
       <i class="whiteCart"></i>
       <span>购物车</span>
-      <span>({{ shoppingList && shoppingList.length }})</span>
+      <span>({{ myShoppingCartCount }})</span>
     </el-button>
   </div>
 </template>
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
 export default {
   name: "bsProductSearch",
-  props: ["keyword"],
+  props: ["keyword", "MyisGaoji"],
   data() {
     return {
+      isGaoji: null,
+      placeholderVal: "输入关键词+空格可模糊搜索",
       synthesis: false,
       advanced: true,
       myKeyword: "",
@@ -121,6 +129,10 @@ export default {
     }
   },
   methods: {
+    //关闭高级搜素显示
+    handleIsgaoji() {
+      this.$emit("handleIsgaoji", false);
+    },
     // 关闭关联搜索
     closeTag() {
       this.$emit("closeTag");
@@ -240,10 +252,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    }),
-    ...mapState(["searchHallCate", "typeId"])
+    ...mapState(["searchHallCate", "typeId", "myShoppingCartCount"])
   },
   beforeDestroy() {
     eventBus.$off("imgSearchChange");
@@ -275,6 +284,23 @@ export default {
       }
       .history_box {
         position: relative;
+        @{deep}.isPadding {
+          .el-input__inner {
+            padding-left: 130px;
+          }
+        }
+        .gaoji {
+          position: absolute;
+          top: 6px;
+          left: 50px;
+          height: 24px;
+          background: #f9723e;
+          border-radius: 4px;
+          color: #fff;
+          line-height: 24px;
+          padding: 0 9px;
+          cursor: pointer;
+        }
         .history {
           position: absolute;
           // top: 50px;

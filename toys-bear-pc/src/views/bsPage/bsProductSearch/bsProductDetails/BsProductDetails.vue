@@ -33,7 +33,7 @@
             >
           </div>
           <div class="textWrap">
-            <div class="left">
+            <div class="textWrap_left">
               <div class="itemText">
                 出厂货号：<span>{{ productDetail.fa_no }}</span>
               </div>
@@ -59,7 +59,7 @@
                 >
               </div>
             </div>
-            <div class="right">
+            <div class="textWrap_right">
               <div class="itemText">
                 包装：<span>{{ productDetail.ch_pa }}</span>
               </div>
@@ -100,7 +100,7 @@
         </div>
         <!-- 上架时间，产品认证 -->
         <div class="shelfTimeBox">
-          <p>
+          <div class="item">
             <span class="newTime">
               上架时间：
               <span>{{
@@ -112,13 +112,61 @@
               库存：
               <span class="tockValue">--</span>
             </span>
-          </p>
-          <p>
+          </div>
+          <div class="item">
             产品认证：
-            <i v-if="productDetail.certificateNo" class="proveActiveIcon"></i>
+
+            <i
+              v-if="productDetail.manuCertificateList"
+              class="proveActiveIcon"
+            ></i>
             <i v-else class="proveIcon"></i>
-            <span>{{ productDetail.certificateNo }}</span>
-          </p>
+
+            <div
+              v-if="productDetail.manuCertificateList"
+              class="manuCertificate"
+            >
+              <div
+                class="cate"
+                v-for="item in productDetail.manuCertificateList"
+                :key="item.index"
+              >
+                <!-- <img
+                  @click="openDialogCertificate(item)"
+                  :src="item.certificateAddres"
+                  alt=""
+                /> -->
+                <el-image
+                  @click="openDialogCertificate(item)"
+                  style="width: 21px; height: 30px; min-width: 21px"
+                  :src="item.certificateAddres"
+                  fit="contain"
+                >
+                  <div
+                    slot="placeholder"
+                    class="image-slot"
+                    style="width: 82px; height: 62px"
+                  >
+                    <img
+                      style="width: 21px; height: 30px; min-width: 21px"
+                      :src="require('@/assets/images/PDF.png')"
+                    />
+                  </div>
+                  <div
+                    slot="error"
+                    class="image-slot"
+                    style="width: 21px; height: 30px; min-width: 21px"
+                  >
+                    <img
+                      style="width: 21px; height: 30px; min-width: 21px"
+                      :src="require('@/assets/images/PDF.png')"
+                    />
+                  </div>
+                </el-image>
+                <span>{{ item.certificateName }}</span>
+              </div>
+            </div>
+          </div>
         </div>
         <!-- 联系方式 -->
         <div class="contactMode">
@@ -204,11 +252,17 @@
         </div>
       </div>
     </div>
+
+    <el-dialog title="证书详情" :visible.sync="dialogCertificate">
+      <div class="dialogCertificateCss">
+        <img :src="dataCertificate.certificateAddres" alt="" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapState } from "vuex";
 import magnifierComponent from "@/components/bsComponents/bsProductSearchComponent/bsMagnifierComponent.vue";
 import eventBus from "@/assets/js/common/eventBus.js";
 export default {
@@ -222,6 +276,9 @@ export default {
   },
   data() {
     return {
+      dialogCertificate: false,
+      canClick: true,
+      dataCertificate: {},
       productDetail: {}
     };
   },
@@ -260,38 +317,89 @@ export default {
       this.$store.commit("myAddTab", fd);
       this.$router.push("/bsIndex/bsVendorQuery");
     },
+    openDialogCertificate(item) {
+      console.log(item, "证书信息");
+      this.dataCertificate = item;
+      this.dialogCertificate = true;
+    },
     // 加购
-    handlerShopping() {
-      if (this.shoppingList.length >= 500 && !this.item.isShopping) {
-        this.$common.handlerMsgState({
-          msg: "购物车已满500条",
-          type: "warning"
-        });
-        return;
+    handlerShopping(item) {
+      if (item.isShop) {
+        this.removeShopping(item);
+      } else {
+        if (this.myShoppingCartCount >= 500 && !this.item.isShop) {
+          this.$common.handlerMsgState({
+            msg: "购物车已满500条",
+            type: "warning"
+          });
+          return;
+        }
+        if (this.canClick) {
+          this.canClick = false;
+          this.callbackShopping(item);
+          setTimeout(() => {
+            this.canClick = true;
+          }, 500);
+        } else {
+          this.$common.handlerMsgState({
+            msg: "操作过于频繁",
+            type: "danger"
+          });
+        }
       }
-      this.item.isShopping = !this.item.isShopping;
-      if (this.item.isShopping) {
-        this.item.shoppingCount = 1;
-        this.productDetail.shoppingCount = 1;
-        this.$store.commit("pushShopping", this.productDetail);
+    },
+    // 加购事件
+    async callbackShopping(item) {
+      const fd = {
+        userID: this.userInfo.userInfo.id,
+        companyNumber: this.userInfo.commparnyList[0].companyNumber,
+        sourceFrom: "active",
+        number: 1,
+        currency: "￥",
+        Price: 0,
+        shopType: "companysamples",
+        productNumber: item.productNumber
+      };
+      const res = await this.$http.post("/api/AddShoppingCart", fd);
+      if (res.data.result.code === 200) {
+        item.isShop = !item.isShop;
+        eventBus.$emit("resetProductIsShop", item);
+        this.$store.commit("handlerShoppingCartCount", res.data.result.item);
         this.$common.handlerMsgState({
           msg: "加购成功",
           type: "success"
         });
       } else {
-        this.item.shoppingCount = 0;
-        this.productDetail.shoppingCount = 0;
-        this.$store.commit("popShopping", this.productDetail);
         this.$common.handlerMsgState({
-          msg: "取消加购成功",
-          type: "warning"
+          msg: "加购失败",
+          type: "danger"
         });
       }
-      // 删除购物车样式
-      eventBus.$emit("resetMyCart", this.item);
-      this.$nextTick(() => {
-        this.$forceUpdate();
-      });
+    },
+    // 删除当前购物车产品
+    async removeShopping(item) {
+      const fd = {
+        userID: this.userInfo.userInfo.id,
+        companyNumber: this.userInfo.commparnyList[0].companyNumber,
+        sourceFrom: "active",
+        shopType: "companysamples",
+        productNumber: item.productNumber
+      };
+      const res = await this.$http.post("/api/RemoveShoppingCart", fd);
+      if (res.data.result.code === 200) {
+        item.isShop = !item.isShop;
+        eventBus.$emit("resetProductIsShop", item);
+        this.$store.commit("handlerShoppingCartCount", res.data.result.item);
+        this.$common.handlerMsgState({
+          msg: "取消加购",
+          type: "warning"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: "取消失败",
+          type: "danger"
+        });
+      }
     },
     // 收藏
     async addCollect(item) {
@@ -329,7 +437,7 @@ export default {
       });
       if (res.data.result.code === 200) {
         this.productDetail = res.data.result.item;
-        this.productDetail.isShopping = this.item.isShopping;
+        // this.productDetail.isShopping = this.item.isShopping;
         console.log(this.productDetail, "产品详情");
         eventBus.$emit("refreshHtml");
       } else {
@@ -350,11 +458,7 @@ export default {
     });
     this.getProductDetails();
   },
-  computed: {
-    ...mapGetters({
-      shoppingList: "myShoppingList"
-    })
-  },
+  computed: { ...mapState(["userInfo", "myShoppingCartCount"]) },
   beforeDestroy() {}
 };
 </script>
@@ -426,15 +530,15 @@ export default {
         }
         .textWrap {
           display: flex;
-          .left,
-          .right {
+          .textWrap_left,
+          .textWrap_right {
             padding: 0;
             .itemText {
               line-height: 32px;
             }
           }
-          .right {
-            margin-left: 50px;
+          .textWrap_right {
+            margin-left: 52px;
           }
         }
       }
@@ -493,7 +597,7 @@ export default {
       .shelfTimeBox {
         margin-top: 20px;
         color: #666;
-        p {
+        .item {
           height: 50px;
           display: flex;
           align-items: center;
@@ -522,6 +626,25 @@ export default {
             background: url("~@/assets/images/proveActiveIcon.png") no-repeat
               center;
             background-size: contain;
+          }
+          .manuCertificate {
+            display: flex;
+            align-items: center;
+            height: 50px;
+
+            .cate {
+              margin: 0 10px;
+              display: flex;
+              align-items: center;
+              cursor: pointer;
+              img {
+                width: 21px;
+                height: 30px;
+              }
+              span {
+                margin: 0 5px;
+              }
+            }
           }
         }
       }
@@ -628,6 +751,7 @@ export default {
     }
     .left {
       padding: 40px;
+      width: 526px;
     }
   }
   .productDetails {
@@ -664,6 +788,12 @@ export default {
         }
       }
     }
+  }
+  .dialogCertificateCss {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

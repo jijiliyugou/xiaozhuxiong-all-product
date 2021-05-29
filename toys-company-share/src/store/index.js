@@ -3,17 +3,10 @@ import Vuex from "vuex";
 import { Message } from "element-ui";
 import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
-function myForEach(oList, yList) {
-  for (let i = 0; i < oList.length; i++) {
-    for (let j = 0; j < yList.length; j++) {
-      if (oList[i].id === yList[j].id) {
-        oList.splice(i, 1);
-      }
-    }
-  }
-}
 const store = new Vuex.Store({
   state: {
+    temporaryToken: "",
+    shopLength: 0,
     langList: null, // 下拉语言列表
     langs: [], // 语言列表
     imageSearchValue: null, // 图搜结果
@@ -49,6 +42,18 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
+    // 添加用户名
+    handlerLoginName(state, payLoad) {
+      state.userInfo.loginEmail = payLoad;
+    },
+    // 修改临时token
+    handlerTemporaryToken(state, payLoad) {
+      state.temporaryToken = payLoad;
+    },
+    // 修改购物车数量
+    handlerShopLength(state, payLoad) {
+      state.shopLength = payLoad;
+    },
     // 初始化语言列表
     initLangs(state, payLoad) {
       Vue.prototype.$set(state, "langs", payLoad);
@@ -107,70 +112,70 @@ const store = new Vuex.Store({
     // 图搜保存预览图
     handlerSearchImgPreview(state, value) {
       state.searchImgPreview = value;
-    },
-    // 加购
-    pushShopping(state, payLoad) {
-      const key =
-        state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
-      if (state[key]) {
-        payLoad.index = state[key].length + 1;
-        state[key].push(payLoad);
-      } else {
-        payLoad.index = 1;
-        Vue.prototype.$set(state, key, [payLoad]);
-      }
-      if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
-    },
-    // 更新购物车
-    replaceShoppingCart(state, payLoad) {
-      const key =
-        state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
-      Vue.prototype.$set(state, key, payLoad);
-      if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
-    },
-    // 删除购物车某一个或多个商品
-    resetShoppingCart(state, payLoad) {
-      const key =
-        state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
-      myForEach(state[key], payLoad);
-      if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
-    },
-    // 删除购物车某指定一个商品
-    popShopping(state, payLoad) {
-      const key =
-        state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
-      for (let i = 0; i < state[key].length; i++) {
-        if (state[key][i].id === payLoad.id) state[key].splice(i, 1);
-      }
-      if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
-    },
-    // 修改数量方法
-    replaceShoppingCartValueCount(state, payLoad) {
-      const key =
-        state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
-      for (let i = 0; i < state[key].length; i++) {
-        for (const keys in state[key][i]) {
-          Vue.prototype.$set(state[key][i], keys, payLoad[i][keys]);
-        }
-      }
-      if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
     }
+    // 加购
+    // pushShopping(state, payLoad) {
+    //   const key =
+    //     state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
+    //   if (state[key]) {
+    //     payLoad.index = state[key].length + 1;
+    //     state[key].push(payLoad);
+    //   } else {
+    //     payLoad.index = 1;
+    //     Vue.prototype.$set(state, key, [payLoad]);
+    //   }
+    //   if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
+    // },
+    // // 更新购物车
+    // replaceShoppingCart(state, payLoad) {
+    //   const key =
+    //     state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
+    //   Vue.prototype.$set(state, key, payLoad);
+    //   if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
+    // },
+    // // 删除购物车某一个或多个商品
+    // resetShoppingCart(state, payLoad) {
+    //   const key =
+    //     state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
+    //   myForEach(state[key], payLoad);
+    //   if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
+    // },
+    // // 删除购物车某指定一个商品
+    // popShopping(state, payLoad) {
+    //   const key =
+    //     state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
+    //   for (let i = 0; i < state[key].length; i++) {
+    //     if (state[key][i].id === payLoad.id) state[key].splice(i, 1);
+    //   }
+    //   if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
+    // },
+    // // 修改数量方法
+    // replaceShoppingCartValueCount(state, payLoad) {
+    //   const key =
+    //     state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
+    //   for (let i = 0; i < state[key].length; i++) {
+    //     for (const keys in state[key][i]) {
+    //       Vue.prototype.$set(state[key][i], keys, payLoad[i][keys]);
+    //     }
+    //   }
+    //   if (state.userInfo.loginEmail) store.dispatch("addServiceShoppingCart");
+    // }
   },
   getters: {
-    myShoppingList(state) {
-      if (!state.userInfo) {
-        return [];
-      } else {
-        const key =
-          state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
-        if (state[key]) {
-          return state[key];
-        } else {
-          Vue.prototype.$set(state, key, []);
-          return state[key];
-        }
-      }
-    }
+    // myShoppingList(state) {
+    //   if (!state.userInfo) {
+    //     return [];
+    //   } else {
+    //     const key =
+    //       state.userInfo.shareId + "_" + (state.userInfo.loginEmail || "");
+    //     if (state[key]) {
+    //       return state[key];
+    //     } else {
+    //       Vue.prototype.$set(state, key, []);
+    //       return state[key];
+    //     }
+    //   }
+    // }
   },
   actions: {
     addServiceShoppingCart({ state }) {
@@ -191,7 +196,7 @@ const store = new Vuex.Store({
   modules: {},
   plugins: [
     createPersistedState({
-      storage: window.localStorage
+      storage: window.sessionStorage
     })
   ]
 });

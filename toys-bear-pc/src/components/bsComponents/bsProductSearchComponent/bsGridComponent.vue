@@ -21,6 +21,10 @@ export default {
   props: {
     productList: {
       type: Array
+    },
+    selection: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
