@@ -5,10 +5,7 @@
       <div class="infoTop">
         <div class="itemBox">
           <span class="itemTitle">择样类型：</span>
-          <span class="type"
-            ><span>{{ item.hall_na }}：</span
-            >{{ item.messageExt | switchMessageExt }}</span
-          >
+          <span class="type">{{ item.messageExt | switchMessageExt }}</span>
         </div>
         <div class="itemBox">
           <span class="itemTitle">展厅名称：</span>
@@ -20,8 +17,30 @@
         </div>
         <div class="itemBox">
           <span class="itemTitle">状态：</span>
-          <span class="orderNumber" v-if="item.readStatus == 0">未读</span>
-          <span class="orderNumber" v-if="item.readStatus == 1">已读</span>
+          <span
+            class="orderNumber"
+            style="color: #FF4848;"
+            v-if="item.readStatus == 0"
+            >对方未读</span
+          >
+          <span
+            class="orderNumber"
+            style="color: #3368A9; "
+            v-if="item.readStatus == 1"
+            >对方已读</span
+          >
+          <span
+            class="orderNumber"
+            style="color: #33A96A; "
+            v-if="item.readStatus == 9"
+            >已完成</span
+          >
+          <span
+            class="orderNumber"
+            style="color: #999999; "
+            v-if="item.readStatus == 99"
+            >已读</span
+          >
         </div>
       </div>
       <div class="infoBottom">
@@ -136,6 +155,7 @@ export default {
             isHiden: true,
             infoBox: true,
             productInfo: true,
+            cartInfoIcon: true,
             elImage: row => {
               return row.imgUrl;
             },

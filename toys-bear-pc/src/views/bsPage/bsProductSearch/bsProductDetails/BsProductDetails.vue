@@ -117,7 +117,7 @@
             产品认证：
 
             <i
-              v-if="productDetail.manuCertificateList"
+              v-if="productDetail.manuCertificateList.length > 0"
               class="proveActiveIcon"
             ></i>
             <i v-else class="proveIcon"></i>
@@ -279,7 +279,9 @@ export default {
       dialogCertificate: false,
       canClick: true,
       dataCertificate: {},
-      productDetail: {}
+      productDetail: {
+        manuCertificateList: []
+      }
     };
   },
   methods: {

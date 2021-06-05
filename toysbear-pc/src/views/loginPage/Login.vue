@@ -35,12 +35,11 @@ export default {
   data() {
     return {};
   },
-  created() {
-    if (this.$route.query.id === "signOut") {
-      this.$store.commit("removeLoginItems");
-    }
-  },
-  mounted() {}
+  mounted() {
+    this.$store.commit("removeLoginItems");
+    this.$cookies.remove("validityPeriod");
+    localStorage.clear();
+  }
 };
 </script>
 

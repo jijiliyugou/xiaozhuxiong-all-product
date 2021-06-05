@@ -15,11 +15,8 @@
           </div>
         </el-image>
         <div class="leftTitleText">
-          <!-- {{ currentLang.companyName }} -->
-          <notice-bar
-            :text="currentLang.companyName"
-            :startRoll="companyNameLength"
-          />
+          <vue-marquee :content="currentLang.companyName" :showtwo="false" />
+          <!-- <notice-bar :text="currentLang.companyName"> </notice-bar> -->
         </div>
       </div>
       <div class="right">
@@ -191,13 +188,15 @@
 <script>
 import { mapState } from "vuex";
 import { VueCropper } from "vue-cropper";
-import NoticeBar from "@/components/noticeBar/notice-bar";
-
+// import NoticeBar from "@/components/noticeBar/notice-bar";
+import VueMarquee from "vue-marquee-ho";
+require("vue-marquee-ho/dist/vue-marquee.min.css");
 export default {
   name: "home-top-component",
   components: {
     VueCropper,
-    NoticeBar
+    // NoticeBar,
+    "vue-marquee": VueMarquee
   },
   computed: {
     homeLang() {
@@ -396,6 +395,7 @@ export default {
         font-weight: bold;
         color: #333333;
         margin-left: 20px;
+        height: 50px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

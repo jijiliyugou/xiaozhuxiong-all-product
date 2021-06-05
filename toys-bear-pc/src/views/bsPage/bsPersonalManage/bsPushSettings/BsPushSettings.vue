@@ -82,11 +82,13 @@
       width="800px"
     >
       <bsAddOfferFormulaLang
+        :messageExtType="messageExtType"
         :editRow="editRow"
         :isEdit="isEdit"
         @submit="submit"
+        @handleUpdate="handleUpdate"
         @close="close"
-      />
+      ></bsAddOfferFormulaLang>
     </el-dialog>
   </div>
 </template>
@@ -105,8 +107,9 @@ export default {
     return {
       keyword: null,
       staffId: null,
+      parameter: null,
+      messageExtType: [],
       staffList: [],
-      currentRow: {},
       isEdit: false,
       editRow: {},
       dialogTitle: "新增推送模板",
@@ -118,11 +121,12 @@ export default {
         data: [],
         showLoading: false,
         sizeMini: "mini",
-        isIndex: true,
+        // isIndex: true,
         columns: [
-          { prop: "title", label: "主题" },
+          { prop: "sort", label: "排序", width: 100 },
+          { prop: "title", label: "类型", width: 200 },
           { prop: "content", label: "内容" },
-          { prop: "staffName", label: "业务员" }
+          { prop: "staffName", label: "业务员", width: 200 }
         ],
         btnWidth: 200,
         actions: [
@@ -173,6 +177,45 @@ export default {
         this.totalCount = res.data.result.item.totalCount;
       }
     },
+    // 获取推送类型
+    async getMessageTeplateSettingsByPage() {
+      const fd = {
+        skipCount: 1,
+        maxResultCount: 999,
+        messageModel: this.parameter
+      };
+
+      const res = await this.$http.post(
+        "/api/PushSettings/MessageTeplateSettingsByPage",
+        fd
+      );
+      if (res.data.result.code === 200) {
+        let list = res.data.result.item.items;
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].messageExt > -1) {
+            this.messageExtType.push({
+              messageExt: list[i].messageExt,
+              title: list[i].title
+            });
+          }
+        }
+      }
+    },
+    // 获取消息类型系统参数
+    async getServiceConfigurationList() {
+      const res = await this.$http.post("/api/ServiceConfigurationList", {
+        basisParameters: "OrderMessageModel"
+      });
+      if (res.data.result.code === 200) {
+        res.data.result.item.forEach(val => {
+          if (val.itemCode === this.userInfo.commparnyList[0].companyType) {
+            this.parameter = val.parameter;
+          }
+        });
+
+        this.getMessageTeplateSettingsByPage();
+      }
+    },
     // 获取公司下的员工列表
     async getStaffList() {
       const res = await this.$http.post("/api/CompanyUserList", {
@@ -193,7 +236,7 @@ export default {
       this.currentPage = 1;
       this.getPushSettingsPage();
     },
-    // 提交新增或编辑
+    // 提交新增
     async submit(form) {
       const res = await this.$http.post("/api/PushSettings/Create", form);
       if (res.data.result.code === 200) {
@@ -203,6 +246,23 @@ export default {
           type: "success"
         });
 
+        this.getPushSettingsPage();
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+    // 提交编辑
+    async handleUpdate(form) {
+      const res = await this.$http.post("/api/PushSettings/Update", form);
+      if (res.data.result.code === 200) {
+        this.close();
+        this.$common.handlerMsgState({
+          msg: "编辑成功",
+          type: "success"
+        });
         this.getPushSettingsPage();
       } else {
         this.$common.handlerMsgState({
@@ -223,7 +283,7 @@ export default {
     },
     // 打开编辑推送
     openEdit(row) {
-      this.currentRow = row;
+      this.editRow = row;
       this.isEdit = true;
       this.dialogTitle = "编辑推送模板";
       this.addLangDialog = true;
@@ -274,7 +334,9 @@ export default {
       this.getPushSettingsPage();
     }
   },
-  created() {},
+  created() {
+    this.getServiceConfigurationList();
+  },
   mounted() {
     this.getStaffList();
   },

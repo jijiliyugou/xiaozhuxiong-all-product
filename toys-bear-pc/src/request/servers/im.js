@@ -4,6 +4,38 @@ import $Store from "@/store";
 import router from "@/router/index.js";
 import v from "vue";
 
+// 刷新token
+function resetToken(token) {
+  return new Promise((result, reject) => {
+    v.prototype.$http
+      .post("/api/RefreshToken", {
+        token: token
+      })
+      .then(res => {
+        result(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+// 获取临时token
+function getToken() {
+  return new Promise((result, reject) => {
+    v.prototype.$http
+      .post("/api/GetToken", {
+        companyNum: "LittleBearWeb",
+        platForm: "PC"
+      })
+      .then(res => {
+        result(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+
 // logo报错日志
 const createLogRecord = async function(obj) {
   if (obj.Url.includes("CreateLogRecord")) {
@@ -103,7 +135,49 @@ instance.interceptors.request.use(
 );
 // 响应拦截
 instance.interceptors.response.use(
-  res => {
+  async res => {
+    if (res.data.result.code === 401) {
+      const validityPeriod = localStorage.getItem("validityPeriod");
+      const options = JSON.parse(validityPeriod);
+      if (validityPeriod && options.dateTime) {
+        const currentDate = Date.now();
+        // 一天的时间戳为86400000
+        const day = 86400000 * 7;
+        // 超过7天
+        if (currentDate - options.dateTime >= day) {
+          v.prototype.$common.handlerMsgState({
+            msg: "登录过期，请重新登录",
+            type: "danger"
+          });
+          const result = await getToken();
+          if (result.data.result.code === 200) {
+            $Store.commit("reset_Token", result.data.result.item);
+          }
+          router.push({
+            path: "/login?id=signOut"
+          });
+        } else {
+          const result = await resetToken(res.config.headers.Utoken);
+          if (result.data.result.isLogin) {
+            $Store.commit("reset_Token", result.data.result.accessToken);
+            location.reload();
+          }
+        }
+      } else {
+        const result = await getToken();
+        if (result.data.result.code === 200) {
+          // accessToken = result.data.result.item;
+          $Store.commit("reset_Token", result.data.result.item);
+        }
+        v.prototype.$common.handlerMsgState({
+          msg: "登录过期，请重新登录",
+          type: "danger"
+        });
+        router.push({
+          path: "/login?id=signOut"
+        });
+      }
+    }
     return res;
   },
   error => {

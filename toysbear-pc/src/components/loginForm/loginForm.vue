@@ -7,21 +7,24 @@
     <el-tabs v-model="activeName" class="loginFormLaout" stretch>
       <el-tab-pane label="二维码登录" name="erweima">
         <div class="qrCodeBox">
-          <div class="qrcode">
-            <vue-qr
-              :text="options.url"
-              :logoSrc="options.icon + '?cache'"
-              colorLight="#fff"
-              colorDark="#018e37"
-              :margin="0"
-              :size="230"
-            ></vue-qr>
-            <div class="refresh" v-show="showQrCode">
-              <div class="refreshIcon" @click="getQrCodeUrl">
-                <i class="el-icon-refresh"></i>
+          <div class="code_box">
+            <div class="qrcode">
+              <vue-qr
+                :text="options.url"
+                :logoSrc="options.icon + '?cache'"
+                colorLight="#fff"
+                colorDark="#018e37"
+                :margin="0"
+                :size="230"
+              ></vue-qr>
+              <div class="refresh" v-show="showQrCode">
+                <div class="refreshIcon" @click="getQrCodeUrl">
+                  <i class="el-icon-refresh"></i>
+                </div>
               </div>
             </div>
           </div>
+
           <p class="qrText">
             {{ qrcodeTitle }}
           </p>
@@ -73,6 +76,9 @@
             >
           </el-form-item>
         </el-form>
+        <div class="rememberPassword">
+          <el-checkbox v-model="thePassword">记住密码(7天)</el-checkbox>
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -87,11 +93,13 @@ export default {
   },
   data() {
     return {
+      thePassword: false,
       value: null,
       ws: null,
-      // loginUrl: "http://1.14.158.14:8081/new/#/bsIndex",
       loginUrl: "https://www.toysbear.com/new/#/bsIndex",
       wsBaseUrl: "wss://impush.toysbear.com/ws?UserId=",
+      // loginUrl: "http://139.9.71.135:8080/new/#/bsIndex",
+      // wsBaseUrl: "ws://139.9.71.135:8090/ws?UserId=",
       // loginUrl: "http://124.71.6.26:8080/new/#/bsIndex",
       // wsBaseUrl: "ws://124.71.6.26:8090/ws?UserId=",
       lang: "zh-CN",
@@ -159,6 +167,7 @@ export default {
     // webSocket 连接错误
     websocketonerror() {
       console.log("WebSocket连接发生错误");
+      this.$message.error("WebSocket连接发生错误");
     },
     // webSocket 数据接收
     websocketonmessage(e) {
@@ -261,7 +270,7 @@ export default {
         // 开启长连接
         this.initWebSocket();
       }
-      // const TIME_COUNT = 20
+      // const TIME_COUNT = 10;
       const TIME_COUNT = 300;
       if (!this.timer) {
         let count = TIME_COUNT;
@@ -318,8 +327,18 @@ export default {
             if (res.data.result.commparnyList.length === 1) {
               // 一个角色
               // 保存数据到cookit
-              this.$cookies.set("userInfo", res.data.result.accessToken);
-              console.log(this.$cookies.get("userInfo"));
+              // 记住密码
+              const options = {
+                token: res.data.result.accessToken
+              };
+              if (this.thePassword) {
+                options.dateTime = Date.now();
+              }
+              const validityPeriod = JSON.stringify(options);
+              console.log(validityPeriod);
+              localStorage.setItem("validityPeriod", validityPeriod);
+              this.$cookies.set("validityPeriod", validityPeriod);
+
               this.$store.commit("setToken", res.data.result);
               this.$store.commit(
                 "setComparnyId",
@@ -378,10 +397,19 @@ export default {
             } else if (res.data.result.commparnyList.length > 1) {
               // 多个角色
               this.$store.commit("setToken", res.data.result);
-              this.$router.push({
-                name: "LoginConfirm",
-                params: res.data.result
-              });
+              // this.$router.push({
+              //   name: "LoginConfirm",
+              //   params: res.data.result
+              // });
+              const pathOption = {
+                path: "loginConfirm"
+              };
+              if (this.thePassword) {
+                pathOption.query = {
+                  thePassword: this.thePassword
+                };
+              }
+              this.$router.push(pathOption);
             }
           } else {
             this.$message.error(res.data.result.message);
@@ -424,14 +452,14 @@ export default {
     this.getQrCodeUrl();
   },
   watch: {
-    activeName(val) {
-      if (val === "mobile") {
-        //   this.getQrCodeUrl();
-        // } else {
-        clearInterval(this.qrTimer);
-        this.ws && this.ws.close();
-      }
-    }
+    // activeName(val) {
+    //   if (val === "mobile") {
+    //     //   this.getQrCodeUrl();
+    //     // } else {
+    //     clearInterval(this.qrTimer);
+    //     this.ws && this.ws.close();
+    //   }
+    // }
   },
   beforeDestroy() {
     clearInterval(this.timer);
@@ -485,7 +513,7 @@ export default {
     .smsLogin {
       padding-top: 27px;
       .el-form-item {
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         .submintBtn {
           width: 100%;
           height: 48px;
@@ -565,41 +593,44 @@ export default {
     .qrCodeBox {
       height: 265px;
       box-sizing: border-box;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      .qrcode {
-        width: 190px;
-        height: 190px;
-        position: relative;
-        margin-top: 15px;
-        img {
+      .code_box {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        .qrcode {
           width: 190px;
           height: 190px;
-        }
-        .refresh {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(255, 255, 255, 0.9);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          .refreshIcon {
-            width: 100px;
-            height: 100px;
-            background-color: #fff !important;
-            border-radius: 50%;
-            cursor: pointer;
+          position: relative;
+          margin-top: 15px;
+          img {
+            width: 190px;
+            height: 190px;
+          }
+          .refresh {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 50px;
+            justify-content: center;
+            .refreshIcon {
+              width: 100px;
+              height: 100px;
+              background-color: #fff !important;
+              border-radius: 50%;
+              cursor: pointer;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              font-size: 50px;
+            }
           }
         }
       }
+
       .qrText {
         padding-top: 5px;
         font-size: 14px;
@@ -607,6 +638,11 @@ export default {
         text-align: center;
       }
     }
+  }
+}
+@{deep} .rememberPassword {
+  .el-checkbox {
+    color: #666;
   }
 }
 </style>

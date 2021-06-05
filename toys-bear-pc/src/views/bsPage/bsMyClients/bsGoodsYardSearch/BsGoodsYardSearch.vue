@@ -104,6 +104,7 @@ export default {
             prop: "imgUrl",
             label: "图片",
             elImageUrl: true,
+            style: "width: 82px; height: 62px; min-width: 82px",
             elImage: row => {
               return row.imgUrl;
             }

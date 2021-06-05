@@ -8,6 +8,7 @@ export default {
       InvitationCode: "邀请码",
       email: "邮箱",
       userName: "用户名",
+      contact: "联系人",
       emailExplain: "（电子邮件仅用于通知）",
       loginBtn: "登录",
       title: "登录"
@@ -138,9 +139,15 @@ export default {
       id: "序号"
     },
     publicLang: {
+      pleaseEnterContact: "请输入联系人",
+      tips: "提示",
+      determine: "确认",
+      cancel: "取消",
+      incorrectInput: "输入有误",
       noData: "暂无数据",
       successfulPurchase: "加购成功",
       cancelSuccessfully: "取消成功",
+      theShoppingCartIsFull: "购物车已满",
       itsTheFirstPage: "已经是第一页",
       itsTheLastPage: "已经是最后一页",
       submittedSuccessfully: "提交成功",

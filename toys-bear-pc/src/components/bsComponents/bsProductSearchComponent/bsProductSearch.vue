@@ -82,12 +82,18 @@
       >
         <el-checkbox label="精准查询" name="type"></el-checkbox>
       </el-checkbox-group>
+      <p class="shuxian"></p>
       <div class="advancedBox" @click="advancedSearchProducts">
         高级搜索
         <i
           :class="advanced == true ? 'el-icon-arrow-down' : ' el-icon-arrow-up'"
         ></i>
       </div>
+      <!-- <p class="shuxian"></p> -->
+      <!-- <div class="synthesizeBox" @click="handleIsSynthesize">
+        <i class="synthesizeIconv"></i>
+        综合搜索
+      </div> -->
     </div>
     <el-button
       v-if="typeId != 1"
@@ -114,6 +120,7 @@ export default {
       placeholderVal: "输入关键词+空格可模糊搜索",
       synthesis: false,
       advanced: true,
+      IsSynthesize: false,
       myKeyword: "",
       isShowHistoryPanel: false,
       searchHistoryList: [],
@@ -175,7 +182,7 @@ export default {
       // };
       // this.$store.commit("myAddTab", fd);
     },
-    // 选择综合
+    // 选择精准
     handleSynthesis() {
       this.$emit("handleSynthesis");
     },
@@ -195,6 +202,10 @@ export default {
     advancedSearchProducts() {
       this.advanced = !this.advanced;
       this.$emit("screeningShow");
+    },
+    handleIsSynthesize() {
+      this.IsSynthesize = !this.IsSynthesize;
+      this.$emit("handleIsSynthesize");
     },
     //是否显示历史搜索面板
     showHistoryModal(value) {
@@ -341,13 +352,13 @@ export default {
         }
       }
     }
+    .shuxian {
+      width: 1px;
+      height: 16px;
+      background: #b9b9b9;
+    }
     .advancedBox {
-      width: 90px;
-      height: 36px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      line-height: 36px;
+      margin: 0 30px;
       cursor: pointer;
       color: #3368a9;
       i {
@@ -356,6 +367,18 @@ export default {
         height: 10px;
         color: #3368a9;
         display: inline-block;
+      }
+    }
+    .synthesizeBox {
+      margin: 0 30px;
+      cursor: pointer;
+      .synthesizeIcon {
+        display: inline-block;
+        vertical-align: bottom;
+        width: 20px;
+        height: 16px;
+        background: url("~@/assets/images/synthesizeIcon.png") no-repeat center;
+        background-size: contain;
       }
     }
   }

@@ -141,7 +141,7 @@
                   @click="toFactory(scope.row)"
                   v-html="col.fcatoryNameHtml(scope.row)"
                 ></div>
-                <div class="icons">
+                <div class="icons" v-if="col.cartInfoIcon">
                   <!-- <el-tooltip
                     class="item"
                     effect="dark"
@@ -170,6 +170,9 @@
               v-html="col.companyName(scope.row)"
             ></span>
             <span class="isMain" v-if="scope.row.isMain"><i>主账号</i></span>
+            <span class="isMe" v-if="scope.row.id == userInfo.userInfo.id">
+              <i>我的</i>
+            </span>
           </div>
           <!-- 只放图片 -->
           <div class="productInfo" v-else-if="col.elImageUrl">
@@ -210,27 +213,19 @@
               </div>
               <el-image
                 v-if="col.elImage"
-                style="width: 82px; height: 62px; min-width: 82px"
+                :style="col.style"
                 :src="isString(col.elImage(scope.row))"
                 fit="contain"
               >
-                <div
-                  slot="placeholder"
-                  class="image-slot"
-                  style="width: 82px; height: 62px"
-                >
+                <div slot="placeholder" class="image-slot" :style="col.style">
                   <img
-                    style="width: 82px; height: 62px"
+                    :style="col.style"
                     :src="require('@/assets/images/imgError.png')"
                   />
                 </div>
-                <div
-                  slot="error"
-                  class="image-slot"
-                  style="width: 82px; height: 62px"
-                >
+                <div slot="error" :style="col.style" class="image-slot">
                   <img
-                    style="width: 82px; height: 62px"
+                    :style="col.style"
                     :src="require('@/assets/images/imgError.png')"
                   />
                 </div>
@@ -270,9 +265,9 @@
       >
         <template slot-scope="scope">
           <div v-if="table.actions">
-            <template v-for="(btn, index) in table.actions">
+            <template v-for="btn in table.actions">
               <el-button
-                v-if="(!btn.hidden || btn.hidden(scope.row)) && index < 3"
+                v-if="!btn.hidden || btn.hidden(scope.row)"
                 :key="btn.index"
                 :type="btn.classWrapper(scope.row)"
                 :disabled="btn.disabledWrapper(scope.row)"
@@ -284,57 +279,34 @@
                 {{ btn.textWrapper(scope.row) }}
               </el-button>
             </template>
-            <el-popover
-              trigger="hover"
-              placement="left-start"
-              width="160"
-              popper-class="more_btns"
-              v-model="isShowMoreBtn[scope.row.id]"
-              v-if="table.actions && table.actions.length > 3"
-            >
-              <div class="more_btn">
-                <div class="more_btn_panel">
-                  <template v-for="(btn, index) in table.actions">
-                    <div class="more_btn_item" v-if="index >= 3" :key="index">
-                      <el-button
-                        v-if="!btn.hidden || btn.hidden(scope.row)"
-                        :key="btn.index"
-                        :type="btn.classWrapper(scope.row)"
-                        :disabled="btn.disabledWrapper(scope.row)"
-                        size="mini"
-                        @click="btn.methods(scope.row)"
-                        :icon="btn.icon"
-                        :style="{
-                          margin: btn.margin,
-                          backgroundColor: btn.color,
-                          borderColor: btn.color
-                        }"
-                        :class="[
-                          btn.class ? 'copy_btn_share' + scope.row.id : ''
-                        ]"
-                      >
-                        {{ btn.textWrapper(scope.row) }}
-                      </el-button>
-                    </div>
-                  </template>
-                </div>
-              </div>
-              <el-button
-                slot="reference"
-                icon="el-icon-more"
-                size="mini"
-                type="success"
-                :style="{
-                  backgroundColor: '#1DCFC3',
-                  color: '#ffffff',
-                  borderColor: '#1DCFC3',
-                  marginLeft: '10px',
-                  position: 'relative'
-                }"
-              >
-              </el-button>
-            </el-popover>
           </div>
+        </template>
+      </el-table-column>
+      <!-- 下拉框 -->
+      {{ table.dropdown }}
+      <el-table-column
+        v-if="table.dropdown"
+        :label="table.dropdown.title"
+        align="center"
+        :width="table.dropdown.width || 300"
+        class-name="small-padding fixed-width"
+      >
+        <template slot-scope="scope">
+          {{ scope.row.ext }}
+          <el-dropdown szie="mini">
+            <el-button type="primary">
+              测试
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown" szie="mini">
+              <el-dropdown-item
+                szie="mini"
+                v-for="(btn, i) in table.dropdown.list"
+                :key="i"
+                >{{ btn }}</el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
       <el-table-column
@@ -388,10 +360,7 @@ export default {
       isShoppingUpdate: false,
       canClick: true,
       templates: {},
-      item: null,
-      isShowMoreBtn: [],
-      openDelay: 0,
-      closeDelay: 200
+      item: null
     };
   },
   created() {
@@ -805,37 +774,6 @@ export default {
         margin-bottom: 5px;
       }
     }
-  }
-}
-.more_btn {
-  position: absolute;
-  // right: 80px;
-  // top: 12px;
-  // width: 120px;
-  right: -5px;
-  top: 0;
-  width: 80px;
-  background-color: #fff;
-  color: #333333;
-  font-size: 15px;
-  border-radius: 4px;
-  z-index: 200;
-  box-shadow: 0px 4px 15px 0px rgba(42, 69, 116, 0.25);
-  .more_btn_panel {
-    padding: 10px 8px 0px 12px;
-    .more_btn_item {
-      margin-bottom: 10px;
-    }
-  }
-  &::after {
-    position: absolute;
-    content: "";
-    width: 0;
-    height: 0;
-    border: 10px solid transparent;
-    border-left-color: white;
-    right: -15px;
-    top: 5px;
   }
 }
 </style>

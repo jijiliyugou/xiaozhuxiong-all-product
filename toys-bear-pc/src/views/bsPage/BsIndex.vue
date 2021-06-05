@@ -187,6 +187,9 @@ import bsExhibitionHallHome from "@/components/bsComponents/bsExhibitionHallHome
 // 业务消息
 import bsBusinessMsg from "@/views/bsPage/bsMyNews/bsBusinessMsg/BsBusinessMsg.vue";
 
+// 聊天业务消息详情
+import bsHallYewuDetails from "@/components/bsComponents/bsNewsComponent/bsHallYewuDetails.vue";
+
 import bsTop from "@/components/bsComponents/bsTopComponent/BsTop";
 import bsMenu from "@/components/bsComponents/bsMenuComponent/BsMenu";
 import eventBus from "@/assets/js/common/eventBus.js";
@@ -244,7 +247,8 @@ export default {
     bsPurchaseOrderDetails,
     bsSimilarProduct,
     bsExhibitionHallHome,
-    bsBusinessMsg
+    bsBusinessMsg,
+    bsHallYewuDetails
   },
   data() {
     return {
@@ -272,7 +276,7 @@ export default {
     },
     // 关闭标签
     closeTab(e) {
-      this.$store.commit("handleraddrSearch", false);
+      // this.$store.commit("handleraddrSearch", false);
       let len = this.tabList.length;
       len > 1 && this.$store.commit("closeTab", e);
       this.$nextTick(() => {});
@@ -321,7 +325,8 @@ export default {
         path.includes("bsSpotProducts") ||
         path.includes("bsVIPProducts") ||
         path.includes("bsMyCollection") ||
-        path.includes("bsBrowsingFootprints")
+        path.includes("bsBrowsingFootprints") ||
+        path.includes("bsVendorQuery")
       ) {
         eventBus.$emit("showCart", true);
       } else {

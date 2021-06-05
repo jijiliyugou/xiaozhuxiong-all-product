@@ -17,6 +17,8 @@ const v = new Vue();
 // }
 const store = new Vuex.Store({
   state: {
+    hallCount: 0, // 所有未读业务消息
+    allCount: 0, // 所有未读业务消息
     myColles: [],
     isJindu: false,
     activeTab: "/bsIndex/bsHome",
@@ -33,6 +35,7 @@ const store = new Vuex.Store({
         refresh: true
       }
     ],
+    historyText: [], //存储查询历史记录
     offerProductList: [], //报价数据
     typeId: null, //报价详情我的产品组件切换
     historyNames: [],
@@ -76,6 +79,18 @@ const store = new Vuex.Store({
     myShoppingCartCount: 0
   },
   mutations: {
+    // 过期更新token
+    reset_Token(state, token) {
+      state.userInfo.accessToken = token;
+    },
+    // 更新展厅业务未读消息
+    updataHallCount(state, payLoad) {
+      state.hallCount = payLoad;
+    },
+    // 更新业务未读消息
+    updataAllCount(state, payLoad) {
+      state.allCount = payLoad;
+    },
     // 购物车CartCount
     handlerShoppingCartCount(state, payLoad) {
       state.myShoppingCartCount = payLoad;
@@ -92,10 +107,27 @@ const store = new Vuex.Store({
     handleraddrSearch(state, payLoad) {
       state.addrSearch = payLoad;
     },
+    // 综合搜索查询记录
+    handlerSynthesizeSearchData(state, payLoad) {
+      state.historyText.push(payLoad);
+    },
+    // 综合搜索查询记录清空
+    claerHandlerSynthesizeSearchData(state, payLoad) {
+      state.historyText = payLoad;
+    },
+    // 综合搜索查询记录清空
+    deleteHandlerSynthesizeSearchData(state) {
+      state.historyText.splice(0, 1);
+    },
     //修改查询值
     handlerSearchTxt(state, payLoad) {
       state.searchTxt = payLoad;
     },
+    // for (let i = 0; i < this.productList.length; i++) {
+    //   if (this.productList[i].productNumber == item.productNumber) {
+    //     this.productList[i].isFavorite = item.isFavorite;
+    //   }
+    // }
     // 展厅带分类查产品
     handlerHallSearchCate(state, payLoad) {
       state.searchHallCate = payLoad;

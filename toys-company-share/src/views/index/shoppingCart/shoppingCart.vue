@@ -115,11 +115,20 @@
                         : scope.row.productJson.ename
                     }}
                   </p>
-                  <p class="fa_no">No.{{ scope.row.productJson.fa_no }}</p>
-                  <p class="price">
+                  <p class="fa_no" v-if="shareInfo.showNumber == 1">
+                    No.{{ scope.row.productJson.number }}
+                  </p>
+                  <p class="fa_no" v-else-if="shareInfo.showNumber == 2">
+                    No.{{ scope.row.productNumber }}
+                  </p>
+                  <p class="fa_no" v-else-if="shareInfo.showNumber == -1"></p>
+                  <p class="fa_no" v-else>
+                    No.{{ scope.row.productJson.fa_no }}
+                  </p>
+                  <p class="price" v-if="shareInfo.isShowPrice">
                     <span>{{ userInfo.currencyType }}</span>
                     <span class="priceText">{{
-                      scope.row.productJson.price
+                      scope.row.shareProductJson.price
                     }}</span>
                   </p>
                 </div>
@@ -251,12 +260,12 @@
                     }}cuft
                   </p>
                 </div>
-                <p class="item price">
+                <p class="item price" v-if="shareInfo.isShowPrice">
                   <span>{{ userInfo.currencyType }}</span>
                   <span>
                     {{
                       priceCount(
-                        scope.row.price,
+                        scope.row.shareProductJson.price,
                         scope.row.productJson.ou_lo,
                         scope.row.number
                       )
@@ -328,7 +337,7 @@
               </span>
             </div>
             <!-- 总价 -->
-            <div class="totalWrap totalPrice">
+            <div class="totalWrap totalPrice" v-if="shareInfo.isShowPrice">
               {{ myShoppingCartLang.totalPrice }}：
               <span class="price">{{ userInfo.currencyType }}</span>
               <span style="margin-left:5px;" class="price">
@@ -706,21 +715,21 @@ export default {
       this.formInfo.currencyType = this.userInfo.currencyType;
       this.formInfo.shareOrderDetails = selectProducts.map(val => {
         return {
-          productNumber: val.productNumber,
-          productName: val.productJson.name,
-          productEName: val.productJson.ename,
-          productPrice: val.price,
+          productNumber: val.shareProductJson.productNumber,
+          productName: val.shareProductJson.name,
+          productEName: val.shareProductJson.ename,
+          productPrice: val.shareProductJson.price,
           productCount: val.number,
-          productFeet: val.productJson.bulk_feet,
-          productStere: val.productJson.bulk_stere,
+          productFeet: val.shareProductJson.outerBoxFeet,
+          productStere: val.shareProductJson.outerBoxStere,
           productImage: val.productImgs,
           currencyType: this.userInfo.currencyType,
-          outerBoxLo: val.productJson.ou_lo,
+          outerBoxLo: val.shareProductJson.outerBoxLo,
           packMethod:
             this.globalLang === "zh-CN"
-              ? val.productJson.ch_pa
-              : val.productJson.en_pa,
-          productInfo: JSON.parse(val.shareProductJson)
+              ? val.shareProductJson.packMethod
+              : val.shareProductJson.ePackMethod,
+          productInfo: val.shareProductJson
         };
       });
       const res = await this.$http.post(
@@ -730,9 +739,30 @@ export default {
       const { code, message } = res.data.result;
       if (code === 200) {
         this.$message.success(this.publicLang.submittedSuccessfully);
+        const products = selectProducts.map(val => {
+          return val.productNumber;
+        });
+        this.deleteSubmitProduct(products);
         this.$router.push("/index/myOrder");
       } else {
         this.$message.error(message);
+      }
+    },
+    // 删除已提交的
+    async deleteSubmitProduct(productNumbers) {
+      const res = await this.$toys.post("/api/RemoveShoppingCart", {
+        shareID: this.userInfo.shareId,
+        customerRemarks: this.userInfo.loginEmail,
+        sourceFrom: "share",
+        shopType: "customersamples",
+        number: 1,
+        currency: "￥",
+        Price: 0,
+        productNumber: productNumbers.toString()
+      });
+      console.log(res);
+      if (res.data.result.code === 200) {
+        this.$store.commit("handlerShopLength", res.data.result.item);
       }
     },
     // 单元格样式
@@ -825,7 +855,7 @@ export default {
         price = this.add(
           price,
           this.multiply(
-            this.multiply(list[i].price, list[i].number),
+            this.multiply(list[i].shareProductJson.price, list[i].number),
             list[i].productJson.ou_lo
           )
         );
@@ -859,8 +889,10 @@ export default {
       });
       if (res.data.result.code === 200) {
         this.dataList = res.data.result.item.map((val, i) => {
+          const shareProduct = JSON.parse(val.shareProductJson);
           const product = JSON.parse(val.productJson);
           val.productJson = product;
+          val.shareProductJson = shareProduct;
           val.index = i + 1;
           return val;
         });
@@ -877,6 +909,7 @@ export default {
       let my = JSON.parse(JSON.stringify(val));
       my.productJson = JSON.stringify(my.productJson);
       my.supplierJson = JSON.stringify(my.supplierJson);
+      my.shareProductJson = JSON.stringify(my.shareProductJson);
       const res = await this.$toys.post("/api/UpdateShoppingCart", my);
       if (res.data.result.code != 200) {
         this.$message.error(res.data.result.msg);
@@ -979,7 +1012,7 @@ export default {
     myOrderLang() {
       return this.$t("lang.myOrder");
     },
-    ...mapState(["globalLang", "userInfo"])
+    ...mapState(["globalLang", "userInfo", "shareInfo"])
   },
   filters: {}
 };

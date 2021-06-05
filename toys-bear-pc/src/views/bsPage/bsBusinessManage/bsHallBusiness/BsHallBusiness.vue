@@ -16,20 +16,21 @@
       </div>
       <div class="item">
         <span class="label">择样类型：</span>
-        <el-select
-          v-model="searchForm.messageExt"
-          size="medium"
-          clearable
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="(item, i) in typesList"
-            :key="i"
-            :label="item.label"
-            :value="item.value"
+        <div class="content">
+          <el-select
+            v-model="searchForm.messageExt"
+            size="medium"
+            placeholder="请选择"
           >
-          </el-option>
-        </el-select>
+            <el-option
+              v-for="item in typesList"
+              :key="item.id"
+              :label="item.title"
+              :value="item.messageExt"
+            >
+            </el-option>
+          </el-select>
+        </div>
       </div>
       <div class="item">
         <span class="label">展厅名称：</span>
@@ -234,25 +235,63 @@ export default {
             label: "备注"
           },
           {
-            prop: "readStatus",
+            prop: "orderStatus",
             isHiden: true,
             label: "状态",
             render: row => {
-              let msg = "";
-              switch (row.readStatus) {
-                case false:
-                  msg = "<span style='color: #f56c6c'>未读</span>";
-                  break;
-                case true:
-                  msg = "<span style='color: green'>已读</span>";
-                  break;
+              if (
+                row.toCompanyNumer !=
+                  this.userInfo.commparnyList[0].companyNumber &&
+                row.orderStatus == 0
+              ) {
+                return "<span style='color: #FF4848; '>对方未读</span>";
+              } else if (
+                row.toCompanyNumer ==
+                  this.userInfo.commparnyList[0].companyNumber &&
+                row.orderStatus == 0
+              ) {
+                return "--";
+              } else if (
+                row.toCompanyNumer !=
+                  this.userInfo.commparnyList[0].companyNumber &&
+                row.orderStatus == 1
+              ) {
+                return "<span style='color: #3368A9; '>对方已读</span>";
+              } else if (
+                row.toCompanyNumer ==
+                  this.userInfo.commparnyList[0].companyNumber &&
+                row.orderStatus == 1
+              ) {
+                return "--";
+              } else if (row.orderStatus == 9) {
+                return "<span style='color: #33A96A; '>已完成</span>";
+              } else if (row.orderStatus == 99) {
+                return "<span style='color: #999999; '>已取消</span>";
               }
-              return msg;
             }
           }
         ],
-        btnWidth: 100,
+        btnWidth: 150,
         actions: [
+          {
+            type: "info",
+            textWrapper() {
+              return "推送";
+            },
+            methods: row => {
+              row.label = "展厅业务推送";
+              const fd = {
+                name: row.offerNumber + "展厅业务推送",
+                linkUrl: "/bsIndex/bsSampleQuotation",
+                component: "bsPushIndex",
+                refresh: true,
+                noPush: true,
+                label: "展厅业务推送",
+                value: row
+              };
+              this.$store.commit("myAddTab", fd);
+            }
+          },
           {
             type: "warning",
             textWrapper() {
@@ -267,28 +306,7 @@ export default {
       staffList: [],
       exportTemplateDialog: false,
       orderRow: {},
-      typesList: [
-        {
-          label: "系统通知",
-          value: 0
-        },
-        {
-          label: "补样",
-          value: 3
-        },
-        {
-          label: "借样",
-          value: 5
-        },
-        {
-          label: "补样借样",
-          value: 11
-        },
-        {
-          label: "洽谈",
-          value: 12
-        }
-      ],
+      typesList: [],
       readStatusList: [
         {
           label: "全部",
@@ -307,7 +325,8 @@ export default {
         keyword: null,
         fromCompanyName: null,
         staffId: null,
-        messageExt: null,
+        messageModel: null,
+        messageExt: -1,
         readStatus: "-1",
         dateTime: null
       },
@@ -317,6 +336,17 @@ export default {
     };
   },
   methods: {
+    // 择样类型
+    async getTypeList() {
+      const res = await this.$http.post(
+        "/api/PushSettings/MessageTeplateSettingsByPage",
+        { maxResultCount: 9999, messageModel: "1", skipCount: 1 }
+      );
+      console.log(res);
+      if (res.data.result.code === 200) {
+        this.typesList = res.data.result.item.items;
+      }
+    },
     // 获取公司下的员工列表
     async getStaffList() {
       const res = await this.$http.post("/api/CompanyUserList", {
@@ -330,7 +360,8 @@ export default {
           type: "danger"
         });
       }
-      this.getTableDataList();
+      await this.getTableDataList();
+      await this.getTypeList();
     },
     // 导出
     exportOrder(row) {
@@ -352,8 +383,10 @@ export default {
     // 获取列表
     async getTableDataList() {
       const fd = {
+        sampleTo: "Sales",
+        messageModel: "1",
         readStatus: this.searchForm.readStatus,
-        sampleFrom: "hall",
+        sampleFrom: "Hall",
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyWord: this.searchForm.keyword,

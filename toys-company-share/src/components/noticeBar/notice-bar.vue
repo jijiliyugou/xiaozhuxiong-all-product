@@ -16,10 +16,6 @@ export default {
       type: Number,
       default: 15
     },
-    startRoll: {
-      type: Boolean,
-      default: false
-    },
     text: {
       Type: String,
       default: ""
@@ -38,7 +34,13 @@ export default {
   },
   created() {},
   mounted() {
-    this.startRoll && this.start();
+    this.textContent = this.text;
+    const wrap = this.$refs.wrap.offsetWidth;
+    const content = this.$refs.content.offsetWidth;
+    this.$nextTick(() => {
+      console.log(content, wrap);
+      content > wrap && this.start();
+    });
   },
   methods: {
     start() {
@@ -52,13 +54,28 @@ export default {
       let distance = this.wrapWidth;
       content.style.transform = "translateX(" + distance + "px)"; //初始值
       let that = this;
-      that.timeID = setInterval(function() {
+      clearInterval(that.timeID);
+      this.timeID = setInterval(function() {
         distance = distance - 1;
         if (-distance >= that.contentWidth) {
           distance = that.wrapWidth;
         }
         content.style.transform = "translateX(" + distance + "px)";
       }, that.speed); //控制速度
+    }
+  },
+  watch: {
+    text() {
+      clearInterval(this.timeID);
+      this.timeID = null;
+      const wrap = this.$refs.wrap.offsetWidth;
+      const content = this.$refs.content.offsetWidth;
+      console.log(content > wrap);
+      if (content > wrap) {
+        this.start();
+      } else {
+        clearInterval(this.timeID);
+      }
     }
   },
   // 更新的时候运动

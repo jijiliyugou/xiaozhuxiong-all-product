@@ -49,11 +49,13 @@
               </div>
               <div class="three">
                 <div class="left">
-                  <div class="keys">{{ myOrderLang.totalPrice }}：</div>
+                  <div class="keys" v-if="shareInfo.isShowPrice">
+                    {{ myOrderLang.totalPrice }}：
+                  </div>
                   <div class="keys">{{ myOrderLang.contact }}：</div>
                 </div>
                 <div class="right">
-                  <div class="values totalPrice">
+                  <div class="values totalPrice" v-if="shareInfo.isShowPrice">
                     {{ item.currencyType }}
                     {{ item.totalAmount }}
                   </div>
@@ -221,8 +223,7 @@ export default {
     publicLang() {
       return this.$t("lang.publicLang");
     },
-    ...mapState(["userInfo"]),
-    ...mapState(["globalLang"])
+    ...mapState(["globalLang", "userInfo", "shareInfo"])
   }
 };
 </script>

@@ -234,7 +234,7 @@ export default {
     },
     // 获取厂商所有产品
     async getSupplierProductShare() {
-      const res = await this.$http.post("/api/SupplierProductShare  ", {
+      const res = await this.$http.post("/api/SupplierProductShare", {
         skipCount: 1,
         maxResultCount: 8,
         companyNumber: "HS0000006"

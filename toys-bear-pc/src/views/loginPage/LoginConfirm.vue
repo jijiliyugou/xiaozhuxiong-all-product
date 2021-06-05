@@ -181,6 +181,15 @@ export default {
             });
             this.$store.commit("removeLoginItems");
           }
+          this.getShoppingCartCount();
+          // 记住密码
+          if (this.$route.query.thePassword) {
+            const validityPeriod = JSON.stringify({
+              dateTime: Date.now(),
+              token: res.data.result.accessToken
+            });
+            localStorage.setItem("validityPeriod", validityPeriod);
+          }
           const fd = {
             component: "bsHome",
             label: "后台首页",
@@ -189,9 +198,9 @@ export default {
             refresh: true
           };
           switch (item.companyType) {
-            case "Admin":
-            case "Supplier":
-            case "Exhibition":
+            // case "Admin":
+            // case "Supplier":
+            // case "Exhibition":
             case "Sales":
               this.$store.commit("updateActiveTab", fd);
               this.$store.commit("closeTabAll", this.$router);
@@ -204,7 +213,6 @@ export default {
               // location.href = "https://www.toysbear.com/#/me";
               break;
           }
-          this.getShoppingCartCount();
           // this.$router.push("/bsIndex");
           // let token = JSON.stringify(res.data.result);
           // location =
@@ -231,6 +239,7 @@ export default {
     ...mapState(["userInfo", "isLogin"])
   },
   mounted() {
+    console.log(this.$route.query.thePassword);
     this.userList = this.userInfo.commparnyList;
     if (this.$route.query.id === "checkted" || this.isLogin) {
       this.loginTow();

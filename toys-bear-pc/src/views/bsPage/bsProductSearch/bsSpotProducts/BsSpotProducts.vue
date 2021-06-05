@@ -243,6 +243,7 @@ export default {
               msg: " 一键加购成功",
               type: "success"
             });
+            this.checkAll = false;
             this.getProductsList();
           } else {
             this.$common.handlerMsgState({
@@ -292,6 +293,7 @@ export default {
           this.productList[i].isShop = item.isShop;
         }
       }
+      this.$forceUpdate();
     });
   },
   computed: { ...mapState(["userInfo", "myShoppingCartCount"]) },

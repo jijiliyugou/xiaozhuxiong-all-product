@@ -249,6 +249,7 @@ export default {
               msg: " 一键加购成功",
               type: "success"
             });
+            this.checkAll = false;
             this.getProductsList();
           } else {
             this.$common.handlerMsgState({
@@ -279,11 +280,14 @@ export default {
     });
     // 取消或加购样式/刷新页面
     eventBus.$on("resetProductIsShop", item => {
-      for (let i = 0; i < this.productList.length; i++) {
-        if (this.productList[i].productNumber == item.productNumber) {
-          this.productList[i].isShop = item.isShop;
-        }
-      }
+      console.log(item);
+      this.getProductsList();
+      // for (let i = 0; i < this.productList.length; i++) {
+      //   if (this.productList[i].productNumber == item.productNumber) {
+      //     this.productList[i].isShop = item.isShop;
+      //   }
+      // }
+      this.$forceUpdate();
     });
   },
   beforeDestroy() {

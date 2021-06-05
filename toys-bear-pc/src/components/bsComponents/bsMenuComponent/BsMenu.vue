@@ -46,12 +46,18 @@
             ></i>
 
             <span slot="title">
-              <el-badge
-                :is-dot="item.parent.linkUrl === '/bsIndex/bsMyNews'"
-                class="hongdian"
-              >
+              <span v-if="item.parent.linkUrl !== '/bsIndex/bsMyNews'">
                 {{ item.parent.name }}
-              </el-badge>
+              </span>
+              <span v-else>
+                <el-badge
+                  :value="allCount"
+                  :hidden="allCount < 1"
+                  class="onehongdian"
+                >
+                  {{ item.parent.name }}
+                </el-badge>
+              </span>
             </span>
           </template>
           <el-menu-item
@@ -60,18 +66,26 @@
             :key="child.id"
             :index="child.linkUrl"
           >
-            <el-badge
-              :is-dot="
-                item.parent.linkUrl === '/bsIndex/bsMyNews' &&
-                  child.linkUrl != '/bsIndex/bsToyCircle'
-              "
-              class="hongdian"
-            >
+            <span v-if="child.linkUrl != '/bsIndex/bsBusinessMsg'">
               <span
-                style="font-size: 26px;position: relative; top: -2px;margin-right:5px;"
+                style="font-size: 26px;position: relative; top: -2px;margin-right:5px;margin-left: 20px;"
                 >·</span
-              >{{ child.name }}
-            </el-badge>
+              >{{ child.name }}</span
+            >
+            <template v-else>
+              <span
+                style="font-size: 26px;position: relative; top: -2px;margin-left: 20px;"
+              >
+                ·
+              </span>
+              <el-badge
+                class="hongdian"
+                :value="allCount"
+                :hidden="allCount < 1"
+              >
+                {{ child.name }}
+              </el-badge>
+            </template>
           </el-menu-item>
         </el-submenu>
       </el-menu>
@@ -118,7 +132,7 @@ export default {
   created() {},
   mounted() {},
   computed: {
-    ...mapState(["routers"])
+    ...mapState(["routers", "allCount"])
   }
 };
 </script>

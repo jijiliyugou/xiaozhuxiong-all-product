@@ -1,4 +1,3 @@
-const { devEnv, testEnv, proEnv } = require("./src/assets/js/config/config.js");
 const webpack = require("webpack");
 const path = require("path");
 function resolve(dir) {
@@ -6,22 +5,31 @@ function resolve(dir) {
 }
 const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const productionGzipExtensions = ["js", "css", "html", "svg", "less"];
+
+// 常规请求
+// const { devEnv, testEnv, proEnv } = require("./src/assets/js/config/config.js");
+// // im请求
+// const imOptions = require("./src/assets/js/config/imConfig.js");
 const env = process.env.NODE_ENV;
-let target = "";
-// 默认是本地环境
-switch (env) {
-  case "production": // 生产环境
-    target = proEnv.hosturl;
-    break;
-  case "test": // 测试环境
-    target = testEnv.hosturl;
-    break;
-  default:
-    // 本地环境
-    target = devEnv.hosturl;
-    break;
-}
-console.log(target);
+// let target = devEnv.hosturl;
+// let imTarget = imOptions.devEnv.hosturl;
+// // 默认是本地环境
+// switch (env) {
+//   case "production": // 生产环境
+//     target = proEnv.hosturl;
+//     imTarget = imOptions.proEnv.hosturl;
+//     break;
+//   case "test": // 测试环境
+//     target = testEnv.hosturl;
+//     imTarget = imOptions.testEnv.hosturl;
+//     break;
+//   default:
+//     // 本地环境
+//     target = devEnv.hosturl;
+//     imTarget = imOptions.devEnv.hosturl;
+//     break;
+// }
+// console.log(target, imTarget);
 const plugins = [
   new webpack.ProvidePlugin({
     $: "jquery",
@@ -60,7 +68,8 @@ const configureWebpack = {
     }
   },
   externals: {
-    BMap: "BMap"
+    BMap: "BMap",
+    RongIMLib: "RongIMLib"
   }
 };
 if (env === "production") {
@@ -87,21 +96,27 @@ const config = {
   configureWebpack: configureWebpack
 };
 
-if (env == "development")
-  config.devServer = {
-    open: true, // 开启自动打开浏览器
-    disableHostCheck: true,
-    proxy: {
-      "/api": {
-        // 设置跨域变量代号
-        target: target, // 你想要代理的目标源链接
-        ws: true, // 开启websocket
-        changeOrigin: true, // 开启代理
-        pathRewrite: {
-          // 设置二级
-          "^/api": "/api"
-        }
-      }
-    }
-  };
+// if (env == "development")
+// config.devServer = {
+// open: true, // 开启自动打开浏览器
+// disableHostCheck: true,
+// proxy: {
+//   "/api": {
+//     // 设置跨域变量代号
+//     target: target, // 你想要代理的目标源链接
+//     ws: true, // 开启websocket
+//     changeOrigin: true, // 开启代理
+//     pathRewrite: {
+//       // 设置二级
+//       "^/api": "/api"
+//     }
+//   },
+//   // [imTarget]: {
+//   //   // 设置跨域变量代号
+//   //   target: imTarget, // 你想要代理的目标源链接
+//   //   ws: true, // 开启websocket
+//   //   changeOrigin: true // 开启代理
+//   // }
+// }
+// };
 module.exports = config;

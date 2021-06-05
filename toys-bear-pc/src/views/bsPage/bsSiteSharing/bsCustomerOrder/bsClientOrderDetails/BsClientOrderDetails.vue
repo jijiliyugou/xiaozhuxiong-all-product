@@ -111,8 +111,8 @@ export default {
         totalBulkFeet: 0, //总材积
         totalGrWe: 0, //总毛重
         totalNeWe: 0, //总净重
-        cu_de: "", //金额单位
-        totalMoney: 0 //总金额
+        cu_de: "" //金额单位
+        // totalMoney: 0 //总金额
         // countData: [],
       },
       tableData: {
@@ -130,6 +130,7 @@ export default {
             // isHiden: true,
             infoBox: true,
             productInfo: true,
+            cartInfoIcon: true,
             elImage: row => {
               return row.productImage;
             },
@@ -280,10 +281,13 @@ export default {
             isHiden: true,
             color: "#f56c6c",
             render: row => {
-              return this.$calculate.countTotalprice(
-                row.productCount,
-                row.ou_lo,
-                row.productPrice
+              return (
+                this.options.currencyType +
+                this.$calculate.countTotalprice(
+                  row.productCount,
+                  row.ou_lo,
+                  row.productPrice
+                )
               );
             }
           }
@@ -369,6 +373,7 @@ export default {
       );
       if (res.data.result.code === 200) {
         this.options = res.data.result.item;
+        console.log(this.options);
         this.tableData.data = res.data.result.item.shareOrderDetails.items;
         this.totalCount = res.data.result.item.shareOrderDetails.totalCount;
         this.summaryData.cu_de = this.options.currencyType;

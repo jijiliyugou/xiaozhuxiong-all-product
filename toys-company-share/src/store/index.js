@@ -5,6 +5,8 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
+    shareInfo: {},
+    formLabelAlign: {},
     temporaryToken: "",
     shopLength: 0,
     langList: null, // 下拉语言列表
@@ -42,6 +44,14 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
+    // 保存是否显示价格配置
+    setShareInfo(state, payLoad) {
+      state.shareInfo = payLoad;
+    },
+    // 登录成功保存登录信息
+    setLoginForm(state, payLoad) {
+      state.formLabelAlign = payLoad;
+    },
     // 添加用户名
     handlerLoginName(state, payLoad) {
       state.userInfo.loginEmail = payLoad;

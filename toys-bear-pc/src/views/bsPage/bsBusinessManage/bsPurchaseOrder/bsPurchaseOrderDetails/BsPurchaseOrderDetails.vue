@@ -17,7 +17,7 @@
         </div>
         <div class="middle">
           <li class="clientItem">
-            <span class="itemTitle">操 作 员：</span>
+            <span class="itemTitle">业务员：</span>
             <span class="content orgPersonnelName">
               {{ item.orgPersonnelName }}
             </span>
@@ -132,6 +132,7 @@ export default {
             isHiden: true,
             infoBox: true,
             productInfo: true,
+            cartInfoIcon: true,
             elImage: row => {
               return row.imgUrl;
             },

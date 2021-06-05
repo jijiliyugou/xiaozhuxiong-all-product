@@ -61,8 +61,28 @@ export async function getMenuFuc() {
   const routers = await setMenuTree(list);
   router.addRoutes(routers);
 }
+const proEnv = require("/config/pro.env"); // 生产环境
+const testEnv = require("/config/test.env"); // 测试环境
+const devEnv = require("/config/dev.env"); // 本地环境
+const env = process.env.NODE_ENV;
+let target = "";
+// 默认是本地环境
+switch (env) {
+  case "production": // 生产环境
+    target = proEnv.hosturl;
+    break;
+  case "test": // 测试环境
+    target = testEnv.hosturl;
+    break;
+  default:
+    // 本地环境
+    target = devEnv.hosturl;
+    break;
+}
+console.log(target);
 // 拦截
 router.beforeEach(async (to, from, next) => {
+  console.log(target, to.fullPath);
   // 如果没有登录token
   if (!store.state.userInfo || !store.state.userInfo.accessToken) {
     const res = await getToken();
@@ -94,6 +114,9 @@ router.beforeEach(async (to, from, next) => {
       next();
     } else {
       if (store.state.isLogin) {
+        if (store.state.userInfo.commparnyList[0].companyType === "Sales") {
+          location.href = target + "/new";
+        }
         next();
       } else {
         // 如果有token但是没有经过正规登录

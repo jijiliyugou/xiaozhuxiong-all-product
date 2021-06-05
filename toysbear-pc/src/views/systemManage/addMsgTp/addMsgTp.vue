@@ -1,80 +1,87 @@
 <template>
   <div class="msgTypeBox">
-    <el-form label-width="100px" :model="formData">
-      <el-form-item label="角色：">
-        <el-select
-          clearable
-          v-model="formData.messageModel"
-          placeholder="请选择"
-          style="width: 100%"
-        >
-          <el-option
-            v-for="(item, index) in configList"
-            :key="index"
-            :label="item.itemText"
-            :value="item.itemCode"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="消息编号：">
-        <div class="bangzuBox">
-          <el-input v-model="formData.messageExt"></el-input>
-          <div class="bangzu">
-            <el-tooltip class="item" effect="dark" placement="top-end">
-              <div slot="content">
-                <p style="line-height: 23px;">公司编号：0=系统通知，7=采购</p>
-                <p style="line-height: 23px;">
-                  展厅编号：0=系统通知，3=补样，5=借样，11=补样借样，12=洽谈
-                </p>
+    <el-form
+      label-width="100px"
+      ref="myForm"
+      :rules="myRules"
+      :model="formData"
+    >
+      <div class="myScroll">
+        <el-scrollbar style="height: 100%;" ref="myScrollbar">
+          <el-form-item label="角色：" prop="messageModel">
+            <el-select
+              clearable
+              v-model="formData.messageModel"
+              placeholder="请选择"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="(item, index) in configList"
+                :key="index"
+                :label="item.itemText"
+                :value="item.parameter"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="消息编号：" prop="messageExt">
+            <div class="bangzuBox">
+              <el-input v-model="formData.messageExt"></el-input>
+              <div class="bangzu">
+                <el-tooltip class="item" effect="dark" placement="top-end">
+                  <div slot="content">
+                    <p style="line-height: 23px;">
+                      公司编号：0=系统通知，7=采购
+                    </p>
+                    <p style="line-height: 23px;">
+                      展厅编号：0=系统通知，3=补样，5=借样，11=补样借样，12=洽谈
+                    </p>
+                  </div>
+                  <div class="icon">?</div>
+                </el-tooltip>
               </div>
-              <div class="icon">?</div>
-            </el-tooltip>
+            </div>
+          </el-form-item>
+          <el-form-item label="消息名称：">
+            <el-input v-model="formData.title"></el-input>
+          </el-form-item>
+          <div class="lineBox">
+            <div class="line_title">参数设置：</div>
+            <div class="line"></div>
           </div>
-        </div>
-      </el-form-item>
-      <el-form-item label="消息名称：">
-        <el-input v-model="formData.title"></el-input>
-      </el-form-item>
-      <div class="lineBox">
-        <div class="line_title">参数设置：</div>
-        <div class="line"></div>
-      </div>
-      <el-form-item
-        :label="'参数' + (i + 1) + '：'"
-        v-for="(item, i) in formData.itemList"
-        :key="item.itemValue"
-      >
-        <div
-          class="bangzuBox"
-          @mouseenter="isDelete = i"
-          @mouseleave="isDelete = null"
-        >
-          <el-input v-model="formData.itemList[i].itemText"></el-input>
-          <div
-            class="shanchu"
-            @click="removeItemList(i)"
-            v-show="isDelete === i"
+          <el-form-item
+            :label="'参数' + (i + 1) + '：'"
+            v-for="(item, i) in formData.itemList"
+            :key="item.itemValue"
           >
-            <i class="el-icon-circle-close"></i>
-          </div>
-        </div>
-      </el-form-item>
+            <div
+              class="bangzuBox"
+              @mouseenter="isDelete = i"
+              @mouseleave="isDelete = null"
+            >
+              <el-input v-model="formData.itemList[i].itemText"></el-input>
+              <div
+                class="shanchu"
+                @click="removeItemList(i)"
+                v-show="isDelete === i"
+              >
+                <i class="el-icon-circle-close"></i>
+              </div>
+            </div>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              plain
+              type="primary"
+              style="margin:0;"
+              icon="el-icon-plus"
+              @click="addItemList"
+              >增加参数</el-button
+            >
+          </el-form-item>
+        </el-scrollbar>
+      </div>
       <el-form-item>
-        <el-button
-          plain
-          type="primary"
-          style="margin:0;"
-          icon="el-icon-plus"
-          @click="addItemList"
-          >增加参数</el-button
-        >
-      </el-form-item>
-      <el-form-item>
-        <el-button
-          class="btnW"
-          type="primary"
-          @click="$emit('submit', formData)"
-        >
+        <el-button class="btnW" type="primary" @click="addSubmit(formData)">
           确定
         </el-button>
         <el-button class="btnW" @click="$emit('close')">取消</el-button>
@@ -104,13 +111,24 @@ export default {
             itemValue: 1
           }
         ]
+      },
+      myRules: {
+        messageModel: [
+          { required: true, message: "请选择", trigger: "change" }
+        ],
+        messageExt: [{ required: true, message: "请输入编号", trigger: "blur" }]
       }
     };
   },
   methods: {
+    // 提交
+    addSubmit(item) {
+      this.$refs.myForm.validate(valid => {
+        if (valid) this.$emit("submit", item);
+      });
+    },
     // 删除参数
     removeItemList(i) {
-      console.log(i);
       this.formData.itemList.splice(i, 1);
     },
     // 添加参数
@@ -118,6 +136,9 @@ export default {
       this.formData.itemList.push({
         itemText: "",
         itemValue: this.formData.itemList.length
+      });
+      this.$nextTick(() => {
+        this.$refs.myScrollbar.wrap.scrollTop = 99999;
       });
     }
   },
@@ -181,6 +202,9 @@ export default {
       height: 1px;
       background-color: #dcdfe6;
     }
+  }
+  .myScroll {
+    height: 410px;
   }
 }
 </style>

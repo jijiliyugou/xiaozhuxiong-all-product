@@ -44,9 +44,9 @@ export default {
     // 返回上一步
     goToBack() {
       this.$router.go(-1);
-      if (this.$route.path.includes("productDetails")) {
-        this.$root.eventHub.$emit("resetRelatedProducts");
-      }
+      // if (this.$route.path.includes("productDetails")) {
+      //   this.$root.eventHub.$emit("resetRelatedProducts");
+      // }
     },
     // 去购物车
     toMyShoppingCart() {

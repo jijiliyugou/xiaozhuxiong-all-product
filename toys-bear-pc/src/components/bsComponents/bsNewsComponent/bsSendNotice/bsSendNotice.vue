@@ -152,14 +152,14 @@
             </el-input>
           </el-form-item>
           <el-form-item
-            :label="selectQuanxian[0] === '' ? '谁可以看：' : '不给谁看：'"
+            :label="acceptor === 'All' ? '谁可以看：' : '不给谁看：'"
           >
             <div class="quanxianBox">
               <el-cascader
                 :options="options"
-                v-model="selectQuanxian"
+                v-model="acceptor"
                 clearable
-                :props="{ expandTrigger: 'hover' }"
+                :props="{ expandTrigger: 'hover', emitPath: false }"
                 :show-all-levels="false"
               ></el-cascader>
               <div class="guangbo">
@@ -281,10 +281,10 @@ export default {
   },
   data() {
     return {
-      selectQuanxian: [""],
+      acceptor: "All",
       options: [
         {
-          value: "",
+          value: "All",
           label: "公开"
         },
         {
@@ -400,7 +400,7 @@ export default {
           const result = await this.$http.post("/api/CreateBearNotice", {
             NoticeTitle: "",
             NoticeType: gonggaoType,
-            Acceptor: this.$store.state.userInfo.commparnyList[0].companyType,
+            Acceptor: this.acceptor == "All" ? "" : this.acceptor,
             Notice: this.formData.content,
             Publisher: this.$store.state.userInfo.userInfo.id,
             IssuedCompanyID: this.$store.state.userInfo.commparnyList[0]

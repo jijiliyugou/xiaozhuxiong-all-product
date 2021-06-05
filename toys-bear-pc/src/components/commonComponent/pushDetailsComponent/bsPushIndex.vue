@@ -7,23 +7,25 @@
     <div class="handerTop">
       <div class="flex_t">
         <p>
-          采购单号：<span class="pId">{{ itemList.offerNumber }} </span>
+          {{ orderData.OrderTypeName }}：<span class="pId"
+            >{{ orderData.orderNumber }}
+          </span>
         </p>
+        <!-- <p>
+          客户名称：<span>{{ orderData.offerName }} </span>
+        </p> -->
         <p>
-          客户名称：<span>{{ itemList.customerName }} </span>
-        </p>
-        <p>
-          业务员：<span style="color: #2d7fe4">{{ itemList.linkman }} </span>
+          业务员：<span style="color: #2d7fe4">{{ orderData.linkman }} </span>
         </p>
         <p>
           状态：<span
             :style="{
-              color: itemList.status == 0 ? '#3368A9' : '#2D7FE4'
+              color: orderData.orderStatus === 0 ? '#3368A9' : '#2D7FE4'
             }"
             >{{
-              itemList.status == 0
+              orderData.orderStatus === 0
                 ? "未审核"
-                : itemList.status == 1
+                : orderData.orderStatus === 1
                 ? "审核通过"
                 : "审核不通过"
             }}
@@ -32,13 +34,13 @@
       </div>
       <div class="flex_b">
         <p>
-          报价时间：<span v-if="itemList.createdOn"
-            >{{ itemList.createdOn.replace(/T/, " ") }}
+          {{ orderData.timeName }}：<span v-if="orderData.createdOn"
+            >{{ orderData.createdOn.replace(/T/, " ") }}
           </span>
         </p>
         <div class="right">
           <p class="remark">
-            报价备注：<span>{{ itemList.title }} </span>
+            {{ orderData.remarkName }}：<span>{{ orderData.remark }} </span>
           </p>
         </div>
       </div>
@@ -51,10 +53,11 @@
             :class="{ grid: true, active: isGrid === 'bsGridPushComponent' }"
             @click="handerIsGrid('bsGridPushComponent')"
           ></div>
-          <div
+          <!-- 列表版本未完成 -->
+          <!-- <div
             :class="{ column: true, active: isGrid === 'bsTablePushComponent' }"
             @click="handerIsGrid('bsTablePushComponent')"
-          ></div>
+          ></div> -->
         </div>
       </div>
       <div class="tableBox">
@@ -68,7 +71,12 @@
         ></component>
       </div>
     </div>
-    <div class="PushFooter">
+    <div
+      :class="{
+        PushFooter: true,
+        PushFooterBorder: isGrid === 'bsGridPushComponent'
+      }"
+    >
       <div class="left">
         <el-checkbox v-model="checkAll" @change="handleCheckAllChange"
           >全选</el-checkbox
@@ -86,10 +94,16 @@
         >
       </div>
     </div>
-    <bsPushDialogComponent
-      @handlePushDialog="handlePushDialog"
-      :pushDialog="pushDialog"
-    ></bsPushDialogComponent>
+
+    <el-dialog :title="title" :visible.sync="pushDialog" width="800px">
+      <bsPushDialogComponent
+        :item="item"
+        :multipleSelection="multipleSelection"
+        :orderData="orderData"
+        @handlePushDialog="handlePushDialog"
+        @handleCheckAllClosee="handleCheckAllClosee"
+      ></bsPushDialogComponent>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -121,37 +135,107 @@ export default {
       isGrid: "bsGridPushComponent",
       checkAll: false,
       pushDialog: false,
+      orderData: {
+        orderPushType: null
+      },
       itemList: {},
+      title: null,
+
       multipleSelection: [],
-      tableData: [
-        {
-          id: 1,
-          checked: false,
-          name: "腾彩玩具有限公司",
-          phone: 222,
-          phoneNumber: 1232132
-        },
-        {
-          id: 2,
-          name: "玩具",
-          checked: false,
-          phone: 222,
-          phoneNumber: 1232132
-        },
-        {
-          id: 3,
-          name: "有限公司",
-          checked: false,
-          phone: 222,
-          phoneNumber: 1232132
-        }
-      ]
+      tableData: []
     };
   },
+  created() {
+    console.log(this.item, "点击推送按钮传过来的数据");
+    switch (this.item.label) {
+      case "展厅业务推送":
+        this.title = "展厅业务推送";
+        this.orderData = {
+          OrderTypeName: "择样单号",
+          timeName: "择样时间",
+          remarkName: "择样备注",
+          // offerName: this.item.client_na,
+          linkman: this.item.orgPersonnelName,
+          status: this.item.orderStatus,
+          createdOn: this.item.createdOn,
+          remark: this.item.pushContent,
+          orderPushType: 1,
+          orderNumber: this.item.orderNumber
+        };
+        break;
+      case "报价推送":
+        this.title = "报价推送";
+        this.orderData = {
+          OrderTypeName: "报价单号",
+          timeName: " 报价时间",
+          remarkName: "报价备注",
+          // offerName: this.item.customerName, //客户名称
+          linkman: this.item.linkman, //业务员
+          orderStatus: this.item.status, //状态
+          createdOn: this.item.createdOn, //时间
+          remark: this.item.title, //备注
+          orderPushType: 2, //推送类型
+          orderNumber: this.item.offerNumber //单号
+        };
+        break;
+      case "采购推送":
+        this.title = "采购推送";
+        this.orderData = {
+          OrderTypeName: "采购单号",
+          timeName: " 采购时间",
+          remarkName: "采购备注",
+          // offerName: this.item.fromCompanyName, //客户名称
+          linkman: this.item.orgPersonnelName, //业务员
+          orderStatus: this.item.readStatus, //状态
+          createdOn: this.item.createdOn, //时间
+
+          remark: this.item.pushContent, //备注
+          orderPushType: 4, //推送类型
+          orderNumber: this.item.offerNumber //单号
+        };
+        break;
+      default:
+        this.$common.handlerMsgState({
+          msg: "该订单无法推送",
+          type: "danger"
+        });
+    }
+  },
+  mounted() {
+    this.getSendCompanyList();
+  },
   methods: {
+    // 根据订单获取可以发送的接收者
+    async getSendCompanyList() {
+      const res = await this.$http.post("/api/SendCompanyList", this.orderData);
+      if (res.data.result.code === 200) {
+        for (let i = 0; i < res.data.result.item.length; i++) {
+          res.data.result.item[i].checked = false;
+        }
+        this.tableData = res.data.result.item;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+
     // 切换产品列表样式
     handerIsGrid(type) {
       this.isGrid = type;
+    },
+    // 关闭全选
+    handleCheckAllClosee() {
+      this.checkAll = false;
+      this.multipleSelection = [];
+      if (this.isGrid === "bsGridPushComponent") {
+        this.$refs.listComponent.plantList.forEach(row => {
+          row.checked = false;
+        });
+      } else {
+        this.$refs.listComponent.$refs.multipleTable.clearSelection();
+      }
     },
     //全选按钮
     handleCheckAllChange(val) {
@@ -181,9 +265,17 @@ export default {
         }
       }
     },
+
     // 打开/关闭推送弹框
     handlePushDialog(flag) {
-      this.pushDialog = flag;
+      if (this.multipleSelection.length > 0) {
+        this.pushDialog = flag;
+      } else {
+        this.$common.handlerMsgState({
+          msg: "请勾选推送厂商",
+          type: "warning"
+        });
+      }
     }
   }
 };
@@ -223,7 +315,8 @@ export default {
       align-content: center;
       margin-bottom: 10px;
       p {
-        width: 235px;
+        // width: 260px;
+        min-width: 270px;
         margin-right: 30px;
         font-weight: 400;
         .pId {
@@ -238,7 +331,7 @@ export default {
       align-items: center;
       p {
         margin-right: 30px;
-        width: 235px;
+        min-width: 270px;
       }
       .right {
         flex: 1;
@@ -251,7 +344,7 @@ export default {
     }
   }
   .bsPushTable {
-    margin-bottom: 80px;
+    margin-top: 20px;
     .right {
       display: flex;
       width: 80px;
@@ -290,9 +383,12 @@ export default {
     }
   }
   .PushFooter {
+    // margin-top: 10px;
+
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    padding: 30px;
+    padding: 15px;
     .right {
       display: flex;
       align-items: center;
@@ -301,6 +397,9 @@ export default {
         color: #333333;
       }
     }
+  }
+  .PushFooterBorder {
+    border-top: 1px solid #dcdfe6;
   }
 }
 </style>

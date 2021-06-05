@@ -1,7 +1,7 @@
 <!--  -->
 <template>
   <div>
-    <component :is="isHome"></component>
+    <component :is="isHome" :allCount="allCount"></component>
   </div>
 </template>
 
@@ -24,8 +24,27 @@ export default {
       isHome: "bsCompanyHome"
     };
   },
+  methods: {
+    // 获取业务消息未读数
+    async getOrderMessageCount() {
+      const res = await this.$http.post("/api/GetOrderMessageCount", {});
+      console.log(res, 123);
+      if (res.data.result.code === 200) {
+        const list = res.data.result.item.result;
+        let count = 0;
+        for (let i = 0; i < list.length; i++) {
+          count += list[i].count;
+          if (list[i].sampleFrom == "HALL") {
+            this.$store.commit("updataHallCount", list[i].count);
+          }
+        }
+        this.$store.commit("updataAllCount", count);
+      }
+    }
+  },
   created() {},
   mounted() {
+    this.getOrderMessageCount();
     switch (this.userInfo.commparnyList[0].companyType) {
       //   case "Exhibition": // 展厅首页
       //     this.isHome = "bsHallHome";
@@ -44,17 +63,10 @@ export default {
         this.getGetSalesOrderDataStatistics();
         this.getGetSalesHotSample();
     }
-    const localKey = this.userInfo.uid;
-    let localShoppingCart = localStorage.getItem(localKey);
-    if (localShoppingCart) {
-      localShoppingCart = JSON.parse(localShoppingCart);
-      this.$store.commit("initShoppingCart", localShoppingCart);
-    } else {
-      this.$store.commit("initShoppingCart", []);
-    }
+    this.$cookies.remove("validityPeriod");
   },
   computed: {
-    ...mapState(["userInfo"])
+    ...mapState(["userInfo", "allCount"])
   }
 };
 </script>

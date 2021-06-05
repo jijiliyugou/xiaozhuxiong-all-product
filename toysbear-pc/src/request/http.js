@@ -3,6 +3,7 @@ import axios from "axios";
 import $Store from "@/store";
 import { router } from "@/router";
 import { Message } from "element-ui";
+import v from "vue";
 // const proEnv = require('@/assets/js/config/pro.env') // 生产环境
 // const testEnv = require('@/assets/js/config/test.env') // 测试环境
 // const devEnv = require('@/assets/js/config/dev.env') // 本地环境
@@ -21,6 +22,37 @@ import { Message } from "element-ui";
 //     target = devEnv.hosturl
 //     break
 // }
+// 刷新token
+function resetToken(token) {
+  return new Promise((result, reject) => {
+    v.prototype.$http
+      .post("/api/RefreshToken", {
+        token: token
+      })
+      .then(res => {
+        result(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+// 获取临时token
+function getToken() {
+  return new Promise((result, reject) => {
+    v.prototype.$http
+      .post("/api/GetToken", {
+        companyNum: "LittleBearWeb",
+        platForm: "PC"
+      })
+      .then(res => {
+        result(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
 const createLogRecord = async function(obj) {
   if (obj.Url.includes("CreateLogRecord")) {
     Message.closeAll();
@@ -83,7 +115,10 @@ myAxios.install = function(Vue) {
       ) {
         $Store.commit("updateAppLoading", true);
       }
-      if (!config.url.includes("GetToken")) {
+      if (
+        !config.url.includes("GetToken") &&
+        !config.url.includes("RefreshToken")
+      ) {
         config.headers.Utoken =
           $Store.state.userInfo && $Store.state.userInfo.accessToken;
       }
@@ -125,7 +160,7 @@ myAxios.install = function(Vue) {
   );
   // 响应拦截
   axios.interceptors.response.use(
-    res => {
+    async res => {
       /** 全局设置请求时长和请求内容 */
       const myUrl = res.config.url;
       let httpDate;
@@ -174,13 +209,42 @@ myAxios.install = function(Vue) {
       ) {
         return res;
       } else {
-        if (res.data.result.code === 401 || res.data.result.code === 403) {
-          Message.closeAll();
-          $Store.commit("updateAppLoading", false);
-          Message.error("登录过期，请重新登录");
-          router.push({
-            path: "/beforeIndex/login?id=signOut"
-          });
+        if (res.data.result.code === 401) {
+          const validityPeriod = localStorage.getItem("validityPeriod");
+          const options = JSON.parse(validityPeriod);
+          if (validityPeriod && options.dateTime) {
+            const currentDate = Date.now();
+            // 一天的时间戳为86400000
+            const day = 86400000 * 7;
+            // 超过7天
+            if (currentDate - options.dateTime >= day) {
+              Message.error("登录过期，请重新登录");
+              const result = await getToken();
+              if (result.data.result.code === 200) {
+                $Store.commit("reset_Token", result.data.result.item);
+              }
+              router.push({
+                path: "/login?id=signOut"
+              });
+            } else {
+              const result = await resetToken(res.config.headers.Utoken);
+              if (result.data.result.isLogin) {
+                $Store.commit("reset_Token", result.data.result.accessToken);
+                location.reload();
+              }
+            }
+          } else {
+            $Store.commit("updateAppLoading", false);
+            const result = await getToken();
+            if (result.data.result.code === 200) {
+              // accessToken = result.data.result.item;
+              $Store.commit("reset_Token", result.data.result.item);
+            }
+            Message.error("登录过期，请重新登录");
+            router.push({
+              path: "/login?id=signOut"
+            });
+          }
         }
       }
       return res;

@@ -52,6 +52,7 @@
 import { getMenuFuc } from "@/router/index";
 import loginTop from "@/components/loginTop/loginTop.vue";
 import loginFooter from "@/components/loginFooter.vue";
+import { mapState } from "vuex";
 export default {
   components: {
     loginTop,
@@ -60,6 +61,7 @@ export default {
   data() {
     return {
       loginUrl: "https://www.toysbear.com/new/#/bsIndex",
+      // loginUrl: "http://139.9.71.135:8080/new/#/bsIndex",
       // loginUrl: "http://124.71.6.26:8080/new/#/bsIndex",
       radioValue: null,
       commparnyList: []
@@ -86,13 +88,23 @@ export default {
     },
     async toMeInfo(item) {
       const res = await this.$http.post("/api/UserAffiliateCompany", {
-        UserId: this.$route.params.userInfo.id,
+        UserId: this.userInfo.userInfo.id,
         CompanyNumber: item.companyNumber
       });
       if (res.data.result.isLogin) {
         // 保存数据到cookit
-        this.$cookies.set("userInfo", res.data.result.accessToken);
-        console.log(this.$cookies.get("userInfo"));
+        // 记住密码
+        const options = {
+          token: res.data.result.accessToken
+        };
+        if (this.$route.query.thePassword) {
+          options.dateTime = Date.now();
+        }
+        const validityPeriod = JSON.stringify(options);
+        console.log(validityPeriod);
+        localStorage.setItem("validityPeriod", validityPeriod);
+        this.$cookies.set("validityPeriod", validityPeriod);
+
         // 设置token
         this.$store.commit("setToken", res.data.result);
         this.$store.commit(
@@ -160,12 +172,11 @@ export default {
       }
     }
   },
-  async mounted() {
-    if (!this.$route.params.commparnyList) {
-      this.$router.push("/beforeIndex/login");
-    } else {
-      this.commparnyList = this.$route.params.commparnyList;
-    }
+  mounted() {
+    this.commparnyList = this.userInfo.commparnyList;
+  },
+  computed: {
+    ...mapState(["userInfo"])
   }
 };
 </script>

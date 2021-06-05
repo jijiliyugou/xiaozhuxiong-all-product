@@ -34,7 +34,7 @@
         </div>
         <div class="selectTions">
           <div class="label">
-            是否按厂商单独导出图片：
+            是否按厂商导出单独图片：
             <!-- <el-radio-group class="myExportWay" v-model="imageExportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
@@ -49,7 +49,7 @@
             </el-checkbox-group>
           </div>
           <div class="label">
-            <span>是否带图：</span>
+            <span>Excel是否带图：</span>
             <el-radio-group class="myExportWay" v-model="exportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
@@ -64,7 +64,7 @@
             </el-checkbox-group> -->
           </div>
           <div class="label">
-            图片大小：
+            Excel图片尺寸：
             <el-select
               size="medium"
               style="width: 100px;"
@@ -101,7 +101,7 @@
         </div>
         <div class="selectTions">
           <div class="label">
-            是否按厂商单独导出图片：
+            是否按厂商导出单独图片：
             <!-- <el-radio-group class="myExportWay" v-model="imageExportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
@@ -116,14 +116,14 @@
             </el-checkbox-group>
           </div>
           <div class="label">
-            是否带图：
+            Excel是否带图：
             <el-radio-group class="myExportWay" v-model="exportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
             </el-radio-group>
           </div>
           <div class="label">
-            图片大小：
+            Excel图片尺寸：
             <el-select
               size="medium"
               style="width: 100px;"
@@ -160,7 +160,7 @@
         </div>
         <div class="selectTions">
           <div class="label">
-            是否按厂商单独导出图片：
+            是否按厂商导出单独图片：
             <!-- <el-radio-group class="myExportWay" v-model="imageExportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
@@ -175,14 +175,14 @@
             </el-checkbox-group>
           </div>
           <div class="label">
-            是否带图：
+            Excel是否带图：
             <el-radio-group class="myExportWay" v-model="exportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
             </el-radio-group>
           </div>
           <div class="label">
-            图片大小：
+            Excel图片尺寸：
             <el-select
               size="medium"
               style="width: 100px;"
@@ -219,7 +219,7 @@
         </div>
         <div class="selectTions">
           <div class="label">
-            是否按厂商单独导出图片：
+            是否按厂商导出单独图片：
             <!-- <el-radio-group class="myExportWay" v-model="imageExportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
@@ -234,14 +234,14 @@
             </el-checkbox-group>
           </div>
           <div class="label">
-            是否带图：
+            Excel是否带图：
             <el-radio-group class="myExportWay" v-model="exportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
             </el-radio-group>
           </div>
           <div class="label">
-            图片大小：
+            Excel图片尺寸：
             <el-select
               size="medium"
               style="width: 100px;"
@@ -278,7 +278,7 @@
         </div>
         <div class="selectTions">
           <div class="label">
-            是否按厂商单独导出图片：
+            是否按厂商导出单独图片：
             <!-- <el-radio-group class="myExportWay" v-model="imageExportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
@@ -313,7 +313,7 @@
         </div>
         <div class="selectTions">
           <div class="label">
-            是否按厂商单独导出图片：
+            是否按厂商导出单独图片：
             <!-- <el-radio-group class="myExportWay" v-model="imageExportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
@@ -328,14 +328,14 @@
             </el-checkbox-group>
           </div>
           <div class="label">
-            是否带图：
+            Excel是否带图：
             <el-radio-group class="myExportWay" v-model="exportWay">
               <el-radio :label="1">是</el-radio>
               <el-radio :label="2">否</el-radio>
             </el-radio-group>
           </div>
           <div class="label">
-            图片大小：
+            Excel图片尺寸：
             <el-select
               size="medium"
               style="width: 100px;"

@@ -16,7 +16,7 @@
             <el-image
               fit="contain"
               style="width: 50px; height: 50px"
-              :src="scope.row.imgUrl"
+              :src="scope.row.companyLogo"
             >
               <div slot="placeholder" class="errorImg">
                 <img
@@ -55,18 +55,18 @@
         min-width="150"
       ></el-table-column>
 
-      <el-table-column label="操作" min-width="250" align="center">
+      <!-- <el-table-column label="操作" min-width="250" align="center">
         <template slot-scope="scope">
-          <el-button size="medium" type="success" @click="openBsSampleDetail">
+          <el-button size="mini" type="success" @click="openBsSampleDetail">
             泽洋明细
           </el-button>
 
-          <el-button size="medium" type="warning" @click="openBsPushRecord"
+          <el-button size="mini" type="warning" @click="openBsPushRecord"
             >推送记录（{{ scope.$index }}）</el-button
           >
-          <el-button size="medium" type="primary"> 在线咨询 </el-button>
+          <el-button size="mini" type="primary"> 在线咨询 </el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <el-dialog
       title="择样明细"

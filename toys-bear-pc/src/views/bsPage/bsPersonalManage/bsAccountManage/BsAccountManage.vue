@@ -554,6 +554,25 @@ export default {
           transform: scale(0.8);
         }
       }
+      .isMe {
+        margin-left: 10px;
+        width: 44px;
+        height: 18px;
+        text-align: center;
+        background: blue;
+        border-radius: 9px;
+        color: #fff;
+        font-size: 12px;
+        i {
+          display: block;
+          position: relative;
+          top: -3px;
+          -webkit-transform: scale(0.8);
+          -moz-transform: scale(0.8);
+          -ms-transform: scale(0.8);
+          transform: scale(0.8);
+        }
+      }
     }
   }
 }

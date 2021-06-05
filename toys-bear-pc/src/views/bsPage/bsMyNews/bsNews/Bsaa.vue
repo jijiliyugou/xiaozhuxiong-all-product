@@ -390,6 +390,7 @@ export default {
   },
   created() {},
   mounted() {
+    console.log(this.im);
     this.watchIm();
   },
   computed: {

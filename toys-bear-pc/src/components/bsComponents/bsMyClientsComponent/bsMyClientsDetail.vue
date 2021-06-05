@@ -195,19 +195,47 @@
         </div>
         <div class="productListBox">
           <!-- 产品列表 -->
-          <component :is="isGrid" :productList="productList"></component>
+          <component
+            ref="componentRef"
+            :is="isGrid"
+            :productList="productList"
+          ></component>
           <!-- 分页 -->
-          <center class="myPagination">
+          <center
+            :class="{
+              myPagination: true,
+              leftCheckbox: isGrid === 'bsColumnComponent'
+            }"
+          >
+            <div class="left" v-show="isGrid === 'bsColumnComponent'">
+              <el-checkbox
+                :indeterminate="isIndeterminate"
+                v-model="checkAll"
+                @change="handleCheckAllChange"
+              >
+                全选
+              </el-checkbox>
+
+              <el-button
+                class="purchased"
+                size="small"
+                @click="handelrPurchased"
+              >
+                <i class="selectionCart"></i>
+                <span>本页选中一键加购</span>
+              </el-button>
+            </div>
             <el-pagination
-              layout="total, sizes, prev, pager, next, jumper"
-              :page-sizes="[12, 24, 36, 48]"
               background
-              :total="totalCount"
-              :page-size="pageSize"
-              :current-page.sync="currentPage"
-              @current-change="handleCurrentChange"
               @size-change="handleSizeChange"
-            ></el-pagination>
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-sizes="[12, 24, 36, 48]"
+              :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="totalCount"
+            >
+            </el-pagination>
           </center>
         </div>
       </div>
@@ -219,6 +247,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 // import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
 import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
@@ -244,6 +273,8 @@ export default {
       isRedu: null,
       sortOrder: null,
       sortType: null,
+      isIndeterminate: false,
+      checkAll: false,
       KeyWord: null,
       keywordAll: null,
       isGrid: "bsGridComponent",
@@ -261,6 +292,9 @@ export default {
       },
       typesList: []
     };
+  },
+  computed: {
+    ...mapState(["userInfo"])
   },
   watch: {},
   created() {},
@@ -281,13 +315,13 @@ export default {
           this.productList[i].isShop = item.isShop;
         }
       }
+      this.$forceUpdate();
     });
 
     eventBus.$emit("showCart", true);
     this.getProductListPageAll();
     this.getCompanyByID();
   },
-  computed: {},
   methods: {
     // 去聊天
     toNews() {
@@ -335,19 +369,6 @@ export default {
       const res = await this.$http.post("/api/SupplierProduct", fd);
       const { code, item, msg } = res.data.result;
       if (code === 200) {
-        // if (this.shoppingList) {
-        //   for (let i = 0; i < item.items.length; i++) {
-        //     this.$set(item.items[i], "isShopping", false);
-        //     for (let j = 0; j < this.shoppingList.length; j++) {
-        //       if (
-        //         item.items[i].productNumber ===
-        //         this.shoppingList[j].productNumber
-        //       ) {
-        //         this.$set(item.items[i], "isShopping", true);
-        //       }
-        //     }
-        //   }
-        // }
         this.productList = item.items;
         this.totalCount = item.totalCount;
       } else {
@@ -465,6 +486,69 @@ export default {
         this.getProductListPageEcommend();
       }
     },
+    // 点击全选
+    handleCheckAllChange(val) {
+      let myTableRef = this.$refs.componentRef.$refs.bsTableItemRef.$refs
+        .myTableRef;
+      if (val) myTableRef.toggleAllSelection();
+      else myTableRef.clearSelection();
+      this.isIndeterminate = false;
+    },
+    // 一键加购
+    handelrPurchased() {
+      this.$confirm("确定要加购选中的产品吗？", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const selectProducts = this.$refs.componentRef.$refs.bsTableItemRef
+            .$refs.myTableRef.selection;
+
+          let productNumber = [];
+          for (let i = 0; i < selectProducts.length; i++) {
+            productNumber.push(selectProducts[i].productNumber);
+          }
+          const fd = {
+            userID: this.userInfo.userInfo.id,
+            companyNumber: this.userInfo.commparnyList[0].companyNumber,
+            sourceFrom: "active",
+            number: 1,
+            currency: "￥",
+            Price: 0,
+            shopType: "companysamples",
+            productNumber: productNumber.join()
+          };
+          const res = await this.$http.post("/api/AddShoppingCart", fd);
+          if (res.data.result.code === 200) {
+            this.$store.commit(
+              "handlerShoppingCartCount",
+              res.data.result.item
+            );
+            this.$common.handlerMsgState({
+              msg: " 一键加购成功",
+              type: "success"
+            });
+            this.checkAll = false;
+            if (this.isDiyu === 0) {
+              this.getProductListPageAll();
+            } else {
+              this.getProductListPageEcommend();
+            }
+          } else {
+            this.$common.handlerMsgState({
+              msg: " 一键加购失败",
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "已取消一键加购",
+            type: "warning"
+          });
+        });
+    },
+
     // 过滤类型
     sortTypeEvent(type) {
       this.sortOrder = type;
@@ -792,6 +876,32 @@ export default {
     box-sizing: border-box;
     .myPagination {
       padding: 30px 0;
+    }
+    .leftCheckbox {
+      display: flex;
+      align-items: center;
+      width: 80%;
+
+      .left {
+        display: flex;
+        align-items: center;
+        padding: 0 300px 0 20px;
+        .purchased {
+          margin-left: 30px;
+          color: #3368a9;
+          border: 1px solid #3368a9;
+          .selectionCart {
+            display: inline-block;
+            vertical-align: bottom;
+            width: 14px;
+            height: 14px;
+            background: url("~@/assets/images/selectionCart.png") no-repeat
+              center;
+            background-size: contain;
+            margin-right: 10px;
+          }
+        }
+      }
     }
   }
 }

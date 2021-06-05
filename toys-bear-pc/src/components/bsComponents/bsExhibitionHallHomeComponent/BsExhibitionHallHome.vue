@@ -46,7 +46,7 @@
           </div>
         </div>
       </div>
-      <div class="right">
+      <!-- <div class="right">
         <div class="totalItem four">
           <p class="totalValue">{{ statisticsCount.hallTotalCount }}</p>
           <p class="totalTitle">择样统计</p>
@@ -63,7 +63,7 @@
           <p class="totalValue">{{ statisticsCount.productTotalCount }}</p>
           <p class="totalTitle">产品总数</p>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="contentWrap">
       <div class="contentTitle">

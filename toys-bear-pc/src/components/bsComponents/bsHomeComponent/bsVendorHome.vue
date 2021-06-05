@@ -231,6 +231,7 @@ export default {
             label: "访客",
             width: 150,
             productInfo: true,
+            cartInfoIcon: true,
             color: "red",
             // elImage: (row) => {
             //   return row.url;

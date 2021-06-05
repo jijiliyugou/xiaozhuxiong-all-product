@@ -29,8 +29,7 @@
     </center>
     <div class="ipList">
       <span class="title">小竹熊域名IP：</span>
-      <span class="value">香港IP：119.8.46.84</span>
-      <span class="value">美国IP：132.148.25.167</span>
+      <span class="value">119.29.72.160</span>
     </div>
     <div class="zhinanTitle">
       操作指南

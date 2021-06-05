@@ -8,6 +8,7 @@ export default {
       InvitationCode: "Invitation Code",
       email: "E-mail",
       userName: "user name",
+      contact: "Linkman",
       emailExplain: "（Email For Notification Only）",
       loginBtn: "Sign In",
       title: "login"
@@ -138,9 +139,15 @@ export default {
       id: "ID"
     },
     publicLang: {
+      pleaseEnterContact: "Please enter contact",
+      tips: "Tips",
+      determine: "Determine",
+      cancel: "Cancel",
+      incorrectInput: "Incorrect input",
       noData: "No data",
       successfulPurchase: "Successful purchase",
       cancelSuccessfully: "Cancel successfully",
+      theShoppingCartIsFull: "The shopping cart is full",
       itsTheFirstPage: "It's the first page",
       itsTheLastPage: "It's the last page",
       submittedSuccessfully: "Submitted successfully",

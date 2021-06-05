@@ -857,17 +857,24 @@ export default {
   methods: {
     // 提交扫码加购
     async submitCode() {
-      const res = await this.$http.post("/api/AddShoppingCart", {
-        userID: this.userInfo.userInfo.id,
-        companyNumber: this.userInfo.commparnyList[0].companyNumber,
-        // sourceFrom: "active",
-        sourceFrom: "QRCodeSearch",
-        number: this.QRcodeValue.productCount,
-        currency: "￥",
-        Price: 0,
-        shopType: "companysamples",
-        productNumber: this.QRcodeValue.productNumber
-      });
+      this.$store.commit("updateAppLoading", true);
+      const res = await this.$http.post(
+        "/api/AddShoppingCart",
+        {
+          userID: this.userInfo.userInfo.id,
+          companyNumber: this.userInfo.commparnyList[0].companyNumber,
+          // sourceFrom: "active",
+          sourceFrom: "QRCodeSearch",
+          number: 1,
+          currency: "￥",
+          Price: 0,
+          shopType: "companysamples",
+          productNumber: this.QRcodeValue.productNumber
+        },
+        {
+          timeout: 9999999
+        }
+      );
       if (res.data.result.code === 200) {
         this.getShoppingCartList();
         this.$common.handlerMsgState({
@@ -882,6 +889,7 @@ export default {
       }
 
       this.showCodeValue = false;
+      // this.$store.commit("updateAppLoading", true);
     },
     // 发送上传图片
     async httpFile(file) {
@@ -1137,21 +1145,31 @@ export default {
         .then(async () => {
           const selectProducts = this.$refs.myTableRef.selection;
           let productNumber = [];
-          for (let i = 0; i < selectProducts.length; i++) {
-            productNumber.push(selectProducts[i].productJson.productNumber);
-          }
-
+          // for (let i = 0; i < selectProducts.length; i++) {
+          //   productNumber.push(selectProducts[i].productJson.productNumber);
+          // }
+          productNumber = selectProducts.map(
+            val => val.productJson.productNumber
+          );
           const fd = {
             userID: this.userInfo.userInfo.id,
             companyNumber: this.userInfo.commparnyList[0].companyNumber,
-            sourceFrom: "active",
+            // sourceFrom: "active",
             shopType: "companysamples",
             productNumber: productNumber.join()
           };
-          const res = await this.$http.post("/api/RemoveShoppingCart", fd);
+          this.$store.commit("updateAppLoading", true);
+          const res = await this.$http.post("/api/RemoveShoppingCart", fd, {
+            timeout: 9999999
+          });
           if (res.data.result.code === 200) {
+            for (let i = 0; i < selectProducts.length; i++) {
+              eventBus.$emit(
+                "resetProductIsShop",
+                selectProducts[i].productJson
+              );
+            }
             this.getShoppingCartList();
-            eventBus.$emit("searchProducts");
             this.$common.handlerMsgState({
               msg: "删除成功",
               type: "success"
@@ -1162,6 +1180,7 @@ export default {
               type: "danger"
             });
           }
+          this.$store.commit("updateAppLoading", false);
         })
         .catch(() => {
           this.$common.handlerMsgState({
@@ -1298,7 +1317,10 @@ export default {
               offerAmount: val.price
             };
           });
-          if (this.userInfo.commparnyList[0].companyType == "Sales") {
+          if (
+            this.userInfo.commparnyList[0].companyType == "Sales" ||
+            this.userInfo.commparnyList[0].companyType == "Exhibition"
+          ) {
             this.clienFormData.productOfferType = "company";
           }
           for (let i = 0; i < this.clientList.length; i++) {
@@ -1322,24 +1344,22 @@ export default {
             let productNumber = [];
             for (let i = 0; i < selectProducts.length; i++) {
               productNumber.push(selectProducts[i].productJson.productNumber);
+              eventBus.$emit(
+                "resetProductIsShop",
+                selectProducts[i].productJson
+              );
             }
             const data = {
               userID: this.userInfo.userInfo.id,
               companyNumber: this.userInfo.commparnyList[0].companyNumber,
-              sourceFrom: "active",
+              // sourceFrom: "active",
               shopType: "companysamples",
               productNumber: productNumber.join()
             };
             const res = await this.$http.post("/api/RemoveShoppingCart", data);
             if (res.data.result.code === 200) {
               this.getShoppingCartList();
-              eventBus.$emit("searchProducts");
-              // this.$common.handlerMsgState({
-              //   msg: "删除成功",
-              //   type: "success"
-              // });
             }
-            this.$store.commit("resetShoppingCart", selectProducts);
             this.subDialogVisible = false;
             const fd = {
               name: "/bsIndex/bsSampleQuotation",
@@ -1416,7 +1436,9 @@ export default {
         userID: this.userInfo.userInfo.id,
         companyNumber: this.userInfo.commparnyList[0].companyNumber
       };
-      const res = await this.$http.post("/api/ShoppingCartList", fd);
+      const res = await this.$http.post("/api/ShoppingCartList", fd, {
+        timeout: 9999999
+      });
       if (res.data.result.code === 200) {
         this.cartList = res.data.result.item;
         for (let i = 0; i < this.cartList.length; i++) {
@@ -1426,8 +1448,9 @@ export default {
             { supplierJson: JSON.parse(this.cartList[i].supplierJson) }
           );
         }
-        // console.log(this.cartList, "解析的列表");
+
         this.tableData = this.cartList;
+        // console.log(this.tableData, "解析的列表");
         this.$store.commit(
           "handlerShoppingCartCount",
           res.data.result.item.length
@@ -1437,8 +1460,8 @@ export default {
           const totalEl = document.getElementById("totalBox");
           totalEl.style.width =
             document.getElementById("tableId").offsetWidth + 60 + "px";
+          this.$refs.myTableRef && this.$refs.myTableRef.toggleAllSelection();
         });
-        this.$refs.myTableRef.toggleAllSelection();
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -1447,20 +1470,13 @@ export default {
       }
     }
   },
-
-  created() {
-    this.getSelectProductOfferFormulaList();
-    this.getSelectCompanyOffer();
-  },
-  mounted() {
-    this.getClientList();
-    this.getShoppingCartList();
+  async mounted() {
+    await this.getSelectProductOfferFormulaList();
+    await this.getSelectCompanyOffer();
+    await this.getClientList();
+    await this.getShoppingCartList();
     eventBus.$on("handlergetClientList", () => {
       this.getShoppingCartList();
-    });
-
-    this.$nextTick(() => {
-      this.$refs.myTableRef.toggleAllSelection();
     });
     const totalEl = document.getElementById("totalBox");
     eventBus.$on("handlerLeft", left => {

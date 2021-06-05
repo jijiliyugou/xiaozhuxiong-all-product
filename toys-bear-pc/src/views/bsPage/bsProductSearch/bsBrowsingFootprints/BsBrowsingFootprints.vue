@@ -328,6 +328,7 @@ export default {
           }
         }
       }
+      this.$forceUpdate();
     });
   },
 

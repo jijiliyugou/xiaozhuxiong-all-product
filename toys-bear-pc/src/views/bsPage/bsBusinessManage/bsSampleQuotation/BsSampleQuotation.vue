@@ -102,7 +102,7 @@
 <script>
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gongsizhaoyangbaojia.vue";
 import eventBus from "@/assets/js/common/eventBus.js";
-import bsTables from "@/components/table";
+import bsTables from "@/components/tableBtn";
 import { mapState } from "vuex";
 import { proEnv, testEnv, devEnv } from "@/assets/js/config/config.js";
 export default {
@@ -241,7 +241,17 @@ export default {
               return row.offerNumber[0] != "S";
             },
             methods: row => {
-              console.log(row);
+              row.label = "报价推送";
+              const fd = {
+                name: row.offerNumber + "报价推送",
+                linkUrl: "/bsIndex/bsSampleQuotation",
+                component: "bsPushIndex",
+                refresh: true,
+                noPush: true,
+                label: "报价推送",
+                value: row
+              };
+              this.$store.commit("myAddTab", fd);
             }
           },
           {
@@ -258,23 +268,32 @@ export default {
           },
           {
             type: "warning",
+            color: "#F9723E",
+            hidden(row) {
+              return row.offerNumber[0] != "S" ? false : true;
+            },
             textWrapper() {
               return "导出";
             },
             methods: row => {
               this.exportOrder(row);
-            }
+            },
+            icon: "el-icon-download"
           },
           {
             type: "warning",
             color: "#F9AE3E",
+            hidden(row) {
+              return row.offerNumber[0] != "S" ? false : true;
+            },
             textWrapper() {
               return "分享";
             },
             methods: row => {
               this.copyShare(row);
             },
-            class: "copy"
+            class: "copy",
+            icon: "el-icon-s-promotion"
           }
         ]
       },
@@ -407,23 +426,6 @@ export default {
       };
       this.$store.commit("myAddTab", fd);
     },
-    // 推送跳转
-    // toPushDetails(index, row) {
-    //   const fd = {
-    //     name: row.offerNumber + "报价推送",
-    //     linkUrl: "/bsIndex/bsSampleQuotation",
-    //     component: "bsPushIndex",
-    //     refresh: true,
-    //     noPush: true,
-    //     label: "报价推送" + row.offerNumber,
-    //     value: row
-    //   };
-    //   console.log(fd);
-    //   this.$store.commit("myAddTab", fd);
-    // },
-    toPushDetails() {
-      return false;
-    },
     //编辑报价跳转
     async handleEdit(index, row) {
       console.log(row, "row");
@@ -460,7 +462,7 @@ export default {
           target = devEnv.hosturl;
           break;
       }
-      var url = target + "share/#/offerSharing?id=" + row.offerNumber;
+      var url = target + "/share/#/offerSharing?id=" + row.offerNumber;
       const input = document.createElement("input");
       document.body.appendChild(input);
       input.setAttribute("value", url);

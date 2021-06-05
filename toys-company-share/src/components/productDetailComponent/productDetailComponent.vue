@@ -21,14 +21,30 @@
               globalLang === "zh-CN" ? productData.name : productData.ename
             }}</span>
           </div>
-          <div class="itemText">
+          <div class="itemText" v-if="shareInfo.isShowPrice">
             {{ productLang.price }}：
             <span class="priceBox"
               >{{ userInfo.currencyType
               }}<span class="price">{{ productData.price }}</span></span
             >
           </div>
-          <div class="itemText">
+          <!-- <div class="itemText">
+            {{ productLang.exFactoryArticleNo }}：<span>{{
+              productData.outFactoryNumber
+            }}</span>
+          </div> -->
+          <div class="itemText" v-if="shareInfo.showNumber == 1">
+            {{ productLang.exFactoryArticleNo }}：<span>{{
+              productData.commodityNumber
+            }}</span>
+          </div>
+          <div class="itemText" v-else-if="shareInfo.showNumber == 2">
+            {{ productLang.exFactoryArticleNo }}：<span>{{
+              productData.productNumber
+            }}</span>
+          </div>
+          <div class="itemText" v-else-if="shareInfo.showNumber == -1"></div>
+          <div class="itemText" v-else>
             {{ productLang.exFactoryArticleNo }}：<span>{{
               productData.outFactoryNumber
             }}</span>
@@ -134,9 +150,9 @@ export default {
           if (res.data.result.code === 200) {
             item.isShop = !item.isShop;
             if (item.isShop) {
-              this.$message.success("加购成功");
+              this.$message.success(this.publicLang.successfulPurchase);
             } else {
-              this.$message.warning("取消加购");
+              this.$message.warning(this.publicLang.cancelSuccessfully);
             }
             this.$store.commit("handlerShopLength", res.data.result.item);
           } else {
@@ -147,27 +163,32 @@ export default {
     // 是否加购
     async handlerShopping(item) {
       if (!this.userInfo.loginEmail) {
-        this.$prompt("请输入用户名", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消"
+        this.$prompt(this.publicLang.pleaseEnterContact, this.publicLang.tips, {
+          confirmButtonText: this.publicLang.determine,
+          cancelButtonText: this.publicLang.cancel
         })
           .then(({ value }) => {
             if (value) {
               this.$store.commit("handlerLoginName", value);
+              // 重新登录
+              const fd = JSON.parse(JSON.stringify(this.formLabelAlign));
+              fd.email = value;
+              console.log(fd);
+              this.$http.post("/api/Account/CompanyShareLogin", fd);
               this.addCart(item);
             } else {
-              this.$message.error("输入有误");
+              this.$message.error(this.publicLang.incorrectInput);
             }
           })
           .catch(() => {
-            this.$message({
-              type: "info",
-              message: "取消输入"
-            });
+            // this.$message({
+            //   type: "info",
+            //   message: "取消输入"
+            // });
           });
         return false;
       } else if (this.shopLength >= 500) {
-        this.$message.error("购物车已满500条");
+        this.$message.error(this.publicLang.theShoppingCartIsFull);
         return false;
       } else {
         this.addCart(item);
@@ -200,7 +221,13 @@ export default {
     publicLang() {
       return this.$t("lang.publicLang");
     },
-    ...mapState(["globalLang", "userInfo", "shopLength"])
+    ...mapState([
+      "globalLang",
+      "userInfo",
+      "shopLength",
+      "formLabelAlign",
+      "shareInfo"
+    ])
   }
 };
 </script>

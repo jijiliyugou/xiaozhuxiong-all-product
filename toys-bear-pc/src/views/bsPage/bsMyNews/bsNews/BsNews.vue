@@ -1,18 +1,18 @@
 <template>
   <div>
-    <!-- 敬请期待 -->
-    <bsaa :im="im" />
+    敬请期待
+    <!-- <bsaa :im="im" /> -->
   </div>
 </template>
 
 <script>
-import bsaa from "./Bsaa";
+// import bsaa from "./Bsaa";
 export default {
   name: "",
   props: ["im"],
-  components: {
-    bsaa
-  },
+  // components: {
+  //   bsaa
+  // },
   data() {
     return {};
   },

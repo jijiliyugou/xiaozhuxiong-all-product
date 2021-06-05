@@ -182,7 +182,6 @@
     font-size: 15px !important;
     height: 40px !important;
     line-height: 39px !important;
-    text-indent: 10px !important;
     // padding-left: 50px !important;
     background-color: #f9fafc;
     &:hover {
@@ -197,6 +196,13 @@
     }
   }
 }
-@{deep} .el-badge__content.is-fixed.is-dot {
-  top: 10px;
+@{deep} .hongdian {
+  .el-badge__content.is-fixed {
+    text-indent: 0;
+  }
+}
+@{deep} .onehongdian {
+  .el-badge__content.is-fixed {
+    top: 15px;
+  }
 }

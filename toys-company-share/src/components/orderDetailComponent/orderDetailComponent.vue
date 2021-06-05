@@ -116,8 +116,17 @@
                         : scope.row.productEName
                     }}
                   </p>
-                  <p class="fa_no">{{ scope.row.outFactoryNumber }}</p>
-                  <p class="price">
+                  <p class="fa_no" v-if="shareInfo.showNumber == 1">
+                    {{ scope.row.commodityNumber }}
+                  </p>
+                  <p class="fa_no" v-else-if="shareInfo.showNumber == 2">
+                    {{ scope.row.productNumber }}
+                  </p>
+                  <p class="fa_no" v-else-if="shareInfo.showNumber == -1"></p>
+                  <p class="fa_no" v-else>
+                    {{ scope.row.outFactoryNumber }}
+                  </p>
+                  <p class="price" v-if="shareInfo.isShowPrice">
                     <span>{{ scope.row.currencyType }}</span>
                     <span class="priceText">{{ scope.row.productPrice }}</span>
                   </p>
@@ -206,7 +215,7 @@
               <div class="tableTotalVolume">
                 <p class="item">{{ scope.row.totalProductStere }}cbm</p>
                 <p class="item">{{ scope.row.totalProductFeet }}cuft</p>
-                <p class="item price">
+                <p class="item price" v-if="shareInfo.isShowPrice">
                   <span>{{ scope.row.currencyType }}</span>
                   <span class="priceText">{{ scope.row.totalPrice }}</span>
                 </p>
@@ -259,7 +268,7 @@
             </span>
           </div>
           <!-- 总价 -->
-          <div class="totalWrap totalPrice">
+          <div class="totalWrap totalPrice" v-if="shareInfo.isShowPrice">
             {{ myShoppingCartLang.totalPrice }}：
             <span class="price">{{ userInfo.currencyType }}</span>
             <span style="margin-left:5px;" class="price">
@@ -503,8 +512,7 @@ export default {
     myShoppingCartLang() {
       return this.$t("lang.myShoppingCart");
     },
-    ...mapState(["globalLang"]),
-    ...mapState(["userInfo"])
+    ...mapState(["globalLang", "shareInfo", "userInfo"])
   }
 };
 </script>
@@ -657,9 +665,9 @@ export default {
           }
         }
         .tableTotalVolume {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
+          // display: flex;
+          // flex-direction: column;
+          // justify-content: space-between;
           color: #ff3e3e;
           height: 90px;
           .price {

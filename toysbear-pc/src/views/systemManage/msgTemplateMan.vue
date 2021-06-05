@@ -18,12 +18,12 @@
               >
                 <el-option
                   v-for="(item, index) in [
-                    { itemCode: '', itemText: '全部' },
+                    { parameter: '', itemText: '全部' },
                     ...configList
                   ]"
                   :key="index"
                   :label="item.itemText"
-                  :value="item.itemCode"
+                  :value="item.parameter"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -107,6 +107,7 @@
           title="消息类型"
           :visible.sync="addVisible"
           v-if="addVisible"
+          class="addMsgDialog"
           width="475px"
         >
           <addMsgTp
@@ -179,13 +180,16 @@ export default {
     // 提交消息模板
     async submit(data) {
       console.log(data);
-      let api = "/api/PushSettings/CreateMessageTeplateSettings";
-      if (this.isEdit) api = "/api/PushSettings/UpdateMessageTeplateSettings";
+      let api = "/api/PushSettings/CreateMessageTeplateSettings",
+        msg = "新增成功";
+      if (this.isEdit)
+        (api = "/api/PushSettings/UpdateMessageTeplateSettings"),
+          (msg = "编辑成功");
       const res = await this.$http.post(api, data);
       if (res.data.result.code === 200) {
         this.isEdit = false;
         this.addVisible = false;
-        this.$message.success("新增成功");
+        this.$message.success(msg);
         this.getMessageTeplateSettingsByPage();
       } else {
         this.$message.error(res.data.result.msg);
@@ -246,7 +250,7 @@ export default {
     },
     // 筛选角色
     filterRole(value) {
-      const role = this.configList.find(val => val.itemCode == value);
+      const role = this.configList.find(val => val.parameter == value);
       return role && role.itemText;
     },
     // 获取系统配置
@@ -293,6 +297,7 @@ export default {
 };
 </script>
 <style scoped lang="less">
+@deep: ~">>>";
 .searchBox {
   padding-top: 50px;
   box-sizing: border-box;
@@ -303,5 +308,20 @@ export default {
 .tableContent {
   padding-bottom: 20px;
   box-sizing: border-box;
+}
+@{deep} .addMsgDialog {
+  .el-dialog {
+    .el-dialog__body {
+      padding: 20px 0;
+      .myScroll {
+        .el-scrollbar {
+          .el-scrollbar__wrap {
+            padding: 0 20px;
+            overflow-x: hidden;
+          }
+        }
+      }
+    }
+  }
 }
 </style>

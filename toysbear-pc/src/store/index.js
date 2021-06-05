@@ -51,6 +51,10 @@ export default new Vuex.Store({
     currentComparnyId: null
   },
   mutations: {
+    // 过期更新token
+    reset_Token(state, token) {
+      state.userInfo.accessToken = token;
+    },
     initShoppingCart(state, payLoad) {
       const key = state.userInfo.uid;
       Vue.prototype.$set(state, key, payLoad);

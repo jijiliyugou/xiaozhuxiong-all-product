@@ -142,7 +142,7 @@
                   </div>
                 </div>
               </div>
-              <div class="middle">
+              <div class="middle_content">
                 <div class="itemInput">
                   <div class="title">
                     {{ advancedSearchLang.productSpecification + "：" }}
@@ -552,7 +552,7 @@ export default {
           display: flex;
           .left,
           .right,
-          .middle {
+          .middle_content {
             flex: 1;
             .itemInput {
               margin-top: 20px;
@@ -577,7 +577,7 @@ export default {
               }
             }
           }
-          .middle {
+          .middle_content {
             flex: 1;
             .itemInput {
               margin-top: 20px;

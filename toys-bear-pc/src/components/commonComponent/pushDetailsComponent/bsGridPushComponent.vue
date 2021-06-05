@@ -6,7 +6,7 @@
           <el-image
             fit="contain"
             style="width: 100px; height: 100px"
-            :src="item.imgUrl"
+            :src="item.companyLogo"
           >
             <div slot="placeholder" class="errorImg">
               <img
@@ -25,23 +25,25 @@
           </el-image>
         </div>
         <div class="right">
-          <h4>{{ item.name }}</h4>
+          <h4>{{ item.companyName }}</h4>
           <p>联系电话：{{ item.phoneNumber }}</p>
-          <p class="onlineConsultation" @click="toNews">
+          <p class="onlineConsultation" @click="toNews(item)">
             <img src="~@/assets/images/consult.png" alt />
             在线咨询
           </p>
         </div>
       </div>
       <div class="cheDetail">
-        <p>
+        <div class="checkboxP">
           <el-checkbox
             @change="handleChecked"
             v-model="item.checked"
           ></el-checkbox>
-        </p>
-        <p><i class="el-icon-document"></i> 择样明细(4)</p>
-        <p><i class="el-icon-time"></i>推送记录(0)</p>
+        </div>
+        <div class="text" @click="openDetails">
+          <p><i class="el-icon-document"></i> 择样明细(0)</p>
+          <p><i class="el-icon-time"></i>推送记录(0)</p>
+        </div>
       </div>
     </div>
     <div class="kong"></div>
@@ -64,19 +66,27 @@ export default {
     return {};
   },
   methods: {
+    // 去详情
+    openDetails() {
+      this.$common.handlerMsgState({
+        msg: "敬请期待",
+        type: "warning"
+      });
+    },
     // 去聊天
-    toNews() {
+    toNews(item) {
       const fd = {
-        name: this.companyInfo.companyNumber + "bsNews",
+        name: item.companyNumber + "bsNews",
         linkUrl: "/bsIndex/bsNews",
         component: "bsNews",
         refresh: true,
-        label: this.companyInfo.companyName,
-        value: this.companyInfo
+        label: item.companyName,
+        value: item
       };
-      this.$router.push("/bsIndex/bsNews");
       this.$store.commit("myAddTab", fd);
+      this.$router.push("/bsIndex/bsNews");
     },
+    // 单选
     handleChecked(value) {
       let arr = this.plantList.filter(item => {
         return item.checked === true;
@@ -93,9 +103,9 @@ export default {
 </script>
 <style scoped lang="less">
 .bsGridPushComponent {
-  padding: 30px 0;
+  padding-top: 20px;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   flex-wrap: wrap;
   .gridBox {
     width: 390px;
@@ -103,6 +113,7 @@ export default {
     background: #ffffff;
     border: 1px solid #dcdfe6;
     border-radius: 5px;
+    margin-bottom: 20px;
     .title {
       height: 150px;
       border-bottom: 1px solid #dcdfe6;
@@ -141,13 +152,27 @@ export default {
       height: 40px;
       display: flex;
       align-items: center;
-      justify-content: space-around;
-      p {
-        font-weight: 400;
-        color: #666666;
+      .checkboxP {
+        padding-left: 20px;
+      }
+      .text {
+        margin-left: 102px;
+        margin-right: 20px;
+        flex: 1;
         display: flex;
         align-items: center;
-        line-height: 19px;
+        justify-content: space-between;
+        p {
+          cursor: pointer;
+          font-weight: 400;
+          color: #666666;
+          display: flex;
+          align-items: center;
+          line-height: 19px;
+          i {
+            padding: 0 5px;
+          }
+        }
       }
     }
   }

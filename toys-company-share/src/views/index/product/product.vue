@@ -216,6 +216,7 @@ export default {
         pageSize: this.pageSize,
         loginName: this.userInfo.loginEmail
       };
+      console.log(fd, 123456);
       if (fd.pa_nu) {
         const { packChMethods, packNumber } = JSON.parse(fd.pa_nu);
         fd.ch_pa = packChMethods;
@@ -265,6 +266,11 @@ export default {
     this.$root.eventHub.$on("resetProducts", () => {
       this.currentPage = 1;
       this.getSearchCompanyShareProductPage();
+    });
+    this.$root.eventHub.$on("resetAll", () => {
+      this.$nextTick(() => {
+        this.getSearchCompanyShareProductPage();
+      });
     });
     if (this.imageSearchValue instanceof Array) {
       this.productList = this.imageSearchValue;

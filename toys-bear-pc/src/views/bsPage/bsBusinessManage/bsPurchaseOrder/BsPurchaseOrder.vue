@@ -167,28 +167,43 @@ export default {
             label: "备注"
           },
           {
-            prop: "readStatus",
+            prop: "orderStatus",
             isHiden: true,
             label: "状态",
             render(row) {
-              if (row.readStatus) {
-                return "已读";
-              } else {
-                return "未读";
+              console.log(row.orderStatus);
+              if (row.orderStatus == 0) {
+                return "<span style='color: #FF4848; '>未读</span>";
+              } else if (row.orderStatus == 1) {
+                return "<span style='color: #3368A9; '>已读</span>";
+              } else if (row.orderStatus == 9) {
+                return "<span style='color: #33A96A; '>已完成</span>";
+              } else if (row.orderStatus == 99) {
+                return "<span style='color: #999999; '>已取消</span>";
               }
             }
           }
         ],
         actions: [
-          {
-            type: "primary",
-            textWrapper() {
-              return "推送";
-            },
-            methods: row => {
-              console.log(row);
-            }
-          },
+          // {
+          //   type: "primary",
+          //   textWrapper() {
+          //     return "推送";
+          //   },
+          //   methods: (row) => {
+          //     row.label = "采购推送";
+          //     const fd = {
+          //       name: row.offerNumber + "采购推送",
+          //       linkUrl: "/bsIndex/bsPurchaseOrder",
+          //       component: "bsPushIndex",
+          //       refresh: true,
+          //       noPush: true,
+          //       label: "采购推送",
+          //       value: row,
+          //     };
+          //     this.$store.commit("myAddTab", fd);
+          //   },
+          // },
           {
             type: "warning",
             textWrapper() {
@@ -296,12 +311,14 @@ export default {
     // 获取列表
     async getTableDataList() {
       const fd = {
-        readStatus: "-1",
+        sampleFrom: "Sales",
+        sampleTo: "Supplier",
+        readStatus: -1,
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyword: this.searchForm.keyword,
         staffId: this.searchForm.staffId,
-        messageExt: 7,
+        messageExt: -1,
         messageModel: 7,
         startTime: this.searchForm.dateTime && this.searchForm.dateTime[0],
         endTime: this.searchForm.dateTime && this.searchForm.dateTime[1]

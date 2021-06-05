@@ -35,17 +35,13 @@
       </div>
     </div>
     <div class="contentProduct">
-      <div
-        class="bsGridItem"
-        v-for="item in productList"
-        :key="item.id"
-        @click="toProductDetails(item)"
-      >
+      <div class="bsGridItem" v-for="item in productList" :key="item.id">
         <div class="itemImg">
           <el-image
             style="width: 222px; height: 166px"
             fit="contain"
             :src="item.imgUrl"
+            :preview-src-list="[item.imgUrl]"
             lazy
           >
             <div slot="placeholder" class="image-slot">
@@ -223,22 +219,22 @@ export default {
       this.showQuotationFormula = true;
     },
     // 去产品详情
-    async toProductDetails() {
-      this.$common.handlerMsgState({
-        msg: "没有产品编号",
-        type: "danger"
-      });
-      return false;
-      // const fd = {
-      //   name: this.item.productNumber,
-      //   linkUrl: "/bsIndex/bsProductSearchIndex",
-      //   component: "bsProductDetails",
-      //   refresh: true,
-      //   label: this.item.fa_no || "产品详情",
-      //   value: this.item
-      // };
-      // this.$store.commit("myAddTab", fd);
-    },
+    // async toProductDetails() {
+    //   this.$common.handlerMsgState({
+    //     msg: "没有产品编号",
+    //     type: "danger"
+    //   });
+    //   return false;
+    // const fd = {
+    //   name: this.item.productNumber,
+    //   linkUrl: "/bsIndex/bsProductSearchIndex",
+    //   component: "bsProductDetails",
+    //   refresh: true,
+    //   label: this.item.fa_no || "产品详情",
+    //   value: this.item
+    // };
+    // this.$store.commit("myAddTab", fd);
+    // },
     // 收藏
     async addCollect(item) {
       if (this.canClick) {

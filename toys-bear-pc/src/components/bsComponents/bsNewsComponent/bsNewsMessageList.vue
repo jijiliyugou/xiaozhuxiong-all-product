@@ -375,7 +375,6 @@
                             style="width: 300px; height: 400px; min-width: 300px;"
                             :src="item.content.imageUri"
                             :preview-src-list="[item.content.imageUri]"
-                            lazy
                             fit="contain"
                           >
                             <div
@@ -491,7 +490,6 @@
                           v-else-if="item.messageType === 'RC:ImgMsg'"
                         >
                           <el-image
-                            lazy
                             style="width: 300px; height: 400px; min-width: 100px;"
                             :src="item.content.imageUri"
                             :preview-src-list="[item.content.imageUri]"

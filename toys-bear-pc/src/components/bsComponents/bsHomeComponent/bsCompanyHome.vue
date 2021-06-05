@@ -19,9 +19,15 @@
               fit="contain"
             >
             </el-image>
-            <!-- <el-badge :value="5" class="homeBadge"> -->
-            <span class="text">{{ item.title }}</span>
-            <!-- </el-badge> -->
+            <el-badge
+              v-if="item.count"
+              :value="hallCount"
+              :hidden="hallCount < 1"
+              class="homeBadge"
+            >
+              <span class="text">{{ item.title }}</span>
+            </el-badge>
+            <span class="text" v-else>{{ item.title }}</span>
           </li>
           <li class="block"></li>
           <li class="block"></li>
@@ -362,6 +368,7 @@
 
 <script>
 import { calculateDate } from "@/assets/js/common/common.js";
+import { mapState } from "vuex";
 export default {
   name: "bsCompanyHome",
   data() {
@@ -452,7 +459,8 @@ export default {
       gongzuoList: [
         {
           title: "展厅业务",
-          icon: require("@/assets/images/zhantingyewu.png")
+          icon: require("@/assets/images/zhantingyewu.png"),
+          count: true
         },
         {
           title: "找样报价",
@@ -640,7 +648,8 @@ export default {
   computed: {
     swiper() {
       return this.$refs.mySwiper.$swiper;
-    }
+    },
+    ...mapState(["hallCount"])
   }
 };
 </script>

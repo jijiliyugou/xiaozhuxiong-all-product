@@ -38,6 +38,7 @@ export default {
   mounted() {
     // if (this.$route.query.id === "signOut") {
     this.$store.commit("removeLoginItems");
+    localStorage.clear();
     // }
   }
 };

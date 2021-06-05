@@ -234,6 +234,8 @@ export default {
         label: this.item.fa_no || "产品详情",
         value: this.item
       };
+      console.log(2222);
+      this.$router.push("/bsIndex/bsProductSearchIndex");
       this.$store.commit("myAddTab", fd);
     },
     // 去厂商详情页 || 去展厅详情页

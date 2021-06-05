@@ -33,6 +33,38 @@ const createLogRecord = async function(obj) {
   }
 };
 
+// 刷新token
+function resetToken(token) {
+  return new Promise((result, reject) => {
+    v.prototype.$http
+      .post("/api/RefreshToken", {
+        token: token
+      })
+      .then(res => {
+        result(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+// 获取临时token
+function getToken() {
+  return new Promise((result, reject) => {
+    v.prototype.$http
+      .post("/api/GetToken", {
+        companyNum: "LittleBearWeb",
+        platForm: "PC"
+      })
+      .then(res => {
+        result(res);
+      })
+      .catch(err => {
+        reject(err);
+      });
+  });
+}
+
 /**
  * apiBaseURL
  */
@@ -54,6 +86,7 @@ switch (env) {
     break;
 }
 console.log(target);
+// let accessToken = $Store.state.userInfo && $Store.state.userInfo.accessToken;
 // 基础实例
 const instance = axios.create({
   baseURL: target,
@@ -128,7 +161,7 @@ instance.interceptors.request.use(
 );
 // 响应拦截
 instance.interceptors.response.use(
-  res => {
+  async res => {
     // loaddingOptions[res.config.url] = false;
     v.prototype.$nextTick(() => {
       $Store.commit("updateAppLoading", false);
@@ -186,15 +219,59 @@ instance.interceptors.response.use(
     ) {
       return res;
     } else {
-      if (res.data.result.code === 401 || res.data.result.code === 403) {
-        $Store.commit("updateAppLoading", false);
-        v.prototype.$common.handlerMsgState({
-          msg: "登录过期，请重新登录",
-          type: "danger"
-        });
-        router.push({
-          path: "/login?id=signOut"
-        });
+      if (res.data.result.code === 401) {
+        const validityPeriod = localStorage.getItem("validityPeriod");
+        const options = JSON.parse(validityPeriod);
+        if (validityPeriod && options.dateTime) {
+          const currentDate = Date.now();
+          // 一天的时间戳为86400000
+          const day = 86400000 * 7;
+          // 超过7天
+          if (currentDate - options.dateTime >= day) {
+            v.prototype.$common.handlerMsgState({
+              msg: "登录过期，请重新登录",
+              type: "danger"
+            });
+            const result = await getToken();
+            if (result.data.result.code === 200) {
+              // accessToken = result.data.result.item;
+              $Store.commit("reset_Token", result.data.result.item);
+            }
+            router.push({
+              path: "/login?id=signOut"
+            });
+          } else {
+            const result = await resetToken(res.config.headers.Utoken);
+            if (result.data.result.isLogin) {
+              // accessToken = result.data.result.item;
+              // Create new promise to handle exponential backoff
+              $Store.commit("reset_Token", result.data.result.accessToken);
+              var backoff = new Promise(function(resolve) {
+                setTimeout(function() {
+                  resolve();
+                }, instance.defaults.retryDelay || 1);
+              });
+              // Return the promise in which recalls axios to retry the request
+              return backoff.then(function() {
+                return instance(res.config);
+              });
+              // location.reload();
+            }
+          }
+        } else {
+          const result = await getToken();
+          if (result.data.result.code === 200) {
+            // accessToken = result.data.result.item;
+            $Store.commit("reset_Token", result.data.result.item);
+          }
+          v.prototype.$common.handlerMsgState({
+            msg: "登录过期，请重新登录",
+            type: "danger"
+          });
+          router.push({
+            path: "/login?id=signOut"
+          });
+        }
       }
     }
     return res;

@@ -42,7 +42,9 @@
           <span class="itemTitle">总出厂价/总报出价</span>
           <span class="price">￥{{ summaryData.sumAmountFa_pr }}</span>
           <span>/</span>
-          <span class="price">￥{{ summaryData.sumHa_in_qu || 0 }}</span>
+          <span class="price">
+            {{ summaryData.cu_de }}{{ summaryData.sumHa_in_qu || 0 }}
+          </span>
         </p>
       </div>
       <div class="submit" v-show="summaryData.isHandle">

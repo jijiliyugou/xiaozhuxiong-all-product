@@ -57,6 +57,9 @@ export default {
   },
   mounted() {
     this.getCompanyShareIndex();
+    this.$root.eventHub.$on("resetAll", () => {
+      this.getCompanyShareIndex();
+    });
   }
 };
 </script>

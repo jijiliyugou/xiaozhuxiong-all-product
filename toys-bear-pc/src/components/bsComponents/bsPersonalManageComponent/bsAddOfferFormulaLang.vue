@@ -7,7 +7,7 @@
       :model="formData"
       class="addDialogClass"
     >
-      <el-form-item label="主题：" prop="title">
+      <!-- <el-form-item label="主题：" prop="title">
         <el-input
           placeholder="请输入主题"
           v-model="formData.title"
@@ -16,6 +16,23 @@
           size="medium"
           show-word-limit
         ></el-input>
+      </el-form-item> -->
+      <el-form-item label="类型：" prop="title">
+        <el-select
+          size="medium"
+          style="width: 200px;"
+          clearable
+          v-model="formData.title"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in messageExtType"
+            :key="item.index"
+            :label="item.title"
+            :value="item.title"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
 
       <el-form-item label="内容：" prop="content">
@@ -56,17 +73,16 @@ export default {
     },
     editRow: {
       type: Object
+    },
+    messageExtType: {
+      type: Array
     }
   },
   data() {
     return {
-      formData: {
-        zhuti: null,
-        paixu: null,
-        neirong: null
-      },
+      formData: {},
       defaultFormRules: {
-        title: [{ required: true, message: "请输入主题", trigger: "blur" }],
+        title: [{ required: true, message: "请选择类型", trigger: "blur" }],
         sort: [
           //   { required: true, message: "请输入排序", trigger: "blur" },
           { type: "number", message: "必须为数字值" }
@@ -80,7 +96,16 @@ export default {
     subDefaultForm() {
       this.$refs.addDefaultFormRef.validate(async valid => {
         if (valid) {
-          this.$emit("submit", this.formData);
+          for (let i = 0; i < this.messageExtType.length; i++) {
+            if (this.messageExtType[i].title === this.formData.title) {
+              this.formData.messageExt = this.messageExtType[i].messageExt;
+            }
+          }
+          if (this.isEdit) {
+            this.$emit("handleUpdate", this.formData);
+          } else {
+            this.$emit("submit", this.formData);
+          }
         }
       });
     },
@@ -92,9 +117,7 @@ export default {
   created() {},
   mounted() {
     if (this.isEdit) {
-      for (const key in this.editRow) {
-        this.formData[key] = this.editRow[key];
-      }
+      this.formData = JSON.parse(JSON.stringify(this.editRow));
     }
   }
 };

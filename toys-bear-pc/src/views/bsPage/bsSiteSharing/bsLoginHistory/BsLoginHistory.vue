@@ -126,9 +126,9 @@ export default {
               );
             }
           },
+          { prop: "email", label: "联系人" },
           { prop: "siteRegion", label: "站点" },
           { prop: "createdBy", label: "业务员" },
-          { prop: "email", label: "登录邮箱" },
           {
             prop: "createdOn",
             label: "登录时间",

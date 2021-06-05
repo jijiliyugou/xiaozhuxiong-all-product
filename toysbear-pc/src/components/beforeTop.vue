@@ -34,9 +34,11 @@
                 <span @click="infoListEvent(3)"
                   ><i class="el-icon-bell"></i>我的消息</span
                 >
-                <span @click="infoListEvent(4)"
+                <span class="userName" @click="infoListEvent(4)"
                   ><i class="el-icon-user-solid"></i
-                  >{{ userInfo.userInfo && userInfo.userInfo.linkman }}</span
+                  >{{
+                    userInfo.userInfo && userInfo.userInfo.linkman
+                  }}发射点发多少个发射点发多少个发射点发多少个</span
                 >
               </div>
               <a class="tuichu" width="20" @click="SignOut">退出</a>
@@ -233,6 +235,12 @@ export default {
                 text-align: center;
                 line-height: 20px;
                 margin-right: 10px;
+              }
+              &.userName {
+                max-width: 150px;
+                overflow: hidden;
+                white-space: nowrap; /*不换行*/
+                text-overflow: ellipsis; /*超出部分文字以...显示*/
               }
             }
           }

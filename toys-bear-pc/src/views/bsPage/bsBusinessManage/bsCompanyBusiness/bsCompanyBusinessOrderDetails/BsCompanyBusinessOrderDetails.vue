@@ -160,6 +160,7 @@ export default {
             align: "left",
             isHiden: true,
             productInfo: true,
+            cartInfoIcon: true,
             elImage: row => {
               return row.imgUrl;
             },

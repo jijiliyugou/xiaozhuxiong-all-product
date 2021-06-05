@@ -47,10 +47,10 @@
 <script>
 import { getMenuFuc } from "@/router/index";
 import { mapState, mapGetters } from "vuex";
+
 export default {
   data() {
     return {
-      // im: new this.IM(),
       appHeight: document.documentElement.clientHeight,
       options: {
         // 二维码配置
@@ -129,9 +129,6 @@ export default {
   async created() {
     await getMenuFuc();
     // this.prohibit();
-  },
-  mounted() {
-    // if (this.uid) this.initIM();
   },
   watch: {
     // uid(newV) {
