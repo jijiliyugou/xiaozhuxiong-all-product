@@ -36,9 +36,7 @@
                 >
                 <span class="userName" @click="infoListEvent(4)"
                   ><i class="el-icon-user-solid"></i
-                  >{{
-                    userInfo.userInfo && userInfo.userInfo.linkman
-                  }}发射点发多少个发射点发多少个发射点发多少个</span
+                  >{{ userInfo.userInfo && userInfo.userInfo.linkman }}</span
                 >
               </div>
               <a class="tuichu" width="20" @click="SignOut">退出</a>
@@ -236,6 +234,9 @@ export default {
                 line-height: 20px;
                 margin-right: 10px;
               }
+              overflow: hidden;
+              white-space: nowrap; /*不换行*/
+              text-overflow: ellipsis; /*超出部分文字以...显示*/
               &.userName {
                 max-width: 150px;
                 overflow: hidden;

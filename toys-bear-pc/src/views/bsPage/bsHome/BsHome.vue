@@ -63,6 +63,7 @@ export default {
         this.getGetSalesOrderDataStatistics();
         this.getGetSalesHotSample();
     }
+    console.log(this.$cookies.get("validityPeriod"));
     this.$cookies.remove("validityPeriod");
   },
   computed: {

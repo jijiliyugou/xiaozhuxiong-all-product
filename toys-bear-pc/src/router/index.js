@@ -123,14 +123,15 @@ router.beforeEach(async (to, from, next) => {
     // const token = Vue.prototype.$cookies.get("userInfo");
     const validityPeriod = Vue.prototype.$cookies.get("validityPeriod");
     if (validityPeriod) {
-      localStorage.setItem("validityPeriod", validityPeriod);
-      const tokenOptions = JSON.parse(validityPeriod);
+      console.log(validityPeriod, "登录cookie");
+      const fd_location = JSON.stringify(validityPeriod);
+      localStorage.setItem("validityPeriod", fd_location);
       console.log(
         "跳转保存的token和是否保存7天失效",
-        tokenOptions,
+        validityPeriod,
         validityPeriod
       );
-      const res = await resetPersonInfo(tokenOptions.token);
+      const res = await resetPersonInfo(validityPeriod.token);
       store.commit("handlerLogin", true);
       // 设置token
       store.commit("setToken", res.data.result);
@@ -152,28 +153,28 @@ router.beforeEach(async (to, from, next) => {
       const Json = {};
       Json.MessageRestriction = await getClientTypeList(
         "MessageRestriction",
-        tokenOptions.token
+        validityPeriod.token
       );
       Json.UserRestrictions = await getClientTypeList(
         "UserRestrictions",
-        tokenOptions.token
+        validityPeriod.token
       );
       Json.NoticeRestrictions = await getClientTypeList(
         "NoticeRestrictions",
-        tokenOptions.token
+        validityPeriod.token
       );
       Json.CompanyRestrictions = await getClientTypeList(
         "CompanyRestrictions",
-        tokenOptions.token
+        validityPeriod.token
       );
-      Json.PlatForm = await getClientTypeList("PlatForm", tokenOptions.token);
+      Json.PlatForm = await getClientTypeList("PlatForm", validityPeriod.token);
       Json.packageManage = await getClientTypeList(
         "packageManage",
-        tokenOptions.token
+        validityPeriod.token
       );
       store.commit("globalJson/setGlobalJson", Json);
       // 登录成功获取菜单
-      const menus = await getUserRoleMenu(tokenOptions.token);
+      const menus = await getUserRoleMenu(validityPeriod.token);
       if (menus.data.result.code === 200) {
         store.commit("setRouters", menus.data.result.item.modulesList || []);
         await getMenuFuc();

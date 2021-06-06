@@ -189,6 +189,13 @@ export default {
               token: res.data.result.accessToken
             });
             localStorage.setItem("validityPeriod", validityPeriod);
+            this.$cookies.set("validityPeriod", validityPeriod);
+          } else {
+            const validityPeriod = JSON.stringify({
+              token: res.data.result.accessToken
+            });
+            localStorage.setItem("validityPeriod", validityPeriod);
+            this.$cookies.set("validityPeriod", validityPeriod);
           }
           const fd = {
             component: "bsHome",
@@ -239,7 +246,6 @@ export default {
     ...mapState(["userInfo", "isLogin"])
   },
   mounted() {
-    console.log(this.$route.query.thePassword);
     this.userList = this.userInfo.commparnyList;
     if (this.$route.query.id === "checkted" || this.isLogin) {
       this.loginTow();
