@@ -68,10 +68,22 @@
           <span class="title">择样列表</span>
           ({{ totalCount }})
         </div>
-        <el-button size="medium" @click="openSelectTemplate" type="warning">
-          <i class="iconfont icon-daochujinruchukou"></i>
-          导出列表
-        </el-button>
+        <div class="btns">
+          <el-button size="medium" @click="openSelectTemplate" type="warning">
+            <i class="iconfont icon-daochujinruchukou"></i>
+            导出列表
+          </el-button>
+          <el-button
+            v-if="userInfo.commparnyList[0].companyType !== 'Supplier'"
+            style="background-color: #F9AE3E;border-color: #F9AE3E;"
+            type="warning"
+            @click="openAdd"
+            size="medium"
+          >
+            <i class="el-icon-shopping-cart-full" style="font-size: 16px;"></i>
+            一键加购
+          </el-button>
+        </div>
       </div>
       <!-- 表格 -->
       <bsTables :table="tableData" />
@@ -109,6 +121,24 @@
         />
       </el-dialog>
     </transition>
+    <!-- 一键加购dialog -->
+    <transition name="el-zoom-in-center">
+      <el-dialog
+        title="一键加购"
+        v-if="addPurchaseDialog"
+        :visible.sync="addPurchaseDialog"
+        width="500px"
+      >
+        <oneClickPurchase
+          :addShopOption="{
+            orderNumber: item.orderNumber,
+            orderType: item.orderType
+          }"
+          @close="close"
+          @submit="submit"
+        />
+      </el-dialog>
+    </transition>
   </div>
 </template>
 
@@ -116,9 +146,11 @@
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/zhantingyewu.vue";
 import bsTables from "@/components/table";
 import Summary from "@/components/summaryComponent/summary";
+import oneClickPurchase from "@/components/commonComponent/oneClickPurchase/oneClickPurchase.vue";
+import { mapState } from "vuex";
 export default {
   name: "bsHallBusinessOrderDetails",
-  components: { bsExportOrder, bsTables, Summary },
+  components: { bsExportOrder, bsTables, Summary, oneClickPurchase },
   props: {
     item: {
       type: Object
@@ -130,7 +162,7 @@ export default {
         //汇总数据
         isHandle: false,
         totalDegree: 0, //总款数
-        totalCartons: -1, //总箱数
+        totalCartons: 0, //总箱数
         totalQuantity: 0, //总数量
         totalBulkStere: 0, //总体积
         totalBulkFeet: 0, //总材积
@@ -294,6 +326,7 @@ export default {
           }
         ]
       },
+      addPurchaseDialog: false,
       exportTemplateDialog: false,
       isOrderDetailDialog: false,
       options: {
@@ -312,6 +345,50 @@ export default {
     };
   },
   methods: {
+    // 提交一键加购
+    async submit(myData) {
+      // this.$common.handlerMsgState({
+      //   msg: "敬请期待",
+      //   type: "warning"
+      // });
+      const re = await this.$http.post(
+        "/api/AddShoppingCart",
+        {
+          userID: this.userInfo.userInfo.id,
+          companyNumber: this.userInfo.commparnyList[0].companyNumber,
+          sourceFrom: "active",
+          // sourceFrom: "QRCodeSearch",
+          number: 1,
+          currency: "￥",
+          Price: 0,
+          shopType: "companysamples",
+          productNumber: myData.productNumber
+        },
+        {
+          timeout: 9999999
+        }
+      );
+      if (re.data.result.code === 200) {
+        this.$common.handlerMsgState({
+          msg: re.data.result.msg,
+          type: "success"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: re.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.addPurchaseDialog = false;
+    },
+    // 关闭加购
+    close() {
+      this.addPurchaseDialog = false;
+    },
+    // 一键加购
+    async openAdd() {
+      this.addPurchaseDialog = true;
+    },
     // 去厂商
     toFactory(item) {
       const fd = {
@@ -397,7 +474,6 @@ export default {
       }
       this.getERPOrderTotal();
     },
-
     // 切换当前页
     currentChange(page) {
       this.currentPage = page;
@@ -440,6 +516,9 @@ export default {
   },
   mounted() {
     this.getSearchCompanyShareOrderDetailsPage();
+  },
+  computed: {
+    ...mapState(["userInfo"])
   }
 };
 </script>

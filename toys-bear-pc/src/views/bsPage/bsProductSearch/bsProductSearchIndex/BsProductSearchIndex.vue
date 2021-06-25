@@ -7,8 +7,10 @@
             ref="searchRef"
             :keyword="searchForm.keyword"
             :MyisGaoji="searchForm.MyisGaoji"
+            :MyisZonghe="searchForm.MyisZonghe"
             v-model="searchForm.keyword"
             @handleIsgaoji="handleIsgaoji"
+            @handleIsZonghe="handleIsZonghe"
             @closeTag="closeTag"
             @handleSynthesis="handleSynthesis"
             @screeningShow="screeningShow"
@@ -347,7 +349,7 @@
                 </div>
               </div>
               <el-button
-                @click="getProductList(false)"
+                @click="textSearchProducts"
                 type="primary"
                 style="margin-left: 10px"
                 size="mini"
@@ -420,6 +422,7 @@
                 <el-button
                   class="purchased"
                   size="small"
+                  style="width:165px"
                   @click="handelrPurchased"
                 >
                   <i class="selectionCart"></i>
@@ -892,15 +895,18 @@
       width="830px"
     >
       <BsSynthesizeSearch
+        :childData="childData"
         :categoryList="categoryList"
         :chpaList="chpaList"
         @handelSynthesize="handelSynthesize"
       ></BsSynthesizeSearch>
     </el-dialog>
+    <CartBox></CartBox>
   </div>
 </template>
 
 <script>
+import CartBox from "@/components/cartBox.vue";
 import BsSynthesizeSearch from "@/components/bsComponents/bsProductSearchComponent/bsSynthesizeSearch";
 import bsProductSearch from "@/components/bsComponents/bsProductSearchComponent/bsProductSearch";
 // import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
@@ -916,11 +922,12 @@ export default {
     bsColumnComponent,
     bsGridComponent,
     VueCropper,
+    CartBox,
     BsSynthesizeSearch
   },
   data() {
     return {
-      data: {},
+      childData: null,
       isSynthesizeSearch: false,
       getSynthesize: false,
       synthesizeShow: false,
@@ -991,6 +998,7 @@ export default {
         categoryNumber: null,
         time: [],
         MyisGaoji: false,
+        MyisZonghe: false,
         fa_no: true,
         number: false,
         name: true,
@@ -1029,14 +1037,23 @@ export default {
         this.dialogVisible = true;
       });
     },
-    // 文字搜
+    // 确定文字搜索
     textSearchProducts() {
-      this.currentPage = 1;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
-    handleIsgaoji(val) {
-      this.$set(this.searchForm, "MyisGaoji", val);
+    //关闭高级搜索显示
+    handleIsgaoji() {
+      this.$set(this.searchForm, "MyisGaoji", false);
       this.advancedFormdata = {};
+    },
+    //关闭综合搜索显示
+    handleIsZonghe() {
+      this.isSynthesizeSearch = false;
+      this.$set(this.searchForm, "MyisZonghe", false);
     },
     // 确定裁剪图片
     onCubeImg() {
@@ -1220,82 +1237,80 @@ export default {
           this.sortOrder = null;
           break;
       }
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
     // 获取产品列表请求
     async getProductList(flag) {
+      console.log("模糊搜索");
       this.$store.commit("searchValues", null);
       let startDate = Date.now();
-      if (!this.isSynthesizeSearch) {
-        this.data = {
-          searchType: 0, //0-默认，1-综合搜索
-          name: this.searchForm.keyword,
-          hallNumber: this.searchForm.companyNumber,
-          categoryNumber: this.searchForm.categoryNumber,
-          minPrice: this.searchForm.minPrice,
-          maxPrice: this.searchForm.maxPrice,
-          startTime: this.searchForm.time.length
-            ? this.searchForm.time[0]
-            : null,
-          endTime: this.searchForm.time.length ? this.searchForm.time[1] : null,
-          // skipCount: this.currentPage,
-          // maxResultCount: this.pageSize,
-          // precisionSearch: JSON.stringify({
-          //   fa_no: this.searchForm.fa_no ? 1 : 0,
-          //   number: this.searchForm.number ? 1 : 0,
-          //   name: this.searchForm.name ? 1 : 0,
-          //   packName: this.searchForm.packName ? 1 : 0
-          // }),
-          sortOrder: this.sortOrder,
-          sortType: this.sortType,
-          // 高级搜索条件
-          isUpInsetImg: this.isUpInsetImg,
-          isUpInset3D: this.addrSearch,
-          fa_no: this.advancedFormdata.fa_no,
-          ch_pa: this.advancedFormdata.ch_pa,
-          pr_le: this.advancedFormdata.pr_le,
-          pr_wi: this.advancedFormdata.pr_wi,
-          pr_hi: this.advancedFormdata.pr_hi,
-          ou_le: this.advancedFormdata.ou_le,
-          ou_wi: this.advancedFormdata.ou_wi,
-          ou_hi: this.advancedFormdata.ou_hi,
-          in_le: this.advancedFormdata.in_le,
-          in_wi: this.advancedFormdata.in_wi,
-          in_hi: this.advancedFormdata.in_hi
-        };
-        switch (this.isAccurate) {
-          case "精准":
-            this.data.precisionSearch = JSON.stringify({
-              fa_no: this.searchForm.fa_no ? 2 : 0,
-              name: this.searchForm.name ? 2 : 0,
-              number: this.searchForm.number ? 2 : 0,
-              packName: this.searchForm.packName ? 2 : 0
-            });
-            break;
-          default:
-            this.data.precisionSearch = JSON.stringify({
-              fa_no: this.searchForm.fa_no ? 1 : 0,
-              name: this.searchForm.name ? 1 : 0,
-              number: this.searchForm.number ? 1 : 0,
-              packName: this.searchForm.packName ? 1 : 0
-            });
-            break;
+      const fd = {
+        searchType: 0, //0-默认，1-综合搜索
+        name: this.searchForm.keyword,
+        hallNumber: this.searchForm.companyNumber,
+        categoryNumber: this.searchForm.categoryNumber,
+        minPrice: this.searchForm.minPrice,
+        maxPrice: this.searchForm.maxPrice,
+        startTime: this.searchForm.time.length ? this.searchForm.time[0] : null,
+        endTime: this.searchForm.time.length ? this.searchForm.time[1] : null,
+        skipCount: this.currentPage,
+        maxResultCount: this.pageSize,
+        // precisionSearch: JSON.stringify({
+        //   fa_no: this.searchForm.fa_no ? 1 : 0,
+        //   number: this.searchForm.number ? 1 : 0,
+        //   name: this.searchForm.name ? 1 : 0,
+        //   packName: this.searchForm.packName ? 1 : 0
+        // }),
+        sortOrder: this.sortOrder,
+        sortType: this.sortType,
+        // 高级搜索条件
+        isUpInsetImg: this.isUpInsetImg,
+        isUpInset3D: this.addrSearch,
+        fa_no: this.advancedFormdata.fa_no,
+        ch_pa: this.advancedFormdata.ch_pa,
+        pr_le: this.advancedFormdata.pr_le,
+        pr_wi: this.advancedFormdata.pr_wi,
+        pr_hi: this.advancedFormdata.pr_hi,
+        ou_le: this.advancedFormdata.ou_le,
+        ou_wi: this.advancedFormdata.ou_wi,
+        ou_hi: this.advancedFormdata.ou_hi,
+        in_le: this.advancedFormdata.in_le,
+        in_wi: this.advancedFormdata.in_wi,
+        in_hi: this.advancedFormdata.in_hi
+      };
+      switch (this.isAccurate) {
+        case "精准":
+          fd.precisionSearch = JSON.stringify({
+            fa_no: this.searchForm.fa_no ? 2 : 0,
+            name: this.searchForm.name ? 2 : 0,
+            number: this.searchForm.number ? 2 : 0,
+            packName: this.searchForm.packName ? 2 : 0
+          });
+          break;
+        default:
+          fd.precisionSearch = JSON.stringify({
+            fa_no: this.searchForm.fa_no ? 1 : 0,
+            name: this.searchForm.name ? 1 : 0,
+            number: this.searchForm.number ? 1 : 0,
+            packName: this.searchForm.packName ? 1 : 0
+          });
+          break;
+      }
+
+      for (const key in fd) {
+        if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
+          delete fd[key];
+        }
+
+        if (key != "isUpInsetImg" && fd[key] === false) {
+          delete fd[key];
         }
       }
-      this.data.skipCount = this.currentPage;
-      this.data.maxResultCount = this.pageSize;
-      for (const key in this.data) {
-        if (
-          this.data[key] === null ||
-          this.data[key] === undefined ||
-          this.data[key] === ""
-        )
-          delete this.data[key];
-      }
-      const res = await this.$http.post(
-        "/api/SearchBearProductPage",
-        this.data
-      );
+      const res = await this.$http.post("/api/SearchBearProductPage", fd);
       const { code, item, msg } = res.data.result;
       if (code === 200) {
         if (this.typeId === 1) {
@@ -1311,13 +1326,11 @@ export default {
             }
           }
         }
-
-        if (this.isSynthesizeSearch) {
-          this.addHistoryText(this.data);
-        }
+        this.handleIsZonghe();
         if (Object.values(this.advancedFormdata).some(Boolean)) {
           this.$set(this.searchForm, "MyisGaoji", true);
         }
+
         this.productList = item.items;
         this.totalCount = item.totalCount;
         let endDate = Date.now();
@@ -1333,8 +1346,74 @@ export default {
         this.getProductCategoryList();
       }
     },
+    // 子组件综合搜索
+    handelSynthesize(val) {
+      this.isSynthesizeSearch = true;
+      if (val.categoryNumber != "") {
+        const currentCate = this.categoryList.find(
+          item => item.id == val.categoryNumber
+        );
+        currentCate && (this.oneCurrentTag = currentCate);
+      }
+      this.currentPage = 1;
+      this.synthesizeShow = false;
+      this.childData = JSON.parse(JSON.stringify(val));
+      this.getSyntheProductList();
+    },
+    // 综合搜索
+    async getSyntheProductList() {
+      console.log("综合搜索");
+      let startDate = Date.now();
+      const fd = this.childData;
+      fd.sortOrder = this.sortOrder;
+      fd.sortType = this.sortType;
+      for (const key in fd) {
+        if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
+          delete fd[key];
+        }
+        if (fd[key] === false) {
+          delete fd[key];
+        }
+      }
+      if (this.searchForm.keyword != "") {
+        fd.name = this.searchForm.keyword;
+      }
+      fd.skipCount = this.currentPage;
+      fd.maxResultCount = this.pageSize;
+      const res = await this.$http.post("/api/SearchBearProductPage", fd);
+      const { code, item, msg } = res.data.result;
+      if (code === 200) {
+        if (this.typeId === 1) {
+          for (let i = 0; i < item.items.length; i++) {
+            this.$set(item.items[i], "isShoppingUpdate", false);
+            for (let j = 0; j < this.offerProductList.length; j++) {
+              if (
+                item.items[i].productNumber ===
+                this.offerProductList[j].productNumber
+              ) {
+                this.$set(item.items[i], "isShoppingUpdate", true);
+              }
+            }
+          }
+        }
+        this.handleIsgaoji();
+        this.$set(this.searchForm, "MyisZonghe", true);
+        this.addHistoryText(this.childData);
+        this.productList = item.items;
+        this.totalCount = item.totalCount;
+        let endDate = Date.now();
+        this.searchHttpTime = (endDate - startDate) / 1000;
+      } else {
+        this.totalCount = 0;
+        this.$common.handlerMsgState({
+          msg: msg,
+          type: "danger"
+        });
+      }
+    },
     // 存储历史记录
-    addHistoryText(item) {
+    addHistoryText(valueItem) {
+      const item = JSON.parse(JSON.stringify(valueItem));
       var arr = [];
       for (let key in item) {
         switch (key) {
@@ -1403,25 +1482,16 @@ export default {
             arr.push(item[key]);
         }
       }
-      for (let i = 0; i < arr.length; i++) {
-        if (this.historyText.length > 28) {
-          this.$store.commit("deleteHandlerSynthesizeSearchData");
-          this.$store.commit("handlerSynthesizeSearchData", arr[i]);
-        } else {
-          this.$store.commit("handlerSynthesizeSearchData", arr[i]);
-        }
-      }
-    },
-    // 子组件综合搜索
-    handelSynthesize(data) {
-      this.isSynthesizeSearch = true;
-      this.pageSize = 12;
-      this.currentPage = 1;
-      this.data = Object.assign({}, data);
-      this.$nextTick(() => {
-        this.getProductList(false);
-        this.synthesizeShow = false;
-      });
+
+      this.$store.commit("claerHandlerSynthesizeSearchData", arr);
+      // for (let i = 0; i < arr.length; i++) {
+      //   if (this.historyText.length > 10) {
+      //     this.$store.commit("deleteHandlerSynthesizeSearchData");
+      //     this.$store.commit("handlerSynthesizeSearchData", arr[i]);
+      //   } else {
+      //     this.$store.commit("handlerSynthesizeSearchData", arr[i]);
+      //   }
+      // }
     },
     //重置关闭弹框
     handleIsSynthesizeSearch() {
@@ -1435,13 +1505,21 @@ export default {
         this.currentPage != 1
       )
         return false;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
     // 修改当前页
     handleCurrentChange(page) {
       eventBus.$emit("toTop");
       this.currentPage = page;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
 
     // 获取产品类目列表
@@ -1525,8 +1603,13 @@ export default {
     },
     // 确认高级搜索
     confirmAdvanced() {
+      this.currentPage = 1;
       // this.searchForm.keyword = this.$refs.searchRef.searchForm.keyword;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
     // 切换产品列表样式
     handerIsGrid(type) {
@@ -1542,7 +1625,11 @@ export default {
         return false;
       }
       this.currentPage--;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
     // 下一页
     nextEvent() {
@@ -1555,12 +1642,20 @@ export default {
         return false;
       }
       this.currentPage++;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
     // 展厅分类点击事件
     hallTagEvent(item) {
       this.searchForm.categoryNumber = item ? item.categoryNumber : item;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
     // 一级分类点击事件
     oneTagEvent(item) {
@@ -1568,13 +1663,21 @@ export default {
       this.oneCurrentTag = item;
       this.cateChildren = item ? item.children : [];
       this.searchForm.categoryNumber = item ? item.id : item;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
     // 二级分类点击事件
     twoTagEvent(id) {
       this.currentTwoTag = id;
       this.searchForm.categoryNumber = id || this.oneCurrentTag.id;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     },
     // 展开一级分类
     handlerOneCateLabel() {
@@ -1609,6 +1712,32 @@ export default {
       else myTableRef.clearSelection();
       this.isIndeterminate = false;
     },
+    // 一键添加报价
+    handlerUpadate(selectProducts) {
+      for (let i = 0; i < selectProducts.length; i++) {
+        for (let j = 0; j < this.productList.length; j++) {
+          if (
+            this.productList[j].productNumber ===
+            selectProducts[i].productNumber
+          ) {
+            if (selectProducts[i].isShoppingUpdate) {
+              this.$set(this.productList[j], "boxNumber", 2); //默认传一箱过去，不然总金额计算错误
+              this.$store.commit("pushOfferProductList", this.productList[j]);
+            } else {
+              this.$set(this.productList[j], "isShoppingUpdate", true);
+              this.$set(this.productList[j], "boxNumber", 1); //默认传一箱过去，不然总金额计算错误
+              this.$store.commit("pushOfferProductList", this.productList[j]);
+            }
+          }
+        }
+      }
+      this.$common.handlerMsgState({
+        msg: "一键添加报价产品成功",
+        type: "success"
+      });
+      this.$forceUpdate();
+      this.$store.commit("updateAppLoading", false);
+    },
     // 一键加购
     handelrPurchased() {
       this.$confirm("确定要加购选中的产品吗？", {
@@ -1616,40 +1745,49 @@ export default {
         cancelButtonText: "取消"
       })
         .then(async () => {
+          this.$store.commit("updateAppLoading", true);
           const selectProducts = this.$refs.componentRef.$refs.bsTableItemRef
             .$refs.myTableRef.selection;
-
           let productNumber = [];
-          for (let i = 0; i < selectProducts.length; i++) {
-            productNumber.push(selectProducts[i].productNumber);
-          }
-          const fd = {
-            userID: this.userInfo.userInfo.id,
-            companyNumber: this.userInfo.commparnyList[0].companyNumber,
-            sourceFrom: "active",
-            number: 1,
-            currency: "￥",
-            Price: 0,
-            shopType: "companysamples",
-            productNumber: productNumber.join()
-          };
-          const res = await this.$http.post("/api/AddShoppingCart", fd);
-          if (res.data.result.code === 200) {
-            this.$store.commit(
-              "handlerShoppingCartCount",
-              res.data.result.item
-            );
-            this.$common.handlerMsgState({
-              msg: " 一键加购成功",
-              type: "success"
-            });
-            this.checkAll = false;
-            this.getProductList(false);
+          if (this.typeId === 1) {
+            this.handlerUpadate(selectProducts);
           } else {
-            this.$common.handlerMsgState({
-              msg: " 一键加购失败",
-              type: "danger"
-            });
+            for (let i = 0; i < selectProducts.length; i++) {
+              productNumber.push(selectProducts[i].productNumber);
+            }
+            const fd = {
+              userID: this.userInfo.userInfo.id,
+              companyNumber: this.userInfo.commparnyList[0].companyNumber,
+              sourceFrom: "active",
+              number: 1,
+              currency: "￥",
+              Price: 0,
+              shopType: "companysamples",
+              productNumber: productNumber.join()
+            };
+            const res = await this.$http.post("/api/AddShoppingCart", fd);
+            if (res.data.result.code === 200) {
+              this.$store.commit("updateAppLoading", false);
+              this.$store.commit(
+                "handlerShoppingCartCount",
+                res.data.result.item
+              );
+              this.$common.handlerMsgState({
+                msg: " 一键加购成功",
+                type: "success"
+              });
+              this.checkAll = false;
+              if (this.isSynthesizeSearch) {
+                this.getSyntheProductList();
+              } else {
+                this.getProductList(false);
+              }
+            } else {
+              this.$common.handlerMsgState({
+                msg: " 一键加购失败",
+                type: "danger"
+              });
+            }
           }
         })
         .catch(() => {
@@ -1679,7 +1817,11 @@ export default {
     // 点击搜索-文字搜索
     eventBus.$on("searchProducts", () => {
       this.currentPage = 1;
-      this.getProductList(false);
+      if (this.isSynthesizeSearch) {
+        this.getSyntheProductList();
+      } else {
+        this.getProductList(false);
+      }
     });
     // 图搜
     eventBus.$on("openUpload", file => {

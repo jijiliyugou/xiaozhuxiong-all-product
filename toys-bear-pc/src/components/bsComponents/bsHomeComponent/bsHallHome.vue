@@ -55,23 +55,7 @@
           <i class="icon recentlySampleIcon"></i>
           <span>最新择样</span>
         </div>
-        <el-table
-          :data="HotTableData"
-          style="width: 100%"
-          height="295"
-          @row-click="rowClick"
-          :row-style="rowStyle"
-          :header-row-style="{ height: '40px', padding: '0' }"
-          :header-cell-style="{ backgroundColor: '#f9fafc', padding: '0' }"
-        >
-          <el-table-column label="择样单号"> </el-table-column>
-          <el-table-column label="择样类型"> </el-table-column>
-
-          <el-table-column label="本次代号"> </el-table-column>
-          <el-table-column label="择样日期"> </el-table-column>
-          <el-table-column label="公司名称"> </el-table-column>
-          <el-table-column label="择样总款数"> </el-table-column>
-        </el-table>
+        <Table :table="HotZyTableData"></Table>
       </div>
     </div>
     <div class="myFooter">
@@ -82,58 +66,58 @@
         </div>
         <ul class="increase">
           <li>
-            <h3>1268451</h3>
+            <h3>{{ statisticsData.hallTotalCount }}</h3>
             <p class="text">展厅择样总数</p>
             <div class="bacg">
               <p
                 :class="{
                   today: true,
-                  active: statisticsData.hallOrderTotalToday > 0
+                  active: statisticsData.todayHallTotalCount > 0
                 }"
               >
-                今日+ <span>50</span>
+                今日+ <span>{{ statisticsData.todayHallTotalCount }}</span>
               </p>
             </div>
           </li>
           <li>
-            <h3>1268451</h3>
+            <h3>{{ statisticsData.firmTotalCount }}</h3>
             <p class="text">入驻厂商总数</p>
             <div class="bacg">
               <p
                 :class="{
                   today: true,
-                  active: statisticsData.hallOrderTotalToday > 0
+                  active: statisticsData.todayFirmTotalCount > 0
                 }"
               >
-                今日+ <span>50</span>
+                今日+ <span>{{ statisticsData.todayFirmTotalCount }}</span>
               </p>
             </div>
           </li>
           <li>
-            <h3>1268451</h3>
+            <h3>{{ statisticsData.productTotalCount }}</h3>
             <p class="text">展厅产品总数</p>
             <div class="bacg">
               <p
                 :class="{
                   today: true,
-                  active: statisticsData.hallOrderTotalToday > 0
+                  active: statisticsData.todayProductTotalCount > 0
                 }"
               >
-                今日+ <span>50</span>
+                今日+ <span>{{ statisticsData.todayProductTotalCount }}</span>
               </p>
             </div>
           </li>
           <li>
-            <h3>1268451</h3>
+            <h3>{{ statisticsData.clientTotalCount }}</h3>
             <p class="text">我的客户总数</p>
             <div class="bacg">
               <p
                 :class="{
                   today: true,
-                  active: statisticsData.shareTotalToday > 0
+                  active: statisticsData.todayClientTotalCount > 0
                 }"
               >
-                今日+ <span>50</span>
+                今日+ <span>{{ statisticsData.todayClientTotalCount }}</span>
               </p>
             </div>
           </li>
@@ -160,7 +144,7 @@
         <div class="contentBox">
           <el-table
             :data="tableData"
-            height="365"
+            height="390"
             style="width: 100%"
             @row-click="toProductDetails"
             :row-style="rowStyle"
@@ -208,13 +192,14 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="categoryName"
-              label="玩具分类"
+              prop="fa_no"
+              label="出场货号"
               align="center"
+              width="100"
             >
               <template slot-scope="scope">
                 <span style="font-size: 13px">
-                  {{ scope.row.categoryName }}
+                  {{ scope.row.fa_no }}
                 </span>
               </template>
             </el-table-column>
@@ -231,20 +216,7 @@
           <i class="icon newEnterIcon"></i>
           <span>最新入驻厂商</span>
         </div>
-        <el-table
-          :data="HotTableData"
-          style="width: 100%"
-          height="365"
-          @row-click="rowClick"
-          :row-style="rowStyle"
-          :header-row-style="{ height: '40px', padding: '0' }"
-          :header-cell-style="{ backgroundColor: '#f9fafc', padding: '0' }"
-        >
-          <el-table-column label="排名"> </el-table-column>
-          <el-table-column label="联系人"> </el-table-column>
-          <el-table-column label="手机"> </el-table-column>
-          <el-table-column label="产品数量"> </el-table-column>
-        </el-table>
+        <Table :table="newVendorTableData"></Table>
       </div>
     </div>
   </div>
@@ -252,8 +224,12 @@
 
 <script>
 import { calculateDate } from "@/assets/js/common/common.js";
+import Table from "@/components/table";
 export default {
   name: "bsHallHome",
+  components: {
+    Table
+  },
   data() {
     return {
       timeData: {
@@ -262,17 +238,93 @@ export default {
       },
       HotTableData: [],
       tableData: [],
+      HotZyTableData: {
+        data: [],
+        showLoading: false,
+        isIndex: true,
+        height: "275",
+        columns: [
+          {
+            prop: "number",
+            isHiden: true,
+            label: "择样单号"
+          },
+          {
+            prop: "remark",
+            label: "择样类型"
+          },
+
+          {
+            prop: "the_nu",
+            isHiden: true,
+            label: "本次代号"
+          },
+          {
+            prop: "happenDate",
+            isHiden: true,
+            label: "择样日期",
+            render: row => {
+              return row.happenDate ? row.happenDate.replace(/T/, " ") : "";
+            }
+          },
+          {
+            prop: "hallName",
+            isHiden: true,
+            label: "公司名称"
+          },
+          {
+            prop: "numberCount",
+            isHiden: true,
+            label: "择样总款数"
+          }
+        ]
+      },
+      newVendorTableData: {
+        data: [],
+        showLoading: false,
+        isIndex: true,
+        height: "390",
+        columns: [
+          {
+            productInfo: true,
+            width: 200,
+            prop: "companyLogo",
+            isHiden: false,
+            label: "厂商",
+            align: "left",
+            elImage: row => {
+              return row.companyLogo;
+            },
+            companyName: row => {
+              return row.companyName;
+            }
+          },
+          {
+            prop: "contactsMan",
+            isHiden: true,
+            label: "联系人"
+          },
+          {
+            prop: "phoneNumber",
+            isHiden: true,
+            label: "手机"
+          },
+          {
+            prop: "sumNumber",
+            isHiden: true,
+            label: "产品数量"
+          }
+        ]
+      },
       statisticsData: {
-        hallOrderTotal: "", //展厅业务
-        hallOrderTotalToday: "", //展厅今日
-        sampleOfferTotal: "", //找样报价
-        sampleOfferTotalToday: "", //找样报价今日
-        enterVendorTotal: "", //入驻厂商总数
-        enterVendorTotalToday: "", //入驻厂商总数今日
-        hallProductTotal: "", //展厅产品总数
-        hallProductTotalToday: "", //展厅产品总数今日
-        shareTotal: "", //客户订单
-        shareTotalToday: "" //客户订单今日
+        hallTotalCount: "", //展厅择样所有统计数
+        todayHallTotalCount: "", //展厅今日择样统计数
+        firmTotalCount: "", //入驻厂商总数
+        todayFirmTotalCount: "", //入驻厂商总数今日
+        productTotalCount: "", //展厅产品总数
+        todayProductTotalCount: "", //展厅产品总数今日
+        clientTotalCount: "", //客户订单
+        todayClientTotalCount: "" //客户订单今日
       },
       hotValue: "热门择样",
       dayValue: "7天",
@@ -340,6 +392,9 @@ export default {
   },
   mounted() {
     this.getGetSalesHotSample();
+    this.GetCompanyByNewHallPage();
+    this.GetClientQuoteMainListByLately();
+    this.GetHallStatisticsCount();
   },
   methods: {
     // 行样式
@@ -348,22 +403,44 @@ export default {
         cursor: "pointer"
       };
     },
-    // 热门搜索排行
-    async getGetSalesHotSearch() {
+    // 展厅首页-最新择样
+    async GetClientQuoteMainListByLately() {
       const res = await this.$http.post(
-        "/api/GetSalesHotSearch",
-        this.timeData
+        "/api/GetClientQuoteMainListByLately  ",
+        {
+          hallNumber: this.$store.state.userInfo.commparnyList[0].companyNumber
+        }
       );
       if (res.data.result.code === 200) {
-        this.HotTableData = res.data.result.item;
+        this.HotZyTableData.data = res.data.result.item;
+      }
+    },
+    // 展厅首页—统计参数的接口
+    async GetHallStatisticsCount() {
+      const res = await this.$http.post("/api/GetHallStatisticsCount  ", {
+        hallNumber: this.$store.state.userInfo.commparnyList[0].companyNumber
+      });
+      if (res.data.result.code === 200) {
+        this.statisticsData = res.data.result.item;
+      }
+    },
+    // 查询最新入住厂商
+    async GetCompanyByNewHallPage() {
+      const fd = {
+        maxResultCount: 10,
+        hallNumber: this.$store.state.userInfo.commparnyList[0].companyNumber
+      };
+      const res = await this.$http.post("/api/GetCompanyByNewHallPage", fd);
+      if (res.data.result.code === 200) {
+        this.newVendorTableData.data = res.data.result.item.items;
       }
     },
     // 热门择样排行
     async getGetSalesHotSample() {
-      const res = await this.$http.post(
-        "/api/GetSalesHotSample",
-        this.timeData
-      );
+      const fd = Object.assign(this.timeData, {
+        hallNumber: this.$store.state.userInfo.commparnyList[0].companyNumber
+      });
+      const res = await this.$http.post("/api/GetSalesHotSample", fd);
       if (res.data.result.code === 200) {
         this.tableData = res.data.result.item;
       }
@@ -371,11 +448,7 @@ export default {
     // 天数请求
     changeTime(value) {
       this.timeData = Object.assign(calculateDate(value));
-      if (this.hotValue === "热门择样") {
-        this.getGetSalesHotSample();
-      } else {
-        this.getGetSalesHotSearch();
-      }
+      this.getGetSalesHotSample();
     },
     // 去产品详情
     toProductDetails(row) {
@@ -576,10 +649,9 @@ export default {
     display: flex;
     height: 463px;
     justify-content: space-between;
-    flex-wrap: wrap;
     box-sizing: border-box;
     .statistics {
-      flex: 1;
+      width: 371px;
       background-color: #fff;
       border-radius: 4px;
       padding: 0 20px;
@@ -600,6 +672,7 @@ export default {
         }
       }
       .increase {
+        width: 371px;
         display: flex;
         flex-wrap: wrap;
         li:nth-of-type(1) {
@@ -614,10 +687,11 @@ export default {
         }
 
         li {
+          width: 165px;
           height: 180px;
           padding: 25px 0 15px;
           box-sizing: border-box;
-          flex: 1;
+          // flex: 1;
           h3 {
             font-size: 30px;
             font-weight: 700;
@@ -654,7 +728,9 @@ export default {
       }
     }
     .hallHot {
-      width: 660px;
+      // max-width: 660px;
+      // width: 100%;
+      flex: 1;
       //   height: 430px;
       background-color: #fff;
       border-radius: 4px;
@@ -720,7 +796,7 @@ export default {
         }
       }
       .contentBox {
-        height: 365px;
+        height: 390px;
         background-color: #ccc;
         box-sizing: border-box;
         .tableIndex {

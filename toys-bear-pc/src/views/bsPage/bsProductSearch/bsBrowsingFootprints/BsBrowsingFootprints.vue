@@ -100,17 +100,20 @@
     <div class="footer" v-if="totalCount >= 7">
       <img src="@/assets/images/footerBg.png" alt="" />
     </div>
+    <CartBox></CartBox>
   </div>
 </template>
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
+import CartBox from "@/components/cartBox.vue";
 // import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
 import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
 import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/bsGridComponent";
 import { mapState } from "vuex";
 export default {
   components: {
+    CartBox,
     bsColumnComponent,
     bsGridComponent
   },
@@ -149,11 +152,17 @@ export default {
       const { code, item, msg } = res.data.result;
       if (code === 200) {
         let footprintArr = [];
-        for (let i = 0; i < item.items.length; i++) {
-          footprintArr.push(item.items[i]);
+        if (item.items.length > 0) {
+          for (let i = 0; i < item.items.length; i++) {
+            footprintArr.push(item.items[i]);
+          }
+          this.dataResort(footprintArr);
+        } else {
+          this.productList = item.items;
         }
-        this.dataResort(footprintArr);
+
         this.totalCount = res.data.result.item.totalCount;
+        this.$forceUpdate();
       } else {
         this.totalCount = 0;
         this.$common.handlerMsgState({
@@ -316,11 +325,11 @@ export default {
     // 刷新页面
     eventBus.$on("refreshHtml", () => {
       //   this.footprintArr = [];
+      console.log(2222);
       this.getCollectList();
     });
     // 取消或加购样式/刷新页面
     eventBus.$on("resetProductIsShop", item => {
-      // console.log(this.productList);
       for (let i = 0; i < this.productList.length; i++) {
         for (let j = 0; j < this.productList[i].list.length; j++) {
           if (this.productList[i].list[j].productNumber == item.productNumber) {
@@ -436,6 +445,7 @@ export default {
     }
   }
   .productListBox {
+    min-height: 387px;
     background-color: #fff;
     width: 100%;
     box-sizing: border-box;

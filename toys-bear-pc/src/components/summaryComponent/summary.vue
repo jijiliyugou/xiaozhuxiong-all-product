@@ -65,12 +65,12 @@ export default {
     }
   },
   watch: {
-    summaryData: {
-      deep: true,
-      handler(val) {
-        console.log(val, "watch数据");
-      }
-    }
+    // summaryData: {
+    //   deep: true,
+    //   handler(val) {
+    //     console.log(val, "watch数据");
+    //   }
+    // }
   },
   data() {
     return {

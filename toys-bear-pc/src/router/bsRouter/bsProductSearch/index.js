@@ -27,6 +27,12 @@ const BsSpotProducts = () =>
 const BsVIPProducts = () =>
   import("@/views/bsPage/bsProductSearch/bsVIPProducts/BsVIPProducts.vue");
 
+//  产品管理
+const BsProductManageIndex = () =>
+  import(
+    "@/views/bsPage/bsProductSearch/bsProductManageIndex/BsProductManageIndex.vue"
+  );
+
 export default [
   {
     path: "/bsIndex/bsProductSearchIndex",
@@ -72,6 +78,14 @@ export default [
     path: "/bsIndex/bsVIPProducts",
     name: "bsVIPProducts",
     component: BsVIPProducts,
+    meta: {
+      keepAlive: true
+    }
+  },
+  {
+    path: "/bsIndex/bsProductManageIndex",
+    name: "bsProductManageIndex",
+    component: BsProductManageIndex,
     meta: {
       keepAlive: true
     }

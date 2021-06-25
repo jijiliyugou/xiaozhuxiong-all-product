@@ -122,6 +122,7 @@ export default {
             prop: "",
             label: "厂商",
             align: "left",
+            width: 240,
             companyInfo: true,
             companyLogo: row => {
               return row.companyLogo;
@@ -133,10 +134,10 @@ export default {
               return row.companyName;
             }
           },
-          { prop: "contactsMan", label: "联系人", width: 180 },
-          { prop: "phoneNumber", label: "手机", width: 180 },
-          { prop: "telePhoneNumber", label: "电话", isHiden: true },
-          { prop: "address", label: "地址", width: 180 },
+          { prop: "contactsMan", label: "联系人", width: 200 },
+          { prop: "phoneNumber", label: "手机", width: 200 },
+          { prop: "telePhoneNumber", label: "电话", isHiden: true, width: 200 },
+          { prop: "address", label: "地址" },
           {
             prop: "productCount",
             label: "产品数量",

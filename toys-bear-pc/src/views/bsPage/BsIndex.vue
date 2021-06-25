@@ -190,6 +190,83 @@ import bsBusinessMsg from "@/views/bsPage/bsMyNews/bsBusinessMsg/BsBusinessMsg.v
 // 聊天业务消息详情
 import bsHallYewuDetails from "@/components/bsComponents/bsNewsComponent/bsHallYewuDetails.vue";
 
+// 我的产品
+import bsMyProduct from "@/views/bsPage/bsProductManage/bsMyProduct/BsMyProduct.vue";
+
+// 我的产品
+import bsProductPrice from "@/views/bsPage/bsProductManage/bsProductPrice/BsProductPrice.vue";
+
+// 产品区域
+import bsProductDistrict from "@/views/bsPage/bsProductManage/bsProductDistrict/BsProductDistrict.vue";
+
+// 产品视频
+import bsProductVideo from "@/views/bsPage/bsProductManage/bsProductVideo/BsProductVideo.vue";
+
+// 产品信息
+import bsEditProductVideo from "@/views/bsPage/bsProductManage/bsProductVideo/components/editProductVideo.vue";
+
+// 我的店铺
+import bsMyShop from "@/views/bsPage/bsProductManage/bsMyShop/BsMyShop.vue";
+
+// 证书管理
+import bsCertificateManages from "@/views/bsPage/bsProductManage/bsCertificateManages/BsCertificateManages.vue";
+// 登录记录
+import bsLoginRecord from "@/views/bsPage/bsStatisticsManage/bsLoginRecord/BsLoginRecord.vue";
+
+// 3D产品
+import bsAbbrProduct from "@/views/bsPage/bsProductManage/bsAbbrProduct/BsAbbrProduct.vue";
+
+//错误日志记录
+import bsErrorLogRecord from "@/views/bsPage/bsStatisticsManage/bsErrorLogRecord/BsErrorLogRecord.vue";
+
+//来访明细
+import bsVisitDetail from "@/views/bsPage/bsBusinessManage/bsDataTotal/bsDataTotalComponent/visitDetail.vue";
+/*客户管理模块*/
+// 公司管理
+import bsCompanyManage from "@/views/bsPage/bsClientsManage/bsCompanyManage/BsCompanyManage.vue";
+
+//合并公司
+import bsMergeCompany from "@/views/bsPage/bsClientsManage/bsMergeCompany/BsMergeCompany.vue";
+
+//查询日志记录
+import bsQueryLogRecord from "@/views/bsPage/bsStatisticsManage/bsQueryLogRecord/BsQueryLogRecord.vue";
+
+//短信记录
+import bsNoteRecord from "@/views/bsPage/bsStatisticsManage/bsNoteRecord/BsNoteRecord.vue";
+
+//推送记录
+import bsPushRecord from "@/views/bsPage/bsStatisticsManage/bsPushRecord/BsPushRecord.vue";
+
+//产品查看记录
+import bsProductQueryRecord from "@/views/bsPage/bsStatisticsManage/bsProductQueryRecord/BsProductQueryRecord.vue";
+
+//app下载记录
+import bsAppDownloadRecord from "@/views/bsPage/bsStatisticsManage/bsAppDownloadRecord/BsAppDownloadRecord.vue";
+
+//系统参数
+import bsSystemParameter from "@/views/bsPage/bsSystemSet/bsSystemParameter/BsSystemParameter.vue";
+
+//消息模板管理
+import bsMessageTemplateManage from "@/views/bsPage/bsSystemSet/bsMessageTemplateManage/BsMessageTemplateManage.vue";
+
+//角色管理
+import bsRoleManage from "@/views/bsPage/bsSystemSet/bsRoleManage/BsRoleManage.vue";
+
+//基础信息-货厂查询
+import bsYardManage from "@/views/bsPage/bsSystemSet/bsYardManage/BsYardManage.vue";
+
+// 超级管理员-app版本管理
+import bsAppVersionsManage from "@/views/bsPage/bsOperationalData/bsAppVersionsManage/BsAppVersionsManage.vue";
+
+// 超级管理员-在线人数
+import bsOnlinePeople from "@/views/bsPage/bsOperationalData/bsOnlinePeople/BsOnlinePeople.vue";
+
+// 超级管理员-消息举报
+import bsMessageReport from "@/views/bsPage/bsOperationalData/bsMessageReport/BsMessageReport.vue";
+
+// 超级管理员-游客管理
+import bsSightseerManage from "@/views/bsPage/bsOperationalData/bsSightseerManage/BsSightseerManage.vue";
+
 import bsTop from "@/components/bsComponents/bsTopComponent/BsTop";
 import bsMenu from "@/components/bsComponents/bsMenuComponent/BsMenu";
 import eventBus from "@/assets/js/common/eventBus.js";
@@ -248,7 +325,33 @@ export default {
     bsSimilarProduct,
     bsExhibitionHallHome,
     bsBusinessMsg,
-    bsHallYewuDetails
+    bsHallYewuDetails,
+    bsMyProduct,
+    bsMyShop,
+    bsCertificateManages,
+    bsLoginRecord,
+    bsErrorLogRecord,
+    bsVisitDetail,
+    bsAbbrProduct,
+    bsCompanyManage,
+    bsMergeCompany,
+    bsQueryLogRecord,
+    bsProductDistrict,
+    bsNoteRecord,
+    bsPushRecord,
+    bsMessageTemplateManage,
+    bsProductPrice,
+    bsProductQueryRecord,
+    bsEditProductVideo,
+    bsAppDownloadRecord,
+    bsProductVideo,
+    bsRoleManage,
+    bsAppVersionsManage,
+    bsOnlinePeople,
+    bsMessageReport,
+    bsSightseerManage,
+    bsYardManage,
+    bsSystemParameter
   },
   data() {
     return {
@@ -319,23 +422,23 @@ export default {
   },
   watch: {
     "$route.path"(path) {
-      if (
-        path.includes("bsProductSearchIndex") ||
-        path.includes("bsLatestProducts") ||
-        path.includes("bsSpotProducts") ||
-        path.includes("bsVIPProducts") ||
-        path.includes("bsMyCollection") ||
-        path.includes("bsBrowsingFootprints") ||
-        path.includes("bsVendorQuery")
-      ) {
-        eventBus.$emit("showCart", true);
-      } else {
-        eventBus.$emit("showCart", false);
-      }
+      // if (
+      //   path.includes("bsProductSearchIndex") ||
+      //   path.includes("bsLatestProducts") ||
+      //   path.includes("bsSpotProducts") ||
+      //   path.includes("bsVIPProducts") ||
+      //   path.includes("bsMyCollection") ||
+      //   path.includes("bsBrowsingFootprints") ||
+      //   path.includes("bsVendorQuery")
+      // ) {
+      //   eventBus.$emit("showCart", true);
+      // } else {
+      //   eventBus.$emit("showCart", false);
+      // }
       if (!path.includes("bsSampleQuotation")) {
         this.$store.commit("resetCheckTabstypeId", 0);
       }
-      console.log(path);
+      // console.log(path);
       if (path.includes("bsShoppingCart")) {
         eventBus.$emit("handlergetClientList");
       }
@@ -343,18 +446,6 @@ export default {
     activeTab(newN, oldN) {
       // console.log(newN, "现在", oldN, "上一次"); // tabName
       this.$store.commit("handlerOldTabName", oldN);
-      // if (
-      //   newN == "/bsIndex/bsProductSearchIndex" ||
-      //   newN == "/bsIndex/bsLatestProducts" ||
-      //   newN == "/bsIndex/bsSpotProducts" ||
-      //   newN == "/bsIndex/bsVIPProducts" ||
-      //   newN == "/bsIndex/bsMyCollection" ||
-      //   newN == "/bsIndex/bsBrowsingFootprints"
-      // ) {
-      //   eventBus.$emit("showCart", true);
-      // } else {
-      //   eventBus.$emit("showCart", false);
-      // }
     }
   },
   created() {},

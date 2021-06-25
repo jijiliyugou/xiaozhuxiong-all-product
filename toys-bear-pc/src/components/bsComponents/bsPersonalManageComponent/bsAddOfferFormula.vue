@@ -110,8 +110,15 @@
                 style="flex:1;display:flex; align-items:center;margin-left: 20px;"
                 v-model="addDefaultForm.profitCalcMethod"
               >
-                <el-radio :label="2">除法</el-radio>
-                <el-radio :label="1">乘法</el-radio>
+                <el-radio v-if="clienFormData.profitCalcMethod === 1" :label="1"
+                  >乘法</el-radio
+                >
+                <el-radio v-if="clienFormData.profitCalcMethod === 2" :label="2"
+                  >除法</el-radio
+                >
+                <el-radio v-if="clienFormData.profitCalcMethod === 3" :label="3"
+                  >自定义</el-radio
+                >
               </el-radio-group>
             </div>
           </el-form-item>
@@ -155,11 +162,8 @@
           </el-form-item>
         </div>
       </div>
-      <div class="chengchuTishi" v-show="addDefaultForm.profitCalcMethod == 2">
-        {{ chufa }}
-      </div>
-      <div class="chengchuTishi" v-show="addDefaultForm.profitCalcMethod == 1">
-        {{ chengfa }}
+      <div class="chengchuTishi">
+        {{ addDefaultForm.profitCalcRule }}
       </div>
       <div class="lessThanPrice">
         <div class="left">
@@ -274,9 +278,6 @@ export default {
   },
   data() {
     return {
-      chufa: "(出厂价+(总费用/(每车尺码/体积*外箱装量)))/(1-报价利润/100)/汇率",
-      chengfa:
-        "(出厂价+(总费用/(每车尺码/体积*外箱装量)))*(1+报价利润/100)/汇率",
       configList: [],
       addDefaultForm: {
         profitCalcMethod: 2,

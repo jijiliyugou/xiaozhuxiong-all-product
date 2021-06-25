@@ -26,7 +26,7 @@
     </div>
     <div class="contentTop">
       <div class="contentTop_left">
-        <div class="tabs"><span>产看明细</span> ({{ totalCount }})</div>
+        <div class="tabs"><span>查看明细</span> ({{ totalCount }})</div>
       </div>
       <div class="contentTop_right">
         <el-button type="primary" size="medium" @click="openQuotationFormula">
@@ -152,7 +152,7 @@
       <div class="kong"></div>
     </div>
     <!-- 分页 -->
-    <center class="myPagination">
+    <center class="myPagination" style="margin-top:20px">
       <el-pagination
         background
         @size-change="handleSizeChange"

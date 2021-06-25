@@ -88,25 +88,33 @@
       v-if="showDialog"
       width="800px"
     >
-      <bsAddOfferFormula
+      <!-- <bsAddOfferFormula
         :editRow="editRow"
         :isEdit="isEdit"
         @submit="submit"
         @close="close"
-      />
+      /> -->
+      <OfferFormulaDialog
+        :editRow="editRow"
+        :isEdit="isEdit"
+        @submit="submit"
+        @close="close"
+      ></OfferFormulaDialog>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import Table from "@/components/table";
-import bsAddOfferFormula from "@/components/bsComponents/bsPersonalManageComponent/bsAddOfferFormula";
+// import bsAddOfferFormula from "@/components/bsComponents/bsPersonalManageComponent/bsAddOfferFormula";
+import OfferFormulaDialog from "@/views/bsPage/bsPersonalManage/bsQuotationSettings/components/offerFormulaDialog.vue";
 import { mapState } from "vuex";
 export default {
   name: "bsQuotationSettings",
   components: {
-    bsAddOfferFormula,
-    Table
+    // bsAddOfferFormula,
+    Table,
+    OfferFormulaDialog
   },
   data() {
     return {
@@ -311,6 +319,19 @@ export default {
   created() {},
   mounted() {
     this.getStaffList();
+  },
+  watch: {
+    "clienFormData.exchange": {
+      deep: true,
+      handler(newVal) {
+        if (newVal == 0) {
+          this.$common.handlerMsgState({
+            msg: "汇率不可为0",
+            error: "danger"
+          });
+        }
+      }
+    }
   },
   computed: {
     ...mapState(["userInfo", "currentComparnyId"])

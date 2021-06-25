@@ -3,119 +3,65 @@
  * @Author: gaojiahao
  * @Date: 2021-05-14 18:06:13
  * @FilePath: \projectd:\LittleBearPC\toys-bear-pc\src\views\bsPage\bsBusinessManage\bsDataTotal\bsDataTotalComponent\sampleTotal.vue
- * @LastEditTime: 2021-05-17 09:33:52
+ * @LastEditTime: 2021-06-25 20:22:25
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
 -->
 <template>
   <div class="sampleTotal">
-    <div class="title">
-      <div class="left">择样产品数趋势</div>
-      <div>
-        <div style="margin-top: 20px">
-          <el-radio-group v-model="radio" size="mini">
-            <el-radio-button label="今日"></el-radio-button>
-            <el-radio-button label="3天"></el-radio-button>
-            <el-radio-button label="7天"></el-radio-button>
-            <el-radio-button label="15天"></el-radio-button>
-            <el-radio-button label="30天"></el-radio-button>
-          </el-radio-group>
-        </div>
-      </div>
-    </div>
-    <div class="visit_total_chart" id="barChart"></div>
+    <line-chart
+      :title="title"
+      :chartData="chartData"
+      :defaultValue="defaultValue"
+      :chartCoulum="chartCoulum"
+      charId="sampleTotal"
+      @set-date-type="setDateType"
+      @change-search-date="changeSearchDate"
+      @select-date="selectDate"
+    ></line-chart>
     <div class="title">
       <div class="left">来访明细</div>
     </div>
     <div class="visit_total_table">
       <div class="searchBox">
         <div class="item">
-          <span class="label">关键字：</span>
-          <el-input
-            v-focus
-            type="text"
-            size="medium"
-            v-model="searchForm.keyword"
-            clearable
-            placeholder="请输入关键词"
-            @keyup.native.enter="search"
-          ></el-input>
-        </div>
-        <div class="item">
-          <span class="label">择样类型：</span>
+          <span class="label">选择展厅：</span>
           <el-select
-            v-model="searchForm.messageExt"
+            v-model="searchForm.hallNumber"
+            @change="changeHall"
             size="medium"
             clearable
             placeholder="请选择"
           >
-            <el-option
-              v-for="(item, i) in typesList"
-              :key="i"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
+            <template v-for="item in hallList">
+              <el-option
+                :key="item.hallNumber"
+                :label="item.hallName"
+                :value="item.hallNumber"
+              >
+              </el-option>
+            </template>
           </el-select>
         </div>
         <div class="item">
-          <span class="label">展厅名称：</span>
-          <el-input
-            type="text"
-            size="medium"
-            clearable
-            v-model="searchForm.fromCompanyName"
-            placeholder="请输入关键词"
-            @keyup.native.enter="search"
-          ></el-input>
-        </div>
-        <div class="item">
-          <span class="label">状态：</span>
+          <span class="label">选择厂商：</span>
           <el-select
-            size="medium"
-            v-model="searchForm.readStatus"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="(item, i) in readStatusList"
-              :key="i"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-        </div>
-        <div class="item">
-          <span class="label">业务员：</span>
-          <el-select
-            v-model="searchForm.staffId"
+            v-model="searchForm.supplierNumber"
             filterable
             size="medium"
             clearable
             placeholder="请选择"
           >
-            <el-option
-              v-for="item in staffList"
-              :key="item.id"
-              :label="item.linkman"
-              :value="item.id"
-            >
-            </el-option>
+            <template v-for="item in supplierList">
+              <el-option
+                :key="item.keyGuid"
+                :label="item.client_na"
+                :value="item.keyGuid"
+              >
+              </el-option>
+            </template>
           </el-select>
-        </div>
-        <div class="item date">
-          <span class="label">时间段：</span>
-          <el-date-picker
-            size="medium"
-            value-format="yyyy-MM-ddTHH:mm:ss"
-            v-model="searchForm.dateTime"
-            type="datetimerange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-          >
-          </el-date-picker>
         </div>
         <div class="item">
           <el-button
@@ -129,38 +75,41 @@
         </div>
       </div>
     </div>
+    <div class="tableBox">
+      <bsTables :table="tableData" />
+      <center style="padding: 20px 0">
+        <el-pagination
+          layout="total, sizes, prev, pager, next, jumper"
+          :page-sizes="[10, 20, 30, 40]"
+          background
+          :total="totalCount"
+          :page-size="pageSize"
+          :current-page.sync="currentPage"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        ></el-pagination>
+      </center>
+    </div>
   </div>
 </template>
 <script>
-import * as echarts from "echarts";
+import LineChart from "@/components/public/lineChart";
+import bsTables from "@/components/table";
+import {
+  calculateDateAndDates,
+  getDiffDate,
+  formatTime
+} from "@/assets/js/common/common.js";
+import { mapState } from "vuex";
 
 export default {
   name: "SampleTotal",
+  components: {
+    bsTables,
+    LineChart
+  },
   data() {
     return {
-      radio: "30天",
-      typesList: [
-        {
-          label: "系统通知",
-          value: 0
-        },
-        {
-          label: "补样",
-          value: 3
-        },
-        {
-          label: "借样",
-          value: 5
-        },
-        {
-          label: "补样借样",
-          value: 11
-        },
-        {
-          label: "洽谈",
-          value: 12
-        }
-      ],
       readStatusList: [
         {
           label: "全部",
@@ -175,79 +124,220 @@ export default {
           value: 1
         }
       ],
-      userInfo: {},
-      staffList: [],
-
+      hallList: [], //展厅列表
+      supplierList: [], //厂商列表
       searchForm: {
         keyword: null,
-        fromCompanyName: null,
-        staffId: null,
-        messageExt: null,
-        readStatus: "-1",
+        hallNumber: null,
+        supplierNumber: null,
         dateTime: null
-      }
+      },
+      tableData: {
+        data: [],
+        showLoading: false,
+        sizeMini: "mini",
+        isIndex: false,
+        columns: [
+          {
+            isHiden: true,
+            label: "产品图片",
+            elImageUrl: true,
+            elImage: row => {
+              return row.viewImage;
+            }
+          },
+          {
+            prop: "productNumber",
+            isHiden: true,
+            label: "产品名称"
+          },
+          {
+            prop: "fa_no",
+            isHiden: true,
+            label: "出厂货号"
+          },
+          {
+            prop: "salseName",
+            isHiden: true,
+            label: "公司名称"
+          },
+          {
+            prop: "ma_na",
+            isHiden: true,
+            label: "厂商"
+          },
+          {
+            prop: "hallName",
+            isHiden: true,
+            label: "展厅"
+          },
+          {
+            prop: "createdOn",
+            isHiden: true,
+            label: "时间",
+            render: row => {
+              return row.createdOn ? row.createdOn.replace(/T.*/, "") : "";
+            }
+          }
+        ],
+        btnWidth: 150
+      },
+      totalCount: 0,
+      pageSize: 10,
+      currentPage: 1,
+      title: "择样产品数趋势", //折线图名称
+      chartData: [], //折线图数据
+      defaultValue: "30天", //折线图默认天数
+      dateType: 1, //接口类型
+      chartCoulum: [] //折线图列名
     };
   },
-  methods: {
-    drawLine() {
-      var chartDom = document.getElementById("barChart");
-      var myChart = echarts.init(chartDom);
-      var option;
-
-      option = {
-        xAxis: {
-          type: "category",
-          boundaryGap: false,
-          data: [
-            "2.13",
-            "2.14",
-            "2.15",
-            "2.16",
-            "2.17",
-            "2.18",
-            "2.19",
-            "2.20",
-            "2.21",
-            "2.22",
-            "2.23",
-            "2.24",
-            "2.25",
-            "2.26",
-            "2.27",
-            "2.28",
-            "3.1",
-            "3.2",
-            "3.3",
-            "3.4",
-            "3.5",
-            "3.6",
-            "3.7",
-            "3.8",
-            "3.9",
-            "3.10",
-            "3.11",
-            "3.12",
-            "3.13",
-            "3.14"
-          ]
-        },
-        yAxis: {
-          type: "value"
-        },
-        series: [
-          {
-            data: [1888, 1500, 500, 1100, 800, 953, 556],
-            type: "line",
-            areaStyle: {}
-          }
-        ]
-      };
-      option && myChart.setOption(option);
-    },
-    search() {}
+  watch: {
+    defaultValue: {
+      handler(val) {
+        if (val == "today") {
+          this.dateType = 0;
+        } else {
+          this.dateType = 1;
+        }
+        var time = calculateDateAndDates(val);
+        this.searchForm.startTime = time.startTime;
+        this.searchForm.endTime = time.endTime;
+        this.chartCoulum = time.dates;
+        this.getChartDatas();
+      },
+      deep: true,
+      immediate: true
+    }
   },
-  mounted() {
-    this.drawLine();
+  methods: {
+    // 获取图形数据
+    async getChartDatas() {
+      const fd = {
+        dateType: this.dateType,
+        startTime: this.searchForm.startTime,
+        endTime: this.searchForm.endTime,
+        supplierNumber: this.userInfo.commparnyList[0].companyNumber,
+        skipCount: 1,
+        maxResultCount: 99999,
+        type: 1
+      };
+      for (const key in fd) {
+        if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
+          delete fd[key];
+        }
+      }
+      const res = await this.$http.post("/api/getVisitingTrend", fd);
+      if (res.data.result.code === 200) {
+        //this.totalCount = res.data.result.item.totalCount;
+        this.chartData = res.data.result.item.items;
+      }
+    },
+    // 获取列表
+    async getTableDataList() {
+      const fd = {
+        startTime: this.searchForm.startTime,
+        endTime: this.searchForm.endTime,
+        // salseCompanyNumber: this.userInfo.commparnyList[0].companyNumber,
+        pageSize: this.pageSize,
+        pageIndex: this.currentPage,
+        hallNumber: this.searchForm.hallNumber,
+        ma_nu: this.searchForm.supplierNumber,
+        visitorsType: 6
+      };
+      for (const key in fd) {
+        if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
+          delete fd[key];
+        }
+      }
+      const res = await this.$http.post("/api/GetCompanyPageByVisitorsAll", fd);
+      if (res.data.result.code === 200) {
+        this.totalCount = res.data.result.item.totalCount;
+        this.tableData.data = res.data.result.item.items;
+      }
+    },
+    // 搜索
+    search() {
+      this.currentPage = 1;
+      this.getTableDataList();
+    },
+    // 修改当前页
+    handleCurrentChange(page) {
+      this.currentPage = page;
+      this.getTableDataList();
+    },
+    // 切換頁容量
+    handleSizeChange(pageSize) {
+      this.pageSize = pageSize;
+      if (
+        this.currentPage * pageSize > this.totalCount &&
+        this.currentPage != 1
+      )
+        return false;
+      this.getTableDataList();
+    },
+    // 选择展厅
+    changeHall(val) {
+      this.searchForm.supplierNumber = null;
+      if (val) {
+        const currentHall = this.hallList.find(v => v.hallNumber === val);
+        this.supplierList = currentHall.supplierList;
+      } else {
+        this.supplierList = [];
+      }
+    },
+    // 获取展厅下的厂商
+    async getSupplierListByHall() {
+      const res = await this.$http.post("/api/GetSupplierListByHall", {});
+      if (res.data.result.code === 200) {
+        this.hallList = res.data.result.item;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+    //设置天数类型
+    setDateType(value) {
+      this.defaultValue = value;
+    },
+    //根据搜索的时间改变数据，重新生成chart
+    changeSearchDate(value) {
+      this.searchForm.startTime = value[0];
+      this.searchForm.endTime = value[1];
+      this.dateType = 1;
+      this.chartCoulum = getDiffDate(
+        this.searchForm.startTime,
+        this.searchForm.endTime
+      );
+      this.getChartDatas();
+    },
+    //选中某个时间段查看明细
+    selectDate(data) {
+      var time = data.value[0];
+      if (this.defaultValue == "today") {
+        var data2 = formatTime(new Date());
+        this.searchForm.startTime = data2 + "T" + time + ":00:00";
+        this.searchForm.endTime = data2 + "T" + (parseInt(time) + 1) + ":59:59";
+        this.searchForm.hallNumber = "";
+        this.searchForm.ma_nu = "";
+        this.getTableDataList();
+      } else {
+        this.searchForm.startTime = time + "T00:00:00";
+        this.searchForm.endTime = time + "T23:59:59";
+        this.searchForm.hallNumber = "";
+        this.searchForm.ma_nu = "";
+        this.getTableDataList();
+      }
+    }
+  },
+  created() {
+    this.getTableDataList();
+    this.getSupplierListByHall();
+  },
+  computed: {
+    ...mapState(["currentComparnyId", "userInfo"])
   }
 };
 </script>
@@ -277,10 +367,6 @@ export default {
       content: "";
       transform: translate(0, -50%);
     }
-  }
-  .visit_total_chart {
-    width: 100%;
-    height: 300px;
   }
   .visit_total_table {
     .searchBox {

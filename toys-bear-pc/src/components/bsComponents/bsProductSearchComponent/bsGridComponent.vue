@@ -1,6 +1,7 @@
 <template>
   <div class="bsGridComponent">
     <bsGridItem
+      :productType="productType"
       v-for="item in productList"
       :key="item.productNumber"
       :item="item"
@@ -25,6 +26,10 @@ export default {
     selection: {
       type: Boolean,
       default: true
+    },
+    productType: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -32,7 +37,9 @@ export default {
   },
   methods: {},
   created() {},
-  mounted() {}
+  mounted() {
+    console.log(this.productList);
+  }
 };
 </script>
 <style scoped lang="less">

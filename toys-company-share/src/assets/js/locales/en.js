@@ -112,12 +112,14 @@ export default {
       email: "E-mail",
       remark: "Remark",
       submit: "Submit",
+      cancel: "Cancel",
       totalCapacity: "Total CBM",
       productName: "Product Name",
       cTn: "cTn",
       view: "View",
       delete: "Delete",
-      id: "ID"
+      id: "ID",
+      selectAll: "Select All"
     },
     myOrder: {
       myOrder: "My Order",
@@ -151,7 +153,14 @@ export default {
       itsTheFirstPage: "It's the first page",
       itsTheLastPage: "It's the last page",
       submittedSuccessfully: "Submitted successfully",
-      deleteSuccessful: "Delete successful"
+      deleteSuccessful: "Delete successful",
+      tel: "Tel",
+      mobile: "Mobile",
+      address: "Address"
+    },
+    common: {
+      loading: "Loading...",
+      noMore: "No More"
     }
   },
   ...enLocale

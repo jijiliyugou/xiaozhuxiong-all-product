@@ -181,7 +181,7 @@
               <div slot="content">
                 <el-image
                   v-if="col.elImageUrl"
-                  style="width: 300px; height: auto; cursor: pointer"
+                  style="width: 300px; height: 280px; cursor: pointer"
                   :preview-src-list="isArray(col.elImage(scope.row))"
                   :src="isString(col.elImage(scope.row))"
                   fit="contain"
@@ -337,7 +337,7 @@
                         @click="btn.methods(scope.row)"
                       >
                         <i
-                          :class="btn.icon"
+                          :class="btn.icon2"
                           :style="{
                             color: btn.color
                           }"
@@ -873,6 +873,15 @@ export default {
       margin-bottom: 10px;
       color: #333333;
       border-bottom: 1px solid #dcdfe6;
+      cursor: pointer;
+      .box {
+        margin-bottom: 8px;
+      }
+    }
+    .more_btn_item:last-child {
+      margin-bottom: 10px;
+      color: #333333;
+      border-bottom: unset;
       cursor: pointer;
       .box {
         margin-bottom: 8px;

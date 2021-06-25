@@ -87,7 +87,10 @@
             </div>
           </div>
         </div>
-        <div class="myCartBox">
+        <div
+          class="myCartBox"
+          v-if="userInfo.commparnyList[0].companyType !== 'Supplier'"
+        >
           <div class="myCart" @click="handlerShopping(productDetail)">
             <i class="myCartIcon"></i>
             <span>加入购物车</span>
@@ -258,11 +261,15 @@
         <img :src="dataCertificate.certificateAddres" alt="" />
       </div>
     </el-dialog>
+    <CartBox
+      v-if="userInfo.commparnyList[0].companyType !== 'Supplier'"
+    ></CartBox>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import CartBox from "@/components/cartBox.vue";
 import magnifierComponent from "@/components/bsComponents/bsProductSearchComponent/bsMagnifierComponent.vue";
 import eventBus from "@/assets/js/common/eventBus.js";
 export default {
@@ -272,6 +279,7 @@ export default {
     }
   },
   components: {
+    CartBox,
     magnifierComponent
   },
   data() {

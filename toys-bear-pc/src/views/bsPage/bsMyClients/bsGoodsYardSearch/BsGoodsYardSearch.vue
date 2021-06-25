@@ -126,7 +126,7 @@ export default {
             prop: "createdOn",
             label: "时间",
             render: row => {
-              return row.createdOn.replace(/T.*/, "");
+              return row.createdOn.replace(/T/, " ");
             }
           }
         ]

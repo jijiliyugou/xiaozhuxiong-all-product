@@ -9,7 +9,19 @@
       <div class="top">
         <div class="left">报价产品列表({{ tableData.data.length }})</div>
         <div class="right" v-if="tableData.data.length > 0">
-          <el-button @click="exportOrder()" type="warning"> 导出列表</el-button>
+          <el-button size="medium" @click="exportOrder()" type="warning">
+            <i class="iconfont icon-daochujinruchukou"></i>
+            导出列表
+          </el-button>
+          <el-button
+            size="medium"
+            @click="openAdd"
+            style="background-color: #F9AE3E;border-color: #F9AE3E;"
+            type="warning"
+          >
+            <i class="el-icon-shopping-cart-full" style="font-size: 16px;"></i>
+            一键加购
+          </el-button>
         </div>
       </div>
       <div class="tableBox">
@@ -30,6 +42,21 @@
         <bsExportOrder :options="orderRow" />
       </el-dialog>
     </transition>
+    <!-- 一键加购dialog -->
+    <transition name="el-zoom-in-center">
+      <el-dialog
+        title="一键加购"
+        v-if="addPurchaseDialog"
+        :visible.sync="addPurchaseDialog"
+        width="500px"
+      >
+        <oneClickPurchase
+          :addShopOption="addShopOption"
+          @close="close"
+          @submit="submit"
+        />
+      </el-dialog>
+    </transition>
   </div>
 </template>
 
@@ -38,13 +65,16 @@ import Summary from "@/components/summaryComponent/summary";
 import bsExportOrder from "@/components/commonComponent/exportOrderComponent/gongsizhaoyangbaojia.vue";
 import bsSampleQuotationTopComponent from "@/components/bsComponents/bsSampleComponent/bsSampleQuotationTopComponent";
 import bsTable from "@/components/table";
+import oneClickPurchase from "@/components/commonComponent/oneClickPurchase/oneClickPurchase.vue";
+import { mapState } from "vuex";
 export default {
   name: "bsSampleQuotationDetails",
   components: {
     bsExportOrder,
     bsSampleQuotationTopComponent,
     bsTable,
-    Summary
+    Summary,
+    oneClickPurchase
   },
   props: {
     item: {
@@ -62,7 +92,7 @@ export default {
           {
             prop: "name",
             label: "产品",
-            width: 300,
+            width: 280,
             color: "#3368a9",
             align: "left",
             // isHiden: true,
@@ -82,6 +112,7 @@ export default {
           {
             prop: "supplierPhone",
             label: "联系厂商",
+            width: 100,
             render: row => {
               switch (row.supplierTelephoneNumber) {
                 case "":
@@ -109,10 +140,11 @@ export default {
             isHiden: true,
             label: "资料来源"
           },
-          { prop: "fa_no", width: 60, label: "出厂货号", isHiden: true },
-          { prop: "ch_pa", width: 50, label: "包装", isHiden: true },
+          { prop: "fa_no", Width: 60, label: "出厂货号", isHiden: true },
+          { prop: "ch_pa", minWidth: 70, label: "包装", isHiden: true },
           {
             prop: "pr_le",
+            minWidth: 100,
             renderHeard: () => {
               return "产品规格</br>(cm)";
             },
@@ -123,7 +155,7 @@ export default {
           },
           {
             prop: "pr_le",
-
+            minWidth: 100,
             renderHeard: () => {
               return "包装规格</br>(cm)";
             },
@@ -134,7 +166,7 @@ export default {
           },
           {
             prop: "pr_le",
-
+            minWidth: 100,
             renderHeard: () => {
               return "外箱规格</br>(cm)";
             },
@@ -150,14 +182,14 @@ export default {
               return "体积/材积</br>(cbm)/(cuft)";
             },
             isHiden: true,
-            width: 150,
+            minWidth: 100,
             render: row => {
               return row.bulk_stere + "/" + row.bulk_feet;
             }
           },
           {
             prop: "gr_we",
-
+            minWidth: 90,
             renderHeard: () => {
               return "毛重/净重</br>(kg)";
             },
@@ -195,30 +227,31 @@ export default {
           {
             prop: "price",
             label: "厂价",
-            width: 50,
+            width: 100,
             color: "red",
             render: row => {
-              return "￥ " + row.price;
+              return "￥" + row.price;
             }
           },
           {
             prop: "offerAmount",
             label: "报出价",
-            width: 50,
+            width: 100,
+            padding: "0  2px",
             color: "red",
             render: row => {
-              return row.cu_de + " " + row.offerAmount;
+              return row.cu_de + row.offerAmount;
             }
           },
           {
             prop: "OfferTotalAmount",
             label: "报出总价",
-            width: 60,
+            width: 100,
+            padding: "0  2px",
             color: "red",
             render: row => {
               return (
                 row.cu_de +
-                " " +
                 this.$calculate.countTotalprice(
                   row.offerAmount,
                   row.ou_lo,
@@ -229,6 +262,8 @@ export default {
           }
         ]
       },
+      addShopOption: null,
+      addPurchaseDialog: false,
       orderRow: {},
       exportTemplateDialog: false,
       handerTabData: [],
@@ -251,12 +286,62 @@ export default {
       }
     };
   },
-  created() {},
-
+  computed: {
+    ...mapState(["userInfo"])
+  },
   mounted() {
     this.getProductOfferNumber();
   },
   methods: {
+    // 提交一键加购
+    async submit(myData) {
+      // this.$common.handlerMsgState({
+      //   msg: "敬请期待",
+      //   type: "warning"
+      // });
+      const re = await this.$http.post(
+        "/api/AddShoppingCart",
+        {
+          userID: this.userInfo.userInfo.id,
+          companyNumber: this.userInfo.commparnyList[0].companyNumber,
+          sourceFrom: "active",
+          // sourceFrom: "QRCodeSearch",
+          number: 1,
+          currency: "￥",
+          Price: 0,
+          shopType: "companysamples",
+          productNumber: myData.productNumber
+        },
+        {
+          timeout: 9999999
+        }
+      );
+      if (re.data.result.code === 200) {
+        this.$common.handlerMsgState({
+          msg: re.data.result.msg,
+          type: "success"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: re.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.addPurchaseDialog = false;
+    },
+    // 关闭加购
+    close() {
+      this.addPurchaseDialog = false;
+      this.addShopOption = null;
+    },
+    // 一键加购
+    async openAdd() {
+      this.addShopOption = {
+        orderNumber: this.item.offerNumber,
+        orderType: "ProductOffer"
+      };
+      this.addPurchaseDialog = true;
+    },
     // 判断编号
     handleOffer(row) {
       if (this.item.offerNumber.indexOf("S") < 0) {
@@ -421,41 +506,14 @@ export default {
         e.target.value = e.target.value.slice(1, 5);
       }
       val.shoppingCount = Number(e.target.value);
+      if (e.target.value % 1 != 0) {
+        this.$common.handlerMsgState({
+          msg: "箱数必须为整数",
+          type: "danger"
+        });
+        e.target.value = 0;
+      }
       this.$store.commit("replaceShoppingCartValueCount", this.tableData);
-    }
-  },
-  // 点击上下键盘
-  nextInput(e) {
-    if (e.keyCode === 40) {
-      const inputs = document.getElementsByClassName("inputNumber");
-      for (let i = 0; i < inputs.length; i++) {
-        // 如果是最后一个，则焦点回到第一个
-        if (i == inputs.length - 1) {
-          inputs[0].focus();
-        } else if (e.target == inputs[i]) {
-          inputs[i + 1].focus();
-          break; //不加最后一行eles就直接回到第一个输入框
-        }
-      }
-      e.stopPropagation();
-      e.preventDefault();
-      e.returnValue = false;
-      e.cancelBubble = true;
-    } else if (e.keyCode === 38) {
-      const inputs = document.getElementsByClassName("inputNumber");
-      for (let i = 0; i < inputs.length; i++) {
-        // 如果是最后一个，则焦点回到第一个
-        if (i === 0) {
-          inputs[inputs.length - 1].focus();
-        } else if (e.target == inputs[i]) {
-          inputs[i - 1].focus();
-          break; //不加最后一行eles就直接回到第一个输入框
-        }
-      }
-      e.stopPropagation();
-      e.preventDefault();
-      e.returnValue = false;
-      e.cancelBubble = true;
     }
   }
 };

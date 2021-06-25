@@ -15,7 +15,7 @@
         ></el-input>
       </div>
       <div class="item">
-        <span class="label">择样类型：</span>
+        <span class="label">类型：</span>
         <el-select
           v-model="searchForm.messageExt"
           size="medium"
@@ -23,10 +23,10 @@
           placeholder="请选择"
         >
           <el-option
-            v-for="(item, i) in typesList"
-            :key="i"
-            :label="item.label"
-            :value="item.value"
+            v-for="item in typesList"
+            :key="item.id"
+            :label="item.title"
+            :value="item.messageExt"
           >
           </el-option>
         </el-select>
@@ -229,28 +229,7 @@ export default {
       staffList: [],
       exportTemplateDialog: false,
       orderRow: {},
-      typesList: [
-        {
-          label: "系统通知",
-          value: 0
-        },
-        {
-          label: "补样",
-          value: 3
-        },
-        {
-          label: "借样",
-          value: 5
-        },
-        {
-          label: "补样借样",
-          value: 11
-        },
-        {
-          label: "洽谈",
-          value: 12
-        }
-      ],
+      typesList: [],
       readStatusList: [
         {
           label: "全部",
@@ -308,9 +287,14 @@ export default {
             }
           },
           {
+            prop: "toCompanyName",
+            isHiden: true,
+            label: "名称"
+          },
+          {
             prop: "messageExt",
             isHiden: true,
-            label: "择样类型",
+            label: "类型",
             render: row => {
               let msg;
               switch (row.messageExt) {
@@ -336,21 +320,17 @@ export default {
           {
             prop: "the_nu",
             isHiden: true,
-            label: "本次代号"
+            label: "代号"
           },
           {
             prop: "happenDate",
             isHiden: true,
-            label: "择样日期",
+            label: "日期",
             render: row => {
-              return row.happenDate ? row.happenDate.replace(/T.*/, "") : "";
+              return row.happenDate ? row.happenDate.replace(/T/, " ") : "";
             }
           },
-          {
-            prop: "hall_na",
-            isHiden: true,
-            label: "展厅名称"
-          },
+
           {
             prop: "orgPersonnelName",
             isHiden: true,
@@ -359,7 +339,7 @@ export default {
           {
             prop: "pushContent",
             isHiden: true,
-            label: "备注"
+            label: "内容"
           },
           {
             prop: "readStatus",
@@ -369,10 +349,10 @@ export default {
               let msg = "";
               switch (row.readStatus) {
                 case false:
-                  msg = "<span style='color: green'>未读</span>";
+                  msg = "<span style='color: #EB1515'>未查看</span>";
                   break;
                 case true:
-                  msg = "<span style='color: #f56c6c'>已读</span>";
+                  msg = "<span style='color: #33A96A'>已查看</span>";
                   break;
               }
               return msg;
@@ -427,12 +407,31 @@ export default {
       };
       this.$store.commit("myAddTab", fd);
     },
+    // 择样类型
+    async getTypeList() {
+      const res = await this.$http.post(
+        "/api/PushSettings/MessageTeplateSettingsByPage",
+        {
+          maxResultCount: 9999,
+          messageModel:
+            this.userInfo.commparnyList[0].companyType == "Exhibition" ? 1 : 7,
+          skipCount: 1
+        }
+      );
+      if (res.data.result.code === 200) {
+        this.typesList = res.data.result.item.items;
+      }
+    },
     // 获取列表
     async getTableDataList() {
       console.log(this.searchForm.fromCompanyName);
       const fd = {
+        sampleFrom:
+          this.userInfo.commparnyList[0].companyType == "Exhibition"
+            ? "Hall"
+            : this.userInfo.commparnyList[0].companyType,
+        sampleTo: "Supplier",
         readStatus: this.searchForm.readStatus,
-        sampleFrom: "supplier",
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyWord: this.searchForm.keyword,
@@ -480,9 +479,6 @@ export default {
       this.getTableDataList();
     }
   },
-  created() {
-    this.getStaffList();
-  },
   filters: {
     switchMessageExt(val) {
       let msg;
@@ -506,7 +502,10 @@ export default {
       return msg;
     }
   },
-  mounted() {},
+  async mounted() {
+    await this.getStaffList();
+    await this.getTypeList();
+  },
   computed: {
     ...mapState(["currentComparnyId", "userInfo"])
   }

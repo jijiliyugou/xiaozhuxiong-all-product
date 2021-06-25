@@ -15,7 +15,7 @@
         ></el-input>
       </div>
       <div class="item">
-        <span class="label">择样类型：</span>
+        <span class="label">类型：</span>
         <el-select
           v-model="searchForm.messageExt"
           size="medium"
@@ -23,10 +23,10 @@
           placeholder="请选择"
         >
           <el-option
-            v-for="(item, i) in typesList"
-            :key="i"
-            :label="item.label"
-            :value="item.value"
+            v-for="item in typesList"
+            :key="item.id"
+            :label="item.title"
+            :value="item.messageExt"
           >
           </el-option>
         </el-select>
@@ -229,28 +229,7 @@ export default {
       staffList: [],
       exportTemplateDialog: false,
       orderRow: {},
-      typesList: [
-        {
-          label: "系统通知",
-          value: 0
-        },
-        {
-          label: "补样",
-          value: 3
-        },
-        {
-          label: "借样",
-          value: 5
-        },
-        {
-          label: "补样借样",
-          value: 11
-        },
-        {
-          label: "洽谈",
-          value: 12
-        }
-      ],
+      typesList: [],
       readStatusList: [
         {
           label: "全部",
@@ -427,12 +406,34 @@ export default {
       };
       this.$store.commit("myAddTab", fd);
     },
+    // 择样类型
+    async getTypeList() {
+      const res = await this.$http.post(
+        "/api/PushSettings/MessageTeplateSettingsByPage",
+        {
+          maxResultCount: 9999,
+          messageModel:
+            this.userInfo.commparnyList[0].companyType == "Exhibition" ? 1 : 7,
+          skipCount: 1
+        }
+      );
+      if (res.data.result.code === 200) {
+        this.typesList = res.data.result.item.items;
+      }
+    },
     // 获取列表
     async getTableDataList() {
       console.log(this.searchForm.fromCompanyName);
       const fd = {
+        sampleTo:
+          this.userInfo.commparnyList[0].companyType == "Exhibition"
+            ? "Sales"
+            : this.userInfo.commparnyList[0].companyType,
+        sampleFrom:
+          this.userInfo.commparnyList[0].companyType == "Exhibition"
+            ? "Hall"
+            : "sales",
         readStatus: this.searchForm.readStatus,
-        sampleFrom: "sales",
         skipCount: this.currentPage,
         maxResultCount: this.pageSize,
         keyWord: this.searchForm.keyword,
@@ -480,9 +481,6 @@ export default {
       this.getTableDataList();
     }
   },
-  created() {
-    this.getStaffList();
-  },
   filters: {
     switchMessageExt(val) {
       let msg;
@@ -506,7 +504,10 @@ export default {
       return msg;
     }
   },
-  mounted() {},
+  async mounted() {
+    await this.getStaffList();
+    await this.getTypeList();
+  },
   computed: {
     ...mapState(["currentComparnyId", "userInfo"])
   }

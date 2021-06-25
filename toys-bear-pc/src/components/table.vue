@@ -10,6 +10,7 @@
       :header-cell-style="{ backgroundColor: '#f9fafc' }"
       @selection-change="handleSelectionChange"
       @current-change="handleTableCurrentChange"
+      @sort-change="changeTableSort"
       @row-click="handleDetail"
     >
       <el-table-column
@@ -30,6 +31,7 @@
         v-for="(col, index) in table.columns"
         :width="col.width"
         :min-width="col.minWidth"
+        :sortable="col.sortable"
         :align="col.align || 'center'"
         :key="index"
         :prop="col.prop"
@@ -44,7 +46,7 @@
           <!-- 字段判断 -->
           <span
             v-if="col.render"
-            :style="{ color: col.color }"
+            :style="{ color: col.color, padding: col.padding }"
             v-html="col.render(scope.row)"
           ></span>
           <!-- 产品信息和图片 -->
@@ -57,7 +59,7 @@
               <div slot="content">
                 <el-image
                   v-if="col.elImage"
-                  style="width: 300px; height: auto; cursor: pointer"
+                  style="width: 300px; height: 280px; cursor: pointer"
                   :preview-src-list="isArray(col.elImage(scope.row))"
                   :src="isString(col.elImage(scope.row))"
                   fit="contain"
@@ -122,7 +124,10 @@
               >
                 <el-tooltip
                   effect="dark"
-                  :disabled="col.nameHtml(scope.row).length < 15"
+                  :disabled="
+                    col.nameHtml(scope.row) &&
+                      col.nameHtml(scope.row).length < 15
+                  "
                   :content="col.nameHtml(scope.row)"
                   placement="top-start"
                 >
@@ -154,6 +159,13 @@
                 </div>
               </div>
             </div>
+            <div class="companyName" v-if="col.companyName">
+              <div
+                style="margin-left: 10px"
+                class="name"
+                v-html="col.companyName(scope.row)"
+              ></div>
+            </div>
           </div>
           <!-- 用户头像和名字 -->
           <div class="nameBox" v-else-if="col.companyInfo">
@@ -175,7 +187,11 @@
             </span>
           </div>
           <!-- 只放图片 -->
-          <div class="productInfo" v-else-if="col.elImageUrl">
+          <div
+            class="productInfo"
+            v-else-if="col.elImageUrl"
+            :style="col.style"
+          >
             <el-tooltip
               effect="light"
               placement="right"
@@ -232,6 +248,60 @@
               </el-image>
             </el-tooltip>
           </div>
+          <!-- 视频 -->
+          <div class="productInfo" v-else-if="col.elVideo">
+            <video
+              :lazy-src="scope.row[col.prop]"
+              class="video-js vjs-default-skin vjs-big-play-centered"
+              controls
+              preload="auto"
+              style="object-fit: contain; width: 100px;height: 80px;"
+            >
+              <source :src="scope.row[col.prop]" type="video/mp4" />
+            </video>
+          </div>
+          <!-- 3D -->
+          <div class="productInfo" v-else-if="col.threeDimensional">
+            <!-- <object
+              :data="col.threeDimensionalUrl(scope.row)"
+              width="100"
+              height="50"
+            >
+            </object> -->
+            <iframe
+              :src="col.threeDimensionalUrl(scope.row)"
+              id="map"
+              frameborder="0"
+              scrolling="no"
+              height="50px"
+              width="100px"
+            ></iframe>
+          </div>
+          <!-- 开关switch -->
+          <div class="isSwitch" v-else-if="col.isSwitch">
+            <el-switch
+              v-model="scope.row[col.value]"
+              :active-color="col.activeColor"
+              :inactive-color="col.inactiveColor"
+              :active-value="col.activeValue"
+              :inactive-value="col.inactiveValue"
+              @change="col.handlerChange(scope.row)"
+            >
+            </el-switch>
+          </div>
+          <!-- 输入框 -->
+          <div class="isInput" v-else-if="col.isInput">
+            <el-input
+              size="mini"
+              ref="inputNumber"
+              onfocus="this.select()"
+              @keydown.native="nextInput($event, index)"
+              v-model="scope.row[col.value]"
+              @blur="col.inputBlur(scope.row)"
+              @keyup.native.enter="col.inputBlur(scope.row)"
+            >
+            </el-input>
+          </div>
           <!-- 字段颜色 -->
           <span
             v-else-if="col.isCallback"
@@ -274,7 +344,11 @@
                 size="mini"
                 @click="btn.methods(scope.row)"
                 :icon="btn.icon"
-                :style="{ margin: btn.margin }"
+                :style="{
+                  margin: btn.margin,
+                  backgroundColor: btn.bgColor,
+                  borderColor: btn.bgColor
+                }"
               >
                 {{ btn.textWrapper(scope.row) }}
               </el-button>
@@ -283,7 +357,6 @@
         </template>
       </el-table-column>
       <!-- 下拉框 -->
-      {{ table.dropdown }}
       <el-table-column
         v-if="table.dropdown"
         :label="table.dropdown.title"
@@ -388,6 +461,56 @@ export default {
   },
   mounted() {},
   methods: {
+    changeTableSort(option) {
+      // let sortType;
+      // switch (order) {
+      //   case "descending": // 降序
+      //     sortType = 1;
+      //     break;
+      //   case "ascending": // 升序
+      //     sortType = 2;
+      //     break;
+      //   default:
+      //     sortType = null; // 无排序
+      //     break;
+      // }
+      this.$emit("changeTableSort", option);
+    },
+    // 输入框获取焦点事件
+    nextInput(e) {
+      if (e.keyCode === 40) {
+        // const inputs = document.getElementsByClassName("inputNumber");
+        const inputs = this.$refs.inputNumber;
+        for (let i = 0; i < inputs.length; i++) {
+          // 如果是最后一个，则焦点回到第一个
+          if (i == inputs.length - 1) {
+            inputs[0].focus();
+          } else if (e.target == inputs[i].$el.children[0]) {
+            inputs[i + 1].focus();
+            break; //不加最后一行eles就直接回到第一个输入框
+          }
+        }
+        e.stopPropagation();
+        e.preventDefault();
+        e.returnValue = false;
+        e.cancelBubble = true;
+      } else if (e.keyCode === 38) {
+        const inputs = this.$refs.inputNumber;
+        for (let i = 0; i < inputs.length; i++) {
+          // 如果是最后一个，则焦点回到第一个
+          if (i === 0) {
+            inputs[inputs.length - 1].focus();
+          } else if (e.target == inputs[i].$el.children[0]) {
+            inputs[i - 1].focus();
+            break; //不加最后一行eles就直接回到第一个输入框
+          }
+        }
+        e.stopPropagation();
+        e.preventDefault();
+        e.returnValue = false;
+        e.cancelBubble = true;
+      }
+    },
     isString(img) {
       if (Array.isArray(img)) {
         return img[0];
@@ -415,7 +538,7 @@ export default {
         label: row.fa_no || "产品详情",
         value: row
       };
-      this.$router.push("/bsIndex/bsProductSearchIndex");
+      // this.$router.push("/bsIndex/bsProductSearchIndex");
       this.$store.commit("myAddTab", fd);
     },
     //厂商跳转
@@ -601,13 +724,22 @@ export default {
 @deep: ~">>>";
 
 @{deep}.el-table {
+  .isInput {
+    .el-input {
+      width: 80px;
+      input {
+        color: #ff4848;
+        text-align: center;
+      }
+    }
+  }
   font-size: 13px !important;
   .cell {
     padding: 0 5px;
   }
   .el-table__body-wrapper {
     .cell {
-      padding: 8px 0;
+      padding: 8px 4px;
     }
   }
   .el-table__row {
@@ -624,19 +756,18 @@ export default {
 .productInfo {
   display: flex;
   justify-content: center;
-  .el-image {
-    cursor: pointer;
-  }
+  cursor: pointer;
+
   @{deep}.infoBox {
-    width: 190px;
+    width: 170px;
     height: 60px;
-    margin-left: 10px;
+    text-align: left;
+    margin-left: 15px;
     div {
       line-height: 25px;
     }
     .name {
       margin-top: 5px;
-      cursor: pointer;
       overflow: hidden; /*超出部分隐藏*/
       white-space: nowrap; /*不换行*/
       text-overflow: ellipsis; /*超出部分文字以...显示*/
@@ -647,7 +778,6 @@ export default {
       }
     }
     .factory {
-      cursor: pointer;
       display: flex;
       align-items: center;
       color: #3368a9;
@@ -681,6 +811,14 @@ export default {
         }
       }
     }
+  }
+  @{deep}.companyName {
+    width: 170px;
+    height: 60px;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .el-image {
     width: 70px;

@@ -179,18 +179,107 @@ router.beforeEach(async (to, from, next) => {
         store.commit("setRouters", menus.data.result.item.modulesList || []);
         await getMenuFuc();
       }
-      next();
+      next({ path: "/bsIndex" });
     } else {
-      sessionStorage.clear();
-      const res = await getToken();
-      if (res.data.result.code === 200) {
-        const obj = { accessToken: res.data.result.item };
-        store.commit("setToken", obj);
-      }
-      if (to.path == "/login" || to.path == "/loginConfirm") {
-        next();
+      const validityPeriod = localStorage.getItem("validityPeriod");
+      if (validityPeriod) {
+        const options = JSON.parse(validityPeriod);
+        if (options.dateTime) {
+          const currentDate = Date.now();
+          // 一天的时间戳为86400000
+          const day = 86400000 * 7;
+          // 超过7天
+          if (currentDate - options.dateTime >= day) {
+            const result = await getToken();
+            if (result.data.result.code === 200) {
+              // accessToken = result.data.result.item;
+              store.commit("setToken", {
+                accessToken: result.data.result.item
+              });
+            }
+            return next({ path: "/login" });
+          } else {
+            console.log(123, "刷新token", options.token);
+            // 刷新token
+            const res = await resetPersonInfo(options.token);
+            store.commit("handlerLogin", true);
+            console.log(res);
+            // 设置token
+            store.commit("setToken", res.data.result);
+            store.commit(
+              "setComparnyId",
+              res.data.result.commparnyList[0].commparnyId
+            );
+            // 登录成功获取系统参数
+            const Json = {};
+            Json.MessageRestriction = await getClientTypeList(
+              "MessageRestriction",
+              options.token
+            );
+            Json.UserRestrictions = await getClientTypeList(
+              "UserRestrictions",
+              options.token
+            );
+            Json.NoticeRestrictions = await getClientTypeList(
+              "NoticeRestrictions",
+              options.token
+            );
+            Json.CompanyRestrictions = await getClientTypeList(
+              "CompanyRestrictions",
+              options.token
+            );
+            Json.PlatForm = await getClientTypeList("PlatForm", options.token);
+            Json.packageManage = await getClientTypeList(
+              "packageManage",
+              options.token
+            );
+            store.commit("globalJson/setGlobalJson", Json);
+            // 登录成功获取菜单
+            const menus = await getUserRoleMenu(options.token);
+            if (menus.data.result.code === 200) {
+              store.commit(
+                "setRouters",
+                menus.data.result.item.modulesList || []
+              );
+              await getMenuFuc();
+            }
+            // 清空菜单状态
+            const fd = {
+              component: "bsHome",
+              label: "后台首页",
+              linkUrl: "/bsIndex/bsHome",
+              name: "/bsIndex/bsHome",
+              refresh: true
+            };
+            store.commit("updateActiveTab", fd);
+            store.commit("closeTabAll");
+            next({ path: "/bsIndex" });
+          }
+        } else {
+          sessionStorage.clear();
+          const res = await getToken();
+          if (res.data.result.code === 200) {
+            const obj = { accessToken: res.data.result.item };
+            store.commit("setToken", obj);
+          }
+          if (to.path == "/login" || to.path == "/loginConfirm") {
+            next();
+          } else {
+            return next({ path: "/login" });
+          }
+        }
       } else {
-        return next({ path: "/login" });
+        sessionStorage.clear();
+        const res = await getToken();
+        if (res.data.result.code === 200) {
+          const obj = { accessToken: res.data.result.item };
+          store.commit("setToken", obj);
+        }
+        if (to.path == "/login" || to.path == "/loginConfirm") {
+          next();
+        } else {
+          return next({ path: "/login" });
+        }
       }
     }
   } else {

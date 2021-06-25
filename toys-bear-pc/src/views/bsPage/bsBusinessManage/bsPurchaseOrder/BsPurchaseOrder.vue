@@ -171,7 +171,6 @@ export default {
             isHiden: true,
             label: "状态",
             render(row) {
-              console.log(row.orderStatus);
               if (row.orderStatus == 0) {
                 return "<span style='color: #FF4848; '>未读</span>";
               } else if (row.orderStatus == 1) {
@@ -268,7 +267,10 @@ export default {
     },
     // 导入菜单
     importOrder() {
-      alert("敬请期待");
+      this.$common.handlerMsgState({
+        msg: "敬请期待",
+        type: "danger"
+      });
     },
     // 删除
     handlerDelete(row) {
@@ -311,7 +313,7 @@ export default {
     // 获取列表
     async getTableDataList() {
       const fd = {
-        sampleFrom: "Sales",
+        sampleFrom: "Hall",
         sampleTo: "Supplier",
         readStatus: -1,
         skipCount: this.currentPage,

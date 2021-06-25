@@ -219,6 +219,7 @@
               <el-button
                 class="purchased"
                 size="small"
+                style="width:165px"
                 @click="handelrPurchased"
               >
                 <i class="selectionCart"></i>
@@ -501,6 +502,7 @@ export default {
         cancelButtonText: "取消"
       })
         .then(async () => {
+          this.$store.commit("updateAppLoading", true);
           const selectProducts = this.$refs.componentRef.$refs.bsTableItemRef
             .$refs.myTableRef.selection;
 
@@ -520,6 +522,7 @@ export default {
           };
           const res = await this.$http.post("/api/AddShoppingCart", fd);
           if (res.data.result.code === 200) {
+            this.$store.commit("updateAppLoading", false);
             this.$store.commit(
               "handlerShoppingCartCount",
               res.data.result.item

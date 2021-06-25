@@ -183,19 +183,22 @@ export default {
           }
           this.getShoppingCartCount();
           // 记住密码
-          if (this.$route.query.thePassword) {
-            const validityPeriod = JSON.stringify({
-              dateTime: Date.now(),
-              token: res.data.result.accessToken
-            });
-            localStorage.setItem("validityPeriod", validityPeriod);
-            this.$cookies.set("validityPeriod", validityPeriod);
-          } else {
-            const validityPeriod = JSON.stringify({
-              token: res.data.result.accessToken
-            });
-            localStorage.setItem("validityPeriod", validityPeriod);
-            this.$cookies.set("validityPeriod", validityPeriod);
+          // console.log(this.$route.query.id !== "checkted", this.$route.query.id == "thePassword");
+          if (this.$route.query.id !== "checkted") {
+            if (this.$route.query.id == "thePassword") {
+              const validityPeriod = JSON.stringify({
+                dateTime: Date.now(),
+                token: res.data.result.accessToken
+              });
+              localStorage.setItem("validityPeriod", validityPeriod);
+              this.$cookies.set("validityPeriod", validityPeriod);
+            } else {
+              const validityPeriod = JSON.stringify({
+                token: res.data.result.accessToken
+              });
+              localStorage.setItem("validityPeriod", validityPeriod);
+              this.$cookies.set("validityPeriod", validityPeriod);
+            }
           }
           const fd = {
             component: "bsHome",
@@ -205,9 +208,9 @@ export default {
             refresh: true
           };
           switch (item.companyType) {
-            // case "Admin":
-            // case "Supplier":
-            // case "Exhibition":
+            case "Admin":
+            case "Supplier":
+            case "Exhibition":
             case "Sales":
               this.$store.commit("updateActiveTab", fd);
               this.$store.commit("closeTabAll", this.$router);
@@ -217,7 +220,6 @@ export default {
                 process.env.NODE_ENV === "production"
                   ? proEnv.loginUrl
                   : devEnv.loginUrl;
-              // location.href = "https://www.toysbear.com/#/me";
               break;
           }
           // this.$router.push("/bsIndex");
@@ -228,6 +230,11 @@ export default {
           console.log(error);
           // this.$store.commit("updateAppLoading", false);
         }
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.message,
+          type: "danger"
+        });
       }
     },
     // 获取购物车CartCount

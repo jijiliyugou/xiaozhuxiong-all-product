@@ -147,6 +147,13 @@
               </template>
             </el-select>
           </el-form-item>
+          <!-- 乘法除法 -->
+          <el-form-item label="算法：" prop="profitCalcMethod">
+            <el-radio-group v-model="addDefaultForm.profitCalcMethod">
+              <el-radio :label="2">除法</el-radio>
+              <el-radio :label="1">乘法</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <div class="inputWrap">
             <div class="left">
               <el-form-item label="币种：" prop="cu_de">
@@ -311,6 +318,7 @@ export default {
         decimalPlaces: null,
         profit: null,
         size: null,
+        profitCalcMethod: 1,
         rejectionMethod: null
       },
       totalCount: 0,
@@ -439,6 +447,7 @@ export default {
         name: null,
         remark: null,
         offerMethod: null,
+        profitCalcMethod: 1,
         cu_de: null,
         cu_deName: null,
         exchange: null,

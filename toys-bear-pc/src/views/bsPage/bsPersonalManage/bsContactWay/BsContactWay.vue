@@ -108,6 +108,7 @@
         </el-form-item>
         <el-form-item label="联系地址:" prop="contactAddress">
           <el-input
+            :maxlength="300"
             v-model="ContactWayRulesFormData.contactAddress"
             placeholder="请输入联系地址"
           ></el-input>
@@ -257,15 +258,25 @@ export default {
         ],
         phoneNumber: [
           { required: true, message: "请输入手机号码", trigger: "blur" },
+          { max: 20, message: "不可超过20字符", trigger: "blur" },
           {
             validator: (rule, value, cb) => {
-              if (/^\s*\d{11}\s*$/.test(value)) {
+              if (/^[\d-*+]+$/.test(value)) {
                 cb();
               } else {
                 cb(new Error("手机号格式错误"));
               }
             }
           }
+          // {
+          //   validator: (rule, value, cb) => {
+          //     if (/^\s*\d{21}\s*$/.test(value)) {
+          //       cb();
+          //     } else {
+          //       cb(new Error("手机号格式错误"));
+          //     }
+          //   }
+          // }
         ]
       }
     };

@@ -17,7 +17,7 @@
                 :margin="0"
                 :size="230"
               ></vue-qr>
-              <div class="refresh" v-show="showQrCode">
+              <div class="refresh" v-show="showQrCode || options.url === 'no'">
                 <div class="refreshIcon" @click="getQrCodeUrl">
                   <i class="el-icon-refresh"></i>
                 </div>
@@ -98,8 +98,6 @@ export default {
       ws: null,
       loginUrl: "https://www.toysbear.com/new/#/bsIndex",
       wsBaseUrl: "wss://impush.toysbear.com/ws?UserId=",
-      // loginUrl: "http://139.9.71.135:8080/new/#/bsIndex",
-      // wsBaseUrl: "ws://139.9.71.135:8090/ws?UserId=",
       // loginUrl: "http://124.71.6.26:8080/new/#/bsIndex",
       // wsBaseUrl: "ws://124.71.6.26:8090/ws?UserId=",
       lang: "zh-CN",
@@ -114,7 +112,7 @@ export default {
       search: "",
       options: {
         // 二维码配置
-        url: " ",
+        url: "no",
         icon: require("@/assets/images/logo.png")
       },
       loginforms: {
@@ -167,7 +165,6 @@ export default {
     // webSocket 连接错误
     websocketonerror() {
       console.log("WebSocket连接发生错误");
-      this.$message.error("WebSocket连接发生错误");
     },
     // webSocket 数据接收
     websocketonmessage(e) {
@@ -207,8 +204,12 @@ export default {
         clearInterval(this.qrTimer);
         this.qrTimer = null;
         // 保存数据到cookit
-        this.$cookies.set("userInfo", res.data.result.accessToken);
-        console.log(this.$cookies.get("userInfo"));
+        const validityPeriod = JSON.stringify({
+          token: res.data.result.accessToken
+        });
+        console.log(validityPeriod);
+        localStorage.setItem("validityPeriod", validityPeriod);
+        this.$cookies.set("validityPeriod", validityPeriod);
         this.$store.commit("setToken", res.data.result);
         this.$store.commit(
           "setComparnyId",
@@ -241,6 +242,7 @@ export default {
             this.$store.commit("globalJson/setGlobalJson", Json);
             console.log(res.data.result);
             switch (res.data.result.commparnyList[0].companyType) {
+              case "Exhibition":
               case "Sales":
                 // this.$router.push("/bsIndex");
                 location.href = this.loginUrl;
@@ -269,6 +271,9 @@ export default {
         this.randomCode = res.data.result.item.randomCode;
         // 开启长连接
         this.initWebSocket();
+      } else {
+        this.options.url = "no";
+        this.$message.error(res.data.result.msg);
       }
       // const TIME_COUNT = 10;
       const TIME_COUNT = 300;
@@ -384,6 +389,7 @@ export default {
                 this.$store.commit("removeLoginItems");
               }
               switch (res.data.result.commparnyList[0].companyType) {
+                case "Exhibition":
                 case "Sales":
                   // this.$router.push("/bsIndex");
                   location.href = this.loginUrl;

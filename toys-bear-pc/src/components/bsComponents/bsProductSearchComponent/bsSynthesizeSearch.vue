@@ -226,7 +226,7 @@
             onkeyup="value=value.replace(/[^\d.]/g,'')"
             style="width:80px"
             placeholder="长"
-            v-model="synthesizeFromData.iu_le"
+            v-model="synthesizeFromData.in_le"
           ></el-input>
           <p>-</p>
           <el-input
@@ -234,7 +234,7 @@
             onkeyup="value=value.replace(/[^\d.]/g,'')"
             style="width:80px"
             placeholder="宽"
-            v-model="synthesizeFromData.iu_wi"
+            v-model="synthesizeFromData.in_wi"
           ></el-input>
           <p>-</p>
           <el-input
@@ -242,7 +242,7 @@
             onkeyup="value=value.replace(/[^\d.]/g,'')"
             style="width:80px"
             placeholder="高"
-            v-model="synthesizeFromData.iu_hi"
+            v-model="synthesizeFromData.in_hi"
           ></el-input>
         </div>
       </el-form-item>
@@ -317,10 +317,24 @@ export default {
     },
     chpaList: {
       type: Array
+    },
+    childData: {
+      type: Object
     }
   },
   computed: {
     ...mapState(["historyText"])
+  },
+  watch: {
+    // "synthesizeFromData.maxPrice": {
+    //   deep: true,
+    //   handler(newVal) {
+    //     console.log(newVal);
+    //     if (newVal == 0) {
+    //       this.synthesizeFromData.maxPrice = "";
+    //     }
+    //   },
+    // },
   },
   data() {
     return {
@@ -351,25 +365,33 @@ export default {
         pr_wi: "", //样品宽度
         pr_hi: "", //样品高度
         time: "", //时间
-        iu_le: "", //包装长
-        iu_wi: "", //包装宽
-        iu_hi: "", //包装高
+        in_le: "", //包装长
+        in_wi: "", //包装宽
+        in_hi: "", //包装高
         ou_le: "", //外箱长度
         ou_wi: "", //外箱宽度
         ou_hi: "", //外箱高度
         isUpInsetImg: true, //是否有图
-        isUpInset3D: false, //是否有3D产品
-        isNew: false, //最新产品
-        isHot: false, //热销产品
-        isVip: false, //vip产品
-        isSpotGoods: false //现货产品
+        isUpInset3D: "", //是否有3D图
+        isNew: "", //新品
+        isHot: "", //热销
+        isVip: "", //vip
+        isSpotGoods: "", //现货
+        startTime: "", //开始时间
+        endTime: "" //结束时间
       },
       options: [],
       cities: []
     };
   },
   created() {},
-  mounted() {},
+  mounted() {
+    if (this.childData) {
+      for (const key in this.childData) {
+        this.synthesizeFromData[key] = this.childData[key];
+      }
+    }
+  },
   methods: {
     //   确定
     handleConfirm() {
@@ -415,18 +437,18 @@ export default {
         pr_wi: "", //样品宽度
         pr_hi: "", //样品高度
         time: "", //时间
-        iu_le: "", //包装长
-        iu_wi: "", //包装宽
-        iu_hi: "", //包装高
+        in_le: "", //包装长
+        in_wi: "", //包装宽
+        in_hi: "", //包装高
         ou_le: "", //外箱长度
         ou_wi: "", //外箱宽度
         ou_hi: "", //外箱高度
-        isUpInsetImg: false, //是否有图
-        isUpInset3D: false, //是否有3D图
-        isNew: false, //新品
-        isHot: false, //热销
-        isVip: false, //vip
-        isSpotGoods: false //现货
+        isUpInsetImg: true, //是否有图
+        isUpInset3D: "", //是否有3D图
+        isNew: "", //新品
+        isHot: "", //热销
+        isVip: "", //vip
+        isSpotGoods: "" //现货
       };
       this.$emit("handleIsSynthesizeSearch");
       this.$store.commit("claerHandlerSynthesizeSearchData", []);

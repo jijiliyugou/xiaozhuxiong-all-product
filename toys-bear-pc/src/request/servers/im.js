@@ -95,6 +95,12 @@ instance.interceptors.request.use(
     config.headers.Utoken =
       $Store.state.userInfo && $Store.state.userInfo.accessToken;
     config.headers["content-type"] = "application/json";
+    /**
+     * 需要loadding的请求
+     */
+    if (config.url.includes("api/ChatGroup/Quit")) {
+      $Store.commit("updateAppLoading", true);
+    }
     return config;
   },
   error => {
@@ -136,6 +142,7 @@ instance.interceptors.request.use(
 // 响应拦截
 instance.interceptors.response.use(
   async res => {
+    $Store.commit("updateAppLoading", false);
     if (res.data.result.code === 401) {
       const validityPeriod = localStorage.getItem("validityPeriod");
       const options = JSON.parse(validityPeriod);

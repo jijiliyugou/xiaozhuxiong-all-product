@@ -132,7 +132,7 @@ export default {
   created() {},
   async mounted() {
     await this.getConversationList();
-    eventBus.$on("resetTotalCount", () => {
+    eventBus.$on("resetListCount", () => {
       this.$nextTick(async () => {
         const res = await this.$im_http.post("/api/Conversation/List", {});
         const { code, item, msg } = res.data.result;
@@ -163,7 +163,7 @@ export default {
     ...mapState(["userInfo"])
   },
   beforeDestroy() {
-    eventBus.$off("resetTotalCount");
+    eventBus.$off("resetListCount");
   }
 };
 </script>

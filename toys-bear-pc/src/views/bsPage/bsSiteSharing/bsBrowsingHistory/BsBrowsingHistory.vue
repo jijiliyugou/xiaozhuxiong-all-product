@@ -79,7 +79,7 @@
       </div>
       <div class="item">
         <el-button
-          size="medium"
+          size="mini"
           @click="handletype('')"
           :class="{ all: btnType == '' }"
         >
@@ -89,7 +89,7 @@
       </div>
       <div class="item">
         <el-button
-          size="medium"
+          size="mini"
           @click="handletype('BrowseProducts')"
           :class="{ ll: btnType == 'BrowseProducts' }"
         >
@@ -101,7 +101,7 @@
       </div>
       <div class="item">
         <el-button
-          size="medium"
+          size="mini"
           @click="handletype('ProductsShop')"
           :class="{ jg: btnType == 'ProductsShop' }"
         >
@@ -113,7 +113,7 @@
       </div>
       <div class="item">
         <el-button
-          size="medium"
+          size="mini"
           @click="handletype('ProductOrder')"
           :class="{ Dd: btnType == 'ProductOrder' }"
         >
@@ -187,8 +187,8 @@ export default {
               return row.supplierName;
             }
           },
-          { prop: "customerName", label: "浏览客户" },
-          { prop: "contactperson", label: "联系人" },
+          // { prop: "customerName", label: "浏览客户" },
+          { prop: "customerName", label: "客户" },
           { prop: "linkman", label: "业务员" },
           {
             prop: "source",
@@ -210,12 +210,12 @@ export default {
             }
           },
           { prop: "siteName", label: "浏览站点" },
-          { prop: "url", label: "浏览网址" },
+          { prop: "url", label: "浏览网址", width: 300 },
           {
             prop: "createdOn",
             label: "浏览时间",
             render: row => {
-              return row.createdOn.replace(/T.*/, "");
+              return row.createdOn.replace(/T/, " ");
             }
           }
         ]

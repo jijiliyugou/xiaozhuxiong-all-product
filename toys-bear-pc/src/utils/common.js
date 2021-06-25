@@ -93,6 +93,69 @@ export default {
   goToUrl(title) {
     let fd = {};
     switch (title) {
+      case "我的产品":
+        fd = {
+          name: "/bsIndex/bsMyProduct",
+          linkUrl: "/bsIndex/bsMyProduct",
+          component: "bsMyProduct",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "产品视频":
+        fd = {
+          name: "/bsIndex/bsProductVideo",
+          linkUrl: "/bsIndex/bsProductVideo",
+          component: "bsProductVideo",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "3D产品":
+        fd = {
+          name: "/bsIndex/bsAbbrProduct",
+          linkUrl: "/bsIndex/bsAbbrProduct",
+          component: "bsAbbrProduct",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "证书管理":
+        fd = {
+          name: "/bsIndex/bsCertificateManages",
+          linkUrl: "/bsIndex/bsCertificateManages",
+          component: "bsCertificateManages",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "产品价格":
+        fd = {
+          name: "/bsIndex/bsProductPrice",
+          linkUrl: "/bsIndex/bsProductPrice",
+          component: "bsProductPrice",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "我的店铺":
+        fd = {
+          name: "/bsIndex/bsMyShop",
+          linkUrl: "/bsIndex/bsMyShop",
+          component: "bsMyShop",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "产品活动":
+        fd = {
+          name: "/bsIndex/bsProductActivity",
+          linkUrl: "/bsIndex/bsProductActivity",
+          component: "bsProductActivity",
+          refresh: true,
+          label: title
+        };
+        break;
       case "展厅业务":
         fd = {
           name: "/bsIndex/bsHallBusiness",
@@ -107,6 +170,51 @@ export default {
           name: "/bsIndex/bsSampleQuotation",
           linkUrl: "/bsIndex/bsSampleQuotation",
           component: "bsSampleQuotation",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "购物车":
+        fd = {
+          name: "/bsIndex/bsShoppingCart",
+          linkUrl: "/bsIndex/bsShoppingCart",
+          component: "bsShoppingCart",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "我的客户":
+        fd = {
+          name: "/bsIndex/bsMyClients",
+          linkUrl: "/bsIndex/bsMyClients",
+          component: "bsMyClients",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "择样明细":
+        fd = {
+          name: "/bsIndex/bsHallSampleDetails",
+          linkUrl: "/bsIndex/bsHallSampleDetails",
+          component: "bsHallSampleDetails",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "公司业务":
+        fd = {
+          name: "/bsIndex/bsCompanyBusiness",
+          linkUrl: "/bsIndex/bsCompanyBusiness",
+          component: "bsCompanyBusiness",
+          refresh: true,
+          label: title
+        };
+        break;
+      case "厂商业务":
+        fd = {
+          name: "/bsIndex/bsVendorBusiness",
+          linkUrl: "/bsIndex/bsVendorBusiness",
+          component: "bsVendorBusiness",
           refresh: true,
           label: title
         };

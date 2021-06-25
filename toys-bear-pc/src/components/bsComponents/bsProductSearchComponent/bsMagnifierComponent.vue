@@ -6,56 +6,78 @@
         <!-- 3D -->
         <i v-if="threeDimensional" class="threeIcon" @click="open3D(true)"></i>
         <div class="pic" v-if="middleImg.type === 'img'">
-          <pic-zoom :url="rerunImg(middleImg.url)" :scale="3"></pic-zoom>
+          <pic-zoom
+            v-if="Trident"
+            :url="rerunImg(middleImg.url)"
+            :scale="3"
+          ></pic-zoom>
+          <!-- element标签样式，不带放大镜 -->
+          <el-tooltip
+            v-else
+            class="item"
+            effect="light"
+            :enterable="false"
+            placement="right-start"
+            :visible-arrow="false"
+            popper-class="producttip"
+          >
+            <el-image
+              slot="content"
+              v-if="disabletip"
+              transition="all 0 ease 0"
+              style="width: 850px;height: 700px;"
+              fit="contain"
+              :src="middleImg.url"
+              :preview-src-list="[middleImg.url]"
+            >
+              <div slot="placeholder" class="image-slot">
+                <img
+                  style="width: 850px;height: 700px;"
+                  :src="require('@/assets/images/imgError.png')"
+                />
+              </div>
+              <div slot="error" class="image-slot">
+                <img
+                  style="width: 850px;height: 700px;"
+                  :src="require('@/assets/images/imgError.png')"
+                />
+              </div>
+            </el-image>
+            <el-image
+              @mouseleave="disabletip = false"
+              @mouseenter="disabletip = true"
+              style="width: 524px;height: 393px;"
+              fit="contain"
+              :src="middleImg.url"
+              lazy
+            >
+              <div slot="placeholder" class="image-slot">
+                <img :src="require('@/assets/images/imgError.png')" />
+              </div>
+              <div slot="error" class="image-slot">
+                <img :src="require('@/assets/images/imgError.png')" />
+              </div>
+            </el-image>
+          </el-tooltip>
+          <!--         
+            <el-image fit="contain" :src="middleImg.url">
+              <div
+                slot="placeholder"
+                class="image-slot"
+                style="width: 524px;height: 393px;"
+              >
+                <img :src="require('@/assets/images/imgError.png')" />
+              </div>
+              <div
+                slot="error"
+                class="image-slot"
+                style="width: 524px;  height: 393px;"
+              >
+                <img :src="require('@/assets/images/imgError.png')" />
+              </div>
+            </el-image>
+          -->
         </div>
-
-        <!-- <el-image
-          v-if="middleImg.type === 'img'"
-          :src="middleImg.url"
-          fit="contain"
-        >
-          <div
-            slot="placeholder"
-            class="image-slot"
-            style="width: 524px;height: 393px;"
-          >
-            <pic-zoom
-              :url="require('@/assets/images/imgError.png')"
-              :scale="3"
-            ></pic-zoom>
-          </div>
-          <div
-            slot="error"
-            class="image-slot"
-            style="width: 524px;  height: 393px;"
-          >
-            <pic-zoom
-              :url="require('@/assets/images/imgError.png')"
-              :scale="3"
-            ></pic-zoom>
-          </div>
-        </el-image> -->
-        <!-- element标签样式，不带放大镜 -->
-        <!-- <el-image
-          v-if="middleImg.type === 'img'"
-          fit="contain"
-          :src="middleImg.url"
-        >
-          <div
-            slot="placeholder"
-            class="image-slot"
-            style="width: 524px;height: 393px;"
-          >
-            <img :src="require('@/assets/images/imgError.png')" />
-          </div>
-          <div
-            slot="error"
-            class="image-slot"
-            style="width: 524px;  height: 393px;"
-          >
-            <img :src="require('@/assets/images/imgError.png')" />
-          </div>
-        </el-image> -->
         <!-- 产品视频 -->
         <video
           v-else-if="middleImg.type === 'video'"
@@ -179,9 +201,7 @@ import $ from "jquery";
 import { mapState } from "vuex";
 import PicZoom from "vue-piczoom";
 export default {
-  components: {
-    PicZoom
-  },
+  components: { PicZoom },
   props: {
     middleImgWidth: {
       // 产品图片宽
@@ -222,6 +242,8 @@ export default {
   },
   data() {
     return {
+      disabletip: false,
+      Trident: true,
       direction: null,
       startX: 0, //开始触摸的位置
       moveX: 0, //滑动时的位置
@@ -243,7 +265,13 @@ export default {
       threeDFullscreen: false //3d是否全屏
     };
   },
-  created() {},
+  created() {
+    let reg_Trident = /Trident/;
+    let appVersion = navigator.appVersion;
+    if (reg_Trident.test(appVersion)) {
+      this.Trident = false;
+    }
+  },
   computed: {
     ...mapState(["screenWidth"])
   },

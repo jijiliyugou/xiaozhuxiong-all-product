@@ -328,7 +328,7 @@ export default {
         this.totalCount = res.data.result.item.length;
       } else {
         this.$common.handlerMsgState({
-          msg: res.data.result.message,
+          msg: res.data.result.msg,
           type: "danger"
         });
       }

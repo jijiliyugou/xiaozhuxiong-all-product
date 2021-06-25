@@ -61,7 +61,9 @@
       <div class="tablemian_left_item">
         <p class="left_item">
           <span class="title">时间：</span>
-          <span>{{ item.createdOn && item.createdOn.replace(/T/, " ") }}</span>
+          <span>{{
+            item.happenDate && item.happenDate.replace(/T/, " ")
+          }}</span>
         </p>
         <p class="left_content">
           <span class="title">内容：</span>
@@ -130,6 +132,24 @@
         />
       </el-dialog>
     </transition>
+    <!-- 一键加购dialog -->
+    <transition name="el-zoom-in-center">
+      <el-dialog
+        title="一键加购"
+        v-if="addPurchaseDialog"
+        :visible.sync="addPurchaseDialog"
+        width="500px"
+      >
+        <oneClickPurchase
+          :addShopOption="{
+            orderNumber: item.orderNumber,
+            orderType: item.orderType
+          }"
+          @close="close"
+          @submit="submit"
+        />
+      </el-dialog>
+    </transition>
   </div>
 </template>
 
@@ -139,12 +159,14 @@ import bsExportOrder from "@/components/commonComponent/exportOrderComponent/com
 import bsTable from "@/components/table";
 import { mapState } from "vuex";
 import eventBus from "@/assets/js/common/eventBus.js";
+import oneClickPurchase from "@/components/commonComponent/oneClickPurchase/oneClickPurchase.vue";
 export default {
   name: "bsSampleQuotationDetails",
   components: {
     bsExportOrder,
     bsTable,
-    Summary
+    Summary,
+    oneClickPurchase
   },
   props: {
     item: {
@@ -154,6 +176,7 @@ export default {
   data() {
     return {
       totalAmount: null,
+      addPurchaseDialog: false,
       exportTemplateDialog: false,
       tableData: {
         data: [],
@@ -184,6 +207,7 @@ export default {
           {
             prop: "supplierPhone",
             label: "联系厂商",
+            width: 100,
             render: row => {
               switch (row.supplierTelephoneNumber) {
                 case "":
@@ -342,12 +366,49 @@ export default {
     }
   },
   methods: {
+    // 提交一键加购
+    async submit(myData) {
+      // this.$common.handlerMsgState({
+      //   msg: "敬请期待",
+      //   type: "warning"
+      // });
+      const re = await this.$http.post(
+        "/api/AddShoppingCart",
+        {
+          userID: this.userInfo.userInfo.id,
+          companyNumber: this.userInfo.commparnyList[0].companyNumber,
+          sourceFrom: "active",
+          // sourceFrom: "QRCodeSearch",
+          number: 1,
+          currency: "￥",
+          Price: 0,
+          shopType: "companysamples",
+          productNumber: myData.productNumber
+        },
+        {
+          timeout: 9999999
+        }
+      );
+      if (re.data.result.code === 200) {
+        this.$common.handlerMsgState({
+          msg: re.data.result.msg,
+          type: "success"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: re.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.addPurchaseDialog = false;
+    },
+    // 关闭加购
+    close() {
+      this.addPurchaseDialog = false;
+    },
     // 一键加购
-    openAdd() {
-      this.$common.handlerMsgState({
-        msg: "敬请期待",
-        type: "warning"
-      });
+    async openAdd() {
+      this.addPurchaseDialog = true;
     },
     // 获取合计total
     async getERPOrderTotal() {
@@ -399,7 +460,11 @@ export default {
       if (res.data.result.code === 200) {
         this.tableData.data = res.data.result.item.items;
         this.totalCount = res.data.result.item.totalCount;
-        eventBus.$emit("resetTotalCount");
+        this.$store.commit("updateAppLoading", true);
+        setTimeout(() => {
+          eventBus.$emit("resetTotalCount");
+          eventBus.$emit("resetListCount");
+        }, 1000);
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -687,6 +752,27 @@ export default {
 @{deep} .exportOrder {
   .el-dialog__body {
     padding: 0;
+  }
+}
+.addPushContent {
+  text-align: center;
+  .productCount {
+    margin-top: 30px;
+    font-size: 16px;
+    .countItem {
+      margin-bottom: 20px;
+      .countItem_title {
+        color: #666;
+      }
+    }
+  }
+  .countItem_btns {
+    margin-top: 40px;
+  }
+  .tips {
+    color: #999;
+    font-size: 13px;
+    margin-top: 10px;
   }
 }
 @media screen and (max-width: 1768px) {

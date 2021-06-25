@@ -32,6 +32,8 @@
             <i
               :class="{
                 icon: true,
+                productManageIcon:
+                  item.parent.linkUrl === '/bsIndex/bsProductManage',
                 productSearchIcon:
                   item.parent.linkUrl === '/bsIndex/bsProductSearchIndex',
                 myInfoIcon: item.parent.linkUrl === '/bsIndex/bsMyNews',
@@ -41,7 +43,16 @@
                   item.parent.linkUrl === '/bsIndex/bsSiteSharing',
                 bsPersonalManageIcon:
                   item.parent.linkUrl === '/bsIndex/bsPersonalManage',
-                bsMyClientsIcon: item.parent.linkUrl === '/bsIndex/bsMyClients'
+                bsMyClientsIcon: item.parent.linkUrl === '/bsIndex/bsMyClients',
+                bsMyClientsIcon2:
+                  item.parent.linkUrl === '/bsIndex/bsClientsManageModel',
+                bsOperationalDataIcon:
+                  item.parent.linkUrl === '/bsIndex/bsOperationalData',
+                bsStatisticsManageIcon:
+                  item.parent.linkUrl === '/bsIndex/bsStatisticsManage',
+                bsSystemSetIcon: item.parent.linkUrl === '/bsIndex/bsSystemSet',
+                bsBasicsInfoIcon:
+                  item.parent.linkUrl === '/bsIndex/bsBasicsInfo'
               }"
             ></i>
 

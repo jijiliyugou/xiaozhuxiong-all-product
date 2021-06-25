@@ -43,7 +43,10 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="是否主账号" label-width="100px" prop="isMain">
-          <el-radio-group v-model="addEmployeeForm.isMain">
+          <el-radio-group
+            v-model="addEmployeeForm.isMain"
+            :disabled="isEdit && !isMain"
+          >
             <el-radio :label="true">是</el-radio>
             <el-radio :label="false">否</el-radio>
           </el-radio-group>
@@ -96,6 +99,9 @@ export default {
     },
     currentEditRow: {
       type: Object
+    },
+    isMain: {
+      type: Boolean
     }
   },
   data() {

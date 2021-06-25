@@ -6,6 +6,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   state: {
     shareInfo: {},
+    customerInfo: {},
     formLabelAlign: {},
     temporaryToken: "",
     shopLength: 0,
@@ -44,6 +45,10 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
+    // 保存用户信息
+    setCustomerInfo(state, payLoad) {
+      state.customerInfo = payLoad;
+    },
     // 保存是否显示价格配置
     setShareInfo(state, payLoad) {
       state.shareInfo = payLoad;

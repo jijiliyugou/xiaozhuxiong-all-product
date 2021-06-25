@@ -8,12 +8,14 @@
         </el-tag>
         <div class="history_box">
           <el-input
-            :class="{ isPadding: MyisGaoji === true }"
+            :class="{ isPadding: MyisGaoji || MyisZonghe === true }"
             size="medium"
             ref="focusKeyword"
             @keyup.native.enter="searchProducts"
-            style="width: 340px; margin: 0 15px"
-            :placeholder="MyisGaoji === true ? '' : placeholderVal"
+            style="width: 340px; margin: 0 15px;"
+            :placeholder="
+              MyisGaoji || MyisZonghe === true ? '' : placeholderVal
+            "
             v-model="myKeyword"
             clearable
             @focus="showHistoryModal(true)"
@@ -43,6 +45,10 @@
           <div v-if="MyisGaoji" class="gaoji">
             高级搜索
             <i @click="handleIsgaoji" class="el-icon-close"></i>
+          </div>
+          <div v-if="MyisZonghe" class="gaoji">
+            综合搜索
+            <i @click="handleIsZonghe" class="el-icon-close"></i>
           </div>
           <div
             class="history"
@@ -89,11 +95,11 @@
           :class="advanced == true ? 'el-icon-arrow-down' : ' el-icon-arrow-up'"
         ></i>
       </div>
-      <!-- <p class="shuxian"></p> -->
-      <!-- <div class="synthesizeBox" @click="handleIsSynthesize">
-        <i class="synthesizeIconv"></i>
+      <p class="shuxian"></p>
+      <div class="synthesizeBox" @click="handleIsSynthesize">
+        <i class="synthesizeIcon"></i>
         综合搜索
-      </div> -->
+      </div>
     </div>
     <el-button
       v-if="typeId != 1"
@@ -113,7 +119,7 @@ import eventBus from "@/assets/js/common/eventBus";
 import { mapState } from "vuex";
 export default {
   name: "bsProductSearch",
-  props: ["keyword", "MyisGaoji"],
+  props: ["keyword", "MyisGaoji", "MyisZonghe"],
   data() {
     return {
       isGaoji: null,
@@ -136,9 +142,13 @@ export default {
     }
   },
   methods: {
-    //关闭高级搜素显示
+    //关闭高级搜索显示
     handleIsgaoji() {
-      this.$emit("handleIsgaoji", false);
+      this.$emit("handleIsgaoji");
+    },
+    //关闭综合搜索显示
+    handleIsZonghe() {
+      this.$emit("handleIsZonghe");
     },
     // 关闭关联搜索
     closeTag() {
@@ -295,6 +305,12 @@ export default {
       }
       .history_box {
         position: relative;
+        @{deep}.el-input--prefix .el-input__inner {
+          padding-left: 45px;
+        }
+        @{deep}.el-input__prefix {
+          left: 14px;
+        }
         @{deep}.isPadding {
           .el-input__inner {
             padding-left: 130px;

@@ -41,10 +41,16 @@ import {
   Popover,
   Cascader,
   Dropdown,
-  DropdownMenu
+  DropdownMenu,
+  Collapse,
+  CollapseItem,
+  DropdownItem,
+  Tree
 } from "element-ui";
 const element = {
   install: function(Vue) {
+    Vue.use(Tree);
+    Vue.use(DropdownItem);
     Vue.use(Button);
     Vue.use(InfiniteScroll);
     Vue.use(Switch);
@@ -86,6 +92,9 @@ const element = {
     Vue.use(Cascader);
     Vue.use(Dropdown);
     Vue.use(DropdownMenu);
+    Vue.use(Collapse);
+    Vue.use(CollapseItem);
+    Vue.use(Tree);
 
     // 往vue实例原型里添加消息提示，方便全局调用
     Vue.prototype.$msgbox = MessageBox;

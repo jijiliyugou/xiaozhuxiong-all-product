@@ -109,7 +109,7 @@ const store = new Vuex.Store({
     },
     // 综合搜索查询记录
     handlerSynthesizeSearchData(state, payLoad) {
-      state.historyText.push(payLoad);
+      state.historyText.unshift(payLoad);
     },
     // 综合搜索查询记录清空
     claerHandlerSynthesizeSearchData(state, payLoad) {
@@ -117,7 +117,7 @@ const store = new Vuex.Store({
     },
     // 综合搜索查询记录清空
     deleteHandlerSynthesizeSearchData(state) {
-      state.historyText.splice(0, 1);
+      state.historyText.pop();
     },
     //修改查询值
     handlerSearchTxt(state, payLoad) {

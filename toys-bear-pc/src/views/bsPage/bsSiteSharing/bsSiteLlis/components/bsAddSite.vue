@@ -21,12 +21,12 @@
           >
             报价公式
           </div>
-          <!-- <div
-              :class="{ item: true, active: tp == 3 }"
-              @click="handleTab('advertising', 3)"
-            >
-              站点广告
-            </div> -->
+          <div
+            :class="{ item: true, active: tp == 3 }"
+            @click="handleTab('advertising', 3)"
+          >
+            站点广告
+          </div>
         </div>
         <div
           class="rightBox"
@@ -159,7 +159,10 @@
           <div class="formula" id="formula">
             <div class="title">报价公式</div>
             <el-form-item label="默认公式：" prop="defaultFormula">
-              <el-select v-model="defaultFormula" placeholder="请选择">
+              <el-select
+                v-model="clienFormData.defaultFormula"
+                placeholder="请选择"
+              >
                 <el-option
                   v-for="(item, i) in customerTemplate"
                   :key="i"
@@ -198,8 +201,21 @@
                     style="flex:1;display:flex; align-items:center;margin-left: 20px;"
                     v-model="clienFormData.profitCalcMethod"
                   >
-                    <el-radio :label="2">除法</el-radio>
-                    <el-radio :label="1">乘法</el-radio>
+                    <el-radio
+                      v-if="clienFormData.profitCalcMethod === 1"
+                      :label="1"
+                      >乘法</el-radio
+                    >
+                    <el-radio
+                      v-if="clienFormData.profitCalcMethod === 2"
+                      :label="2"
+                      >除法</el-radio
+                    >
+                    <el-radio
+                      v-if="clienFormData.profitCalcMethod === 3"
+                      :label="3"
+                      >自定义</el-radio
+                    >
                   </el-radio-group>
                 </div>
               </el-form-item>
@@ -287,17 +303,8 @@
                 </el-select>
               </el-form-item>
             </div>
-            <div
-              class="chengchuTishi"
-              v-show="clienFormData.profitCalcMethod == 2"
-            >
-              {{ chufa }}
-            </div>
-            <div
-              class="chengchuTishi"
-              v-show="clienFormData.profitCalcMethod == 1"
-            >
-              {{ chengfa }}
+            <div class="chengchuTishi">
+              {{ clienFormData.profitCalcRule }}
             </div>
             <div class="lessThanPrice">
               <div class="left">
@@ -330,85 +337,86 @@
               </div>
             </div>
           </div>
-          <!-- <div class="advertising" id="advertising">
-              <div class="advertisingTising">
-                <div class="title">站点广告</div>
-                <el-button
-                  @click="addAdvertising"
-                  icon="el-icon-plus"
-                  style="margin-left: 10px;height:36px"
-                  size="mini"
-                  type="primary"
-                  >添加广告</el-button
-                >
-              </div>
-              <el-table :data="advertisingTable" style="width: 100%">
-                <el-table-column
-                  prop="date"
-                  label="图片"
-                  align="center"
-                  width="180"
-                >
-                  <template slot-scope="scope">
-                    <el-image
-                      style="width: 130px; height: 37px; cursor: pointer"
-                      :src="scope.row.imgUrl"
-                      fit="contain"
+          <div class="advertising" id="advertising">
+            <div class="advertisingTising">
+              <div class="title">站点广告</div>
+              <el-button
+                @click="addAdvertising"
+                icon="el-icon-plus"
+                style="margin-left: 10px;height:36px"
+                size="mini"
+                type="primary"
+                >添加广告</el-button
+              >
+            </div>
+            <el-table
+              :data="advertisingTable"
+              style="width: 100%"
+              :header-cell-style="{ backgroundColor: '#f9fafc' }"
+            >
+              <el-table-column
+                prop="date"
+                label="图片"
+                align="center"
+                width="180"
+              >
+                <template slot-scope="scope">
+                  <el-image
+                    style="width: 130px; height: 37px; cursor: pointer"
+                    :src="scope.row.imgUrl"
+                    fit="contain"
+                  >
+                    <div
+                      slot="placeholder"
+                      class="image-slot"
+                      style="width: 130px; height: 37px; min-width: 130px"
                     >
-                      <div
-                        slot="placeholder"
-                        class="image-slot"
-                        style="width: 130px; height: 37px; min-width: 130px"
-                      >
-                        <img
-                          style="width: 130px; height: 37px; min-width: 130px"
-                          :src="require('@/assets/images/imgError.png')"
-                        />
-                      </div>
-                      <div
-                        slot="error"
-                        class="image-slot"
-                        style="width: 130px; height: 37px; min-width: 130px"
-                      >
-                        <img
-                          style="width: 130px; height: 37px; min-width: 130px"
-                          :src="require('@/assets/images/imgError.png')"
-                        />
-                      </div>
-                    </el-image>
-                  </template>
-                </el-table-column>
-                <el-table-column prop="LinkUrl" label="链接" align="center">
-                  <template slot-scope="scope">
-                    <el-input
-                      @blur="handleUpdataAdvertising(scope.row)"
-                      v-model="scope.row.linkUrl"
-                    >
-                    </el-input>
-                  </template>
-                </el-table-column>
-                <el-table-column label="操作" align="center" width="120">
-                  <template slot-scope="scope">
-                    <div class="handle">
-                      排序接口还没有
                       <img
-                        @click="handlegoUp(scope.$index, scope.row)"
-                        src="@/assets/images/up_f.png"
-                        alt=""
+                        style="width: 130px; height: 37px; min-width: 130px"
+                        :src="require('@/assets/images/imgError.png')"
                       />
-                      <div
-                        class="delete"
-                        @click="
-                          handleDeleteAdvertising(scope.$index, scope.row)
-                        "
-                      >
-                        删除
-                      </div>
                     </div>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </div> -->
+                    <div
+                      slot="error"
+                      class="image-slot"
+                      style="width: 130px; height: 37px; min-width: 130px"
+                    >
+                      <img
+                        style="width: 130px; height: 37px; min-width: 130px"
+                        :src="require('@/assets/images/imgError.png')"
+                      />
+                    </div>
+                  </el-image>
+                </template>
+              </el-table-column>
+              <el-table-column prop="linkUrl" label="链接" align="center">
+                <template slot-scope="scope">
+                  <el-input
+                    @blur="handleUpdataAdvertising(scope.row)"
+                    v-model="scope.row.linkUrl"
+                  >
+                  </el-input>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" align="center" width="120">
+                <template slot-scope="scope">
+                  <div class="handle">
+                    <img
+                      @click="handlegoUp(scope.row)"
+                      src="@/assets/images/up_f.png"
+                      alt=""
+                    />
+                    <div
+                      class="delete"
+                      @click="handleDeleteAdvertising(scope.$index, scope.row)"
+                    >
+                      删除
+                    </div>
+                  </div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
         </div>
       </div>
     </el-form>
@@ -427,6 +435,7 @@
       :close-on-click-modal="false"
       :visible.sync="addMyClientDialog"
       destroy-on-close
+      append-to-body
       width="800px"
     >
       <el-form
@@ -469,6 +478,7 @@
     <!-- 选择广告 -->
     <el-dialog
       title="选择广告"
+      append-to-body
       :visible.sync="advertisingDialog"
       v-if="advertisingDialog"
       width="900px"
@@ -520,12 +530,6 @@
 <script>
 export default {
   props: {
-    clientList: {
-      type: Array,
-      default: () => {
-        return [];
-      }
-    },
     isEdit: {
       type: Boolean,
       default: false
@@ -542,16 +546,19 @@ export default {
   },
   data() {
     return {
-      defaultFormula: null,
+      idList: [],
+      shareId: null, //分享站点Id
+      relations: [],
+      listChecked: [],
+      advertisingTable: [],
+      advertisingData: [],
+      clientList: [],
       langs: [],
       total: 0,
       advertisingDialog: false,
       addMyClientRules: {
         name: [{ required: true, message: "请输入客户名称", trigger: "blur" }]
       },
-      chufa: "(出厂价+(总费用/(每车尺码/体积*外箱装量)))/(1-报价利润/100)/汇率",
-      chengfa:
-        "(出厂价+(总费用/(每车尺码/体积*外箱装量)))*(1+报价利润/100)/汇率",
       options: {
         // 报价配置项
         cu_deList: [],
@@ -571,7 +578,7 @@ export default {
         profit: 1,
         expireTime: null,
         customerInfoId: null,
-        offerMethod: "汕头",
+        offerMethod: "",
         currencyType: "¥",
         currencyTypeName: "RMB",
         totalCost: "0",
@@ -593,6 +600,13 @@ export default {
       addRules: {
         websiteLanguage: [
           { required: true, message: "请选择语言", trigger: "change" }
+        ],
+        defaultFormula: [
+          {
+            required: true,
+            message: "请选择默认公式",
+            trigger: "blur"
+          }
         ],
         isCustomerInfo: [
           { required: true, message: "请选择是否提交资料", trigger: "change" }
@@ -636,23 +650,211 @@ export default {
     };
   },
   methods: {
-    // 广告弹框
-    addAdvertising() {
-      if (this.advertisingTable.length > 0) {
-        let id = this.advertisingTable.map(item => {
-          if (item.checked == true) {
-            return item.id;
-          }
+    // 查询分享站点Id下的所有广告
+    async getGetWebsiteShareAdByShareIdList() {
+      const res = await this.$http.post("/api/GetWebsiteShareAdByShareIdList", {
+        shareId: this.clienFormData.id
+      });
+      if (res.data.result.code === 200) {
+        this.advertisingTable = res.data.result.item.sort(this.compare("sort"));
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
         });
-        for (let i = 0; i < this.advertisingData.length; i++) {
-          for (let j = 0; j < id.length; j++) {
-            if (this.advertisingTable[j].id == this.advertisingData[i].id) {
-              this.advertisingData[i].checked = false;
+      }
+    },
+    compare(property) {
+      return function(a, b) {
+        let value1 = a[property];
+        let value2 = b[property];
+        return value1 - value2;
+      };
+    },
+    // 单选
+    handleChecked() {
+      this.listChecked = this.advertisingData.filter(item => {
+        return item.checked === true;
+      });
+    },
+    // 添加广告弹框
+    addAdvertising() {
+      if (
+        this.clienFormData.websiteInfoId == null ||
+        this.clienFormData.websiteInfoId == ""
+      ) {
+        this.$message({
+          message: "请先选择站点域名",
+          type: "warning"
+        });
+      } else {
+        if (this.advertisingTable.length > 0) {
+          for (let i = 0; i < this.advertisingData.length; i++) {
+            for (let j = 0; j < this.advertisingTable.length; j++) {
+              if (this.advertisingTable[j].adId == this.advertisingData[i].id) {
+                this.advertisingData[i].checked = true;
+              }
             }
           }
         }
+        this.advertisingDialog = true;
       }
-      this.advertisingDialog = true;
+    },
+    // 确定选择
+    async handleAddadv() {
+      this.advertisingTable = this.listChecked;
+      for (let i = 0; i < this.advertisingTable.length; i++) {
+        for (let j = 0; j < this.listChecked.length; j++) {
+          this.advertisingTable[i].linkUrl = this.listChecked[i].defaultLinkUrl;
+          if (this.isEdit) {
+            this.advertisingTable[i].adId = this.listChecked[i].id;
+          }
+        }
+      }
+      this.advertisingDialog = false;
+    },
+    // 获取广告管理列表
+    async GetWebsiteShareAdPage() {
+      const fd = {
+        skipCount: 1,
+        maxResultCount: 999
+      };
+      const res = await this.$http.post("/api/GetWebsiteShareAdPage", fd);
+      if (res.data.result.code === 200) {
+        for (let i = 0; i < res.data.result.item.items.length; i++) {
+          res.data.result.item.items[i].checked = false;
+        }
+        this.advertisingData = res.data.result.item.items;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+    //排序
+    handlegoUp(row) {
+      for (let i = 0; i < this.advertisingTable.length; i++) {
+        if (this.advertisingTable[i].adId === row.adId) {
+          this.advertisingTable.splice(i, 1);
+          break;
+        }
+      }
+      this.advertisingTable.unshift(row);
+    },
+    // 删除单个广告关联
+    handleDeleteAdvertising(index) {
+      this.advertisingTable.splice(index, 1);
+    },
+    // 提交新增 | 编辑 分享
+    async subProcessingLog() {
+      this.$refs.addClientFormRef.validate(async valid => {
+        if (valid) {
+          let url = "/api/CreateWebsiteShareInfo";
+          if (this.isEdit) url = "/api/UpdateWebsiteShareInfo";
+          const list = [];
+          for (let i = 0; i < this.clienFormData.websiteLanguage.length; i++) {
+            for (let j = 0; j < this.langs.length; j++) {
+              if (this.langs[j].id == this.clienFormData.websiteLanguage[i]) {
+                list.push(this.langs[j]);
+                break;
+              }
+            }
+          }
+          this.clienFormData.websiteLanguage = JSON.stringify(list);
+          for (const key in this.clienFormData) {
+            if (
+              this.clienFormData[key] == "undefined" ||
+              this.clienFormData[key] == null ||
+              this.clienFormData[key] == "" ||
+              this.clienFormData[key] == undefined ||
+              this.clienFormData[key] == "null"
+            ) {
+              delete this.clienFormData[key];
+            }
+          }
+          const res = await this.$http.post(url, this.clienFormData);
+          if (res.data.result.code === 200) {
+            this.shareId = res.data.result.item.id;
+            this.CreateWebsiteShareAdRelationList();
+
+            this.$emit("submit");
+          } else {
+            this.$common.handlerMsgState({
+              msg: res.data.result.msg,
+              type: "danger"
+            });
+          }
+        }
+      });
+    },
+    // 新增广告关联/覆盖广告关联
+    async CreateWebsiteShareAdRelationList() {
+      for (let i = 0; i < this.advertisingTable.length; i++) {
+        if (this.isEdit) {
+          this.relations.push({
+            adId: this.advertisingTable[i].adId,
+            linkUrl: this.advertisingTable[i].linkUrl,
+            sort: i
+          });
+        } else {
+          this.relations.push({
+            adId: this.advertisingTable[i].id,
+            linkUrl: this.advertisingTable[i].linkUrl,
+            sort: i
+          });
+        }
+      }
+      const fd = {
+        shareId: this.shareId,
+        relations: this.relations
+      };
+      const res = await this.$http.post(
+        "/api/CreateWebsiteShareAdRelationList",
+        fd
+      );
+      if (res.data.result.code === 200) {
+        this.$common.handlerMsgState({
+          msg: "操作成功",
+          type: "success"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+    // 编辑input
+    handleUpdataAdvertising(item) {
+      const fd = {
+        adId: item.adId,
+        type: 1,
+        relations: [
+          {
+            id: this.clienFormData.id,
+            linkUrl: item.linkUrl
+          }
+        ]
+      };
+      this.getUpdate(fd);
+    },
+    async getUpdate(fd) {
+      const res = await this.$http.post(
+        "/api/UpdateWebsiteShareAdRelation",
+        fd
+      );
+      if (res.data.result.code === 200) {
+        // this.$common.handlerMsgState({
+        //   msg: "编辑成功",
+        //   type: "success",
+        // });
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
     },
     // 下拉框输入事件
     selectBlur(val) {
@@ -702,6 +904,22 @@ export default {
         }
       });
     },
+    // 获取客户列表
+    async getClientList() {
+      const fd = {
+        skipCount: 1,
+        maxResultCount: 9999
+      };
+      for (const key in fd) {
+        if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
+          delete fd[key];
+        }
+      }
+      const res = await this.$http.post("/api/SearchCustomerInfosPage", fd);
+      if (res.data.result.code === 200) {
+        this.clientList = res.data.result.item.items;
+      }
+    },
     // 打开新增客户
     openAddMyClient() {
       this.addClientFormData = {
@@ -713,15 +931,15 @@ export default {
     },
     // 滚动条事件
     handelScroll() {
-      let setOffset = document.getElementById("set_id").offsetTop - 30;
-      let formulaOffset = document.getElementById("formula").offsetTop - 30;
+      // let setOffset = document.getElementById("set_id").offsetTop - 30;
+      // let formulaOffset = document.getElementById("formula").offsetTop - 30;
       // let advertisingOffset =
       //   document.getElementById("advertising").offsetTop - 51;
-      console.log(this.$refs.rightBoxScroll.scrollTop, setOffset);
+      // console.log(this.$refs.rightBoxScroll.scrollTop, setOffset);
       if (this.$refs.rightBoxScroll.scrollTop === 0) {
         this.tp = 1;
       } else if (
-        this.$refs.rightBoxScroll.scrollTop >= formulaOffset &&
+        this.$refs.rightBoxScroll.scrollTop >= 340 &&
         this.$refs.rightBoxScroll.scrollHeight -
           this.$refs.rightBoxScroll.scrollTop !=
           this.$refs.rightBoxScroll.clientHeight
@@ -732,8 +950,8 @@ export default {
           this.$refs.rightBoxScroll.scrollTop ===
         this.$refs.rightBoxScroll.clientHeight
       ) {
-        // this.tp = 3;
-        this.tp = 2;
+        this.tp = 3;
+        // this.tp = 2;
       }
     },
     // 获取系统配置语言列表
@@ -749,64 +967,7 @@ export default {
         });
       }
     },
-    // 提交新增 | 编辑 分享
-    async subProcessingLog() {
-      this.$refs.addClientFormRef.validate(async valid => {
-        if (valid) {
-          let url = "/api/CreateWebsiteShareInfo";
-          if (this.isEdit) url = "/api/UpdateWebsiteShareInfo";
-          const list = [];
-          for (let i = 0; i < this.clienFormData.websiteLanguage.length; i++) {
-            for (let j = 0; j < this.langs.length; j++) {
-              if (this.langs[j].id == this.clienFormData.websiteLanguage[i]) {
-                list.push(this.langs[j]);
-                break;
-              }
-            }
-          }
-          this.clienFormData.websiteLanguage = JSON.stringify(list);
 
-          for (const key in this.clienFormData) {
-            if (
-              this.clienFormData[key] == "undefined" ||
-              this.clienFormData[key] == null ||
-              this.clienFormData[key] == "" ||
-              this.clienFormData[key] == undefined ||
-              this.clienFormData[key] == "null"
-            ) {
-              delete this.clienFormData[key];
-            }
-          }
-
-          const res = await this.$http.post(url, this.clienFormData);
-          if (res.data.result.code === 200) {
-            // if (this.advertisingTable.length > 0) {
-            //   for (
-            //     let index = 0;
-            //     index < this.advertisingTable.length;
-            //     index++
-            //   ) {
-            //     this.getCreateWebsiteShareAdRelation(
-            //       this.advertisingTable[index]
-            //     );
-            //   }
-            // }
-            // this.getDataList();
-            // this.clienFormData = {};
-            this.$emit("submit");
-            this.$common.handlerMsgState({
-              msg: "操作成功",
-              type: "success"
-            });
-          } else {
-            this.$common.handlerMsgState({
-              msg: res.data.result.msg,
-              type: "danger"
-            });
-          }
-        }
-      });
-    },
     // 关联站点
     async getCreateWebsiteShareAdRelation(item) {
       const fd = {
@@ -819,7 +980,10 @@ export default {
         fd
       );
       if (res.data.result.code === 200) {
-        console.log(res);
+        this.$common.handlerMsgState({
+          msg: "关联站点成功",
+          type: "success"
+        });
       } else {
         this.$common.handlerMsgState({
           msg: res.data.result.msg,
@@ -830,31 +994,74 @@ export default {
     // 点击导航菜单，页面滚动到指定位置
     handleTab(val, index) {
       this.tp = index;
-      console.log(this.tp);
       let total = document.getElementById(val).offsetTop;
-      this.$refs.rightBoxScroll.scrollTop = total - 71;
+      this.$refs.rightBoxScroll.scrollTop = total - 85;
     }
   },
   created() {},
   async mounted() {
-    console.log(this.myFormData, 998);
     if (this.isEdit) {
+      if (this.myFormData.formulaId) {
+        this.customerTemplate.map(item => {
+          if (item.id === this.myFormData.formulaId) {
+            // this.clienFormData.defaultFormula = JSON.stringify(item);
+            this.$set(
+              this.clienFormData,
+              "defaultFormula",
+              JSON.stringify(item)
+            );
+          }
+        });
+      }
       let myLangs = [];
       if (this.myFormData.websiteLanguage) {
         myLangs = JSON.parse(this.myFormData.websiteLanguage);
       }
       const fd = JSON.parse(JSON.stringify(this.myFormData));
       this.clienFormData = fd;
-      this.clienFormData.customerInfoId = fd.customerId;
+      this.$set(this.clienFormData, "customerInfoId", fd.customerId);
       this.clienFormData.websiteLanguage = myLangs.map(val => {
         return val.id;
       });
-      console.log(this.clienFormData);
+      this.getGetWebsiteShareAdByShareIdList();
+    } else {
+      let str = JSON.stringify(this.customerTemplate[0]);
+      this.$set(this.clienFormData, "defaultFormula", str);
     }
+    await this.getClientList();
     await this.getLanguageType();
     await this.getSelectCompanyOffer();
+    await this.GetWebsiteShareAdPage();
   },
   watch: {
+    "clienFormData.profit": {
+      deep: true,
+      handler(newVal) {
+        if (newVal == 100) {
+          if (this.clienFormData.profitCalcMethod == 2) {
+            this.clienFormData.profit = 10;
+            this.$common.handlerMsgState({
+              msg: "除法利润率不可为100",
+              error: "danger"
+            });
+          }
+        }
+      }
+    },
+    "clienFormData.profitCalcMethod": {
+      deep: true,
+      handler(newVal) {
+        if (newVal == 2) {
+          if (this.clienFormData.profit == 100) {
+            this.clienFormData.profit = 10;
+            this.$common.handlerMsgState({
+              msg: "除法利润率不可为100",
+              error: "danger"
+            });
+          }
+        }
+      }
+    },
     "clienFormData.currencyType": {
       deep: true,
       handler(newVal) {
@@ -866,11 +1073,10 @@ export default {
         }
       }
     },
-    defaultFormula: {
+    "clienFormData.defaultFormula": {
       deep: true,
       handler(newVal) {
         if (newVal) {
-          console.log(newVal);
           const obj = JSON.parse(newVal);
           this.clienFormData.profit = obj.profit;
           this.clienFormData.offerMethod = obj.offerMethod;
@@ -878,9 +1084,16 @@ export default {
           this.clienFormData.currencyTypeName = obj.cu_deName;
           this.clienFormData.exchange = obj.exchange;
           this.clienFormData.size = obj.size;
+          this.clienFormData.totalCost = obj.totalCost;
           // this.clienFormData.showNumber = obj.showNumber;
           this.clienFormData.decimalPlaces = obj.decimalPlaces;
           this.clienFormData.rejectionMethod = obj.rejectionMethod;
+          this.clienFormData.profitCalcMethod = obj.profitCalcMethod;
+          this.clienFormData.formulaId = obj.id;
+          this.clienFormData.profitCalcRule = obj.profitCalcRule;
+          this.clienFormData.miniPrice = obj.miniPrice;
+          this.clienFormData.miniPriceDecimalPlaces =
+            obj.miniPriceDecimalPlaces;
         }
       }
     }
@@ -967,6 +1180,30 @@ export default {
           margin-left: 20px;
         }
       }
+    }
+  }
+}
+.advertisingList {
+  min-height: 200px;
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  li {
+    margin: 0 17px;
+    width: 180px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    h4 {
+      padding: 15px 0;
+      width: 180px;
+      overflow: hidden; /*超出部分隐藏*/
+      white-space: nowrap; /*不换行*/
+      text-overflow: ellipsis; /*超出部分文字以...显示*/
+      text-align: center;
+      color: #333333;
+    }
+    .checkboxP {
+      padding-left: 83px;
     }
   }
 }

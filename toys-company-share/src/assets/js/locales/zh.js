@@ -109,12 +109,14 @@ export default {
       email: "邮箱",
       remark: "备注",
       submit: "提交",
+      cancel: "取消",
       totalCapacity: "总体积",
       productName: "产品名称",
       cTn: "装箱量",
       view: "产看",
       delete: "删除",
-      id: "序号"
+      id: "序号",
+      selectAll: "全选"
     },
     productDetail: {
       title: "产品详情"
@@ -151,7 +153,14 @@ export default {
       itsTheFirstPage: "已经是第一页",
       itsTheLastPage: "已经是最后一页",
       submittedSuccessfully: "提交成功",
-      deleteSuccessful: "删除成功"
+      deleteSuccessful: "删除成功",
+      tel: "电话",
+      mobile: "手机",
+      address: "地址"
+    },
+    common: {
+      loading: "加载中...",
+      noMore: "没有更多了"
     }
   },
   ...zhLocale

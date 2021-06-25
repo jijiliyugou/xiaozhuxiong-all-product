@@ -5,19 +5,52 @@
       @click="toProductDetails"
       @mouseenter="showDetails(true)"
     >
-      <el-image
-        style="width: 222px; height: 166px"
-        fit="contain"
-        :src="item.img"
-        lazy
+      <el-tooltip
+        class="item"
+        effect="light"
+        :enterable="false"
+        placement="right-start"
+        :visible-arrow="false"
+        popper-class="producttip"
       >
-        <div slot="placeholder" class="image-slot">
-          <img :src="require('@/assets/images/imgError.png')" />
-        </div>
-        <div slot="error" class="image-slot">
-          <img :src="require('@/assets/images/imgError.png')" />
-        </div>
-      </el-image>
+        <el-image
+          slot="content"
+          v-if="disabletip"
+          transition="all 0 ease 0"
+          style="width: 500px; height: 400px;"
+          fit="contain"
+          :src="item.img"
+          :preview-src-list="[item.img]"
+        >
+          <div slot="placeholder" class="image-slot">
+            <img
+              style="width: 500px; height: 400px;"
+              :src="require('@/assets/images/imgError.png')"
+            />
+          </div>
+          <div slot="error" class="image-slot">
+            <img
+              style="width: 500px; height: 400px;"
+              :src="require('@/assets/images/imgError.png')"
+            />
+          </div>
+        </el-image>
+        <el-image
+          @mouseleave="disabletip = false"
+          @mouseenter="disabletip = true"
+          style="width: 222px; height: 166px"
+          fit="contain"
+          :src="item.img"
+          lazy
+        >
+          <div slot="placeholder" class="image-slot">
+            <img :src="require('@/assets/images/imgError.png')" />
+          </div>
+          <div slot="error" class="image-slot">
+            <img :src="require('@/assets/images/imgError.png')" />
+          </div>
+        </el-image>
+      </el-tooltip>
       <div
         @click.stop="handlerDeleteBrowsing(item)"
         class="BrowsingFootprintsIcon"
@@ -42,18 +75,23 @@
         v-if="$route.path === '/bsIndex/bsVIPProducts'"
       ></div>
       <i v-show="item.threeDimensional" class="threeIcon"></i>
-      <i
-        v-show="item.isFavorite"
-        class="iconClient activeClientIcon"
-        @click.stop="addCollect(item)"
-      ></i>
-      <i
-        v-show="!item.isFavorite"
-        class="iconClient clientIcon"
-        @click.stop="addCollect(item)"
-      ></i>
+      <template v-if="userInfo.commparnyList[0].companyType !== 'Supplier'">
+        <i
+          v-show="item.isFavorite"
+          class="iconClient activeClientIcon"
+          @click.stop="addCollect(item)"
+        ></i>
+        <i
+          v-show="!item.isFavorite"
+          class="iconClient clientIcon"
+          @click.stop="addCollect(item)"
+        ></i>
+      </template>
       <!-- 找相似，找同款 -->
-      <div class="similaritySame">
+      <div
+        class="similaritySame"
+        v-if="userInfo.commparnyList[0].companyType !== 'Supplier'"
+      >
         <div class="simiBox">
           <div class="similarity" @click.stop="similarityEvent">找相似</div>
           <div class="same" @click.stop="sameEvent">找同款</div>
@@ -68,31 +106,36 @@
         <div class="left">
           <p class="item">
             <span class="title">参考单价：</span>
-            <template v-if="item.isIntegral">
-              <span class="price">{{ item.cu_de }}</span>
-              <span class="price">{{ item.price }}</span>
-            </template>
-            <template v-else>
-              <span class="price lookPrice">积分查看</span>
-            </template>
+            <span class="price">{{ item.cu_de }}</span>
+            <span class="price">{{ item.price }}</span>
           </p>
           <p class="item">
             <span class="title">出厂货号：</span>
             <span>{{ item.fa_no }}</span>
           </p>
         </div>
-        <div v-if="typeId != 1" class="right" @click.stop="handlerShopping">
-          <i v-if="item.isShop" class="shoppingCartActive"></i>
-          <i v-else class="shoppingCart"></i>
-        </div>
-        <div
-          v-if="typeId === 1"
-          class="right"
-          @click.stop="handlerUpadate(item)"
+        <template v-if="productType">
+          <div class="right" @click="videoAddProduct(item)">
+            <i v-if="item.isShoppingUpdate" class="updateIcon"></i>
+            <i v-else class="UpadateCart"></i>
+          </div>
+        </template>
+        <template
+          v-else-if="userInfo.commparnyList[0].companyType !== 'Supplier'"
         >
-          <i v-if="item.isShoppingUpdate" class="updateIcon"></i>
-          <i v-else class="UpadateCart"></i>
-        </div>
+          <div v-if="!typeId" class="right" @click.stop="handlerShopping">
+            <i v-if="item.isShop" class="shoppingCartActive"></i>
+            <i v-else class="shoppingCart"></i>
+          </div>
+          <div
+            v-else-if="typeId === 1"
+            class="right"
+            @click.stop="handlerUpadate(item)"
+          >
+            <i v-if="item.isShoppingUpdate" class="updateIcon"></i>
+            <i v-else class="UpadateCart"></i>
+          </div>
+        </template>
       </div>
       <div class="sourceBox" @click="toFactory(item)">
         <i class="sourceIcon"></i>
@@ -172,15 +215,23 @@ export default {
   props: {
     item: {
       type: Object
+    },
+    productType: {
+      type: Boolean
     }
   },
   data() {
     return {
+      disabletip: false,
       isShowDetails: null,
       canClick: true
     };
   },
   methods: {
+    // 厂商视频添加产品绑定
+    videoAddProduct(item) {
+      item.isShoppingUpdate = !item.isShoppingUpdate;
+    },
     // 找相似
     similarityEvent() {
       // this.$common.handlerMsgState({
@@ -234,8 +285,8 @@ export default {
         label: this.item.fa_no || "产品详情",
         value: this.item
       };
-      console.log(2222);
-      this.$router.push("/bsIndex/bsProductSearchIndex");
+      this.userInfo.commparnyList[0].companyType === "Sales" &&
+        this.$router.push("/bsIndex/bsProductSearchIndex");
       this.$store.commit("myAddTab", fd);
     },
     // 去厂商详情页 || 去展厅详情页
@@ -243,7 +294,10 @@ export default {
       if (item.isIntegral) {
         const fd = {
           name: item.supplierNumber,
-          linkUrl: "/bsIndex/bsVendorQuery",
+          linkUrl:
+            this.userInfo.commparnyList[0].companyType === "Sales"
+              ? "/bsIndex/bsVendorQuery"
+              : this.$route.path,
           component: "bsMyClientsDetail",
           refresh: true,
           noPush: true,
@@ -257,7 +311,8 @@ export default {
             address: item.supplierAddres || item.supplierAddress
           }
         };
-        this.$router.push("/bsIndex/bsVendorQuery");
+        this.userInfo.commparnyList[0].companyType === "Sales" &&
+          this.$router.push("/bsIndex/bsVendorQuery");
         this.$store.commit("myAddTab", fd);
       } else {
         // 去展厅
@@ -431,11 +486,11 @@ export default {
       };
       const res = await this.$http.post("/api/DeleteProductRecord", fd);
       if (res.data.result.code === 200) {
-        eventBus.$emit("refreshHtml");
         this.$common.handlerMsgState({
           msg: "删除成功",
           type: "success"
         });
+        eventBus.$emit("refreshHtml");
       } else {
         this.$common.handlerMsgState({
           msg: "删除失败",
@@ -453,6 +508,7 @@ export default {
 };
 </script>
 <style scoped lang="less">
+@deep: ~">>>";
 .bsGridItem {
   width: 255px;
   min-width: 255px;

@@ -2,27 +2,80 @@
   <div class="bsNewsMessageList">
     <div class="chatMain">
       <div class="head">
-        <img
+        <el-image
           v-if="dataOption.type === 1"
+          class="header-img"
+          style="width: 30px;height: 30px;border-radius: 50%;position:static;"
           :src="dataOption.userInfo && dataOption.userInfo.avatar"
-          alt=""
-        />
-        <img
+          fit="contain"
+        >
+          <div
+            slot="placeholder"
+            class="image-slot"
+            style="width: 30px;height: 30px;border-radius:  50%;"
+          >
+            <img
+              style="width: 30px;height: 30px;border-radius:  50%;"
+              :src="require('@/assets/images/imgError.png')"
+            />
+          </div>
+          <div
+            slot="error"
+            class="image-slot"
+            style="width: 30px;height: 30px;border-radius:  50%;"
+          >
+            <img
+              style="width: 30px;height: 30px;border-radius:  50%;"
+              :src="require('@/assets/images/imgError.png')"
+            />
+          </div>
+        </el-image>
+        <el-image
           v-else-if="dataOption.type === 3"
+          class="header-img"
+          style="width: 30px;height: 30px;border-radius:  50%;position:static;"
           :src="dataOption.userInfo && dataOption.userInfo.userImage"
-          alt=""
-        />
+          fit="contain"
+        >
+          <div
+            slot="placeholder"
+            class="image-slot"
+            style="width: 30px;height: 30px;border-radius:  50%;"
+          >
+            <img
+              style="width: 30px;height: 30px;border-radius:  50%;"
+              :src="require('@/assets/images/imgError.png')"
+            />
+          </div>
+          <div
+            slot="error"
+            class="image-slot"
+            style="width: 30px;height: 30px;border-radius: 50%;"
+          >
+            <img
+              style="width: 30px;height: 30px;border-radius:  50%;"
+              :src="require('@/assets/images/imgError.png')"
+            />
+          </div>
+        </el-image>
         <p v-if="dataOption.type === 1">
           {{ dataOption.userInfo && dataOption.userInfo.nickname }}
         </p>
         <p v-else-if="dataOption.type === 3">
           {{ dataOption.userInfo && dataOption.userInfo.linkName }}
         </p>
-        <i class="el-icon-more"></i>
+        <i
+          class="el-icon-more"
+          @click="openChatSetting(dataOption)"
+          style="cursor: pointer;"
+        ></i>
       </div>
       <div class="center">
         <el-scrollbar style="height: 100%;" ref="myScrollbar">
           <div ref="scrollMain" class="scrollMain">
+            <center style="font-size: 20px;" v-show="noScroll">
+              <i class="el-icon-loading"></i>
+            </center>
             <template v-for="item in chatInfoList">
               <div :key="item.sentTime">
                 <!-- 别人 -->
@@ -41,7 +94,7 @@
                       <template v-if="dataOption.type === 1">
                         <el-image
                           class="header-img"
-                          style="width: 50px;height: 50px;border-radius: 100px;"
+                          style="width: 50px;height: 50px;border-radius: 50%;"
                           :src="
                             dataOption.userInfo && dataOption.userInfo.avatar
                           "
@@ -50,20 +103,20 @@
                           <div
                             slot="placeholder"
                             class="image-slot"
-                            style="width: 50px;height: 50px;border-radius: 100px;"
+                            style="width: 50px;height: 50px;border-radius: 50%;"
                           >
                             <img
-                              style="width: 50px;height: 50px;border-radius: 100px;"
+                              style="width: 50px;height: 50px;border-radius: 50%;"
                               :src="require('@/assets/images/imgError.png')"
                             />
                           </div>
                           <div
                             slot="error"
                             class="image-slot"
-                            style="width: 50px;height: 50px;border-radius: 100px;"
+                            style="width: 50px;height: 50px;border-radius: 50%;"
                           >
                             <img
-                              style="width: 50px;height: 50px;border-radius: 100px;"
+                              style="width: 50px;height: 50px;border-radius: 50%;"
                               :src="require('@/assets/images/imgError.png')"
                             />
                           </div>
@@ -74,7 +127,7 @@
                         <el-image
                           v-if="dataOption.userInfo"
                           class="header-img"
-                          style="width: 50px;height: 50px;border-radius: 100px;"
+                          style="width: 50px;height: 50px;border-radius: 50%;"
                           :src="
                             filterUserInfo(
                               dataOption.userInfo.groupMemberInfos.items,
@@ -86,20 +139,20 @@
                           <div
                             slot="placeholder"
                             class="image-slot"
-                            style="width: 50px;height: 50px;border-radius: 100px;"
+                            style="width: 50px;height: 50px;border-radius: 50%;"
                           >
                             <img
-                              style="width: 50px;height: 50px;border-radius: 100px;"
+                              style="width: 50px;height: 50px;border-radius: 50%;"
                               :src="require('@/assets/images/imgError.png')"
                             />
                           </div>
                           <div
                             slot="error"
                             class="image-slot"
-                            style="width: 50px;height: 50px;border-radius: 100px;"
+                            style="width: 50px;height: 50px;border-radius: 50%;"
                           >
                             <img
-                              style="width: 50px;height: 50px;border-radius: 100px;"
+                              style="width: 50px;height: 50px;border-radius: 50%;"
                               :src="require('@/assets/images/imgError.png')"
                             />
                           </div>
@@ -108,191 +161,12 @@
                       <!-- 名片 -->
                       <div
                         class="youCart"
-                        v-show="dialogBusiness === item.messageUId"
+                        v-if="dialogBusiness === item.messageUId"
                       >
-                        <div class="header">
-                          <div class="imgBox">
-                            <template v-if="dataOption.type === 1">
-                              <el-image
-                                class="header-img"
-                                style="width: 50px;height: 50px;border-radius: 100px;position:static;"
-                                :src="
-                                  dataOption.userInfo &&
-                                    dataOption.userInfo.avatar
-                                "
-                                fit="contain"
-                              >
-                                <div
-                                  slot="placeholder"
-                                  class="image-slot"
-                                  style="width: 50px;height: 50px;border-radius: 100px;"
-                                >
-                                  <img
-                                    style="width: 50px;height: 50px;border-radius: 100px;"
-                                    :src="
-                                      require('@/assets/images/imgError.png')
-                                    "
-                                  />
-                                </div>
-                                <div
-                                  slot="error"
-                                  class="image-slot"
-                                  style="width: 50px;height: 50px;border-radius: 100px;"
-                                >
-                                  <img
-                                    style="width: 50px;height: 50px;border-radius: 100px;"
-                                    :src="
-                                      require('@/assets/images/imgError.png')
-                                    "
-                                  />
-                                </div>
-                              </el-image>
-                            </template>
-                            <!-- 群聊头像 -->
-                            <template v-else-if="dataOption.type === 3">
-                              <el-image
-                                v-if="dataOption.userInfo"
-                                class="header-img"
-                                style="width: 50px;height: 50px;border-radius: 100px;position:static;"
-                                :src="
-                                  filterUserInfo(
-                                    dataOption.userInfo.groupMemberInfos.items,
-                                    item
-                                  ).userImage
-                                "
-                                fit="contain"
-                              >
-                                <div
-                                  slot="placeholder"
-                                  class="image-slot"
-                                  style="width: 50px;height: 50px;border-radius: 100px;"
-                                >
-                                  <img
-                                    style="width: 50px;height: 50px;border-radius: 100px;"
-                                    :src="
-                                      require('@/assets/images/imgError.png')
-                                    "
-                                  />
-                                </div>
-                                <div
-                                  slot="error"
-                                  class="image-slot"
-                                  style="width: 50px;height: 50px;border-radius: 100px;"
-                                >
-                                  <img
-                                    style="width: 50px;height: 50px;border-radius: 100px;"
-                                    :src="
-                                      require('@/assets/images/imgError.png')
-                                    "
-                                  />
-                                </div>
-                              </el-image>
-                            </template>
-                          </div>
-                          <div class="nameBox">
-                            <div class="name" v-if="dataOption.type === 1">
-                              {{
-                                dataOption.userInfo &&
-                                  dataOption.userInfo.nickname
-                              }}
-                            </div>
-                            <template v-else-if="dataOption.type === 3">
-                              <div class="name" v-if="dataOption.userInfo">
-                                {{
-                                  filterUserInfo(
-                                    dataOption.userInfo.groupMemberInfos.items,
-                                    item
-                                  ).linkman
-                                }}
-                              </div>
-                            </template>
-
-                            <div class="company">成卓玩具厂成卓玩具厂成卓</div>
-                          </div>
-                        </div>
-                        <div class="contentBody">
-                          <p class="contentBody_item">
-                            <span class="item_title">性名：</span>
-                            <span v-if="dataOption.type === 1">
-                              {{
-                                dataOption.userInfo &&
-                                  dataOption.userInfo.nickname
-                              }}
-                            </span>
-                            <template v-else-if="dataOption.type === 3">
-                              <span v-if="dataOption.userInfo">
-                                {{
-                                  filterUserInfo(
-                                    dataOption.userInfo.groupMemberInfos.items,
-                                    item
-                                  ).linkman
-                                }}
-                              </span>
-                            </template>
-                          </p>
-                          <p class="contentBody_item">
-                            <template v-if="dataOption.userInfo">
-                              <span class="item_title">手机：</span>
-                              <span
-                                v-if="
-                                  dataOption.type === 1 &&
-                                    dataOption.userInfo.phoneNumber
-                                "
-                              >
-                                {{ dataOption.userInfo.phoneNumber }}
-                              </span>
-                              <span v-else-if="dataOption.type === 3">
-                                {{
-                                  filterUserInfo(
-                                    dataOption.userInfo.groupMemberInfos.items,
-                                    item
-                                  ).phoneNumber
-                                }}
-                              </span>
-                            </template>
-                          </p>
-                          <p
-                            class="contentBody_item"
-                            v-if="dataOption.userInfo"
-                          >
-                            <template>
-                              <span class="item_title">公司：</span>
-                              <span
-                                class="factory"
-                                v-if="
-                                  dataOption.type === 1 &&
-                                    dataOption.userInfo.companyName
-                                "
-                              >
-                                {{ dataOption.userInfo.companyName }}
-                              </span>
-                              <span
-                                v-else-if="dataOption.type === 3"
-                                class="factory"
-                              >
-                                {{
-                                  filterUserInfo(
-                                    dataOption.userInfo.groupMemberInfos.items,
-                                    item
-                                  ).companyName
-                                }}
-                              </span>
-                            </template>
-                          </p>
-                          <p class="contentBody_item">
-                            <span class="item_title">备注：</span>
-                            <span class="el-icon-edit openEditRemark"></span>
-                          </p>
-                        </div>
-                        <!-- 按钮 -->
-                        <div class="foot_btns">
-                          <el-button type="primary" size="medium">
-                            发消息
-                          </el-button>
-                          <el-button type="danger" size="medium" plain>
-                            删除好友
-                          </el-button>
-                        </div>
+                        <businessComponent
+                          :userIdData="userIdData"
+                          @successDeleteFriend="successDeleteFriend"
+                        ></businessComponent>
                       </div>
                     </div>
                     <div class="youChat">
@@ -322,7 +196,14 @@
                           class="message"
                           v-if="item.messageType === 'RC:TxtMsg'"
                         >
-                          {{ item.content.content }}
+                          <a
+                            :href="item.content.content"
+                            target="_brack"
+                            v-if="/^(http)|(www)/.test(item.content.content)"
+                            style="color:blue;"
+                            >{{ item.content.content }}</a
+                          >
+                          <span v-else>{{ item.content.content }}</span>
                         </span>
                         <!-- 引用消息 -->
                         <div
@@ -330,31 +211,31 @@
                           v-if="item.messageType === 'RC:ReferenceMsg'"
                         >
                           <div class="yinyong">
-                            <p v-if="dataOption.type === 1">
-                              <span class="name">
-                                引用@
-                                {{
-                                  dataOption.userInfo &&
-                                    dataOption.userInfo.nickname
-                                }}
-                              </span>
-                            </p>
-                            <p v-else-if="dataOption.type === 3">
-                              <span class="name">
-                                引用@
-                                {{
+                            <div v-if="dataOption.type === 1">
+                              <p style="color:#999">
+                                @{{ dataOption.userInfo.nickname }}
+                              </p>
+                              <p>
+                                <span style="color:#999">引用：</span>
+                                {{ item.content.referMsg.content }}
+                              </p>
+                            </div>
+                            <div v-else-if="dataOption.type === 3">
+                              <p style="color:#999">
+                                @{{
                                   filterUserInfo(
                                     dataOption.userInfo.groupMemberInfos.items,
                                     {
                                       senderUserId: item.content.referMsgUserId
                                     }
                                   ).linkman
-                                }}:
-                                <span>
-                                  {{ item.content.referMsg.content }}</span
-                                >
-                              </span>
-                            </p>
+                                }}
+                              </p>
+                              <p>
+                                <span style="color:#999">引用：</span>
+                                {{ item.content.referMsg.content }}
+                              </p>
+                            </div>
                           </div>
                           <p>{{ item.content.content }}</p>
                         </div>
@@ -416,6 +297,53 @@
                             />
                           </video>
                         </div>
+                        <!-- 订单消息 -->
+                        <div
+                          class="orderMsgBox"
+                          v-else-if="item.messageType === 'XZX:OrderMessage'"
+                        >
+                          <div class="orderMsg_content">
+                            <div class="orderMsg_title">
+                              {{ item.content.orderInfo.fromCompanyName }}
+                            </div>
+                            <div class="orderMsg_item">
+                              单号：{{ item.content.orderInfo.orderNumber }}
+                            </div>
+                            <div class="orderMsg_item">
+                              类型：{{ item.content.orderInfo.messageTitle }}
+                            </div>
+                            <div class="orderMsg_item">
+                              内容：{{ item.content.orderInfo.pushContent }}
+                            </div>
+                          </div>
+                          <div
+                            class="orderMsg_lookBtn"
+                            @click="toOrderDetails(item.content.orderInfo)"
+                          >
+                            <center>
+                              查看详情
+                              <i class="el-icon-arrow-right"></i>
+                            </center>
+                          </div>
+                        </div>
+                        <!-- 链接 -->
+                        <div
+                          class="linkMsgBox"
+                          @click="openLink(item.content.linkUrl)"
+                          v-else-if="item.messageType === 'XZX:LinkMessage'"
+                        >
+                          <div class="link_left">
+                            <vue-qr
+                              :text="item.content.linkUrl"
+                              :margin="0"
+                              :size="82"
+                            ></vue-qr>
+                          </div>
+                          <div class="link_right">
+                            <div class="link_productItem">测试分享</div>
+                            <div class="link_productItem">线上报价</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -441,49 +369,51 @@
                           class="message"
                           v-if="item.messageType === 'RC:TxtMsg'"
                         >
-                          {{ item.content.content }}
-                        </span>
-                        <!-- 语音 -->
-                        <span
-                          class="message"
-                          v-if="item.messageType === 'RC:VcMsg'"
-                        >
-                          {{ item.content.content }}
+                          <a
+                            :href="item.content.content"
+                            target="_brack"
+                            v-if="/^(http)|(www)/.test(item.content.content)"
+                            style="color:blue;"
+                            >{{ item.content.content }}</a
+                          >
+                          <span v-else>{{ item.content.content }}</span>
                         </span>
                         <!-- 引用消息 -->
                         <div
-                          class="yinyongMsg"
+                          class="myYinyongMsg"
                           v-if="item.messageType === 'RC:ReferenceMsg'"
                         >
                           <div class="yinyong">
-                            <p v-if="dataOption.type === 1">
-                              <span class="name">
-                                引用@
-                                {{
-                                  dataOption.userInfo &&
-                                    dataOption.userInfo.nickname
-                                }}
-                              </span>
-                            </p>
-                            <p v-else-if="dataOption.type === 3">
-                              <span class="name">
-                                引用@
-                                {{
-                                  filterUserInfo(
-                                    dataOption.userInfo.groupMemberInfos.items,
-                                    {
-                                      senderUserId: item.content.referMsgUserId
-                                    }
-                                  ).linkman
-                                }}:
-                                <span>
-                                  {{ item.content.referMsg.content }}</span
-                                >
-                              </span>
-                            </p>
+                            <div v-if="dataOption.type === 1">
+                              <p style="color:#999">
+                                @{{ userInfo.userInfo.linkman }}
+                              </p>
+                              <p>
+                                <span style="color:#999">引用：</span>
+                                {{ item.content.referMsg.content }}
+                              </p>
+                            </div>
+                            <div v-else-if="dataOption.type === 3">
+                              <p style="color:#999">
+                                @{{ userInfo.userInfo.linkman }}
+                              </p>
+                              <p>
+                                <span style="color:#999">引用：</span>
+                                {{ item.content.referMsg.content }}
+                              </p>
+                            </div>
                           </div>
                           <p>{{ item.content.content }}</p>
                         </div>
+                        <!-- 语音 -->
+                        <span
+                          class="message"
+                          style="color: #fff;"
+                          v-if="item.messageType === 'RC:VcMsg'"
+                        >
+                          <i class="yuyinMsg"></i>
+                          <!-- {{ item.content.content }} -->
+                        </span>
                         <!-- 图片 -->
                         <div
                           class="imgBox"
@@ -534,6 +464,53 @@
                               type="video/mp4"
                             />
                           </video>
+                        </div>
+                        <!-- 订单消息 -->
+                        <div
+                          class="orderMsgBox"
+                          v-else-if="item.messageType === 'XZX:OrderMessage'"
+                        >
+                          <div class="orderMsg_content">
+                            <div class="orderMsg_title">
+                              {{ item.content.orderInfo.fromCompanyName }}
+                            </div>
+                            <div class="orderMsg_item">
+                              单号：{{ item.content.orderInfo.orderNumber }}
+                            </div>
+                            <div class="orderMsg_item">
+                              类型：{{ item.content.orderInfo.messageTitle }}
+                            </div>
+                            <div class="orderMsg_item">
+                              内容：{{ item.content.orderInfo.pushContent }}
+                            </div>
+                          </div>
+                          <div
+                            class="orderMsg_lookBtn"
+                            @click="toOrderDetails(item.content.orderInfo)"
+                          >
+                            <center>
+                              查看详情
+                              <i class="el-icon-arrow-right"></i>
+                            </center>
+                          </div>
+                        </div>
+                        <!-- 链接 -->
+                        <div
+                          class="linkMsgBox"
+                          @click="openLink(item.content.linkUrl)"
+                          v-else-if="item.messageType === 'XZX:LinkMessage'"
+                        >
+                          <div class="link_left">
+                            <vue-qr
+                              :text="item.content.linkUrl"
+                              :margin="0"
+                              :size="82"
+                            ></vue-qr>
+                          </div>
+                          <div class="link_right">
+                            <div class="link_productItem">测试分享</div>
+                            <div class="link_productItem">线上报价</div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -596,52 +573,75 @@
       </div>
     </div>
     <div class="chattingRecords">
-      <div class="chattingTop">
-        <p>聊天记录</p>
-      </div>
-      <div class="title">
-        <div
-          :class="{ tabs: true, active: isDiyu === 0 }"
-          @click="checkTabs(0)"
-        >
-          全部
-        </div>
-        <div
-          :class="{ tabs: true, active: isDiyu === 1 }"
-          @click="checkTabs(1)"
-        >
-          图片
-        </div>
-        <div
-          :class="{ tabs: true, active: isDiyu === 2 }"
-          @click="checkTabs(2)"
-        >
-          视频
-        </div>
-        <div
-          :class="{ tabs: true, active: isDiyu === 3 }"
-          @click="checkTabs(3)"
-        >
-          链接
-        </div>
-      </div>
-      <div class="chattingList">
-        <div class="recordData">
-          <div class="cecorLeft">
-            <img src="@/assets/images/imgError.png" alt="" />
+      <transition name="el-fade-in-linear">
+        <div class="chat_history" v-show="!isChatSetting">
+          <div class="chattingTop">
+            <p>聊天记录</p>
           </div>
-          <div class="cecorRight">
-            <div class="cecorHead">
-              <p>名字</p>
-              <p>28分钟前</p>
+          <div class="title">
+            <div
+              :class="{ tabs: true, active: msgType === 0 }"
+              @click="checkTabs(0)"
+            >
+              全部
             </div>
-            <div class="cecorMain">
-              <p>聊天消息</p>
-              <!-- <img src="" alt="" /> -->
+            <div
+              :class="{ tabs: true, active: msgType === 2 }"
+              @click="checkTabs(2)"
+            >
+              图片
+            </div>
+            <div
+              :class="{ tabs: true, active: msgType === 4 }"
+              @click="checkTabs(4)"
+            >
+              视频
+            </div>
+            <div
+              :class="{ tabs: true, active: msgType === 3 }"
+              @click="checkTabs(3)"
+            >
+              链接
             </div>
           </div>
+          <div class="chattingList" ref="myScrollBox">
+            <el-scrollbar
+              style="height: 100%;position:relative;"
+              ref="histroyScroll"
+            >
+              <div class="myScrollWrap" ref="myScrollWrap">
+                <bsAllMsg v-if="tp === 0" :msgList="historyList" />
+                <bsImgMsg v-if="tp === 2" :msgList="historyList" />
+                <bsLinkMsg v-if="tp === 3" :msgList="historyList" />
+                <bsVideoMsg v-if="tp === 4" :msgList="historyList" />
+                <center
+                  style="width:100%; position: absolute; top:30px;left:0;font-size:30px;"
+                  v-show="isDaoDiLe"
+                >
+                  <i class="el-icon-loading"></i>
+                </center>
+              </div>
+            </el-scrollbar>
+          </div>
         </div>
-      </div>
+      </transition>
+      <transition name="el-fade-in-linear">
+        <div class="chat_setting" v-if="isChatSetting">
+          <!-- 群聊设置 -->
+          <bsGroupSetting
+            :options="dataOption"
+            @resetChatList="resetChatList"
+            @closeChatSetting="closeChatSetting"
+            v-if="dataOption.type === 3"
+          />
+          <!-- 单聊设置 -->
+          <bsSingleChat
+            :options="dataOption"
+            @closeChatSetting="closeChatSetting"
+            v-else-if="dataOption.type === 1"
+          />
+        </div>
+      </transition>
     </div>
   </div>
 </template>
@@ -651,12 +651,38 @@ import eventBus from "@/assets/js/common/eventBus.js";
 import { dateDiff, base64file } from "@/assets/js/common/common.js";
 import { mapState } from "vuex";
 import RongIMLib from "RongIMLib";
+import VueQr from "vue-qr";
+import bsAllMsg from "./bsNewsMsgComponents/bsAllMsg";
+import bsImgMsg from "./bsNewsMsgComponents/bsImgMsg";
+import bsLinkMsg from "./bsNewsMsgComponents/bsLinkMsg";
+import bsVideoMsg from "./bsNewsMsgComponents/bsVideoMsg";
+import bsGroupSetting from "./bsChatSetting/bsGroupSetting";
+import bsSingleChat from "./bsChatSetting/bsSingleChat";
+import businessComponent from "@/components/commonComponent/friendComponent/businessComponent.vue";
 export default {
   name: "bsNewsMessageList",
   props: ["dataOption", "im"],
+  components: {
+    bsAllMsg,
+    bsImgMsg,
+    bsLinkMsg,
+    bsVideoMsg,
+    VueQr,
+    bsGroupSetting,
+    bsSingleChat,
+    businessComponent
+  },
   data() {
     return {
-      msgType: 1,
+      typeList: [], // 业务消息类型
+      userIdData: {},
+      isChatSetting: false,
+      historyPageIndex: 1,
+      isDaoDiLe: false,
+      tp: 0,
+      msgType: 0,
+      historyList: [],
+      historyTotalCount: 0,
       historyKeyword: "",
       skipCount: 1,
       maxResultCount: 10,
@@ -668,16 +694,95 @@ export default {
       textInfo: "",
       dialogBusiness: null,
       hasMore: false,
-      isDiyu: 0,
       chatInfoList: [],
       expressionLibrary: [] // 表情库
     };
   },
   methods: {
-    // 分页获取历史消息
-    async getMessageHisByPage() {
+    // 获取消息类型
+    async getMessageTeplateSettingsByPage(messageModel) {
       const fd = {
-        skipCount: 1,
+        maxResultCount: 9999,
+        messageModel: messageModel,
+        skipCount: 1
+      };
+      for (const key in fd) {
+        if (fd[key] === null || fd[key] === undefined || fd[key] === "")
+          delete fd[key];
+      }
+      const res = await this.$http.post(
+        "/api/PushSettings/MessageTeplateSettingsByPage",
+        fd
+      );
+      if (res.data.result.code === 200) {
+        this.typeList = res.data.result.item.items;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+    // 查看订单消息详情
+    async toOrderDetails(item) {
+      console.log(item);
+      await this.getMessageTeplateSettingsByPage(item.messageModel);
+      const fd = {
+        name: "bsHallYewuDetails" + item.orderNumber || item.offerNumber,
+        linkUrl: this.$route.path,
+        component: "bsHallYewuDetails",
+        refresh: true,
+        label: item.orderNumber || item.offerNumber,
+        value: {
+          ...item,
+          typeList: this.typeList
+        }
+      };
+      this.$store.commit("myAddTab", fd);
+    },
+    // 刷新会话列表
+    resetChatList({ userImage, linkName }) {
+      // this.dataOption.userInfo.userImage = userImage;
+      // this.dataOption.userInfo.linkName = linkName;
+      console.log(userImage, linkName);
+      this.$emit("resetConversationList");
+    },
+    // 删除好友成功
+    successDeleteFriend() {
+      this.dialogBusiness = null;
+      eventBus.$emit("resetMyFriendList");
+    },
+    // 关闭聊天设置
+    closeChatSetting() {
+      this.isChatSetting = false;
+    },
+    // 打开聊天设置
+    openChatSetting(option) {
+      if (option.type == 3) {
+        const list = option.userInfo.groupMemberInfos.items;
+        const flag = list.find(
+          val => val.chatUserId === this.userInfo.chatUser.chatUserId
+        );
+        if (flag) {
+          this.isChatSetting = !this.isChatSetting;
+        } else {
+          this.$common.handlerMsgState({
+            msg: "不在群组中",
+            type: "danger"
+          });
+        }
+      } else {
+        this.isChatSetting = !this.isChatSetting;
+      }
+    },
+    // 点击打开分享链接
+    openLink(url) {
+      window.open(url, "_blank");
+    },
+    // 分页获取历史消息
+    async getMessageHisByPage(flag) {
+      const fd = {
+        skipCount: this.historyPageIndex,
         maxResultCount: 10,
         type: this.dataOption.type === 1 ? 1 : 2,
         messageType: this.msgType,
@@ -687,18 +792,28 @@ export default {
         keyWord: this.historyKeyword
       };
       const res = await this.$im_http.post("/api/Message/MessageHisByPage", fd);
-      console.log(res);
       if (res.data.result.code === 200) {
-        console.log(123);
+        if (flag)
+          this.historyList = this.historyList.concat(
+            res.data.result.item.items
+          );
+        else this.historyList = res.data.result.item.items;
+        this.historyTotalCount = res.data.result.item.totalCount;
+        this.isDaoDiLe = false;
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
       }
     },
     // 发送表情
     sendEmoticon(b) {
-      console.log(b);
       this.textInfo += b.emoji;
     },
     // 聊天窗口滚动事件
     handleScroll() {
+      // 聊天窗体
       let scrollbarEl = this.$refs.myScrollbar.wrap;
       scrollbarEl.onscroll = () => {
         // 到顶部了
@@ -706,7 +821,7 @@ export default {
           this.isFixedTop = true;
           // 是否还有历史数据可获取 hasMore
           if (this.hasMore) {
-            console.log(this.hasMore, "还有历史消息");
+            // console.log(this.hasMore, "还有历史消息");
             this.noScroll = true;
             const startTime =
               this.chatInfoList[0] && this.chatInfoList[0].sentTime;
@@ -716,6 +831,27 @@ export default {
         } else {
           this.isFixedTop = false;
         }
+      };
+      // 历史聊条滚动
+      let histroyScrollEl = this.$refs.histroyScroll.wrap;
+      const myScrollBox = this.$refs.myScrollBox;
+      const myWrapBox = this.$refs.myScrollWrap;
+      histroyScrollEl.onscroll = () => {
+        // 到底部了
+        if (
+          histroyScrollEl.scrollTop ===
+          myWrapBox.scrollHeight - (myScrollBox.offsetHeight - 40)
+        ) {
+          // 是否还有历史数据可获取
+          if (this.historyList.length < this.historyTotalCount) {
+            this.isDaoDiLe = true;
+            this.historyPageIndex++;
+            this.getMessageHisByPage(true);
+          }
+        }
+        // else {
+        //   this.isDaoDiLe = false;
+        // }
       };
     },
     // 发送上传图片
@@ -825,6 +961,29 @@ export default {
     },
     // 点击头像打开卡片
     openShowCart(item) {
+      console.log(this.dataOption, item);
+      if (item.type === 1) {
+        this.userIdData = {
+          companyId:
+            this.dataOption.userInfo && this.dataOption.userInfo.companyId,
+          id: this.dataOption.userInfo && this.dataOption.userInfo.userId
+        };
+      } else if (item.type === 3) {
+        this.userIdData = {
+          companyId:
+            this.dataOption.userInfo &&
+            this.filterUserInfo(
+              this.dataOption.userInfo.groupMemberInfos.items,
+              item
+            ).companyId,
+          id:
+            this.dataOption.userInfo &&
+            this.filterUserInfo(
+              this.dataOption.userInfo.groupMemberInfos.items,
+              item
+            ).id
+        };
+      }
       this.dialogBusiness = item.messageUId;
     },
     // 筛选群聊聊天用户信息
@@ -834,7 +993,10 @@ export default {
     },
     // 记录聊天消息
     recordMessageHis(fd) {
-      this.$im_http.post("/api/Message/RecordMessageHis", fd);
+      this.$im_http.post("/api/Message/RecordMessageHis", fd).then(() => {
+        this.historyPageIndex = 1;
+        this.getMessageHisByPage(false);
+      });
     },
     // 刷新历史记录
     resetHistoryChat(msg) {
@@ -847,16 +1009,21 @@ export default {
         count: 20
       };
       conversation.getMessages(option).then(() => {
+        console.log(msg.messageType);
         if (msg.messageType === "RC:ReadNtf") {
-          console.log("已读");
+          // console.log("已读");
         } else if (msg.messageType === "RC:TypSts") {
-          console.log("正在输入");
+          // console.log("正在输入");
+        } else if (msg.messageType === "RC:SRSMsg") {
+          // console.log("取消输入");
         } else {
           // 回复成功
           this.chatInfoList.push(msg);
         }
         // 清除未读
         this.clearReadInfo();
+        this.historyPageIndex = 1;
+        this.getMessageHisByPage(false);
       });
     },
     // im获取历史消息,聊天窗口消息
@@ -869,27 +1036,53 @@ export default {
         timestamp: startTime || +new Date(),
         count: 20
       };
-      conversation.getMessages(option).then(result => {
-        var list = result.list; // 历史消息列表
-        this.hasMore = result.hasMore; // 是否还有历史消息可以获取
-        if (startTime) {
-          this.chatInfoList = [...list, ...this.chatInfoList];
-          this.$nextTick(() => {
-            this.$refs["myScrollbar"].wrap.scrollTop =
-              this.$refs["myScrollbar"].wrap.scrollHeight - height;
-            this.noScroll = false;
-          });
-        } else {
-          this.chatInfoList = list;
-        }
-        console.log(
-          "是否还有历史消息可以获取",
-          this.hasMore,
-          this.chatInfoList
-        );
-        // 清除未读
-        this.clearReadInfo();
-      });
+      conversation
+        .getMessages(option)
+        .then(result => {
+          var list = result.list; // 历史消息列表
+          this.hasMore = result.hasMore; // 是否还有历史消息可以获取
+          if (startTime) {
+            this.chatInfoList = [...list, ...this.chatInfoList];
+            this.$nextTick(() => {
+              this.$refs["myScrollbar"].wrap.scrollTop =
+                this.$refs["myScrollbar"].wrap.scrollHeight - height;
+              this.noScroll = false;
+            });
+          } else {
+            this.chatInfoList = list;
+          }
+          // 清除未读
+          this.clearReadInfo();
+        })
+        .catch(err => {
+          console.log(err);
+          switch (err.code) {
+            case 22406:
+              this.$common.handlerMsgState({
+                msg: "不在群组中",
+                type: "danger"
+              });
+              break;
+            case 405:
+              this.$common.handlerMsgState({
+                msg: "已被对方加入黑名单",
+                type: "danger"
+              });
+              break;
+            case 22408:
+              this.$common.handlerMsgState({
+                msg: "在群组中被禁言",
+                type: "danger"
+              });
+              break;
+            case 30001:
+              this.$common.handlerMsgState({
+                msg: "用户未连接成功, 需连接成功后再执行",
+                type: "danger"
+              });
+              break;
+          }
+        });
     },
     // 清除未读
     clearReadInfo() {
@@ -905,9 +1098,13 @@ export default {
     dateDiff(time) {
       return dateDiff(time);
     },
-    // 切换专区
-    checkTabs(num) {
-      this.isDiyu = num;
+    // 切换专聊天记录
+    async checkTabs(num) {
+      this.msgType = 0;
+      this.msgType = num;
+      this.historyPageIndex = 1;
+      this.tp = num;
+      this.getMessageHisByPage(false);
     },
     // 发送消息
     sendInfo({ targetId, messageType, content }) {
@@ -921,7 +1118,7 @@ export default {
           content: content
         })
         .then(message => {
-          console.log(message);
+          console.log(message, "发送了消息");
           const fd = {
             chatType: message.type == 1 ? 1 : 2,
             targetId: message.targetId,
@@ -937,6 +1134,52 @@ export default {
           };
           this.recordMessageHis(fd);
           this.chatInfoList.push(message);
+        })
+        .catch(err => {
+          console.log(err, "发送报错了");
+          switch (err.code) {
+            case 20604:
+              this.$common.handlerMsgState({
+                msg: "发送频率过快",
+                type: "danger"
+              });
+              break;
+            case 22406:
+              this.$common.handlerMsgState({
+                msg: "不在群组中",
+                type: "danger"
+              });
+              break;
+            case 405:
+              this.$common.handlerMsgState({
+                msg: "已被对方加入黑名单",
+                type: "danger"
+              });
+              break;
+            case 22408:
+              this.$common.handlerMsgState({
+                msg: "在群组中被禁言",
+                type: "danger"
+              });
+              break;
+            case 30001:
+              this.$common.handlerMsgState({
+                msg: "用户未连接成功, 需连接成功后再执行",
+                type: "danger"
+              });
+              break;
+            case 34009:
+              this.$common.handlerMsgState({
+                msg: "发送扩展消息失败",
+                type: "danger"
+              });
+              break;
+            default:
+              this.$common.handlerMsgState({
+                msg: "发送失败，错误码：" + err.code + "，请联系管理员",
+                type: "danger"
+              });
+          }
         });
     },
     // 按钮发送文本
@@ -968,10 +1211,8 @@ export default {
       if (e.ctrlKey && e.keyCode == 13) {
         // 用户点击了ctrl+enter触发
         this.textInfo += "\n";
-        console.log(this.textInfo);
       } else {
         //用户点击了enter触发
-        console.log("用户点击了回车");
         if (!this.textInfo) {
           this.$common.handlerMsgState({
             msg: "发送内容不能为空",
@@ -1004,6 +1245,7 @@ export default {
     });
     this.handleScroll();
     this.getMessageHisByPage();
+    console.log(this.dataOption);
   },
   watch: {
     chatInfoList: {
@@ -1043,7 +1285,7 @@ export default {
       display: flex;
       align-items: center;
       border-bottom: 1px solid #dcdfe6;
-      img {
+      .el-image {
         width: 30px;
         height: 30px;
         margin: 0 13px 0 20px;
@@ -1093,6 +1335,11 @@ export default {
           margin-bottom: 20px;
           .header-img {
             cursor: pointer;
+          }
+          .el-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
           }
           .youCart {
             position: absolute;
@@ -1180,7 +1427,7 @@ export default {
           }
           .messageBox {
             margin-top: 10px;
-            max-width: 400px;
+            max-width: 500px;
             white-space: normal;
             word-break: break-all;
             .message {
@@ -1224,6 +1471,62 @@ export default {
               width: 400px;
               height: 250px;
             }
+            .orderMsgBox {
+              width: 462px;
+              // height: 203px;
+              background: #ffffff;
+              border: 1px solid #3368a9;
+              border-radius: 0px 5px 5px 5px;
+              .orderMsg_content {
+                box-sizing: border-box;
+                padding: 15px;
+                .orderMsg_title {
+                  font-weight: 700;
+                }
+                .orderMsg_item {
+                  margin-top: 5px;
+                  overflow: hidden; /*超出部分隐藏*/
+                  white-space: nowrap; /*不换行*/
+                  text-overflow: ellipsis; /*超出部分文字以...显示*/
+                }
+              }
+              .orderMsg_lookBtn {
+                padding: 16px;
+                box-sizing: border-box;
+                border-top: 1px solid #3368a9;
+                color: #3368a9;
+                cursor: pointer;
+              }
+            }
+            .linkMsgBox {
+              height: 100px;
+              width: 300px;
+              background-color: #f5f5f5;
+              border-radius: 10px;
+              padding: 9px 10px;
+              box-sizing: border-box;
+              display: flex;
+              cursor: pointer;
+              .link_left {
+                width: 82px;
+                min-width: 82px;
+                min-height: 82px;
+                background-color: #ccc;
+              }
+              .link_right {
+                margin-left: 10px;
+                flex: 1;
+                overflow: hidden; /*超出部分隐藏*/
+                white-space: nowrap; /*不换行*/
+                text-overflow: ellipsis; /*超出部分文字以...显示*/
+                .link_productItem {
+                  margin-top: 15px;
+                  overflow: hidden; /*超出部分隐藏*/
+                  white-space: nowrap; /*不换行*/
+                  text-overflow: ellipsis; /*超出部分文字以...显示*/
+                }
+              }
+            }
           }
         }
       }
@@ -1242,7 +1545,7 @@ export default {
           }
           .messageBox {
             margin-top: 10px;
-            max-width: 400px;
+            max-width: 500px;
             .message {
               color: #fff;
               background-color: #3368a9;
@@ -1252,9 +1555,22 @@ export default {
                 width: 13px;
                 height: 17px;
                 cursor: pointer;
-                background: url("~@/assets/images/yuyinMsg.png") no-repeat
+                background: url("~@/assets/images/myYuyinMsg.png") no-repeat
                   center;
                 background-size: contain;
+              }
+            }
+            .myYinyongMsg {
+              color: #fff;
+              background-color: #3368a9;
+              border: 1px solid #3368a9;
+              border-radius: 10px;
+              padding: 9px 10px;
+              text-align: left;
+              .yinyong {
+                .name {
+                  color: #999;
+                }
               }
             }
             .imgBox {
@@ -1264,6 +1580,64 @@ export default {
               width: 400px;
               height: 250px;
             }
+            .orderMsgBox {
+              text-align: left;
+              width: 462px;
+              // height: 203px;
+              background: #ffffff;
+              border: 1px solid #3368a9;
+              border-radius: 5px 0px 5px 5px;
+              .orderMsg_content {
+                box-sizing: border-box;
+                padding: 15px;
+                .orderMsg_title {
+                  font-weight: 700;
+                }
+                .orderMsg_item {
+                  margin-top: 5px;
+                  overflow: hidden; /*超出部分隐藏*/
+                  white-space: nowrap; /*不换行*/
+                  text-overflow: ellipsis; /*超出部分文字以...显示*/
+                }
+              }
+              .orderMsg_lookBtn {
+                padding: 16px;
+                box-sizing: border-box;
+                border-top: 1px solid #3368a9;
+                color: #3368a9;
+                cursor: pointer;
+              }
+            }
+            .linkMsgBox {
+              height: 100px;
+              width: 300px;
+              background-color: #f5f5f5;
+              border-radius: 10px;
+              padding: 9px 10px;
+              box-sizing: border-box;
+              display: flex;
+              cursor: pointer;
+              .link_left {
+                width: 82px;
+                min-width: 82px;
+                min-height: 82px;
+                background-color: #ccc;
+              }
+              .link_right {
+                text-align: left;
+                margin-left: 10px;
+                flex: 1;
+                overflow: hidden; /*超出部分隐藏*/
+                white-space: nowrap; /*不换行*/
+                text-overflow: ellipsis; /*超出部分文字以...显示*/
+                .link_productItem {
+                  margin-top: 15px;
+                  overflow: hidden; /*超出部分隐藏*/
+                  white-space: nowrap; /*不换行*/
+                  text-overflow: ellipsis; /*超出部分文字以...显示*/
+                }
+              }
+            }
           }
         }
       }
@@ -1271,7 +1645,8 @@ export default {
       .header-img {
         width: 50px;
         height: 50px;
-        border-radius: 100px;
+        border-radius: 50%;
+        object-fit: contain;
       }
       .chart-timer {
         text-align: center;
@@ -1396,6 +1771,15 @@ export default {
     background: #ffffff;
     border-radius: 4px;
     margin-left: 20px;
+    position: relative;
+    .chat_history,
+    .chat_setting {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
     .chattingTop {
       padding-left: 20px;
       height: 54px;
@@ -1433,51 +1817,11 @@ export default {
       }
     }
     .chattingList {
+      height: 664px;
       padding: 20px;
       box-sizing: border-box;
-
-      .recordData {
-        background: #f6f8f9;
-        border-radius: 4px;
-        padding: 15px 18px;
-        display: flex;
-        .cecorLeft {
-          width: 40px;
-          height: 40px;
-          margin-right: 8px;
-          img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid #dcdfe6;
-            background: rgba(0, 0, 0, 0);
-          }
-        }
-        .cecorRight {
-          width: 100%;
-          .cecorHead {
-            display: flex;
-            justify-content: space-between;
-            p {
-              height: 17px;
-              font-size: 13px;
-              font-weight: 400;
-              text-align: left;
-              color: #999999;
-              line-height: 19px;
-            }
-          }
-          .cecorMain {
-            padding-top: 10px;
-            box-sizing: border-box;
-            p {
-              color: #666666;
-              font-size: 14px;
-              line-height: 22px;
-            }
-          }
-        }
-      }
+      // overflow-x: hidden;
+      // overflow-y: auto;
     }
   }
 }

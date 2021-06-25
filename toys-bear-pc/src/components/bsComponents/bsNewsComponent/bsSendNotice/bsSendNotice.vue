@@ -43,7 +43,11 @@
                       @mouseenter="itemImgNter(value.uid)"
                       @mouseleave="itemImgLeave"
                     >
-                      <el-image fit="contain" :src="value.url"></el-image>
+                      <el-image
+                        fit="contain"
+                        style="width:148px;height:148px;"
+                        :src="value.url"
+                      ></el-image>
                       <div
                         class="itemIcon"
                         v-show="isHoverImgItem === value.uid"
@@ -419,12 +423,9 @@ export default {
               type: "success"
             });
             // 刷新公告列表
-            this.$emit("close", true);
-            this.skipCount = 1;
-            this.maxResultCount = 10;
-            this.formData.fileList = [];
+            this.$emit("onSuccess");
           } else {
-            this.$emit("close", false);
+            this.$emit("close");
             this.$common.handlerMsgState({
               msg: result.data.result.msg,
               type: "danger"
@@ -713,21 +714,6 @@ export default {
                 }
               }
             }
-            .el-image {
-              width: 100%;
-              height: 100%;
-              padding-bottom: 100%;
-              position: relative;
-              @{deep} img {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-              }
-            }
           }
           @{deep} .el-image-viewer__wrapper {
             .el-image-viewer__mask {
@@ -738,23 +724,6 @@ export default {
       }
       .imgsItemBox {
         margin-top: 5px;
-        // .imgsItem {
-        //   width: 100%;
-        //   height: 100%;
-        //   float: left;
-        //   @{deep} .el-upload {
-        //     width: 100%;
-        //     height: 123.98px;
-        //     line-height: normal;
-        //     position: relative;
-        //     .el-icon-plus {
-        //       position: absolute;
-        //       left: 50%;
-        //       top: 50%;
-        //       transform: translate(-50%, -50%);
-        //     }
-        //   }
-        // }
       }
     }
     .sendGonggaoBtn {

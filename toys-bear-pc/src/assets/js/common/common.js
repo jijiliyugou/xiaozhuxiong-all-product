@@ -70,7 +70,7 @@ export function dateDiff(time) {
   };
 
   // 使用
-  if (monthC > 12) {
+  if (hourC > 24) {
     // 超过1年，直接显示年月日
     return (function() {
       var date = new Date(timestamp);
@@ -80,7 +80,13 @@ export function dateDiff(time) {
         zero(date.getMonth() + 1) +
         "月" +
         zero(date.getDate()) +
-        "日"
+        "日" +
+        " " +
+        zero(date.getHours()) +
+        ":" +
+        zero(date.getMinutes()) +
+        ":" +
+        zero(date.getSeconds())
       );
     })();
   } else if (monthC >= 1) {
@@ -167,6 +173,126 @@ export function calculateDate(code) {
     }
   }
 }
+//计算几天 并返回这中间的日期
+export function calculateDateAndDates(code) {
+  if (code) {
+    var date = new Date();
+    var endTime = formatTime(date);
+    var date1 = Date.parse(date);
+    var start = "";
+    var oneDay = 1000 * 3600 * 24;
+    if (code === "全部") {
+      console.log(date);
+    } else {
+      switch (code) {
+        // 今天
+        case "today":
+          start = new Date();
+          break;
+        // 3天
+        case "3天":
+          start = date1 - oneDay * 3;
+          break;
+        // 最近1周
+        case "7天":
+          start = date1 - oneDay * 7;
+          break;
+        // 最近15天
+        case "15天":
+          start = date1 - oneDay * 15;
+          break;
+        // 最近1月
+        case "30天":
+          start = new Date();
+          start.setMonth(start.getMonth() - 1);
+          break;
+        // 最近3月
+        case "lastThreeMonth":
+          start = new Date();
+          start.setMonth(start.getMonth() - 3);
+          break;
+        // 最近半年
+        case "lastHalfYear":
+          start = date1 - oneDay * 183;
+          break;
+      }
+      const timeData = {
+        startTime: formatTime(new Date(start)) + "T00:00:00",
+        endTime: endTime + "T23:59:59",
+        dates:
+          code == "today"
+            ? get24Hours()
+            : getDiffDate(formatTime(new Date(start)), endTime)
+      };
+      return timeData;
+    }
+  }
+}
+/**
+ ***获取两个日期间的所有日期
+ ***默认start<end
+ **/
+export function getDiffDate(start, end) {
+  var startTime = getDate2(start);
+  var endTime = getDate2(end);
+  var dateArr = [];
+  while (endTime.getTime() - startTime.getTime() > 0) {
+    var year = startTime.getFullYear();
+    var month =
+      (startTime.getMonth() + 1).toString().length === 1
+        ? "0" + (parseInt(startTime.getMonth().toString(), 10) + 1)
+        : startTime.getMonth() + 1;
+    var day =
+      startTime.getDate().toString().length === 1
+        ? "0" + startTime.getDate()
+        : startTime.getDate();
+    dateArr.push(year + "-" + month + "-" + day);
+    startTime.setDate(startTime.getDate() + 1);
+  }
+  return dateArr;
+}
+//日期格式化
+function getDate2(datestr) {
+  var temp = datestr.split("-");
+  if (temp[1] === "01") {
+    temp[0] = parseInt(temp[0], 10) - 1;
+    temp[1] = "12";
+  } else {
+    temp[1] = parseInt(temp[1], 10) - 1;
+  }
+  //new Date()的月份入参实际都是当前值-1
+  var date = new Date(temp[0], temp[1], temp[2]);
+  return date;
+}
+//返回24时间段
+function get24Hours() {
+  return [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ];
+}
 // 格式化时间
 export function formatTime(param) {
   var y = param.getFullYear();
@@ -197,14 +323,14 @@ export function filterMsgTypes(param) {
     case "RC:HQVCMsg": // 语音消息
       msg = "[语音]";
       break;
-    case "XZX:LinkMessage": // 链接消息
-      msg = param.content;
-      break;
     case "RC:ImgMsg": // 链接消息
       msg = "[图片]";
       break;
     case "RC:ReferenceMsg": // 引用消息
       msg = "[引用]";
+      break;
+    case "XZX:LinkMessage": // 链接消息
+      msg = "[链接]" + param.content.linkUrl;
       break;
   }
   return msg;
@@ -233,7 +359,6 @@ export function compress(file, size) {
 export function base64file(file, type) {
   //判断支不支持FileReader
   if (!file || !window.FileReader) {
-    console.log(window.FileReader);
     return false;
   }
   return new Promise(resolve => {

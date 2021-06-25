@@ -37,6 +37,23 @@
 import { mapState } from "vuex";
 export default {
   methods: {
+    // 获取购物车数量
+    async getShopLength() {
+      if (this.userInfo && this.userInfo.shareId) {
+        const res = await this.$toys.post("/api/ShoppingCartCount", {
+          shareID: this.userInfo.shareId,
+          customerRemarks: this.customerInfo.id,
+          sourceFrom: "share",
+          shopType: "customersamples"
+        });
+        console.log(res);
+        if (res.data.result.code === 200) {
+          this.$store.commit("handlerShopLength", res.data.result.item);
+        } else {
+          this.$message.error(res.data.result.msg);
+        }
+      }
+    },
     // 回到顶部
     toTop() {
       $("#app").animate({ scrollTop: 0 }, 100);
@@ -50,8 +67,15 @@ export default {
     },
     // 去购物车
     toMyShoppingCart() {
-      this.$router.push("/index/shoppingCart");
+      window.localStorage.setItem("nowActive", "/index/shoppingCart");
+      this.$router.push({
+        path: "/index/shoppingCart"
+      });
+      //this.$router.push("/index/shoppingCart");
     }
+  },
+  mounted() {
+    this.getShopLength();
   },
   watch: {
     globalLang(val) {
@@ -60,7 +84,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["userInfo", "globalLang", "shopLength"])
+    ...mapState(["userInfo", "globalLang", "shopLength", "customerInfo"])
   }
 };
 </script>
@@ -184,8 +208,12 @@ export default {
 @media screen and (max-width: 1280px) {
   .cartBox {
     right: 0px;
+    z-index: 2;
+    bottom: 102px;
   }
   .goBack {
+    z-index: 2;
+    top: 40%;
     right: 0px;
   }
 }

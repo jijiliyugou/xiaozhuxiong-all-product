@@ -120,7 +120,7 @@ export default {
       this.$toys
         .post(api, {
           shareID: this.userInfo.shareId,
-          customerRemarks: this.userInfo.loginEmail,
+          customerRemarks: this.customerInfo.id,
           sourceFrom: "share",
           shopType: "customersamples",
           number: 1,
@@ -146,33 +146,7 @@ export default {
     },
     // 是否加购
     async handlerShopping(item) {
-      if (!this.userInfo.loginEmail) {
-        this.$prompt(this.publicLang.pleaseEnterContact, this.publicLang.tips, {
-          confirmButtonText: this.publicLang.determine,
-          cancelButtonText: this.publicLang.cancel
-        })
-          .then(({ value }) => {
-            if (value) {
-              this.$root.eventHub.$emit("resetAll");
-              this.$store.commit("handlerLoginName", value);
-              // 重新登录
-              const fd = JSON.parse(JSON.stringify(this.formLabelAlign));
-              fd.email = value;
-              console.log(fd);
-              this.$http.post("/api/Account/CompanyShareLogin", fd);
-              this.addCart(item);
-            } else {
-              this.$message.error(this.publicLang.incorrectInput);
-            }
-          })
-          .catch(() => {
-            // this.$message({
-            //   type: "info",
-            //   message: "取消输入"
-            // });
-          });
-        return false;
-      } else if (this.shopLength >= 500) {
+      if (this.shopLength >= 500) {
         this.$message.error(this.publicLang.theShoppingCartIsFull);
         return false;
       } else {
@@ -211,7 +185,8 @@ export default {
       "shopLength",
       "userInfo",
       "formLabelAlign",
-      "shareInfo"
+      "shareInfo",
+      "customerInfo"
     ])
   }
 };

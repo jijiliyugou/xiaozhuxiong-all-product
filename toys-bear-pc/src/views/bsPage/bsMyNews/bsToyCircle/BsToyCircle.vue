@@ -30,9 +30,8 @@
         </el-button>
       </div>
     </div>
-    <div class="noticeContent">
+    <div class="noticeContent" v-if="findList.length">
       <waterfall
-        v-show="findList.length"
         :col="col"
         ref="findListRef"
         :data="findList"
@@ -59,10 +58,10 @@
 
                     <div
                       class="dialogBusiness"
-                      v-show="dialogBusiness === item.bearNotice.id"
+                      v-if="dialogBusiness === item.bearNotice.id"
                     >
                       <businessComponent
-                        :userData="userData"
+                        :userIdData="userIdData"
                       ></businessComponent>
                     </div>
                   </div>
@@ -341,24 +340,20 @@
       title="举报"
       :visible.sync="dialogjubao"
       destroy-on-close
-      width="800px"
+      width="500px"
     >
       <ul class="selectJubaoInfo">
-        <li
+        <el-radio
           v-for="(item, i) in ['政治敏感', '欺诈骗钱', '其他']"
           :key="i"
-          @click="checkJubaoInfo($event, item)"
-          :class="{ active: jubaoActive === item }"
+          v-model="selectJubaoValue"
+          :label="item"
+          >{{ item }}</el-radio
         >
-          {{ item }}
-        </li>
-        <el-button
-          type="primary"
-          round
-          style="width: 100%; height: 50px"
-          @click="jubaoEvent"
-          >确 定</el-button
-        >
+        <center class="btns">
+          <el-button @click="dialogjubao = false">取 消</el-button>
+          <el-button type="primary" @click="jubaoEvent">确 定</el-button>
+        </center>
       </ul>
     </el-dialog>
     <!-- 发布公告 -->
@@ -368,7 +363,7 @@
       v-if="sendNoticeDialog"
       width="703px"
     >
-      <bsSendNotice @close="closeSendNotice" />
+      <bsSendNotice @close="closeSendNotice" @onSuccess="onSuccess" />
     </el-dialog>
   </div>
 </template>
@@ -387,7 +382,7 @@ export default {
   components: { bsSendNotice, businessComponent },
   data() {
     return {
-      userData: {},
+      userIdData: {},
       canClick: true,
       dialogBusiness: false,
       flagReturnTop: false,
@@ -508,7 +503,6 @@ export default {
       this.issuedCompanyID = this.currentComparnyId;
       this.currentPage = 1;
       this.getDataList();
-      this.upImage();
     },
     // 删除我的公告
     async deleteMyNotice(val) {
@@ -525,13 +519,10 @@ export default {
               msg: "删除成功",
               type: "success"
             });
-            for (let i = 0; i < this.findList.length; i++) {
-              if (val.bearNotice.id == this.findList[i].bearNotice.id) {
-                this.findList.splice(i, 1);
-                this.showActive = false;
-                break;
-              }
-            }
+            this.showActive = false;
+            this.findList = this.findList.filter(
+              v => v.bearNotice.id !== val.bearNotice.id
+            );
           } else {
             this.$common.handlerMsgState({
               msg: res.data.result.msg,
@@ -546,35 +537,15 @@ export default {
           });
         });
     },
-    // 解决图片不加载问题
-    upImage() {
-      // setTimeout(() => {
-      const beginTime = Date.now();
-      const beginValue = this.$refs.findListRef.$el.scrollTop;
-      if (beginValue == 1) this.$refs.findListRef.$el.scrollTop = 0;
-      const rAF =
-        window.requestAnimationFrame || (func => setTimeout(func, 16));
-      const frameFunc = () => {
-        const progress = (Date.now() - beginTime) / 500;
-        if (progress < 1) {
-          this.$refs.findListRef.$el.scrollTop =
-            beginValue * (1 - easeInOutCubic(progress));
-          rAF(frameFunc);
-        } else {
-          this.$refs.findListRef.$el.scrollTop = 0;
-        }
-      };
-      rAF(frameFunc);
-      // this.$waterfall.forceUpdate();
-      // }, 200);
+    // 发送公告成功
+    onSuccess() {
+      this.findList = [];
+      this.currentPage = 1;
+      this.sendNoticeDialog = false;
+      this.getDataList(false);
     },
     // 关闭发布公告
-    closeSendNotice(flag) {
-      if (flag) {
-        this.currentPage = 1;
-        this.getDataList();
-        this.upImage();
-      }
+    closeSendNotice() {
       this.sendNoticeDialog = false;
     },
     // 打开发布公告
@@ -589,7 +560,6 @@ export default {
       this.publisher = null;
       this.issuedCompanyID = null;
       this.getDataList();
-      this.upImage();
     },
     // 举报
     async jubaoEvent() {
@@ -634,7 +604,6 @@ export default {
           type: "success"
         });
         this.getDataList();
-        this.upImage();
       } else {
         this.$common.handlerMsgState({
           msg: "屏蔽公告失败，请联系管理员",
@@ -826,22 +795,14 @@ export default {
       item.isHuiPinglun = false;
     },
     // 点击头像
-    async examineBusiness(item) {
+    examineBusiness(item) {
       if (this.canClick) {
         this.canClick = false;
-        const res = await this.$http.post("/api/OrgPersonnelByID", {
+        this.userIdData = {
           companyId: item.userInfo.companyId,
           id: item.userInfo.userId
-        });
-        if (res.data.result.code === 200) {
-          this.userData = res.data.result.item;
-          this.dialogBusiness = item.bearNotice.id;
-        } else {
-          this.$common.handlerMsgState({
-            msg: res.data.result.msg,
-            type: "danger"
-          });
-        }
+        };
+        this.dialogBusiness = item.bearNotice.id;
         setTimeout(() => {
           this.canClick = true;
         }, 500);
@@ -918,14 +879,15 @@ export default {
     eventBus.$on("handleDialogBusiness", val => {
       this.dialogBusiness = val;
     });
-    this.$refs.findListRef.$el.addEventListener("scroll", () => {
-      console.log(" scroll " + this.$refs.findListRef.$el.scrollTop);
-      if (this.$refs.findListRef.$el.scrollTop > 300) {
-        this.flagReturnTop = true;
-      } else {
-        this.flagReturnTop = false;
-      }
-    });
+    this.$refs.findListRef &&
+      this.$refs.findListRef.$el.addEventListener("scroll", () => {
+        console.log(" scroll " + this.$refs.findListRef.$el.scrollTop);
+        if (this.$refs.findListRef.$el.scrollTop > 300) {
+          this.flagReturnTop = true;
+        } else {
+          this.flagReturnTop = false;
+        }
+      });
     const that = this;
     window.onresize = () => {
       return (() => {
@@ -1455,23 +1417,14 @@ export default {
   //   }
 }
 .selectJubaoInfo {
-  li {
-    height: 80px;
-    border-bottom: 1px solid #ccc;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    text-indent: 50px;
-    cursor: pointer;
-    &:last-of-type {
-      border: none;
-    }
-    &:hover {
-      background-color: #f5f7fa;
-    }
-    &.active {
-      color: red;
-    }
+  .el-radio {
+    width: 100%;
+    height: 44px;
+    line-height: 44px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .btns {
+    margin-top: 20px;
   }
 }
 @{deep} .el-input-group__append {

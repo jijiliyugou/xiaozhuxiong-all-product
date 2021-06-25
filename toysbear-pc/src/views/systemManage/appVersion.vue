@@ -43,13 +43,31 @@
             size="medium"
             :default-sort="{ prop: 'date', order: 'descending' }"
           >
-            <el-table-column prop="platForm" label="手机平台"></el-table-column>
-            <el-table-column prop="vesion" label="版本号"></el-table-column>
+            <el-table-column
+              prop="platForm"
+              label="手机平台"
+              width="100"
+            ></el-table-column>
+            <el-table-column
+              prop="vesion"
+              label="版本号"
+              width="100"
+            ></el-table-column>
             <el-table-column
               prop="fileUrl"
               label="版本地址"
               align="center"
-              width="400"
+              width="220"
+            ></el-table-column>
+            <el-table-column
+              prop="title"
+              label="版本标题"
+              align="center"
+            ></el-table-column>
+            <el-table-column
+              prop="content"
+              label="更新内容"
+              align="center"
             ></el-table-column>
             <el-table-column
               prop="createdOn"
@@ -102,7 +120,7 @@
         :title="versionTitle"
         :visible.sync="versionDialog"
         v-if="versionDialog"
-        width="50%"
+        width="800px"
       >
         <el-form
           ref="addVersionForm"
@@ -110,8 +128,8 @@
           :rules="addVersionRules"
           :model="versionFormData"
         >
-          <div style="display:flex;justifyContent:space-between;">
-            <el-form-item label="平台" prop="platForm">
+          <div style="display:flex;">
+            <el-form-item label="平台：" prop="platForm">
               <el-select
                 v-model="versionFormData.platForm"
                 placeholder="请选择"
@@ -124,7 +142,11 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="强制更新" prop="forceUpdate">
+            <el-form-item
+              label="强制更新："
+              prop="forceUpdate"
+              v-if="versionFormData.platForm != 'pc'"
+            >
               <el-select
                 v-model="versionFormData.forceUpdate"
                 placeholder="请选择"
@@ -140,17 +162,23 @@
                 ></el-option>
               </el-select>
             </el-form-item>
+            <el-form-item label="标题：" prop="title" v-else>
+              <el-input v-model="versionFormData.title"></el-input>
+            </el-form-item>
           </div>
-          <el-form-item label="版本号" prop="vesion">
+          <el-form-item label="版本号：" prop="vesion">
             <el-input v-model="versionFormData.vesion"></el-input>
           </el-form-item>
-          <el-form-item label="链接地址" prop="fileUrl">
+          <el-form-item label="链接地址：" prop="fileUrl">
             <el-input
               v-model="versionFormData.fileUrl"
               :disabled="versionFormData.versionFile != ''"
             ></el-input>
           </el-form-item>
-          <el-form-item label="上传文件">
+          <el-form-item
+            label="上传文件："
+            v-if="versionFormData.platForm != 'pc'"
+          >
             <input
               type="file"
               ref="installFile"
@@ -164,6 +192,15 @@
                   $store.state.globalJson.Json.packageManage[1].itemCode
               "
             />
+          </el-form-item>
+          <el-form-item label="更新内容：" v-else>
+            <el-input
+              type="textarea"
+              :rows="3"
+              placeholder="请输入内容"
+              v-model="versionFormData.content"
+            >
+            </el-input>
           </el-form-item>
           <center>
             <template>
@@ -204,7 +241,9 @@ export default {
         forceUpdate: false,
         vesion: null,
         fileUrl: "",
-        versionFile: ""
+        versionFile: "",
+        title: "",
+        content: ""
       },
       totalCount: 0,
       currentPage: 1,
@@ -212,7 +251,7 @@ export default {
       tableData: [],
       addVersionRules: {
         platForm: [
-          { required: true, message: "请选择手机平台", trigger: "change" }
+          { required: true, message: "请选择平台", trigger: "change" }
         ],
         forceUpdate: [
           { required: true, message: "请选择是否强制更新", trigger: "change" }
@@ -314,11 +353,13 @@ export default {
     openAddVersion() {
       this.versionTitle = "版本新增";
       this.versionFormData = {
-        vesion: null,
+        platForm: null,
         forceUpdate: false,
+        vesion: null,
         fileUrl: "",
-        platForm: "",
-        versionFile: ""
+        versionFile: "",
+        title: "",
+        content: ""
       };
       this.versionDialog = true;
     },
@@ -378,7 +419,7 @@ export default {
   watch: {
     versionDialog(val) {
       if (!val) {
-        this.$refs.installFile.value = "";
+        this.$refs.installFile && (this.$refs.installFile.value = "");
       }
     }
   },

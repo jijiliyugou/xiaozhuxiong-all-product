@@ -89,7 +89,7 @@
       >
         <el-table-column label="序号" type="index" align="center" width="70">
         </el-table-column>
-        <el-table-column label="公司">
+        <el-table-column label="公司" width="300">
           <template slot-scope="scope">
             <div class="nameBox">
               <el-avatar

@@ -417,7 +417,7 @@
                 v-model="clienFormData.title"
               ></el-input>
             </el-form-item>
-            <el-form-item label="默认公式：">
+            <el-form-item label="默认公式：" prop="defaultFormula">
               <el-select
                 v-model="clienFormData.defaultFormula"
                 style="width: 100%"
@@ -510,8 +510,21 @@
                       "
                       v-model="clienFormData.profitCalcMethod"
                     >
-                      <el-radio :label="2">除法</el-radio>
-                      <el-radio :label="1">乘法</el-radio>
+                      <el-radio
+                        v-if="clienFormData.profitCalcMethod === 1"
+                        :label="1"
+                        >乘法</el-radio
+                      >
+                      <el-radio
+                        v-if="clienFormData.profitCalcMethod === 2"
+                        :label="2"
+                        >除法</el-radio
+                      >
+                      <el-radio
+                        v-if="clienFormData.profitCalcMethod === 3"
+                        :label="3"
+                        >自定义</el-radio
+                      >
                     </el-radio-group>
                   </div>
                 </el-form-item>
@@ -560,17 +573,8 @@
                 </el-form-item>
               </div>
             </div>
-            <div
-              class="chengchuTishi"
-              v-show="clienFormData.profitCalcMethod == 2"
-            >
-              {{ chufa }}
-            </div>
-            <div
-              class="chengchuTishi"
-              v-show="clienFormData.profitCalcMethod == 1"
-            >
-              {{ chengfa }}
+            <div class="chengchuTishi">
+              {{ clienFormData.profitCalcRule }}
             </div>
             <div class="lessThanPrice">
               <div class="left">
@@ -708,10 +712,6 @@ export default {
         // countData: [],
       },
       showTooltip: false,
-
-      chufa: "(出厂价+(总费用/(每车尺码/体积*外箱装量)))/(1-报价利润/100)/汇率",
-      chengfa:
-        "(出厂价+(总费用/(每车尺码/体积*外箱装量)))*(1+报价利润/100)/汇率",
       showEditMethod: true,
       addClientFormData: {
         name: null,
@@ -738,13 +738,13 @@ export default {
         customerId: null,
         customerName: null,
         quotationProductList: [],
-        profitCalcMethod: 2,
+        profitCalcMethod: null,
         profit: 0,
-        offerMethod: "汕头",
+        offerMethod: "",
         cu_de: "¥",
         cu_deName: "RMB",
         totalCost: "0",
-        exchange: 0,
+        exchange: 1,
         size: "24",
         decimalPlaces: 3,
         rejectionMethod: "四舍五入",
@@ -859,25 +859,6 @@ export default {
     },
     // 打开编辑报价方式
     async openEditOffMethods() {
-      //   this.clienFormData = {
-      //     title: null,
-      //     defaultFormula: null,
-      //     customerId: null,
-      //     customerName: null,
-      //     quotationProductList: [],
-      //     profit: 0,
-      //     offerMethod: "汕头",
-      //     cu_de: "¥",
-      //     cu_deName: "RMB",
-      //     totalCost: "0",
-      //     exchange: 0,
-      //     size: "24",
-      //     decimalPlaces: 3,
-      //     rejectionMethod: "四舍五入",
-      //     miniPrice: 0,
-      //     miniPriceDecimalPlaces: 1
-      //   };
-
       await this.getSelectCompanyOffer();
       await this.getSelectProductOfferFormulaList();
       await this.getClientList();
@@ -887,9 +868,17 @@ export default {
       const clientItem = this.clientList.find(
         val => val.id == this.clienFormData.customerId
       );
+      if (this.itemList.formulaId) {
+        this.customerTemplate.map(item => {
+          if (item.id === this.itemList.formulaId) {
+            this.clienFormData.defaultFormula = JSON.stringify(item);
+          }
+        });
+      }
       if (!clientItem) {
         this.clienFormData.customerId = null;
       }
+
       this.subDialogVisible = true;
     },
     // 下拉框输入事件
@@ -1011,6 +1000,8 @@ export default {
         if (res.data.result.code === 200) {
           this.$set(this.handerTabData, 0, res.data.result.item);
           this.itemList = res.data.result.item;
+
+          console.log(this.itemList, "formulaId");
           for (const key in this.itemList) {
             this.clienFormData[key] = this.itemList[key];
           }
@@ -1241,6 +1232,13 @@ export default {
         e.target.value = e.target.value.slice(1, 5);
       }
       val.boxNumber = Number(e.target.value);
+      if (e.target.value % 1 != 0) {
+        this.$common.handlerMsgState({
+          msg: "箱数必须为整数",
+          type: "danger"
+        });
+        e.target.value = 0;
+      }
       this.$store.commit("changeOfferProductNumber", this.offerProductList);
     },
     // 点击上下键盘
@@ -1286,13 +1284,19 @@ export default {
           const obj = JSON.parse(newVal);
           this.clienFormData.profit = obj.profit;
           this.clienFormData.offerMethod = obj.offerMethod;
+          this.clienFormData.formulaId = obj.id;
           this.clienFormData.cu_de = obj.cu_de;
           this.clienFormData.cu_deName = obj.cu_deName;
           this.clienFormData.exchange = obj.exchange;
           this.clienFormData.size = obj.size;
+          this.clienFormData.totalCost = obj.totalCost;
           this.clienFormData.decimalPlaces = obj.decimalPlaces;
           this.clienFormData.rejectionMethod = obj.rejectionMethod;
+          this.clienFormData.profitCalcRule = obj.profitCalcRule;
           this.clienFormData.profitCalcMethod = obj.profitCalcMethod;
+          this.clienFormData.miniPrice = obj.miniPrice;
+          this.clienFormData.miniPriceDecimalPlaces =
+            obj.miniPriceDecimalPlaces;
         }
       }
     },

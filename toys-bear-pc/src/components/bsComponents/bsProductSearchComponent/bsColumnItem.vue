@@ -59,13 +59,8 @@
         <div class="left">
           <p class="item">
             <span class="title">参考单价：</span>
-            <template v-if="item.isIntegral">
-              <span class="price">{{ item.cu_de }}</span>
-              <span class="price">{{ item.price }}</span>
-            </template>
-            <template v-else>
-              <span class="price lookPrice">积分查看</span>
-            </template>
+            <span class="price">{{ item.cu_de }}</span>
+            <span class="price">{{ item.price }}</span>
           </p>
           <p class="item">
             <span class="title">出厂货号：</span>

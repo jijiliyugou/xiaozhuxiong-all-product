@@ -6,15 +6,15 @@
       </div>
       <div class="item">
         <span v-if="currentLang.telephone">
-          Tel: {{ currentLang.telephone }}
+          {{ publicLang.tel }}: {{ currentLang.telephone }}
         </span>
         <span v-if="currentLang.phoneNumber">
-          Mobile: {{ currentLang.phoneNumber }}
+          {{ publicLang.mobile }}: {{ currentLang.phoneNumber }}
         </span>
         <span v-if="currentLang.email">e-mail: {{ currentLang.email }}</span>
       </div>
       <div class="item" v-if="currentLang.contactAddress">
-        Address: {{ currentLang.contactAddress }}
+        {{ publicLang.address }}: {{ currentLang.contactAddress }}
       </div>
     </div>
   </div>
@@ -29,7 +29,10 @@ export default {
   methods: {},
   mounted() {},
   computed: {
-    ...mapState(["currentLang"])
+    ...mapState(["currentLang"]),
+    publicLang() {
+      return this.$t("lang.publicLang");
+    }
   }
 };
 </script>

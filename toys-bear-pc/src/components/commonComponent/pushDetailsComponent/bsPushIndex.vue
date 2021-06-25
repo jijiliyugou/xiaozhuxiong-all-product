@@ -65,9 +65,9 @@
         <component
           ref="listComponent"
           :is="isGrid"
+          :orderData="orderData"
           :plantList="tableData"
-          :multipleSelection.sync="multipleSelection"
-          :checkAll.sync="checkAll"
+          @updateMultipleSelection="updateMultipleSelection"
         ></component>
       </div>
     </div>
@@ -95,10 +95,15 @@
       </div>
     </div>
 
-    <el-dialog :title="title" :visible.sync="pushDialog" width="800px">
+    <el-dialog
+      :title="orderData.title"
+      :visible.sync="pushDialog"
+      width="800px"
+    >
       <bsPushDialogComponent
         :item="item"
         :multipleSelection="multipleSelection"
+        :singleSelection="singleSelection"
         :orderData="orderData"
         @handlePushDialog="handlePushDialog"
         @handleCheckAllClosee="handleCheckAllClosee"
@@ -110,6 +115,7 @@
 import bsGridPushComponent from "@/components/commonComponent/pushDetailsComponent/bsGridPushComponent.vue";
 import bsTablePushComponent from "@/components/commonComponent/pushDetailsComponent/bsTablePushComponent.vue";
 import bsPushDialogComponent from "@/components/commonComponent/pushDetailsComponent/bsPushDialogComponent.vue";
+import eventBus from "@/assets/js/common/eventBus";
 export default {
   name: "bsPushIndex",
   components: {
@@ -124,11 +130,16 @@ export default {
   },
 
   watch: {
-    // multipleSelection: {
-    //   handler(newName, oldName) {
-    //     console.log(newName, oldName);
-    //   },
-    // },
+    multipleSelection: {
+      deep: true,
+      handler(newName) {
+        if (this.tableData.length === newName.length) {
+          this.checkAll = true;
+        } else {
+          this.checkAll = false;
+        }
+      }
+    }
   },
   data() {
     return {
@@ -139,9 +150,8 @@ export default {
         orderPushType: null
       },
       itemList: {},
-      title: null,
-
-      multipleSelection: [],
+      multipleSelection: [], //批量推送
+      singleSelection: [], //单个推送
       tableData: []
     };
   },
@@ -149,12 +159,13 @@ export default {
     console.log(this.item, "点击推送按钮传过来的数据");
     switch (this.item.label) {
       case "展厅业务推送":
-        this.title = "展厅业务推送";
         this.orderData = {
+          title: "展厅业务推送",
           OrderTypeName: "择样单号",
           timeName: "择样时间",
           remarkName: "择样备注",
           // offerName: this.item.client_na,
+          erpOrderID: this.item.erpOrderID,
           linkman: this.item.orgPersonnelName,
           status: this.item.orderStatus,
           createdOn: this.item.createdOn,
@@ -164,11 +175,13 @@ export default {
         };
         break;
       case "报价推送":
-        this.title = "报价推送";
         this.orderData = {
+          cu_de: this.item.cu_de,
+          title: "报价推送",
           OrderTypeName: "报价单号",
           timeName: " 报价时间",
           remarkName: "报价备注",
+          erpOrderID: this.item.id,
           // offerName: this.item.customerName, //客户名称
           linkman: this.item.linkman, //业务员
           orderStatus: this.item.status, //状态
@@ -179,16 +192,16 @@ export default {
         };
         break;
       case "采购推送":
-        this.title = "采购推送";
         this.orderData = {
+          title: "采购推送",
           OrderTypeName: "采购单号",
           timeName: " 采购时间",
           remarkName: "采购备注",
+          erpOrderID: this.item.erpOrderID,
           // offerName: this.item.fromCompanyName, //客户名称
           linkman: this.item.orgPersonnelName, //业务员
           orderStatus: this.item.readStatus, //状态
           createdOn: this.item.createdOn, //时间
-
           remark: this.item.pushContent, //备注
           orderPushType: 4, //推送类型
           orderNumber: this.item.offerNumber //单号
@@ -203,6 +216,11 @@ export default {
   },
   mounted() {
     this.getSendCompanyList();
+    // 再次推送
+    eventBus.$on("openPushDialog", val => {
+      this.singleSelection.push(val);
+      this.pushDialog = true;
+    });
   },
   methods: {
     // 根据订单获取可以发送的接收者
@@ -225,58 +243,61 @@ export default {
     handerIsGrid(type) {
       this.isGrid = type;
     },
+    // 单选添加和删除
+    updateMultipleSelection(event, companyNumber) {
+      if (event) {
+        this.multipleSelection.push(companyNumber);
+      } else {
+        this.multipleSelection.splice(
+          this.multipleSelection.findIndex(item => item === companyNumber),
+          1
+        );
+      }
+    },
     // 关闭全选
     handleCheckAllClosee() {
       this.checkAll = false;
       this.multipleSelection = [];
-      if (this.isGrid === "bsGridPushComponent") {
-        this.$refs.listComponent.plantList.forEach(row => {
-          row.checked = false;
-        });
-      } else {
-        this.$refs.listComponent.$refs.multipleTable.clearSelection();
-      }
+      this.singleSelection = [];
+      this.$refs.listComponent.plantList.forEach(row => {
+        row.checked = false;
+      });
     },
     //全选按钮
     handleCheckAllChange(val) {
       if (val) {
         //点击全选后数据所有选择的数据存到这个数组里边
-        this.multipleSelection = this.tableData;
-        if (this.isGrid === "bsGridPushComponent") {
-          this.$refs.listComponent.plantList.forEach(row => {
-            row.checked = true;
-          });
-        } else {
-          this.$refs.listComponent.plantList.forEach(row => {
-            this.$refs.listComponent.$refs.multipleTable.toggleRowSelection(
-              row,
-              true
-            );
-          });
-        }
+        this.multipleSelection = this.tableData.map(item => {
+          return item.companyNumber;
+        });
+        this.$refs.listComponent.plantList.forEach(row => {
+          row.checked = true;
+        });
       } else {
         this.multipleSelection = [];
-        if (this.isGrid === "bsGridPushComponent") {
-          this.$refs.listComponent.plantList.forEach(row => {
-            row.checked = false;
-          });
-        } else {
-          this.$refs.listComponent.$refs.multipleTable.clearSelection();
-        }
-      }
-    },
-
-    // 打开/关闭推送弹框
-    handlePushDialog(flag) {
-      if (this.multipleSelection.length > 0) {
-        this.pushDialog = flag;
-      } else {
-        this.$common.handlerMsgState({
-          msg: "请勾选推送厂商",
-          type: "warning"
+        this.$refs.listComponent.plantList.forEach(row => {
+          row.checked = false;
         });
       }
+    },
+    // 打开/关闭推送弹框
+    handlePushDialog(flag) {
+      if (flag) {
+        if (this.multipleSelection.length > 0) {
+          this.pushDialog = flag;
+        } else {
+          this.$common.handlerMsgState({
+            msg: "请勾选推送厂商",
+            type: "warning"
+          });
+        }
+      } else {
+        this.pushDialog = flag;
+      }
     }
+  },
+  beforeDestroy() {
+    eventBus.$off("openPushDialog");
   }
 };
 </script>

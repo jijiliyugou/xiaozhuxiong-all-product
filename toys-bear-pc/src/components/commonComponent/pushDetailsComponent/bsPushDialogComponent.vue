@@ -11,9 +11,9 @@
         <ul class="item" v-for="item in pushList" :key="item.index">
           <li class="title">
             <el-radio
-              v-model="radio"
+              v-model="dataRadio"
               @change="handleRadio(item)"
-              :label="item.id"
+              :label="item"
             >
               {{ item.title }}</el-radio
             >
@@ -76,13 +76,13 @@ export default {
     pushDialog: {
       type: Boolean
     },
-    // pushList: {
-    //   type: Array,
-    // },
     orderData: {
       type: Object
     },
     multipleSelection: {
+      type: Array
+    },
+    singleSelection: {
       type: Array
     }
   },
@@ -94,12 +94,10 @@ export default {
   },
   data() {
     return {
-      radio: "1",
-      dataRadio: null,
+      dataRadio: "",
       checkAll: false,
       textareaData: "",
       messageExtType: [],
-      toCompanyNumber: [],
       pushList: [],
       PushContent: null,
       editRow: {},
@@ -140,12 +138,13 @@ export default {
     },
     //关闭弹框
     closeDialog() {
+      this.dataRadio = "";
+      this.textareaData = "";
       this.$emit("handlePushDialog", false);
     },
     //新增推送模板
     addMsgTemplate() {
       this.getServiceConfigurationList();
-
       this.addLangDialog = true;
     },
     // 提交新增或编辑
@@ -168,46 +167,51 @@ export default {
 
     // 单选框事件
     handleRadio(item) {
-      this.dataRadio = item;
       this.textareaData = item.content;
-      console.log(item, "单选框事件");
     },
     // 确定推送
     async handleConfirmPush() {
-      for (let i = 0; i < this.multipleSelection.length; i++) {
-        this.toCompanyNumber.push(this.multipleSelection[i].companyNumber);
-      }
-      if (this.textareaData != "") {
-        this.PushContent = this.textareaData;
-      } else {
-        this.PushContent = this.dataRadio.content;
-      }
-      const data = {
-        senderTo: "Supplier", //暂时写死
-        senderFrom: this.userInfo.commparnyList[0].companyType,
-        companyNumber: this.userInfo.commparnyList[0].companyNumber,
-        phoneNumber: this.userInfo.phoneNumber,
-        orderPushType: this.orderData.orderPushType,
-        orderNumber: this.orderData.orderNumber,
-        toCompanyNumber: this.toCompanyNumber,
-        PushContent: this.PushContent,
-        messageExt: this.dataRadio.messageExt,
-        messageModel: this.dataRadio.messageModel,
-        messageTitle: this.dataRadio.title
-      };
-      const res = await this.$http.post("/api/SendPushTemplate", data);
-      if (res.data.result.code === 200) {
-        this.closeDialog();
-        this.$emit("handleCheckAllClosee", false);
+      if (this.dataRadio == "") {
         this.$common.handlerMsgState({
-          msg: "推送成功",
-          type: "success"
+          msg: "请选择消息类型",
+          type: "warning"
         });
       } else {
-        this.$common.handlerMsgState({
-          msg: res.data.result.msg,
-          type: "danger"
-        });
+        if (this.textareaData != "") {
+          this.PushContent = this.textareaData;
+        } else {
+          this.PushContent = this.dataRadio.content;
+        }
+        const data = {
+          senderTo: "Supplier", //暂时写死
+          senderFrom: this.userInfo.commparnyList[0].companyType,
+          companyNumber: this.userInfo.commparnyList[0].companyNumber,
+          phoneNumber: this.userInfo.phoneNumber,
+          orderPushType: this.orderData.orderPushType,
+          orderNumber: this.orderData.orderNumber,
+          toCompanyNumber:
+            this.multipleSelection.length > 0
+              ? this.multipleSelection
+              : this.singleSelection,
+          PushContent: this.PushContent,
+          messageExt: this.dataRadio.messageExt,
+          messageModel: this.dataRadio.messageModel,
+          messageTitle: this.dataRadio.title
+        };
+        const res = await this.$http.post("/api/SendPushTemplate", data);
+        if (res.data.result.code === 200) {
+          this.closeDialog();
+          this.$emit("handleCheckAllClosee");
+          this.$common.handlerMsgState({
+            msg: "推送成功",
+            type: "success"
+          });
+        } else {
+          this.$common.handlerMsgState({
+            msg: res.data.result.msg,
+            type: "danger"
+          });
+        }
       }
     },
     // 关闭新增或编辑
@@ -221,7 +225,6 @@ export default {
         maxResultCount: 999,
         messageModel: this.parameter
       };
-
       const res = await this.$http.post(
         "/api/PushSettings/MessageTeplateSettingsByPage",
         fd
@@ -249,7 +252,6 @@ export default {
             this.parameter = val.parameter;
           }
         });
-
         this.getMessageTeplateSettingsByPage();
       }
     }

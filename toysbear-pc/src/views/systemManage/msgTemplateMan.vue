@@ -177,6 +177,11 @@ export default {
     };
   },
   methods: {
+    // 筛选角色
+    filterRole(value) {
+      const role = this.configList.find(val => val.parameter == value);
+      return role && role.itemText;
+    },
     // 提交消息模板
     async submit(data) {
       console.log(data);

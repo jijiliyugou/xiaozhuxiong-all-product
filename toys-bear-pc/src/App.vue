@@ -16,7 +16,7 @@
     </transition>
     <router-view ref="bsIndex" />
     <!-- 漂浮物 -->
-    <transition name="el-zoom-in-top">
+    <!-- <transition name="el-zoom-in-top">
       <div class="cartBox" v-show="isShowCartBox">
         <div class="cart" @click="toMyShoppingCart">
           <div class="cartIconBox">
@@ -33,7 +33,7 @@
           <i class="toTopIcon el-icon-top"></i>
         </div>
       </div>
-    </transition>
+    </transition> -->
     <!-- 进度条 -->
     <div class="jindutiaoBox" v-show="isJindu">
       <div class="jindutiao"></div>

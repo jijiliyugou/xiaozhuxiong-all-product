@@ -31,7 +31,7 @@ export const staticRouters = [
   },
   {
     path: "/",
-    redirect: "/login"
+    redirect: "/bsIndex"
   }
 ];
 export async function setMenuTree(menuTree, router) {

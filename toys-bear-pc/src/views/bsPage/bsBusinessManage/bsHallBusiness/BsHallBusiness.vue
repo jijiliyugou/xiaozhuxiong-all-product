@@ -153,7 +153,7 @@ export default {
       tableData: {
         data: [],
         showLoading: false,
-        sizeMini: this.size,
+        sizeMini: "mini",
         isIndex: true,
         columns: [
           {
@@ -275,6 +275,9 @@ export default {
         actions: [
           {
             type: "info",
+            hidden: () => {
+              return this.userInfo.commparnyList[0].companyType !== "Supplier";
+            },
             textWrapper() {
               return "推送";
             },
@@ -342,7 +345,6 @@ export default {
         "/api/PushSettings/MessageTeplateSettingsByPage",
         { maxResultCount: 9999, messageModel: "1", skipCount: 1 }
       );
-      console.log(res);
       if (res.data.result.code === 200) {
         this.typesList = res.data.result.item.items;
       }
@@ -383,7 +385,7 @@ export default {
     // 获取列表
     async getTableDataList() {
       const fd = {
-        sampleTo: "Sales",
+        sampleTo: this.userInfo.commparnyList[0].companyType,
         messageModel: "1",
         readStatus: this.searchForm.readStatus,
         sampleFrom: "Hall",

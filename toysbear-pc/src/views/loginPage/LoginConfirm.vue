@@ -61,7 +61,6 @@ export default {
   data() {
     return {
       loginUrl: "https://www.toysbear.com/new/#/bsIndex",
-      // loginUrl: "http://139.9.71.135:8080/new/#/bsIndex",
       // loginUrl: "http://124.71.6.26:8080/new/#/bsIndex",
       radioValue: null,
       commparnyList: []
@@ -152,6 +151,7 @@ export default {
             this.$store.commit("removeLoginItems");
           }
           switch (item.companyType) {
+            case "Exhibition":
             case "Sales":
               location.href = this.loginUrl;
               // location.href = "http://124.71.6.26:8080/new/#/bsIndex";
@@ -169,6 +169,8 @@ export default {
           this.$store.commit("updateAppLoading", false);
           this.$message.error("获取菜单失败，请检查网络");
         }
+      } else {
+        this.$message.error(res.data.result.message);
       }
     }
   },

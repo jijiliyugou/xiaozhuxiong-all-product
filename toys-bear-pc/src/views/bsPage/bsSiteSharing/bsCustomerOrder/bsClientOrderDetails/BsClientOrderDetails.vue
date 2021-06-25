@@ -47,10 +47,21 @@
           <span class="title">产品列表</span>
           ({{ totalCount }})
         </div>
-        <el-button size="medium" @click="openSelectTemplate" type="warning">
-          <i class="iconfont icon-daochujinruchukou"></i>
-          导出列表
-        </el-button>
+        <div class="btns">
+          <el-button size="medium" @click="openSelectTemplate" type="warning">
+            <i class="iconfont icon-daochujinruchukou"></i>
+            导出列表
+          </el-button>
+          <el-button
+            size="medium"
+            @click="openAdd"
+            style="background-color: #F9AE3E;border-color: #F9AE3E;"
+            type="warning"
+          >
+            <i class="el-icon-shopping-cart-full" style="font-size: 16px;"></i>
+            一键加购
+          </el-button>
+        </div>
       </div>
       <bsTables :table="tableData" />
       <center style="margin-top: 20px">
@@ -85,6 +96,21 @@
         />
       </el-dialog>
     </transition>
+    <!-- 一键加购dialog -->
+    <transition name="el-zoom-in-center">
+      <el-dialog
+        title="一键加购"
+        v-if="addPurchaseDialog"
+        :visible.sync="addPurchaseDialog"
+        width="500px"
+      >
+        <oneClickPurchase
+          :addShopOption="addShopOption"
+          @close="close"
+          @submit="submit"
+        />
+      </el-dialog>
+    </transition>
   </div>
 </template>
 
@@ -92,8 +118,10 @@
 import bsExportOrder from "@/components/bsComponents/bsSiteSharingComponent/bsExportOrder";
 import bsTables from "@/components/table";
 import Summary from "@/components/summaryComponent/summary";
+import oneClickPurchase from "@/components/commonComponent/oneClickPurchase/oneClickPurchase.vue";
+import { mapState } from "vuex";
 export default {
-  components: { bsExportOrder, bsTables, Summary },
+  components: { bsExportOrder, bsTables, Summary, oneClickPurchase },
   props: {
     item: {
       type: Object
@@ -124,7 +152,7 @@ export default {
           {
             prop: "productName",
             label: "产品",
-            width: 300,
+            width: 280,
             color: "#3368a9",
             align: "left",
             // isHiden: true,
@@ -144,6 +172,7 @@ export default {
           {
             prop: "supplierPhone",
             label: "联系厂商",
+            width: 100,
             render: row => {
               switch (row.supplierTelephoneNumber) {
                 case "":
@@ -171,67 +200,64 @@ export default {
             isHiden: true,
             label: "资料来源"
           },
-          { prop: "fa_no", label: "出厂货号", isHiden: true },
-          { prop: "ch_pa", label: "包装", isHiden: true, width: 90 },
+          { prop: "fa_no", label: "出厂货号", isHiden: true, Width: 60 },
+          { prop: "ch_pa", label: "包装", isHiden: true, minWidth: 70 },
           {
             prop: "pr_le",
+            minWidth: 100,
             renderHeard: () => {
               return "产品规格<br /> (cm)";
             },
-            isHiden: true,
+
             render: row => {
               return row.pr_le + "x" + row.pr_wi + "x" + row.pr_hi;
             }
           },
           {
             prop: "pr_le",
-
+            minWidth: 100,
             renderHeard: () => {
               return "包装规格<br /> (cm)";
             },
-            isHiden: true,
+
             render: row => {
               return row.in_le + "x" + row.in_wi + "x" + row.in_hi;
             }
           },
           {
             prop: "pr_le",
-
+            minWidth: 100,
             renderHeard: () => {
               return "外箱规格<br /> (cm)";
             },
-            isHiden: true,
+
             render: row => {
               return row.ou_le + "x" + row.ou_wi + "x" + row.ou_hi;
             }
           },
           {
             prop: "bulk_stere",
+            minWidth: 100,
 
-            isHiden: true,
             renderHeard: () => {
               return "体积/材积<br />(cbm)/(cuft)";
             },
-            width: 150,
             render: row => {
               return row.bulk_stere + "/" + row.bulk_feet;
             }
           },
           {
             prop: "gr_we",
-
-            isHiden: true,
+            minWidth: 90,
             renderHeard: () => {
               return "毛重/净重<br />(kg)";
             },
-            width: 100,
             render: row => {
               return row.gr_we + "/" + row.ne_we;
             }
           },
           {
             prop: "in_en",
-
             renderHeard: () => {
               return "装箱量<br />(pcs)";
             },
@@ -257,8 +283,7 @@ export default {
           {
             prop: "costPrice",
             label: "参考单价",
-            isHiden: true,
-            width: 70,
+            minWidth: 80,
             color: "#3368a9",
             render: row => {
               return "￥" + row.costPrice;
@@ -267,8 +292,7 @@ export default {
           {
             prop: "productPrice",
             label: "报出价",
-            isHiden: true,
-            width: 70,
+            minWidth: 100,
             color: "#f56c6c",
             render: row => {
               return this.options.currencyType + row.productPrice;
@@ -277,8 +301,8 @@ export default {
           {
             prop: "OfferTotalAmount",
             label: "报出总价",
-            width: 70,
-            isHiden: true,
+            minWidth: 100,
+
             color: "#f56c6c",
             render: row => {
               return (
@@ -294,6 +318,8 @@ export default {
         ],
         btnWidth: 100
       },
+      addShopOption: null,
+      addPurchaseDialog: false,
       exportTemplateDialog: false,
       isOrderDetailDialog: false,
       options: {},
@@ -303,13 +329,62 @@ export default {
       orderOption: {}
     };
   },
-  created() {
-    // console.log(this.item, "客户详情");
+  computed: {
+    ...mapState(["userInfo"])
   },
   mounted() {
     this.getSearchCompanyShareOrderDetailsPage();
   },
   methods: {
+    // 提交一键加购
+    async submit(myData) {
+      // this.$common.handlerMsgState({
+      //   msg: "敬请期待",
+      //   type: "warning"
+      // });
+      const re = await this.$http.post(
+        "/api/AddShoppingCart",
+        {
+          userID: this.userInfo.userInfo.id,
+          companyNumber: this.userInfo.commparnyList[0].companyNumber,
+          sourceFrom: "active",
+          // sourceFrom: "QRCodeSearch",
+          number: 1,
+          currency: "￥",
+          Price: 0,
+          shopType: "companysamples",
+          productNumber: myData.productNumber
+        },
+        {
+          timeout: 9999999
+        }
+      );
+      if (re.data.result.code === 200) {
+        this.$common.handlerMsgState({
+          msg: re.data.result.msg,
+          type: "success"
+        });
+      } else {
+        this.$common.handlerMsgState({
+          msg: re.data.result.msg,
+          type: "danger"
+        });
+      }
+      this.addPurchaseDialog = false;
+    },
+    // 关闭加购
+    close() {
+      this.addPurchaseDialog = false;
+      this.addShopOption = null;
+    },
+    // 一键加购
+    async openAdd() {
+      this.addShopOption = {
+        orderNumber: this.item.orderNumber,
+        orderType: "ShareOrder"
+      };
+      this.addPurchaseDialog = true;
+    },
     // 去消息聊天
     toNews(item) {
       console.log(item);
@@ -502,6 +577,27 @@ export default {
 @{deep} .exportOrder {
   .el-dialog__body {
     padding: 0;
+  }
+}
+.addPushContent {
+  text-align: center;
+  .productCount {
+    margin-top: 30px;
+    font-size: 16px;
+    .countItem {
+      margin-bottom: 20px;
+      .countItem_title {
+        color: #666;
+      }
+    }
+  }
+  .countItem_btns {
+    margin-top: 40px;
+  }
+  .tips {
+    color: #999;
+    font-size: 13px;
+    margin-top: 10px;
   }
 }
 </style>

@@ -36,7 +36,7 @@
         ></el-table-column>
         <el-table-column label="序号" type="index" align="center" width="40">
         </el-table-column>
-        <el-table-column label="产品" width="280">
+        <el-table-column label="产品" width="270">
           <template slot-scope="scope">
             <div class="imgBox">
               <el-tooltip
@@ -95,15 +95,22 @@
                 <div class="name" @click="goDetails(scope.row)">
                   <el-tooltip
                     effect="dark"
-                    :disabled="scope.row.productJson.name.length < 15"
-                    :content="scope.row.productJson.name"
+                    :disabled="
+                      scope.row.productJson &&
+                        scope.row.productJson.name.length < 15
+                    "
+                    :content="
+                      scope.row.productJson && scope.row.productJson.name
+                    "
                     placement="top-start"
                   >
                     <span
                       class=" spanName"
                       style="max-width:190px; display:inline-block"
                     >
-                      {{ scope.row.productJson.name }}</span
+                      {{
+                        scope.row.productJson && scope.row.productJson.name
+                      }}</span
                     >
                   </el-tooltip>
                 </div>
@@ -119,12 +126,20 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="联系厂商">
+        <el-table-column align="center" label="联系厂商" min-width="100">
           <template slot-scope="scope">
-            <div v-if="scope.row.supplierJson.phoneNumber">
+            <div
+              v-if="
+                scope.row.supplierJson && scope.row.supplierJson.phoneNumber
+              "
+            >
               {{ scope.row.supplierJson.phoneNumber }}
             </div>
-            <div v-if="scope.row.supplierJson.telephoneNumber">
+            <div
+              v-if="
+                scope.row.supplierJson && scope.row.supplierJson.telephoneNumber
+              "
+            >
               {{ scope.row.supplierJson.telephoneNumber }}
             </div>
           </template>
@@ -136,7 +151,10 @@
           show-overflow-tooltip
         >
           <template slot-scope="scope">
-            {{ scope.row.exhibitionCompany.companyName }}
+            {{
+              scope.row.exhibitionCompany &&
+                scope.row.exhibitionCompany.companyName
+            }}
           </template>
         </el-table-column>
         <el-table-column
@@ -146,7 +164,7 @@
           label="出厂货号"
         ></el-table-column>
         <el-table-column
-          width="60"
+          min-width="70"
           align="center"
           prop="productJson.ch_pa"
           label="包装"
@@ -209,7 +227,7 @@
         <el-table-column
           align="center"
           label="体积(cbm)/材积(cuft)"
-          width="150"
+          min-width="100"
           show-overflow-tooltip
         >
           <template slot="header">
@@ -227,7 +245,7 @@
         <el-table-column
           align="center"
           label="毛重/净重(kg)"
-          width="100"
+          width="90"
           show-overflow-tooltip
         >
           <template slot="header">
@@ -294,7 +312,7 @@
           align="center"
           prop="price"
           label="单价"
-          width="50"
+          min-width="70"
           show-overflow-tooltip
         >
           <template slot-scope="scope">
@@ -303,7 +321,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="总价" min-width="60">
+        <el-table-column align="center" label="总价" min-width="70">
           <template slot-scope="scope">
             <p class="item price">
               <span>{{ scope.row.currency }}</span>
@@ -486,7 +504,7 @@
                   <el-input
                     maxlength="30"
                     onkeyup="value=value.replace(/[^\d.]/g,'')"
-                    v-model.number="clienFormData.exchange"
+                    v-model="clienFormData.exchange"
                   ></el-input>
                 </el-form-item>
                 <el-form-item label="小数位数：" prop="decimalPlaces">
@@ -512,7 +530,7 @@
                       maxlength="30"
                       onkeyup="value=value.replace(/[^\d.]/g,'')"
                       style="flex:1;"
-                      v-model.number="clienFormData.profit"
+                      v-model="clienFormData.profit"
                     >
                       <span slot="suffix">%</span>
                     </el-input>
@@ -520,14 +538,27 @@
                       style="flex:1;display:flex; align-items:center;margin-left: 20px;"
                       v-model="clienFormData.profitCalcMethod"
                     >
-                      <el-radio :label="2">除法</el-radio>
-                      <el-radio :label="1">乘法</el-radio>
+                      <el-radio
+                        v-if="clienFormData.profitCalcMethod === 1"
+                        :label="1"
+                        >乘法</el-radio
+                      >
+                      <el-radio
+                        v-if="clienFormData.profitCalcMethod === 2"
+                        :label="2"
+                        >除法</el-radio
+                      >
+                      <el-radio
+                        v-if="clienFormData.profitCalcMethod === 3"
+                        :label="3"
+                        >自定义</el-radio
+                      >
                     </el-radio-group>
                   </div>
                 </el-form-item>
                 <el-form-item label="总费用：" prop="totalCost">
                   <el-input
-                    v-model.number="clienFormData.totalCost"
+                    v-model="clienFormData.totalCost"
                     onkeyup="value=value.replace(/[^\d.]/g,'')"
                     clearable
                     placeholder="请输入总费用"
@@ -540,7 +571,7 @@
                     style="width: 100%"
                     @change="selectBlur"
                     max-length="2"
-                    v-model.number="clienFormData.size"
+                    v-model="clienFormData.size"
                     filterable
                     allow-create
                     default-first-option
@@ -554,14 +585,6 @@
                     >
                     </el-option>
                   </el-select>
-                  <!-- <el-radio-group
-                      style="flex:1;display:flex; align-items:center;margin-left: 20px;"
-                      v-model="clienFormData.profitCalcMethod"
-                    >
-                      <el-radio :label="2">除法</el-radio>
-                      <el-radio :label="1">乘法</el-radio>
-                    </el-radio-group>
-                  </div> -->
                 </el-form-item>
                 <el-form-item label="取舍方式：" prop="rejectionMethod">
                   <el-select
@@ -580,26 +603,17 @@
                 </el-form-item>
               </div>
             </div>
-            <div
-              class="chengchuTishi"
-              v-show="clienFormData.profitCalcMethod == 2"
-            >
-              {{ chufa }}
-            </div>
-            <div
-              class="chengchuTishi"
-              v-show="clienFormData.profitCalcMethod == 1"
-            >
-              {{ chengfa }}
+            <div class="chengchuTishi">
+              {{ clienFormData.profitCalcRule }}
             </div>
             <div class="lessThanPrice">
               <div class="left">
                 <el-form-item label="价格小于：" prop="miniPrice">
                   <el-input
-                    v-model.number="clienFormData.miniPrice"
+                    v-model="clienFormData.miniPrice"
                     onkeyup="value=value.replace(/[^\d.]/g,'')"
                     clearable
-                    placeholder="请输入"
+                    placeholder=""
                   >
                   </el-input>
                 </el-form-item>
@@ -608,7 +622,14 @@
               <div class="right">
                 <!-- xiaoshuweishu -->
                 <el-form-item label="小数位数：" prop="miniPriceDecimalPlaces">
-                  <el-select
+                  <el-input
+                    v-model="clienFormData.miniPriceDecimalPlaces"
+                    onkeyup="value=value.replace(/[^\d.]/g,'')"
+                    clearable
+                    placeholder=""
+                  >
+                  </el-input>
+                  <!-- <el-select
                     v-model="clienFormData.miniPriceDecimalPlaces"
                     style="width: 100%"
                     placeholder="请选择取舍方式"
@@ -620,7 +641,7 @@
                       :value="item.parameter"
                     >
                     </el-option>
-                  </el-select>
+                  </el-select> -->
                 </el-form-item>
               </div>
             </div>
@@ -723,9 +744,6 @@ export default {
     return {
       QRcodeValue: {},
       showCodeValue: false,
-      chufa: "(出厂价+(总费用/(每车尺码/体积*外箱装量)))/(1-报价利润/100)/汇率",
-      chengfa:
-        "(出厂价+(总费用/(每车尺码/体积*外箱装量)))*(1+报价利润/100)/汇率",
       myTotalPrice: 0,
       myTotalOuterBoxStere: 0,
       myTotalOuterBoxFeet: 0,
@@ -765,7 +783,7 @@ export default {
         quotationProductList: [],
         profitCalcMethod: 2,
         profit: 0,
-        offerMethod: "汕头",
+        offerMethod: "",
         cu_de: "¥",
         cu_deName: "RMB",
         totalCost: "0",
@@ -773,8 +791,8 @@ export default {
         size: "24",
         decimalPlaces: 3,
         rejectionMethod: "四舍五入",
-        miniPrice: 0,
-        miniPriceDecimalPlaces: 1
+        miniPrice: null,
+        miniPriceDecimalPlaces: null
       },
       addInfoRules: {
         customerId: [
@@ -1122,8 +1140,8 @@ export default {
     // 获取客户列表
     async getClientList() {
       const fd = {
-        skipCount: this.clientCurrentPage,
-        maxResultCount: this.clientPageSize
+        skipCount: 1,
+        maxResultCount: 9999
       };
       for (const key in fd) {
         if (fd[key] === null || fd[key] === undefined || fd[key] === "") {
@@ -1200,6 +1218,13 @@ export default {
         e.target.value = 0;
       } else if (e.target.value.length > 1 && e.target.value[0] == 0) {
         e.target.value = e.target.value.slice(1, 5);
+      }
+      if (e.target.value % 1 != 0) {
+        this.$common.handlerMsgState({
+          msg: "箱数必须为整数",
+          type: "danger"
+        });
+        e.target.value = 0;
       }
       val.number = Number(e.target.value);
       // this.$store.commit("replaceShoppingCartValueCount", this.tableData);
@@ -1284,7 +1309,7 @@ export default {
         quotationProductList: [],
         profitCalcMethod: 2,
         profit: 0,
-        offerMethod: "汕头",
+        offerMethod: "",
         cu_de: "¥",
         cu_deName: "RMB",
         totalCost: "0",
@@ -1292,8 +1317,8 @@ export default {
         size: "24",
         decimalPlaces: 3,
         rejectionMethod: "四舍五入",
-        miniPrice: 0,
-        miniPriceDecimalPlaces: 1
+        miniPrice: null,
+        miniPriceDecimalPlaces: null
       };
       const selectProducts = this.$refs.myTableRef.selection;
       if (selectProducts.length < 1) {
@@ -1389,7 +1414,7 @@ export default {
         quotationProductList: [],
         profitCalcMethod: 2,
         profit: 0,
-        offerMethod: "汕头",
+        offerMethod: "",
         cu_de: "¥",
         cu_deName: "RMB",
         totalCost: "0",
@@ -1477,6 +1502,7 @@ export default {
     await this.getShoppingCartList();
     eventBus.$on("handlergetClientList", () => {
       this.getShoppingCartList();
+      this.getSelectProductOfferFormulaList();
     });
     const totalEl = document.getElementById("totalBox");
     eventBus.$on("handlerLeft", left => {
@@ -1518,9 +1544,15 @@ export default {
           this.clienFormData.cu_deName = obj.cu_deName;
           this.clienFormData.exchange = obj.exchange;
           this.clienFormData.size = obj.size;
+          this.clienFormData.totalCost = obj.totalCost;
           this.clienFormData.decimalPlaces = obj.decimalPlaces;
           this.clienFormData.rejectionMethod = obj.rejectionMethod;
           this.clienFormData.profitCalcMethod = obj.profitCalcMethod;
+          this.clienFormData.formulaId = obj.id;
+          this.clienFormData.profitCalcRule = obj.profitCalcRule;
+          this.clienFormData.miniPrice = obj.miniPrice;
+          this.clienFormData.miniPriceDecimalPlaces =
+            obj.miniPriceDecimalPlaces;
         }
       }
     },
@@ -1705,6 +1737,7 @@ export default {
       bottom: 0;
       box-sizing: border-box;
       padding-right: 20px;
+      border-top: 1px solid #ebeef5;
       .total_wrap {
         background-color: #fff;
         display: flex;

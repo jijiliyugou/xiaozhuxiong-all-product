@@ -73,6 +73,7 @@
         :isEdit="isEdit"
         :companyId="myInfo.id"
         :currentEditRow="currentEditRow"
+        :isMain="myInfo.isMain"
         @close="close"
       />
     </el-dialog>
@@ -208,8 +209,8 @@ export default {
         btnWidth: 300,
         actions: [
           {
-            disabledWrapper: () => {
-              return !this.myInfo.isMain;
+            disabledWrapper: row => {
+              return !this.myInfo.isMain && this.userInfo.userInfo.id != row.id;
             },
             classWrapper: () => {
               return "success";
@@ -222,8 +223,8 @@ export default {
             }
           },
           {
-            disabledWrapper: () => {
-              return !this.myInfo.isMain;
+            disabledWrapper: row => {
+              return !this.myInfo.isMain && this.userInfo.userInfo.id != row.id;
             },
             classWrapper: () => {
               return "primary";
@@ -372,8 +373,16 @@ export default {
       const { code, item, msg } = res.data.result;
       if (code === 200) {
         this.myInfo = item;
-        this.tableData.data = item.personnels;
-        this.totalCount = item.personnels.length;
+        const list = item.personnels;
+        for (let i = 0; i < list.length; i++) {
+          if (list[i].id == this.userInfo.userInfo.id && i != 0) {
+            const oldItem = list[1];
+            list.splice(1, 1, list[i]);
+            list.splice(i, 1, oldItem);
+          }
+        }
+        this.tableData.data = list;
+        this.totalCount = list.length;
       } else {
         this.$common.handlerMsgState({
           msg: msg,
@@ -387,7 +396,7 @@ export default {
     this.getCompanyUserList();
   },
   computed: {
-    ...mapState(["currentComparnyId"])
+    ...mapState(["currentComparnyId", "userInfo"])
   }
 };
 </script>
@@ -559,7 +568,7 @@ export default {
         width: 44px;
         height: 18px;
         text-align: center;
-        background: blue;
+        background: #3368a9;
         border-radius: 9px;
         color: #fff;
         font-size: 12px;

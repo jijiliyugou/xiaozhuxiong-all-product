@@ -137,11 +137,19 @@
         </span>
       </center>
     </el-dialog>
+    <!-- 关联站点弹框 -->
     <el-dialog
-      :title="dialogRelation"
-      :visible.sync="isDialogRelation"
-      width="700px"
+      class="siteDialog"
+      :title="RelevanceSiteDialogTitle"
+      :visible.sync="isRelevanceSiteDialog"
+      v-if="isRelevanceSiteDialog"
+      width="1000px"
     >
+      <RelevanceSiteDialog
+        :itemData="itemData"
+        :relevanceSiteDialogData="relevanceSiteDialogData"
+        @GetWebsiteShareAdRelationList="GetWebsiteShareAdRelationList"
+      ></RelevanceSiteDialog>
     </el-dialog>
   </div>
 </template>
@@ -149,18 +157,23 @@
 <script>
 import { mapState } from "vuex";
 import Table from "@/components/table";
+import RelevanceSiteDialog from "./components/relevanceSiteDialog.vue";
 export default {
   name: "BsAdvertisingManage",
   components: {
-    Table
+    Table,
+    RelevanceSiteDialog
   },
   data() {
     return {
+      itemData: null,
       editImages: [],
+      selectTableData: [],
+      relevanceSiteDialogData: [],
       file: null,
+      RelevanceSiteDialogTitle: "已关联站点（0）",
+      isRelevanceSiteDialog: false,
       dialogTitle: "",
-      dialogRelation: "已关联站点（0）",
-      isDialogRelation: false,
       isDialog: false,
       staffList: [],
       userId: null,
@@ -178,11 +191,11 @@ export default {
         title: [{ required: true, message: "请输入图片标题", trigger: "blur" }],
         imgUrl: [
           { required: true, message: "请选择上传图片", trigger: "change" }
-        ],
-        defaultLinkUrl: [
-          { required: true, message: "请输入默认链接", trigger: "blur" },
-          { type: "url", message: `请输入正确的url`, trigger: "change" }
         ]
+        // defaultLinkUrl: [
+        //   { required: true, message: "请输入默认链接", trigger: "blur" },
+        //   { type: "url", message: `请输入正确的url`, trigger: "change" }
+        // ]
       },
       tableData: {
         data: [],
@@ -193,7 +206,6 @@ export default {
           {
             prop: "imgUrl",
             label: "图片",
-            elImageUrl: true,
             widht: 200,
             style: "width: 150px; height: 43px; min-width: 82px",
             elImage: row => {
@@ -202,7 +214,7 @@ export default {
           },
           { prop: "title", label: "广告标题" },
           { prop: "createdBy", label: "业务员" },
-          { prop: "email", label: "关联站点数" },
+          { prop: "count", label: "关联站点数" },
           {
             prop: "createdOn",
             label: "登录时间",
@@ -222,16 +234,18 @@ export default {
               this.handleUpdate(row);
             }
           },
-          // 暂时不做
-          // {
-          //   type: "success",
-          //   textWrapper() {
-          //     return "关联站点";
-          //   },
-          //   methods: row => {
-          //     console.log(row);
-          //   }
-          // },
+          // 不开放隐藏
+          {
+            type: "success",
+            textWrapper() {
+              return "关联站点";
+            },
+            methods: row => {
+              console.log(row);
+              this.itemData = row;
+              this.GetWebsiteShareAdRelationList(row.id);
+            }
+          },
           {
             type: "danger",
             textWrapper() {
@@ -246,6 +260,26 @@ export default {
     };
   },
   methods: {
+    //查询广告Id所有关联的站点列表
+    async GetWebsiteShareAdRelationList(id) {
+      console.log(id, "id");
+      const res = await this.$http.post("/api/GetWebsiteShareAdRelationList", {
+        id: id
+      });
+      if (res.data.result.code === 200) {
+        this.relevanceSiteDialogData = res.data.result.item;
+        this.RelevanceSiteDialogTitle =
+          "已关联站点" + "(" + this.relevanceSiteDialogData.length + ")";
+        this.isRelevanceSiteDialog = true;
+        this.GetWebsiteShareAdPage();
+      } else {
+        this.$common.handlerMsgState({
+          msg: res.data.result.msg,
+          type: "danger"
+        });
+      }
+    },
+
     // 获取公司下的员工列表
     async getStaffList() {
       const res = await this.$http.post("/api/CompanyUserList", {
@@ -289,22 +323,25 @@ export default {
     //新增
     handleAddAdvertising() {
       this.dialogTitle = "新增广告图";
+      this.editImages = [];
+      this.dialogFromData = {
+        imgUrl: "",
+        title: null,
+        defaultLinkUrl: null
+      };
       this.isDialog = true;
     },
     // 选择图片/判断图片大小尺寸
     changeUpload(file, fileList) {
       let that = this;
       const width = 1920;
-      const height = 551;
+      const height = 550;
       let img = new Image();
       const isLt2M = file.size / 1024 / 1024 < 2; // 限制小于2M
       img.src = URL.createObjectURL(file.raw);
       img.onload = function() {
-        // console.log(img.width, img.height, "图片大小");
-        console.log(width, height);
+        console.log(img.width, img.height, "图片大小");
         const valid = img.width === width && img.height === height;
-        console.log(valid, "valid");
-        console.log(isLt2M, "isLt2M");
         if (valid && isLt2M) {
           that.file = file.raw;
           that.editImages = fileList;
@@ -378,7 +415,6 @@ export default {
     },
     // 确定新增广告
     async comfirmAddAdvertising() {
-      console.log(this.dialogFromData);
       if (this.editImages.length != 0) {
         const imgRes = await this.successUpload();
         if (imgRes.data.result.code === 200) {
@@ -423,13 +459,7 @@ export default {
       this.dialogTitle = "编辑广告图";
       this.isDialog = true;
       if (item.imgUrl) this.$set(this, "editImages", [{ url: item.imgUrl }]);
-      // this.dialogFromData = Object.assign({}, item);
-      this.dialogFromData.id = item.id;
-      this.dialogFromData.title = item.title;
-      this.dialogFromData.imgUrl = item.imgUrl;
-      this.dialogFromData.defaultLinkUrl = item.defaultLinkUrl;
-
-      console.log(this.dialogFromData);
+      this.dialogFromData = JSON.parse(JSON.stringify(item));
     },
     // 确定编辑请求
     async comfirmUpdateAdvertising() {
@@ -445,7 +475,6 @@ export default {
           this.$messsage.error("头像上传失败");
           return false;
         }
-        console.log(this.dialogFromData);
         this.$refs.formDataRef.validate(async valid => {
           if (valid) {
             const res = await this.$http.post(
@@ -474,20 +503,32 @@ export default {
       }
     },
     // 删除广告
-    async handelDelete(item) {
-      const res = await this.$http.post("/api/DeleteWebsiteShareAd", item);
-      if (res.data.result.code === 200) {
-        this.GetWebsiteShareAdPage();
-        this.$common.handlerMsgState({
-          msg: "删除成功",
-          type: "success"
+    handelDelete(item) {
+      this.$confirm("确定要删除吗?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(async () => {
+          const res = await this.$http.post("/api/DeleteWebsiteShareAd", item);
+          if (res.data.result.code === 200) {
+            this.GetWebsiteShareAdPage();
+            this.$common.handlerMsgState({
+              msg: "删除成功",
+              type: "success"
+            });
+          } else {
+            this.$common.handlerMsgState({
+              msg: "删除失败",
+              type: "danger"
+            });
+          }
+        })
+        .catch(() => {
+          this.$common.handlerMsgState({
+            msg: "取消删除",
+            type: "warning"
+          });
         });
-      } else {
-        this.$common.handlerMsgState({
-          msg: "删除失败",
-          type: "danger"
-        });
-      }
     },
     // 切換頁容量
     handleSizeChange(pageSize) {

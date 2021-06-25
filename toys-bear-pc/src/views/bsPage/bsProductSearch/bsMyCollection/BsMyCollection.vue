@@ -90,7 +90,12 @@
               全选
             </el-checkbox>
 
-            <el-button class="purchased" size="small" @click="handelrPurchased">
+            <el-button
+              class="purchased"
+              style="width:165px"
+              size="small"
+              @click="handelrPurchased"
+            >
               <i class="selectionCart"></i>
               <span>本页选中一键加购</span>
             </el-button>
@@ -112,11 +117,13 @@
     <div class="footer" v-if="totalCount >= 7">
       <img src="@/assets/images/footerBg.png" alt="" />
     </div>
+    <CartBox></CartBox>
   </div>
 </template>
 
 <script>
 import eventBus from "@/assets/js/common/eventBus";
+import CartBox from "@/components/cartBox.vue";
 import { mapState } from "vuex";
 // import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsColumnComponent";
 import bsColumnComponent from "@/components/bsComponents/bsProductSearchComponent/bsTableItem";
@@ -124,6 +131,7 @@ import bsGridComponent from "@/components/bsComponents/bsProductSearchComponent/
 export default {
   name: "bsMyCollection",
   components: {
+    CartBox,
     bsColumnComponent,
     bsGridComponent
   },
@@ -226,6 +234,7 @@ export default {
         cancelButtonText: "取消"
       })
         .then(async () => {
+          this.$store.commit("updateAppLoading", true);
           const selectProducts = this.$refs.componentRef.$refs.bsTableItemRef
             .$refs.myTableRef.selection;
 
@@ -245,6 +254,7 @@ export default {
           };
           const res = await this.$http.post("/api/AddShoppingCart", fd);
           if (res.data.result.code === 200) {
+            this.$store.commit("updateAppLoading", false);
             this.$store.commit(
               "handlerShoppingCartCount",
               res.data.result.item

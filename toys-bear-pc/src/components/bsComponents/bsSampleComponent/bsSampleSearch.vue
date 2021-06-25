@@ -296,6 +296,12 @@ export default {
           this.clienFormData.decimalPlaces = obj.decimalPlaces;
           this.clienFormData.rejectionMethod = obj.rejectionMethod;
           this.clienFormData.profitCalcMethod = obj.profitCalcMethod;
+          this.clienFormData.formulaId = obj.id;
+          this.clienFormData.profitCalcRule = obj.profitCalcRule;
+          this.clienFormData.totalCost = obj.totalCost;
+          this.clienFormData.miniPrice = obj.miniPrice;
+          this.clienFormData.miniPriceDecimalPlaces =
+            obj.miniPriceDecimalPlaces;
         }
       }
     }
@@ -468,8 +474,8 @@ export default {
     // 获取客户列表
     async getClientList() {
       const fd = {
-        skipCount: this.clientCurrentPage,
-        maxResultCount: this.clientPageSize
+        skipCount: 1,
+        maxResultCount: 9999
       };
       for (const key in fd) {
         if (fd[key] === null || fd[key] === undefined || fd[key] === "") {

@@ -8,69 +8,75 @@
       :rules="addRules"
       class="clientDialogForm"
     >
-      <el-form-item label="公司名称" prop="companyName">
+      <el-form-item label="公司名称：" prop="companyName">
         <el-input
           v-model="myEditClientForm.companyName"
           size="medium"
         ></el-input>
       </el-form-item>
-      <el-form-item label="简称" prop="companyNickName">
+      <el-form-item label="简称：" prop="companyNickName">
         <el-input
           v-model="myEditClientForm.companyNickName"
           size="medium"
         ></el-input>
       </el-form-item>
       <div class="threeBox">
-        <el-form-item label="公司logo" prop="companyLogo">
-          <el-upload
-            action="/api/File/InsertPic"
-            list-type="picture-card"
-            size="medium"
-            ref="upload"
-            :auto-upload="false"
-            :on-change="changeUpload1"
-            :on-preview="handlePictureCardPreview1"
-            :on-remove="handleRemoveImg1"
-            :http-request="successUpload1"
-            :file-list="editImages1"
-            accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>
+        <el-form-item label="公司logo：" prop="companyLogo">
+          <div class="myUpLoad">
+            <el-upload
+              action="/api/File/InsertPic"
+              list-type="picture"
+              size="mini"
+              ref="upload"
+              :auto-upload="false"
+              :on-change="changeUpload1"
+              :on-preview="handlePictureCardPreview1"
+              :on-remove="handleRemoveImg1"
+              :http-request="successUpload1"
+              :file-list="editImages1"
+              accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </div>
         </el-form-item>
-        <el-form-item label="公司背景" prop="bgImg">
-          <el-upload
-            size="medium"
-            action="/api/File/InsertPic"
-            list-type="picture-card"
-            ref="upload2"
-            :auto-upload="false"
-            :on-change="changeUpload2"
-            :on-preview="handlePictureCardPreview2"
-            :on-remove="handleRemoveImg2"
-            :http-request="successUpload2"
-            :file-list="editImages2"
-            accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>
+        <el-form-item label="公司背景：" prop="bgImg">
+          <div class="myUpLoad">
+            <el-upload
+              size="medium"
+              action="/api/File/InsertPic"
+              list-type="picture"
+              ref="upload2"
+              :auto-upload="false"
+              :on-change="changeUpload2"
+              :on-preview="handlePictureCardPreview2"
+              :on-remove="handleRemoveImg2"
+              :http-request="successUpload2"
+              :file-list="editImages2"
+              accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </div>
         </el-form-item>
-        <el-form-item label="营业执照" prop="bgImg">
-          <el-upload
-            action="/api/File/InsertPic"
-            size="medium"
-            list-type="picture-card"
-            ref="upload2"
-            :auto-upload="false"
-            :on-change="changeUpload3"
-            :on-preview="handlePictureCardPreview3"
-            :on-remove="handleRemoveImg3"
-            :http-request="successUpload3"
-            :file-list="editImages3"
-            accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>
+        <el-form-item label="营业执照：" prop="bgImg">
+          <div class="myUpLoad">
+            <el-upload
+              action="/api/File/InsertPic"
+              size="medium"
+              list-type="picture"
+              ref="upload2"
+              :auto-upload="false"
+              :on-change="changeUpload3"
+              :on-preview="handlePictureCardPreview3"
+              :on-remove="handleRemoveImg3"
+              :http-request="successUpload3"
+              :file-list="editImages3"
+              accept=".jpg,.jpeg,.png,.ico,.bmp,.JPG,.JPEG,.PNG,.ICO,.BMP"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </div>
         </el-form-item>
       </div>
       <el-form-item>
@@ -83,10 +89,11 @@
           ></BMapComponent>
         </div>
       </el-form-item>
-      <el-form-item label="联系地址" class="attrsForItem" prop="address">
+      <el-form-item label="联系地址：" class="attrsForItem" prop="address">
         <el-input
           id="suggestId"
           size="medium"
+          :maxlength="300"
           name="address_detail"
           @click.native="isShowAttrsList = false"
           @keyup.native="selectMapAttrs($event, false)"
@@ -108,45 +115,45 @@
         </div>
       </el-form-item>
       <div class="threeBox">
-        <el-form-item label="手机" prop="phoneNumber">
+        <el-form-item label="手机：" prop="phoneNumber">
           <el-input
             v-model.trim="myEditClientForm.phoneNumber"
             size="medium"
           ></el-input>
         </el-form-item>
-        <el-form-item label="联系人" prop="contactsMan">
+        <el-form-item label="联系人：" prop="contactsMan">
           <el-input
             v-model="myEditClientForm.contactsMan"
             size="medium"
           ></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="e_mail">
+        <el-form-item label="邮箱：" prop="e_mail">
           <el-input v-model="myEditClientForm.e_mail" size="medium"></el-input>
         </el-form-item>
       </div>
       <div class="threeBox">
-        <el-form-item label="联系电话" prop="telephoneNumber">
+        <el-form-item label="联系电话：" prop="telephoneNumber">
           <el-input
             v-model="myEditClientForm.telephoneNumber"
             size="medium"
           ></el-input>
         </el-form-item>
 
-        <el-form-item label="传真号码" prop="fax">
+        <el-form-item label="传真号码：" prop="fax">
           <el-input v-model="myEditClientForm.fax" size="medium"></el-input>
         </el-form-item>
-        <el-form-item label="qq" prop="qq">
+        <el-form-item label="qq：" prop="qq">
           <el-input v-model="myEditClientForm.qq" size="medium"></el-input>
         </el-form-item>
       </div>
       <div class="threeBox">
-        <el-form-item label="msn" prop="msn">
+        <el-form-item label="msn：" prop="msn">
           <el-input v-model="myEditClientForm.msn" size="medium"></el-input>
         </el-form-item>
-        <el-form-item label="skype" prop="skype">
+        <el-form-item label="skype：" prop="skype">
           <el-input v-model="myEditClientForm.skype" size="medium"></el-input>
         </el-form-item>
-        <el-form-item label="公司KeyCode" prop="companyKeyCode">
+        <el-form-item label="keyCode：" prop="companyKeyCode">
           <el-input
             type="text"
             size="medium"
@@ -155,7 +162,7 @@
         </el-form-item>
       </div>
       <el-form-item
-        label="公司API"
+        label="公司API："
         prop="api"
         v-if="userInfo.commparnyList[0].companyType == 'Admin'"
       >
@@ -165,7 +172,7 @@
           size="medium"
         ></el-input>
       </el-form-item>
-      <el-form-item label="公司介绍" prop="homepage">
+      <el-form-item label="公司介绍：" prop="homepage">
         <el-input
           type="textarea"
           size="medium"
@@ -175,7 +182,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item
-        label="备注"
+        label="备注："
         prop="remark"
         v-if="userInfo.commparnyList[0].companyType == 'Admin'"
       >
@@ -496,12 +503,22 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
+  .el-form-item {
+    flex: 1;
+    margin: 0;
+  }
+  .myUpLoad {
+    width: 280px;
+  }
   .el-upload {
     width: 100px;
     height: 100px;
   }
-  .el-form-item {
-    margin: 0;
+}
+@{deep} .el-upload-list__item-name {
+  cursor: pointer;
+  &:hover {
+    color: #5c86ba;
   }
 }
 </style>

@@ -11,6 +11,7 @@ import bsCompanyHome from "@/components/bsComponents/bsHomeComponent/bsCompanyHo
 import bsHallHome from "@/components/bsComponents/bsHomeComponent/bsHallHome";
 import bsVendorHome from "@/components/bsComponents/bsHomeComponent/bsVendorHome";
 import bsSuperAdminHome from "@/components/bsComponents/bsHomeComponent/bsSuperAdminHome";
+import eventBus from "@/assets/js/common/eventBus";
 export default {
   name: "bsHome",
   components: {
@@ -32,39 +33,42 @@ export default {
       if (res.data.result.code === 200) {
         const list = res.data.result.item.result;
         let count = 0;
+        let flag = true;
         for (let i = 0; i < list.length; i++) {
           count += list[i].count;
+          flag = false;
           if (list[i].sampleFrom == "HALL") {
             this.$store.commit("updataHallCount", list[i].count);
           }
         }
+        flag && this.$store.commit("updataHallCount", 0);
         this.$store.commit("updataAllCount", count);
       }
     }
   },
-  created() {},
-  mounted() {
-    this.getOrderMessageCount();
+  created() {
     switch (this.userInfo.commparnyList[0].companyType) {
-      //   case "Exhibition": // 展厅首页
-      //     this.isHome = "bsHallHome";
-      //     break;
+      case "Exhibition": // 展厅首页
+        this.isHome = "bsHallHome";
+        break;
       case "Sales": // 公司首页
         this.isHome = "bsCompanyHome";
         break;
-      //   case "bsVendorHome": // 厂商首页
-      //     this.isHome = "bsVendorHome";
-      //     break;
-      case "Exhibition": // 超级管理员
+      case "Supplier": // 厂商首页
+        this.isHome = "bsVendorHome";
+        break;
+      case "Admin": // 超级管理员
         this.isHome = "bsSuperAdminHome";
         break;
-      default:
-        this.getOrgCompany();
-        this.getGetSalesOrderDataStatistics();
-        this.getGetSalesHotSample();
     }
+  },
+  mounted() {
+    this.getOrderMessageCount();
     console.log(this.$cookies.get("validityPeriod"));
     this.$cookies.remove("validityPeriod");
+    eventBus.$on("resetTotalCount", () => {
+      this.getOrderMessageCount();
+    });
   },
   computed: {
     ...mapState(["userInfo", "allCount"])

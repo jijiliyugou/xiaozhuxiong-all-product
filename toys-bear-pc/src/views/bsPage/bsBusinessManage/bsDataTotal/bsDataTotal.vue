@@ -3,7 +3,7 @@
  * @Author: gaojiahao
  * @Date: 2021-05-14 14:44:05
  * @FilePath: \projectd:\LittleBearPC\toys-bear-pc\src\views\bsPage\bsBusinessManage\bsDataTotal\bsDataTotal.vue
- * @LastEditTime: 2021-05-15 12:38:13
+ * @LastEditTime: 2021-06-21 18:36:41
  * @LastEditors: sueRimn
  * @Descripttion: 
  * @version: 1.0.0
@@ -38,16 +38,22 @@
     </div>
     <VisitTotal v-if="isDiyu == 0"> </VisitTotal>
     <SampleTotal v-if="isDiyu == 1"></SampleTotal>
+    <SampleList v-if="isDiyu == 2"></SampleList>
+    <FllowMe v-if="isDiyu == 3"></FllowMe>
   </div>
 </template>
 <script>
 import VisitTotal from "@/views/bsPage/bsBusinessManage/bsDataTotal/bsDataTotalComponent/visitTotal.vue";
 import SampleTotal from "@/views/bsPage/bsBusinessManage/bsDataTotal/bsDataTotalComponent/sampleTotal.vue";
+import SampleList from "@/views/bsPage/bsBusinessManage/bsDataTotal/bsDataTotalComponent/sampleList.vue";
+import FllowMe from "@/views/bsPage/bsBusinessManage/bsDataTotal/bsDataTotalComponent/fllowMe.vue";
 export default {
   name: "bsDataTotal",
   components: {
     VisitTotal,
-    SampleTotal
+    SampleTotal,
+    SampleList,
+    FllowMe
   },
   data() {
     return {

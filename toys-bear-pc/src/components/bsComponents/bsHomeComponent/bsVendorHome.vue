@@ -51,7 +51,9 @@
             </div>
             <div class="conText">
               <div class="titleName">{{ item.title }}</div>
-              <div class="text">{{ item.content }}</div>
+              <div class="text">
+                {{ item.content }}<span>{{ item.count }}</span>
+              </div>
             </div>
           </div>
           <div class="block"></div>
@@ -69,22 +71,60 @@
           <span>来访统计</span>
         </div>
         <div class="totalBox">
-          <span>择样产品总数</span>
-          <p class="total">{{ statisticsData.hallOrderTotal }}</p>
+          <span>来访公司总数</span>
+          <p class="total">{{ statisticsData.visitingTotalCount }}</p>
           <p
             :class="{
               today: true,
-              active: statisticsData.hallOrderTotalToday > 0
+              active: statisticsData.visitingTotalCountTotal > 0
             }"
           >
             <img
-              :src="statisticsData.hallOrderTotalToday > 0 ? up_t : up_f"
+              :src="statisticsData.visitingTotalCountTotal > 0 ? up_t : up_f"
               alt=""
             />
-            今日:{{ statisticsData.hallOrderTotalToday }}
+            今日:{{ statisticsData.visitingTotalCountTotal }}
           </p>
         </div>
-        <Table :table="visitingTableData"></Table>
+        <el-table
+          :data="visitingTableData"
+          height="390"
+          style="width: 100%;font-sise: 12px"
+          :header-row-style="{ height: '40px', padding: '0' }"
+          :header-cell-style="{ backgroundColor: '#f9fafc', padding: '0' }"
+        >
+          <el-table-column prop="salseName" label="访客" width="180">
+            <template slot-scope="scope">
+              <div class="visitingSalse">
+                <span class="salseName">{{ scope.row.salseName }}</span>
+                <div class="bto">
+                  <div class="left">所在展厅:</div>
+                  <div class="right">{{ scope.row.hallName }}</div>
+                </div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="checkType"
+            label="来源"
+            width="70"
+            align="center"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="fa_no"
+            label="查看货号"
+            width="80"
+            align="center"
+          >
+          </el-table-column>
+          <el-table-column prop="createdOn" label="查看时间" align="center">
+            <template slot-scope="scope">
+              <span> {{ scope.row.createdOn.replace(/AM/, " ") }} </span>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- <Table :table="visitingTableData"></Table> -->
       </div>
       <div class="sample">
         <div class="title">
@@ -93,18 +133,18 @@
         </div>
         <div class="totalBox">
           <span>择样产品总数</span>
-          <p class="total">{{ statisticsData.hallOrderTotal }}</p>
+          <p class="total">{{ statisticsData.HistoryPageV2TotalCount }}</p>
           <p
             :class="{
               today: true,
-              active: statisticsData.hallOrderTotalToday > 0
+              active: statisticsData.HistoryPageV2Total > 0
             }"
           >
             <img
-              :src="statisticsData.hallOrderTotalToday > 0 ? up_t : up_f"
+              :src="statisticsData.HistoryPageV2Total > 0 ? up_t : up_f"
               alt=""
             />
-            今日:{{ statisticsData.hallOrderTotalToday }}
+            今日:{{ statisticsData.HistoryPageV2Total }}
           </p>
         </div>
         <Table :table="sampleTableData"></Table>
@@ -115,19 +155,19 @@
           <span>择样排行</span>
         </div>
         <div class="totalBox">
-          <span>择样产品总数</span>
-          <p class="total">{{ statisticsData.hallOrderTotal }}</p>
+          <span>择样总数</span>
+          <p class="total">{{ statisticsData.RankingV2TotalCount }}</p>
           <p
             :class="{
               today: true,
-              active: statisticsData.hallOrderTotalToday > 0
+              active: statisticsData.RankingV2Total > 0
             }"
           >
             <img
-              :src="statisticsData.hallOrderTotalToday > 0 ? up_t : up_f"
+              :src="statisticsData.RankingV2Total > 0 ? up_t : up_f"
               alt=""
             />
-            今日:{{ statisticsData.hallOrderTotalToday }}
+            今日:{{ statisticsData.RankingV2Total }}
           </p>
         </div>
         <Table :table="rankingTableData"></Table>
@@ -148,120 +188,103 @@ export default {
       up_f: require("@/assets/images/up_f.png"),
       up_t: require("@/assets/images/up_t.png"),
       statisticsData: {
-        hallOrderTotal: "", //展厅业务
-        hallOrderTotalToday: "", //展厅今日
-        sampleOfferTotal: "", //找样报价
-        sampleOfferTotalToday: "", //找样报价今日
-        purchaseTotal: "", //采购订单
-        purchaseTotalToday: "", //采购今日
-        shareTotal: "", //客户订单
-        shareTotalToday: "" //客户订单今日
+        visitingTotalCount: 0, //来访公司总数
+        visitingTotalCountTotal: 0, //今日来访公司数量
+        HistoryPageV2TotalCount: 0, //择样产品总数
+        HistoryPageV2Total: 0, //今日择样产品数量
+        RankingV2TotalCount: 0, //择样公司排行总数
+        RankingV2Total: 0 //今日择样公司排行数
+      },
+      productCount: {
+        videoCount: 0, //视频数
+        certificateCount: 0, //证书数
+        threeDCount: 0, //3D产品
+        priceCount: 0 //产品价格
       },
       labelList: [
         {
-          title: "找玩具",
-          content: "产品100W+为您存在",
-          icon: require("@/assets/images/zhaowanju.png")
+          title: "产品视频",
+          content: "产品视频数：",
+          count: 0,
+          icon: require("@/assets/images/ProductVideo.png")
         },
         {
-          title: "按图找样",
-          content: "智能对比，轻松找样",
-          icon: require("@/assets/images/antuzhaoyang.png")
-        },
-        {
-          title: "现货区",
-          content: "现货在手，说有就有",
+          title: "3D产品",
+          content: "3D产品数：",
+          count: 0,
           icon: require("@/assets/images/xianhuoqu.png")
         },
         {
-          title: "VIP区",
-          content: "品牌厂商不容错过",
-          icon: require("@/assets/images/vipqu.png")
+          title: "证书管理",
+          content: "证书管理数：",
+          count: 0,
+          icon: require("@/assets/images/CertificateManage.png")
         },
         {
-          title: "玩具圈",
-          content: "查看发布玩具信息",
-          icon: require("@/assets/images/wanjuquan.png")
+          title: "产品价格",
+          content: "产品价格数：",
+          count: 0,
+          icon: require("@/assets/images/ProductPrice.png")
         }
       ],
       gongzuoList: [
         {
+          title: "我的产品",
+          icon: require("@/assets/images/bsMyProductIcon.png")
+        },
+        {
           title: "展厅业务",
           icon: require("@/assets/images/zhantingyewu.png")
         },
-        {
-          title: "找样报价",
-          icon: require("@/assets/images/zhaoyangbaojia.png")
-        },
+
         {
           title: "采购订单",
           icon: require("@/assets/images/caigoudingdan.png")
         },
         {
-          title: "浏览足迹",
-          icon: require("@/assets/images/liulanzuji.png")
+          title: "我的店铺",
+          icon: require("@/assets/images/bsMyShopIcon.png")
         },
         {
-          title: "站点分享",
-          icon: require("@/assets/images/zhandianfenxiang.png")
-        },
-        {
-          title: "客户订单",
-          icon: require("@/assets/images/kehudingdan.png")
-        },
-        {
-          title: "我的消息",
-          icon: require("@/assets/images/wodexiaoxi.png")
+          title: "产品活动",
+          icon: require("@/assets/images/bsProductActivityIcon.png")
         }
       ],
-      visitingTableData: {
-        data: [
-          {
-            name: "成名",
-            url:
-              "http://img.toysbear.com/ProductImgCutting//HS0016308/HS0000005/P160235290538512_HS0016308_Photo01YS0549242.jpg"
-          }
-        ],
-        selection: false,
-        showLoading: false,
-        height: "390",
-        columns: [
-          {
-            prop: "name",
-            label: "访客",
-            width: 150,
-            productInfo: true,
-            cartInfoIcon: true,
-            color: "red",
-            // elImage: (row) => {
-            //   return row.url;
-            // },
-            nameHtml: row => {
-              console.log(row);
-              return 2222;
-            },
-            fcatoryNameHtml: row => {
-              console.log(row);
-              return 6565654;
-            }
-          },
-          { prop: "teacherName", label: "来源" },
-          { prop: "start", label: "查看厂商" },
-          { prop: "end", label: "查看货号" },
-          { prop: "commitTimes", label: "查看时间" }
-        ]
-      },
+      visitingTableData: [],
       sampleTableData: {
         data: [],
         selection: false,
         showLoading: false,
         height: "390",
         columns: [
-          { prop: "name", label: "产品信息" },
-
-          { prop: "teacherName", label: "出厂货号" },
-          { prop: "start", label: "公司" },
-          { prop: "end", label: "时间" }
+          {
+            prop: "hallName",
+            label: "产品信息",
+            width: 230,
+            color: "#3368a9",
+            align: "center",
+            // isHiden: true,
+            infoBox: true,
+            productInfo: true,
+            elImage: row => {
+              return row.viewImage;
+            },
+            nameHtml: row => {
+              return row.productName;
+            },
+            fcatoryNameHtml: row => {
+              return row.hallName;
+            }
+          },
+          { prop: "fa_no", label: "出厂货号", width: 80 },
+          { prop: "salseName", label: "公司" },
+          {
+            prop: "createdOn",
+            label: "时间",
+            render: row => {
+              return row.createdOn.replace(/AM/, " ");
+            }
+          }
         ]
       },
       rankingTableData: {
@@ -270,20 +293,107 @@ export default {
         showLoading: false,
         height: "390",
         columns: [
-          { prop: "name", label: "展厅" },
-          { prop: "teacherName", label: "公司" },
-          { prop: "start", label: "出厂货号" },
-          { prop: "end", label: "择样数" }
+          { prop: "hallName", label: "展厅" },
+          { prop: "fa_no", label: "出厂货号" },
+          { prop: "sumfa_no", label: "择样数" }
         ]
       }
     };
   },
-  created() {},
-  mounted() {},
+  created() {
+    this.GetTodayCompanyVisitorsCount(1);
+    this.GetTodayCompanyVisitorsCount(2);
+    this.GetTodayCompanyVisitorsCount(3);
+    this.GetMyProductCount();
+    this.ProductRankingV2();
+  },
+  mounted() {
+    this.GetCompanyPageByVisitorsAll(6);
+    this.GetCompanyPageByVisitorsAll(-1);
+  },
   methods: {
     //跳转页面路由
     handleGoToUrl(title) {
       this.$common.goToUrl(title);
+    },
+    // 厂商首页-我的产品count值
+    async GetMyProductCount() {
+      const res = await this.$http.post("/api/GetMyProductCount");
+      if (res.data.result.code === 200) {
+        // this.productCount = res.data.result.item;
+        for (let i = 0; i < this.labelList.length; i++) {
+          switch (this.labelList[i].title) {
+            case "产品视频":
+              this.labelList[i].count = res.data.result.item.videoCount;
+              break;
+            case "3D产品":
+              this.labelList[i].count = res.data.result.item.threeDCount;
+              break;
+            case "证书管理":
+              this.labelList[i].count = res.data.result.item.certificateCount;
+              break;
+            case "产品价格":
+              this.labelList[i].count = res.data.result.item.priceCount;
+              break;
+          }
+        }
+      }
+    },
+    // 来访统计-2，择样统计type=6
+    async GetCompanyPageByVisitorsAll(type) {
+      const fd = {
+        skipCount: 1,
+        maxResultCount: 10,
+        visitorsType: type
+      };
+      const res = await this.$http.post("/api/GetCompanyPageByVisitorsAll", fd);
+      if (res.data.result.code === 200) {
+        switch (type) {
+          case -1:
+            this.visitingTableData = res.data.result.item.items;
+            this.statisticsData.visitingTotalCount =
+              res.data.result.item.totalCount;
+            break;
+          case 6:
+            this.sampleTableData.data = res.data.result.item.items;
+            this.statisticsData.HistoryPageV2TotalCount =
+              res.data.result.item.totalCount;
+            break;
+        }
+      }
+    },
+    //择样排行
+    async ProductRankingV2() {
+      const fd = {
+        skipCount: 1,
+        maxResultCount: 10
+      };
+      const res = await this.$http.post("/api/ProductRankingV2", fd);
+      if (res.data.result.code === 200) {
+        this.rankingTableData.data = res.data.result.item.items;
+        this.statisticsData.RankingV2TotalCount =
+          res.data.result.item.totalCount;
+      }
+    },
+    // 厂商角色-今日(来访公司,择样产品,公司排行)数量
+    // 1-今日来访公司数量；2-今日择样产品数量 ；3-今日择样公司排行数
+    async GetTodayCompanyVisitorsCount(type) {
+      const res = await this.$http.post("/api/GetTodayCompanyVisitorsCount", {
+        sumType: type
+      });
+      if (res.data.result.code === 200) {
+        switch (type) {
+          case 1:
+            this.statisticsData.visitingTotalCountTotal = res.data.result.item;
+            break;
+          case 2:
+            this.statisticsData.HistoryPageV2Total = res.data.result.item;
+            break;
+          case 3:
+            this.statisticsData.RankingV2Total = res.data.result.item;
+            break;
+        }
+      }
     }
   }
 };
@@ -425,7 +535,7 @@ export default {
           flex: 1;
           height: 102px;
           background-color: #fff;
-          width: 15.7%;
+          width: 20%;
           // min-width: 261px;
           border-radius: 4px;
           padding: 0 15px;
@@ -454,6 +564,9 @@ export default {
               overflow: hidden; /*超出部分隐藏*/
               white-space: nowrap; /*不换行*/
               text-overflow: ellipsis; /*超出部分文字以...显示*/
+              span {
+                color: #333333;
+              }
             }
           }
           .imgBox {
@@ -495,6 +608,18 @@ export default {
     .visiting {
       width: 540px;
       height: 520px;
+    }
+    .visitingSalse {
+      overflow: hidden; /*超出部分隐藏*/
+      white-space: nowrap; /*不换行*/
+      text-overflow: ellipsis; /*超出部分文字以...显示*/
+      .salseName {
+        color: #3368a9;
+      }
+      .bto {
+        display: flex;
+        color: #ccc;
+      }
     }
     .sample {
       width: 640px;

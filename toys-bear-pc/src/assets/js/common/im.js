@@ -16,7 +16,8 @@ switch (env) {
 }
 class IM {
   constructor(appkey) {
-    this.RongIMClient = RongIMLib.init({ appkey: appkey || id });
+    !this.RongIMClient &&
+      (this.RongIMClient = RongIMLib.init({ appkey: appkey || id }));
   }
 }
 export default IM;

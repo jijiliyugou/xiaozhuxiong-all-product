@@ -124,12 +124,11 @@ export default {
         isIndex: true,
         columns: [
           {
-            prop: "name",
+            prop: "pr_na",
             label: "产品",
-            width: 300,
+            width: 280,
             color: "#3368a9",
             align: "left",
-            isHiden: true,
             infoBox: true,
             productInfo: true,
             cartInfoIcon: true,
@@ -146,6 +145,7 @@ export default {
           {
             prop: "supplierPhone",
             label: "联系厂商",
+            width: 100,
             render: row => {
               switch (row.supplierTelephoneNumber) {
                 case "":
@@ -162,7 +162,7 @@ export default {
                 case undefined:
                 case "null":
                 case "undefined":
-                  row.supplierTelephoneNumber = "";
+                  row.supplierPhone = "";
                   break;
               }
               return row.supplierPhone + "<br>" + row.supplierTelephoneNumber;
@@ -173,12 +173,11 @@ export default {
             isHiden: true,
             label: "资料来源"
           },
-          { prop: "fa_no", label: "出厂货号", isHiden: true },
-          { prop: "ch_pa", label: "包装", isHiden: true, width: 90 },
+          { prop: "fa_no", label: "出厂货号", isHiden: true, width: 60 },
+          { prop: "ch_pa", label: "包装", isHiden: true, minWidth: 70 },
           {
             prop: "pr_le",
-
-            isHiden: true,
+            minWidth: 100,
             renderHeard: () => {
               return "产品规格</br>(cm)";
             },
@@ -188,8 +187,7 @@ export default {
           },
           {
             prop: "pr_le",
-
-            isHiden: true,
+            minWidth: 100,
             renderHeard: () => {
               return "包装规格</br>(cm)";
             },
@@ -199,8 +197,7 @@ export default {
           },
           {
             prop: "pr_le",
-
-            isHiden: true,
+            minWidth: 100,
             renderHeard: () => {
               return "外箱规格</br>(cm)";
             },
@@ -213,18 +210,18 @@ export default {
             renderHeard: () => {
               return "体积/材积</br>(cbm)/(cuft)";
             },
-            isHiden: true,
-            width: 150,
+            minWidth: 100,
             render: row => {
               return row.bulk_stere + row.bulk_feet;
             }
           },
           {
             prop: "gr_we",
+            minWidth: 90,
             renderHeard: () => {
               return "毛重/净重</br>(kg)";
             },
-            isHiden: true,
+
             render: row => {
               return row.gr_we + "/" + row.ne_we;
             }
@@ -234,7 +231,7 @@ export default {
             renderHeard: () => {
               return "装箱量</br>(pcs)";
             },
-            width: 90,
+
             isHiden: true,
             render: row => {
               return row.in_en + "/" + row.ou_lo;
@@ -243,7 +240,7 @@ export default {
           {
             prop: "ou_lo",
             label: "数量",
-            width: 90,
+            width: 50,
             isHiden: true,
             render: row => {
               return row.ou_lo;
@@ -253,7 +250,7 @@ export default {
             prop: "fa_pr",
             label: "参考单价",
             isHiden: true,
-            width: 80,
+            minWidth: 80,
             color: "red",
             render: row => {
               return row.cu_de + " " + row.fa_pr;
@@ -263,7 +260,7 @@ export default {
             prop: "ha_in_qu",
             label: "报出价",
             isHiden: true,
-            width: 80,
+            minWidth: 100,
             color: "red",
             render: row => {
               return row.cu_de + " " + row.ha_in_qu;
@@ -476,91 +473,6 @@ export default {
         .title {
           font-weight: 700;
           border: none;
-        }
-      }
-    }
-    @{deep} .el-table {
-      .el-table__header-wrapper .el-checkbox {
-        display: none;
-      }
-      .cell {
-        white-space: nowrap;
-        width: fit-content;
-      }
-      font-size: 12px;
-      .inputNumber {
-        width: 50px;
-        outline: none;
-        -moz-appearance: textfield;
-        text-align: center;
-        color: #ff3e3e;
-        &::-webkit-outer-spin-button,
-        &::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-          appearance: none;
-          margin: 0;
-        }
-      }
-      .price {
-        color: #ff3e3e;
-      }
-      .tableTotalNumber {
-        color: #ff3e3e;
-        font-size: 14px;
-        margin-top: 5px;
-      }
-      .imgBox {
-        text-align: left;
-        display: flex;
-        font-size: 14px;
-        cursor: pointer;
-        .productName {
-          width: 170px;
-          height: 60px;
-          margin-left: 15px;
-          .name,
-          .factory {
-            width: 170px;
-            max-width: 170px;
-            overflow: hidden; /*超出部分隐藏*/
-            white-space: nowrap; /*不换行*/
-            text-overflow: ellipsis; /*超出部分文字以...显示*/
-          }
-          .factory {
-            color: #3368a9;
-            display: flex;
-            align-items: center;
-            .fcatoryName {
-              width: 100px;
-              max-width: 100px;
-              overflow: hidden; /*超出部分隐藏*/
-              white-space: nowrap; /*不换行*/
-              text-overflow: ellipsis; /*超出部分文字以...显示*/
-            }
-            .icons {
-              display: flex;
-              .cartPhoneIcon,
-              .cartInfoIcon {
-                width: 20px;
-                height: 20px;
-                margin-left: 15px;
-                cursor: pointer;
-              }
-              .cartPhoneIcon {
-                background: url("~@/assets/images/cartPhoneIcon.png") no-repeat
-                  center;
-                background-size: contain;
-              }
-              .cartInfoIcon {
-                background: url("~@/assets/images/cartInfoIcon.png") no-repeat
-                  center;
-                background-size: contain;
-              }
-            }
-          }
-          .name {
-            margin-top: 8px;
-          }
         }
       }
     }

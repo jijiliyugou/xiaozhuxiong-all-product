@@ -278,7 +278,7 @@ export default {
             methods: row => {
               this.exportOrder(row);
             },
-            icon: "el-icon-download"
+            icon2: "el-icon-download"
           },
           {
             type: "warning",
@@ -293,7 +293,7 @@ export default {
               this.copyShare(row);
             },
             class: "copy",
-            icon: "el-icon-s-promotion"
+            icon2: "el-icon-s-promotion"
           }
         ]
       },

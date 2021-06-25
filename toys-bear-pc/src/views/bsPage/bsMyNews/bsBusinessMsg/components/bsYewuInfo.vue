@@ -133,7 +133,7 @@
               <p class="left_item">
                 <span class="title">时间：</span>
                 <span>{{
-                  item.createdOn && item.createdOn.replace(/T/, " ")
+                  item.happenDate && item.happenDate.replace(/T/, " ")
                 }}</span>
               </p>
               <p class="left_item">
@@ -345,6 +345,9 @@ export default {
     eventBus.$on("resetHallList", () => {
       this.getERPOrderListByPage();
     });
+  },
+  beforeDestroy() {
+    eventBus.$off("resetHallList");
   },
   computed: {
     ...mapState(["userInfo"])
